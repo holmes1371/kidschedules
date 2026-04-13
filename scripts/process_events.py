@@ -271,7 +271,7 @@ def render_html(today: dt.date,
 
     # Empty state
     if not weeks_html and not undated_html:
-        weeks_html = """\
+        weeks_html = f"""\
     <section class="empty-state">
       <p>No upcoming kids' events were found in the last {lookback_days} days of email.</p>
     </section>"""

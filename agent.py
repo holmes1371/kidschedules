@@ -156,10 +156,10 @@ def _call_with_retry(
                 messages=[{"role": "user", "content": user_message}],
             )
         except (
-            anthropic.OverloadedError,
-            anthropic.RateLimitError,
-            anthropic.InternalServerError,
+            anthropic.RateLimitError,       # 429
+            anthropic.InternalServerError,  # 500
             anthropic.APIConnectionError,
+            anthropic.APITimeoutError,
         ) as e:
             delay = RETRY_BASE_DELAY * (2 ** (attempt - 1))
             if attempt == MAX_RETRIES:
@@ -168,6 +168,18 @@ def _call_with_retry(
             print(f"\n    {batch_label} attempt {attempt} failed "
                   f"({type(e).__name__}), retrying in {delay}s ...")
             time.sleep(delay)
+        except anthropic.APIStatusError as e:
+            # Retry on 529 (overloaded), but not on 400/401/403 etc.
+            if e.status_code == 529:
+                delay = RETRY_BASE_DELAY * (2 ** (attempt - 1))
+                if attempt == MAX_RETRIES:
+                    print(f"FAILED after {MAX_RETRIES} attempts: {e}")
+                    raise
+                print(f"\n    {batch_label} attempt {attempt} failed "
+                      f"(overloaded 529), retrying in {delay}s ...")
+                time.sleep(delay)
+            else:
+                raise
     # Unreachable, but keeps type checkers happy
     raise RuntimeError("Exhausted retries")
 
@@ -325,14 +337,4 @@ def review_stripped_messages(
         print(f"  Audit parse error: {e}")
         return {"decisions": [], "senders_to_unblock": []}
 
-    usage = response.usage
-    print(f"  Audit token usage: {usage.input_tokens} input, "
-          f"{usage.output_tokens} output")
-
-    unblock = result.get("senders_to_unblock", [])
-    if unblock:
-        print(f"  Senders to unblock: {unblock}")
-    else:
-        print("  All stripped messages correctly filtered.")
-
-    return result
+    usage = re
