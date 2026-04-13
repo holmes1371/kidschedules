@@ -54,6 +54,7 @@ notifications.acorns.com
 jobalerts-noreply@linkedin.com
 chase.com
 shareplus.com
+inhousecounsel.com
 
 # Legal industry
 lexology.com
