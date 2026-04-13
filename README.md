@@ -1,8 +1,8 @@
-# Kids Schedule — GitHub Actions
+# Kids Schedule — GitHub Actions + GitHub Pages
 
-Searches Ellen's Gmail for upcoming kids' activities (school events, appointments, sports, academic deadlines) and saves a consolidated schedule as a Gmail draft every Monday morning.
+Searches Ellen's Gmail for upcoming kids' activities (school events, appointments, sports, academic deadlines) and publishes a clean schedule to a GitHub Pages website every Monday morning.
 
-Runs on GitHub Actions — no computer needs to be on.
+No computer needs to be on. Just bookmark the page.
 
 ## Setup
 
@@ -43,25 +43,31 @@ In your GitHub repo → Settings → Secrets and variables → Actions, add:
 | `GMAIL_REFRESH_TOKEN` | From step 2 output |
 | `ANTHROPIC_API_KEY` | Your Anthropic API key |
 
-### 4. Push and go
+### 4. Enable GitHub Pages
 
-Push this repo to GitHub. The workflow runs automatically every Monday at 6:30 AM Eastern, or you can trigger it manually from the Actions tab.
+In your repo → Settings → Pages:
+- Source: **Deploy from a branch**
+- Branch: **main**, folder: **/docs**
+- Save
+
+### 5. Push and go
+
+Push this repo to GitHub. The workflow runs automatically every Monday at 6:30 AM Eastern. You can also trigger it manually from the Actions tab.
+
+Your schedule will be live at `https://<your-username>.github.io/kids-schedule-github/`
 
 ## Local development
 
 ```bash
-# Set env vars
 export GMAIL_CLIENT_ID="..."
 export GMAIL_CLIENT_SECRET="..."
 export GMAIL_REFRESH_TOKEN="..."
 export ANTHROPIC_API_KEY="..."
 
-# Install
 pip install -r requirements.txt
 
-# Run
 python main.py              # full run
-python main.py --dry-run    # skip creating the draft
+python main.py --dry-run    # skip publishing
 python main.py --lookback-days 90  # wider search window
 ```
 
@@ -73,14 +79,17 @@ gmail_client.py          — Gmail API wrapper (replaces Cowork MCP connector)
 agent.py                 — Anthropic API for event extraction (judgment step)
 scripts/
   build_queries.py       — date math + Gmail query construction (deterministic)
-  process_events.py      — filter, dedupe, sort, render draft body (deterministic)
+  process_events.py      — filter, dedupe, sort, render HTML + text (deterministic)
 blocklist.txt            — sender domains excluded from searches
+docs/
+  index.html             — generated schedule page (served by GitHub Pages)
 .github/workflows/
   weekly-schedule.yml    — GitHub Actions cron workflow
 ```
 
 ## Cost
 
-- **Gmail API**: free (well within quota)
-- **GitHub Actions**: free tier covers this easily (~2 min/week)
-- **Anthropic API**: ~$0.20–0.50/run with Sonnet, ~$1–2/month at weekly cadence
+- **Gmail API**: free
+- **GitHub Actions**: free tier (~2 min/week)
+- **GitHub Pages**: free
+- **Anthropic API**: ~$0.20–0.50/run with Sonnet, ~$1–2/month

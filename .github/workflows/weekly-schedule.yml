@@ -13,10 +13,13 @@ on:
         required: false
         default: "60"
       dry_run:
-        description: "Dry run (skip Gmail draft)"
+        description: "Dry run (skip publishing)"
         required: false
         type: boolean
         default: false
+
+permissions:
+  contents: write
 
 jobs:
   run-schedule:
@@ -51,3 +54,16 @@ jobs:
             ARGS="$ARGS --dry-run"
           fi
           python main.py $ARGS
+
+      - name: Commit and push updated page
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update kids schedule — $(date -u +%Y-%m-%d)"
+            git push
+          fi
