@@ -435,6 +435,7 @@ def render_html(today: dt.date,
   </div>
   <div class="footer">
     Auto-generated from Gmail &middot; Updated every Monday
+    <br><a href="archive.html" style="color:var(--accent);">View past schedules</a>
   </div>
 </body>
 </html>

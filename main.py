@@ -193,24 +193,36 @@ def step4_process_events(
 
 
 def step5_publish(html: str, meta: dict, dry_run: bool) -> None:
-    """Write index.html to docs/ for GitHub Pages."""
+    """Write index.html + dated archive copy to docs/ for GitHub Pages."""
     print("\n" + "=" * 60)
     print("STEP 5: Publishing to GitHub Pages")
     print("=" * 60)
 
+    today_iso = meta["today_iso"]  # e.g. "2026-04-13"
+
     if dry_run:
         print("  DRY RUN — skipping publish")
-        print(f"  Would write {len(html)} chars to docs/index.html")
+        print(f"  Would write docs/index.html + docs/{today_iso}.html")
         return
 
     os.makedirs(PAGES_OUTPUT_DIR, exist_ok=True)
+
+    # Write the current schedule as index.html
     index_path = os.path.join(PAGES_OUTPUT_DIR, "index.html")
     with open(index_path, "w", encoding="utf-8") as f:
         f.write(html)
     print(f"  Wrote docs/index.html ({len(html)} chars)")
 
-    # Also write a .nojekyll file so GitHub Pages doesn't try
-    # to process the HTML through Jekyll
+    # Write a dated archive copy (e.g. docs/2026-04-13.html)
+    archive_path = os.path.join(PAGES_OUTPUT_DIR, f"{today_iso}.html")
+    with open(archive_path, "w", encoding="utf-8") as f:
+        f.write(html)
+    print(f"  Wrote docs/{today_iso}.html (archive copy)")
+
+    # Rebuild the archive index page
+    run_script("build_archive_index.py", ["--docs-dir", PAGES_OUTPUT_DIR])
+
+    # .nojekyll so GitHub Pages serves raw HTML
     nojekyll = os.path.join(PAGES_OUTPUT_DIR, ".nojekyll")
     if not os.path.exists(nojekyll):
         with open(nojekyll, "w") as f:
