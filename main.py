@@ -30,6 +30,7 @@ from agent import extract_events, review_stripped_messages
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 PAGES_OUTPUT_DIR = os.path.join(PROJECT_ROOT, "docs")
+FUTURE_EVENTS_PATH = os.path.join(PROJECT_ROOT, "future_events.json")
 
 
 def run_script(script_name: str, args: list[str] | None = None) -> str:
@@ -238,23 +239,55 @@ def step3_extract_events(
     return events
 
 
+def _load_event_bank() -> list[dict[str, Any]]:
+    """Load the persistent far-future event bank."""
+    if not os.path.exists(FUTURE_EVENTS_PATH):
+        return []
+    try:
+        with open(FUTURE_EVENTS_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        if isinstance(data, list):
+            return data
+    except (json.JSONDecodeError, OSError):
+        pass
+    return []
+
+
+def _save_event_bank(events: list[dict[str, Any]]) -> None:
+    """Save far-future events to the persistent bank."""
+    with open(FUTURE_EVENTS_PATH, "w", encoding="utf-8") as f:
+        json.dump(events, f, indent=2)
+    print(f"  Saved {len(events)} event(s) to future_events.json")
+
+
 def step4_process_events(
     candidates: list[dict[str, Any]],
 ) -> tuple[str, str, dict]:
-    """Run process_events.py and return (html, body_text, meta)."""
+    """Run process_events.py and return (html, body_text, meta).
+
+    Merges in any previously banked far-future events, then saves
+    newly banked events back to future_events.json.
+    """
     print("\n" + "=" * 60)
     print("STEP 4: Processing events (filter, dedupe, sort, render)")
     print("=" * 60)
 
+    # Load previously banked far-future events and merge them in
+    banked_prev = _load_event_bank()
+    if banked_prev:
+        print(f"  Loaded {len(banked_prev)} event(s) from future_events.json")
+    all_candidates = candidates + banked_prev
+
     with tempfile.NamedTemporaryFile(
         mode="w", suffix=".json", delete=False
     ) as f:
-        json.dump(candidates, f)
+        json.dump(all_candidates, f)
         candidates_path = f.name
 
     body_path = candidates_path.replace(".json", "-body.txt")
     html_path = candidates_path.replace(".json", "-page.html")
     meta_path = candidates_path.replace(".json", "-meta.json")
+    banked_path = candidates_path.replace(".json", "-banked.json")
 
     try:
         run_script(
@@ -264,6 +297,8 @@ def step4_process_events(
                 "--body-out", body_path,
                 "--html-out", html_path,
                 "--meta-out", meta_path,
+                "--banked-out", banked_path,
+                "--display-window-days", "60",
             ],
         )
 
@@ -274,9 +309,17 @@ def step4_process_events(
         with open(meta_path, "r", encoding="utf-8") as f:
             meta = json.load(f)
 
+        # Save newly banked far-future events
+        banked_new = []
+        if os.path.exists(banked_path):
+            with open(banked_path, "r", encoding="utf-8") as f:
+                banked_new = json.load(f)
+        _save_event_bank(banked_new)
+
         counts = meta["counts"]
         print(f"  Candidates in: {counts['candidates_in']}")
-        print(f"  Future dated: {counts['future_dated']}")
+        print(f"  Displayed (next 60 days): {counts['future_dated']}")
+        print(f"  Banked (beyond 60 days): {counts.get('banked_far_future', 0)}")
         print(f"  Undated: {counts['undated']}")
         print(f"  Dropped (past): {counts['dropped_past']}")
         if meta["warnings"]:
@@ -285,7 +328,7 @@ def step4_process_events(
 
         return html, body, meta
     finally:
-        for p in [candidates_path, body_path, html_path, meta_path]:
+        for p in [candidates_path, body_path, html_path, meta_path, banked_path]:
             try:
                 os.unlink(p)
             except OSError:

@@ -50,13 +50,21 @@ def load_candidates(path: str) -> list[dict[str, Any]]:
     return data
 
 
-def classify(events: list[dict[str, Any]], cutoff: dt.date
+def classify(events: list[dict[str, Any]], cutoff: dt.date,
+             horizon: dt.date | None = None,
              ) -> tuple[list[dict[str, Any]], list[dict[str, Any]],
-                        list[dict[str, Any]], list[str]]:
-    """Return (future_dated, undated, dropped_past, warnings)."""
-    future: list[dict[str, Any]] = []
+                        list[dict[str, Any]], list[dict[str, Any]], list[str]]:
+    """Return (display, undated, dropped_past, banked_far_future, warnings).
+
+    Args:
+        cutoff: events before this date are "past" and dropped.
+        horizon: if set, events after this date go to "banked" instead of
+                 "display". Use for the 60-day display window.
+    """
+    display: list[dict[str, Any]] = []
     undated: list[dict[str, Any]] = []
     past: list[dict[str, Any]] = []
+    banked: list[dict[str, Any]] = []
     warnings: list[str] = []
 
     for i, ev in enumerate(events):
@@ -81,10 +89,13 @@ def classify(events: list[dict[str, Any]], cutoff: dt.date
             undated.append(norm)
         elif d < cutoff:
             past.append(norm)
+        elif horizon and d > horizon:
+            norm["_date_obj"] = d
+            banked.append(norm)
         else:
             norm["_date_obj"] = d
-            future.append(norm)
-    return future, undated, past, warnings
+            display.append(norm)
+    return display, undated, past, banked, warnings
 
 
 def dedupe(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -448,22 +459,29 @@ def main() -> int:
                    help="Path to candidate events JSON file.")
     p.add_argument("--today", default=None, help="Override today (YYYY-MM-DD).")
     p.add_argument("--lookback-days", type=int, default=60)
+    p.add_argument("--display-window-days", type=int, default=60,
+                   help="Only show events within this many days from today. "
+                        "Events beyond this go to --banked-out.")
     p.add_argument("--body-out", default=None,
                    help="Write rendered body here (default: stdout).")
     p.add_argument("--html-out", default=None,
                    help="Write rendered HTML page here for GitHub Pages.")
     p.add_argument("--meta-out", default=None,
                    help="Write JSON metadata (subject, counts, warnings) here.")
+    p.add_argument("--banked-out", default=None,
+                   help="Write far-future events JSON here (for the event bank).")
     args = p.parse_args()
 
     today = (dt.date.fromisoformat(args.today) if args.today
              else dt.date.today())
+    horizon = today + dt.timedelta(days=args.display_window_days)
     raw = load_candidates(args.candidates)
-    future, undated, past, warnings = classify(raw, today)
-    future = dedupe(future)
+    display, undated, past, banked, warnings = classify(raw, today, horizon)
+    display = dedupe(display)
     undated = dedupe(undated)
-    weeks = group_by_week(future)
-    body = render_body(today, weeks, undated, len(future), args.lookback_days)
+    banked = dedupe(banked)
+    weeks = group_by_week(display)
+    body = render_body(today, weeks, undated, len(display), args.lookback_days)
 
     if args.body_out:
         with open(args.body_out, "w", encoding="utf-8") as f:
@@ -472,21 +490,31 @@ def main() -> int:
         sys.stdout.write(body)
 
     if args.html_out:
-        html = render_html(today, weeks, undated, len(future), args.lookback_days)
+        html = render_html(today, weeks, undated, len(display), args.lookback_days)
         with open(args.html_out, "w", encoding="utf-8") as f:
             f.write(html)
+
+    if args.banked_out:
+        # Strip _date_obj before serializing
+        banked_clean = [
+            {k: v for k, v in ev.items() if k != "_date_obj"}
+            for ev in banked
+        ]
+        with open(args.banked_out, "w", encoding="utf-8") as f:
+            json.dump(banked_clean, f, indent=2)
 
     meta = {
         "subject": f"Kids' Schedule — {today.strftime('%B %-d, %Y')}",
         "today_iso": today.isoformat(),
         "counts": {
             "candidates_in": len(raw),
-            "future_dated": len(future),
+            "future_dated": len(display),
             "undated": len(undated),
             "dropped_past": len(past),
+            "banked_far_future": len(banked),
         },
         "warnings": warnings,
-        "has_events": bool(future or undated),
+        "has_events": bool(display or undated),
     }
     if args.meta_out:
         with open(args.meta_out, "w", encoding="utf-8") as f:
