@@ -51,7 +51,10 @@ WHAT TO EXTRACT — be thorough and extract ALL of these:
    deadlines, form submissions, sign-up deadlines, t-shirt design
    contest deadlines, volunteer sign-ups, fundraiser deadlines
 
-5. **Appointments**: doctor, dentist, orthodontist, therapy, checkups
+5. **Kids' appointments ONLY**: doctor, dentist, orthodontist, therapy,
+   checkups — but ONLY if the appointment is clearly for a child (e.g.
+   pediatric, mentions a child's name). Skip adult-only appointments
+   such as a parent's personal doctor visit or house cleaning services.
 
 6. **Sports and extracurriculars**: swim team practices/meets/deadlines,
    dance recitals/rehearsals/camps, soccer games/practices, Girls on
@@ -85,6 +88,11 @@ For each event, output a dict with exactly these keys:
 KEY RULES:
 - Extract EVERY date you find, even if it seems minor. It is much better
   to include too many events than to miss one.
+- SKIP events that are clearly for adults only, NOT for children. Examples:
+  a parent's personal doctor appointment, house cleaning, home repairs,
+  auto service, adult social events. If in doubt whether a child is
+  involved, include it — but a generic "Doctor Appointment — Ellen" or
+  "House Cleaning Appointment" with no mention of kids should be excluded.
 - No-school days and deadline dates are just as important as events.
 - If a newsletter contains a calendar or list of upcoming dates, extract
   each one as a separate event dict.
