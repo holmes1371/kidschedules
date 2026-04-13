@@ -1,0 +1,53 @@
+name: Kids Schedule Weekly
+
+on:
+  # Every Monday at 6:30 AM Eastern (10:30 UTC)
+  schedule:
+    - cron: "30 10 * * 1"
+
+  # Allow manual trigger from GitHub UI
+  workflow_dispatch:
+    inputs:
+      lookback_days:
+        description: "Email lookback window (days)"
+        required: false
+        default: "60"
+      dry_run:
+        description: "Dry run (skip Gmail draft)"
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  run-schedule:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run kids schedule pipeline
+        env:
+          GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}
+          GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}
+          GMAIL_REFRESH_TOKEN: ${{ secrets.GMAIL_REFRESH_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          ARGS=""
+          if [ "${{ github.event.inputs.lookback_days }}" != "" ]; then
+            ARGS="$ARGS --lookback-days ${{ github.event.inputs.lookback_days }}"
+          fi
+          if [ "${{ github.event.inputs.dry_run }}" == "true" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+          python main.py $ARGS

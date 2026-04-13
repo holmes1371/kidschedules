@@ -1,0 +1,64 @@
+# Sender domains / addresses to exclude from every kids-schedule Gmail search.
+# One entry per line. Lines starting with # or blank lines are ignored.
+#
+# Rules of thumb:
+# - Only add senders that will essentially NEVER email about a child's event.
+# - Prefer full domains (e.g. e.economist.com) over top-level domains.
+# - NEVER add: fcps.edu, *pta.org, jackrabbittech.com, teamsnap.com,
+#   signupgenius.com, myschoolbucks.com, lifetouch.com, or any health-provider
+#   domain. These carry legitimate kids' events even when the subject looks
+#   promotional.
+# - When in doubt, leave it out. A few extra search results are cheaper than
+#   a missed field trip.
+
+# News / politics / newsletters
+e.economist.com
+nytimes.com
+interactive.wsj.com
+nl.mail.washingtonpost.com
+email.washingtonpost.com
+substack.com
+e.traindemocrats.org
+grahamforsenate.com
+mobilize.us
+meidastouch.com
+patch.com
+
+# Retail / deals
+em.target.com
+members.birchlane.com
+mail.crateandbarrel.com
+e.lululemon.com
+marketing.landsend.com
+news.email.ikea.us
+e.ulta.com
+digital.costco.com
+help.walmart.com
+official.nike.com
+emdeals.michaels.com
+email.thredup.com
+email.dashingdiva.com
+service.wayfair.com
+eg.expedia.com
+email.dcbar.org
+alm.com
+toplaw.news
+ccsend.com
+
+# Finance / credit / jobs
+e.usa.experian.com
+seekingalpha.com
+notifications.acorns.com
+jobalerts-noreply@linkedin.com
+chase.com
+
+# Wellness / marketing health (not actual providers)
+bryanjohnson.com
+info.zoe.com
+emilyfieldrd.com
+amandanighbert.com
+
+# System noise
+googlealerts-noreply@google.com
+email.informeddelivery.usps.com
+liveauctioneers.com
