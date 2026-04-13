@@ -186,7 +186,7 @@ def _call_with_retry(
 
 def extract_events(
     emails: list[dict[str, Any]],
-    model: str = "claude-sonnet-4-6-20250415",
+    model: str = "claude-sonnet-4-6",
     max_tokens: int = 8192,
 ) -> list[dict[str, Any]]:
     """Send email content to Claude in batches and collect event dicts.
@@ -280,7 +280,7 @@ def extract_events(
 
 def review_stripped_messages(
     diff_report: dict[str, Any],
-    model: str = "claude-sonnet-4-6-20250415",
+    model: str = "claude-sonnet-4-6",
     max_tokens: int = 4096,
 ) -> dict[str, Any]:
     """Review messages stripped by the blocklist filter.
