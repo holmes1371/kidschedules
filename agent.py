@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import os
+import time
 from typing import Any
 
 import anthropic
@@ -100,10 +101,47 @@ KEY RULES:
 # detail per email, at the cost of more API calls.
 BATCH_SIZE = 15
 
+# Retry config for transient API errors (overloaded, rate limits).
+MAX_RETRIES = 3
+RETRY_BASE_DELAY = 10  # seconds; doubles each retry
+
+
+def _call_with_retry(
+    client: anthropic.Anthropic,
+    model: str,
+    max_tokens: int,
+    user_message: str,
+    batch_label: str,
+) -> anthropic.types.Message:
+    """Call the Anthropic API with exponential backoff on transient errors."""
+    for attempt in range(1, MAX_RETRIES + 1):
+        try:
+            return client.messages.create(
+                model=model,
+                max_tokens=max_tokens,
+                system=EXTRACTION_SYSTEM_PROMPT,
+                messages=[{"role": "user", "content": user_message}],
+            )
+        except (
+            anthropic.OverloadedError,
+            anthropic.RateLimitError,
+            anthropic.InternalServerError,
+            anthropic.APIConnectionError,
+        ) as e:
+            delay = RETRY_BASE_DELAY * (2 ** (attempt - 1))
+            if attempt == MAX_RETRIES:
+                print(f"FAILED after {MAX_RETRIES} attempts: {e}")
+                raise
+            print(f"\n    {batch_label} attempt {attempt} failed "
+                  f"({type(e).__name__}), retrying in {delay}s ...")
+            time.sleep(delay)
+    # Unreachable, but keeps type checkers happy
+    raise RuntimeError("Exhausted retries")
+
 
 def extract_events(
     emails: list[dict[str, Any]],
-    model: str = "claude-sonnet-4-20250514",
+    model: str = "claude-sonnet-4-6-20250415",
     max_tokens: int = 8192,
 ) -> list[dict[str, Any]]:
     """Send email content to Claude in batches and collect event dicts.
@@ -135,7 +173,8 @@ def extract_events(
     client = _get_client()
 
     for batch_num, batch in enumerate(batches, 1):
-        print(f"  Batch {batch_num}/{len(batches)}: "
+        batch_label = f"Batch {batch_num}/{len(batches)}"
+        print(f"  {batch_label}: "
               f"{len(batch)} emails ...", end=" ", flush=True)
 
         # Build the user message for this batch
@@ -150,12 +189,13 @@ def extract_events(
             )
         user_message = "\n".join(parts)
 
-        response = client.messages.create(
-            model=model,
-            max_tokens=max_tokens,
-            system=EXTRACTION_SYSTEM_PROMPT,
-            messages=[{"role": "user", "content": user_message}],
-        )
+        try:
+            response = _call_with_retry(
+                client, model, max_tokens, user_message, batch_label
+            )
+        except Exception as e:
+            print(f"SKIPPING {batch_label}: {e}")
+            continue
 
         # Parse the response
         text = response.content[0].text.strip()

@@ -241,7 +241,7 @@ def main() -> int:
         help="How many days of received email to search (default: 60)."
     )
     parser.add_argument(
-        "--model", type=str, default="claude-sonnet-4-20250514",
+        "--model", type=str, default="claude-sonnet-4-6-20250415",
         help="Anthropic model for event extraction."
     )
     parser.add_argument(

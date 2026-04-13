@@ -44,6 +44,8 @@ email.dcbar.org
 alm.com
 toplaw.news
 ccsend.com
+hellofresh.com
+email.gopuff.com
 
 # Finance / credit / jobs
 e.usa.experian.com
@@ -51,12 +53,36 @@ seekingalpha.com
 notifications.acorns.com
 jobalerts-noreply@linkedin.com
 chase.com
+shareplus.com
+
+# Legal industry
+lexology.com
+seealso.com
+abovethelaw.com
 
 # Wellness / marketing health (not actual providers)
 bryanjohnson.com
 info.zoe.com
 emilyfieldrd.com
 amandanighbert.com
+lssnca.org
+
+# Sports / entertainment tickets (not kids' sports)
+fifa.com
+ticketmaster.com
+
+# Real estate / finance newsletters
+realtor.com
+zillow.com
+redfin.com
+
+# Pet / animal rescue
+petfinder.com
+adoptapet.com
+
+# FSA / benefits admin
+wageworks.com
+healthequity.com
 
 # System noise
 googlealerts-noreply@google.com
