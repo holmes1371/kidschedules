@@ -48,6 +48,7 @@ hellofresh.com
 email.gopuff.com
 gobble.com
 greenchef.com
+wildgrain.com
 
 # Finance / credit / jobs
 e.usa.experian.com
@@ -55,9 +56,12 @@ seekingalpha.com
 notifications.acorns.com
 jobalerts-noreply@linkedin.com
 messages-noreply@linkedin.com
+newsletters-noreply@linkedin.com
+jobs-noreply@linkedin.com
 chase.com
 shareplus.com
 inhousecounsel.com
+goinhouse.com
 handshake.com
 
 # Legal industry
@@ -71,6 +75,7 @@ info.zoe.com
 emilyfieldrd.com
 amandanighbert.com
 lssnca.org
+breathe.calm.com
 
 # Sales / business newsletters
 saleshacker.com
