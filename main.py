@@ -372,4 +372,19 @@ def main() -> int:
         # Step 3: Agent extraction
         candidates = step3_extract_events(full_emails, model=args.model)
 
-    # Step 4: Process
+    # Step 4: Process events
+    html, body, meta = step4_process_events(candidates)
+
+    # Step 5: Publish
+    step5_publish(html, meta, args.dry_run)
+
+    print("\n" + "=" * 60)
+    print("DONE")
+    print("=" * 60)
+    print(f"  Events: {meta['counts']['future_dated']} dated, "
+          f"{meta['counts']['undated']} undated")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
