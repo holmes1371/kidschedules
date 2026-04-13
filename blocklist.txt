@@ -24,7 +24,7 @@ mobilize.us
 meidastouch.com
 patch.com
 
-# Retail / deals
+# Retail / deals / food delivery
 em.target.com
 members.birchlane.com
 mail.crateandbarrel.com
@@ -46,27 +46,36 @@ toplaw.news
 ccsend.com
 hellofresh.com
 email.gopuff.com
+gobble.com
+greenchef.com
 
 # Finance / credit / jobs
 e.usa.experian.com
 seekingalpha.com
 notifications.acorns.com
 jobalerts-noreply@linkedin.com
+messages-noreply@linkedin.com
 chase.com
 shareplus.com
 inhousecounsel.com
+handshake.com
 
 # Legal industry
 lexology.com
 seealso.com
 abovethelaw.com
 
-# Wellness / marketing health (not actual providers)
+# Wellness / beauty / lifestyle marketing (not actual providers)
 bryanjohnson.com
 info.zoe.com
 emilyfieldrd.com
 amandanighbert.com
 lssnca.org
+
+# Sales / business newsletters
+saleshacker.com
+outreach.io
+gong.io
 
 # Sports / entertainment tickets (not kids' sports)
 fifa.com
