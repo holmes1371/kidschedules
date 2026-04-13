@@ -97,6 +97,39 @@ KEY RULES:
 """
 
 
+AUDIT_SYSTEM_PROMPT = """\
+You are reviewing emails that a blocklist filter removed from a kids'
+schedule search. Your job is to decide whether any of these stripped
+messages contain legitimate kids' events that the filter incorrectly hid.
+
+You will receive a list of stripped messages with their sender, subject,
+date, and snippet. For each one, classify it as either:
+- "keep_filtered": correctly blocked (marketing, news, adult content, etc.)
+- "unblock": this looks like it could contain a real kids' event and
+  the sender should be removed from the blocklist
+
+Output a JSON object:
+{
+  "decisions": [
+    {"messageId": "...", "subject": "...", "from": "...", "verdict": "keep_filtered" or "unblock", "reason": "brief explanation"}
+  ],
+  "senders_to_unblock": ["domain1.com", "addr@domain2.com"]
+}
+
+The "senders_to_unblock" list should contain the sender domains or
+addresses that should be REMOVED from the blocklist because they send
+legitimate kids' content. Only include senders where you are reasonably
+confident the filter is hiding real events.
+
+NEVER recommend unblocking these (they are known kids-event senders
+already in the safe list): fcps.edu, any *pta.org, jackrabbittech.com,
+teamsnap.com, signupgenius.com, myschoolbucks.com, lifetouch.com,
+or real medical provider domains.
+
+Output ONLY the JSON object, no other text.
+"""
+
+
 # Maximum emails per API call. Smaller batches = better attention to
 # detail per email, at the cost of more API calls.
 BATCH_SIZE = 15
@@ -231,3 +264,75 @@ def extract_events(
           f"{total_output_tokens} output")
 
     return all_events
+
+
+def review_stripped_messages(
+    diff_report: dict[str, Any],
+    model: str = "claude-sonnet-4-6-20250415",
+    max_tokens: int = 4096,
+) -> dict[str, Any]:
+    """Review messages stripped by the blocklist filter.
+
+    Args:
+        diff_report: parsed JSON from diff_search_results.py
+        model: Anthropic model to use.
+        max_tokens: max response tokens.
+
+    Returns:
+        dict with "decisions" and "senders_to_unblock" lists.
+    """
+    # Collect all stripped messages across categories
+    stripped = []
+    for cat, data in diff_report.get("categories", {}).items():
+        for msg in data.get("stripped_messages", []):
+            stripped.append({**msg, "category": cat})
+
+    if not stripped:
+        print("  No stripped messages to review.")
+        return {"decisions": [], "senders_to_unblock": []}
+
+    print(f"  Reviewing {len(stripped)} stripped messages ...")
+
+    # Build the user message
+    parts = []
+    for i, msg in enumerate(stripped, 1):
+        parts.append(
+            f"--- STRIPPED MESSAGE {i} (category: {msg['category']}) ---\n"
+            f"From: {msg.get('from', '')}\n"
+            f"Subject: {msg.get('subject', '')}\n"
+            f"Date: {msg.get('date', '')}\n"
+            f"Snippet: {msg.get('snippet', '')}\n"
+        )
+    user_message = "\n".join(parts)
+
+    client = _get_client()
+    try:
+        response = _call_with_retry(
+            client, model, max_tokens, user_message, "Audit review"
+        )
+    except Exception as e:
+        print(f"  Audit review failed: {e}")
+        return {"decisions": [], "senders_to_unblock": []}
+
+    text = response.content[0].text.strip()
+    if text.startswith("```"):
+        lines = text.split("\n")
+        text = "\n".join(lines[1:-1]).strip()
+
+    try:
+        result = json.loads(text)
+    except json.JSONDecodeError as e:
+        print(f"  Audit parse error: {e}")
+        return {"decisions": [], "senders_to_unblock": []}
+
+    usage = response.usage
+    print(f"  Audit token usage: {usage.input_tokens} input, "
+          f"{usage.output_tokens} output")
+
+    unblock = result.get("senders_to_unblock", [])
+    if unblock:
+        print(f"  Senders to unblock: {unblock}")
+    else:
+        print("  All stripped messages correctly filtered.")
+
+    return result

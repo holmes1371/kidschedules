@@ -25,7 +25,7 @@ import tempfile
 from typing import Any
 
 from gmail_client import GmailClient
-from agent import extract_events
+from agent import extract_events, review_stripped_messages
 
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -55,6 +55,106 @@ def step1_build_queries(lookback_days: int) -> dict[str, Any]:
           f"{config['email_window']['before']}")
     print(f"  Blocklist: {config['exclusions']['blocklist_size']} senders excluded")
     print(f"  Filter audit: {config['filter_audit']['reason']}")
+    return config
+
+
+def step1b_filter_audit(
+    gmail: GmailClient,
+    config: dict[str, Any],
+    model: str,
+    lookback_days: int,
+) -> dict[str, Any]:
+    """Run the filter audit if due. Returns (possibly updated) config."""
+    audit = config["filter_audit"]
+    if not audit["due"]:
+        print("\n  Filter audit: not due, skipping.")
+        return config
+
+    print("\n" + "=" * 60)
+    print("STEP 1b: Filter audit (blocklist health check)")
+    print("=" * 60)
+    print(f"  Reason: {audit['reason']}")
+
+    queries = config["queries"]
+    loose_queries = config["loose_queries"]
+    max_results = config["max_results_per_query"]
+
+    # Run tight (filtered) searches
+    print("  Running tight (filtered) searches ...")
+    tight_results: dict[str, list] = {}
+    for name, query in queries.items():
+        tight_results[name] = gmail.search_messages(query, max_results=max_results)
+
+    # Run loose (unfiltered) searches
+    print("  Running loose (unfiltered) searches ...")
+    loose_results: dict[str, list] = {}
+    for name, query in loose_queries.items():
+        loose_results[name] = gmail.search_messages(query, max_results=max_results)
+
+    # Write to temp files and run diff script
+    tight_path = os.path.join(tempfile.gettempdir(), "kids-audit-tight.json")
+    loose_path = os.path.join(tempfile.gettempdir(), "kids-audit-loose.json")
+    diff_path = os.path.join(tempfile.gettempdir(), "kids-audit-diff.json")
+
+    with open(tight_path, "w") as f:
+        json.dump(tight_results, f)
+    with open(loose_path, "w") as f:
+        json.dump(loose_results, f)
+
+    run_script("diff_search_results.py", [
+        "--loose", loose_path,
+        "--tight", tight_path,
+        "--out", diff_path,
+    ])
+
+    with open(diff_path, "r") as f:
+        diff_report = json.load(f)
+
+    stripped_total = diff_report["totals"]["stripped"]
+    print(f"  Filter stripped {stripped_total} messages "
+          f"(loose: {diff_report['totals']['loose']}, "
+          f"tight: {diff_report['totals']['tight']})")
+
+    if stripped_total == 0:
+        print("  No messages stripped — blocklist is clean.")
+    else:
+        # Agent reviews the stripped messages
+        audit_result = review_stripped_messages(diff_report, model=model)
+        unblock = audit_result.get("senders_to_unblock", [])
+
+        if unblock:
+            # Remove senders from blocklist
+            blocklist_path = os.path.join(PROJECT_ROOT, "blocklist.txt")
+            with open(blocklist_path, "r") as f:
+                lines = f.readlines()
+            removed = []
+            new_lines = []
+            for line in lines:
+                stripped_line = line.strip()
+                if stripped_line in unblock:
+                    removed.append(stripped_line)
+                else:
+                    new_lines.append(line)
+            if removed:
+                with open(blocklist_path, "w") as f:
+                    f.writelines(new_lines)
+                print(f"  Removed from blocklist: {removed}")
+
+                # Rebuild queries with updated blocklist
+                print("  Rebuilding queries with updated blocklist ...")
+                config = step1_build_queries(lookback_days)
+
+    # Stamp the audit regardless
+    run_script("mark_filter_audit.py", [])
+    print("  Filter audit complete and stamped.")
+
+    # Clean up temp files
+    for p in [tight_path, loose_path, diff_path]:
+        try:
+            os.unlink(p)
+        except OSError:
+            pass
+
     return config
 
 
@@ -253,10 +353,13 @@ def main() -> int:
     # Step 1: Build queries
     config = step1_build_queries(args.lookback_days)
 
-    # Step 2: Search Gmail
+    # Step 1b: Filter audit (if due)
     gmail = GmailClient()
     profile = gmail.get_profile()
     print(f"  Authenticated as: {profile.get('emailAddress')}")
+    config = step1b_filter_audit(gmail, config, args.model, args.lookback_days)
+
+    # Step 2: Search Gmail
     search_results = step2_search_gmail(gmail, config)
 
     # Step 2b: Read promising messages
