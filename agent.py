@@ -140,7 +140,7 @@ Output ONLY the JSON object, no other text.
 
 # Maximum emails per API call. Smaller batches = better attention to
 # detail per email, at the cost of more API calls.
-BATCH_SIZE = 15
+BATCH_SIZE = 10
 
 # Retry config for transient API errors (overloaded, rate limits).
 MAX_RETRIES = 3
@@ -192,10 +192,37 @@ def _call_with_retry(
     raise RuntimeError("Exhausted retries")
 
 
+def _parse_json_response(text: str) -> list[dict] | None:
+    """Try to parse a JSON array from the model's response text.
+
+    Handles ```json wrapping and returns None on failure.
+    """
+    # Strip markdown code fences
+    if text.startswith("```"):
+        lines = text.split("\n")
+        text = "\n".join(lines[1:-1]).strip()
+
+    try:
+        result = json.loads(text)
+    except json.JSONDecodeError as e:
+        print(f"PARSE ERROR: {e}")
+        print(f"  Raw response (first 500 chars):\n{text[:500]}")
+        return None
+
+    if isinstance(result, dict) and "events" in result:
+        result = result["events"]
+
+    if not isinstance(result, list):
+        print(f"WARNING: response is not a list: {type(result)}")
+        return None
+
+    return result
+
+
 def extract_events(
     emails: list[dict[str, Any]],
     model: str = "claude-sonnet-4-6",
-    max_tokens: int = 8192,
+    max_tokens: int = 16384,
 ) -> list[dict[str, Any]]:
     """Send email content to Claude in batches and collect event dicts.
 
@@ -252,24 +279,31 @@ def extract_events(
 
         # Parse the response
         text = response.content[0].text.strip()
+        events = _parse_json_response(text)
 
-        # Handle ```json ... ``` wrapping
-        if text.startswith("```"):
-            lines = text.split("\n")
-            text = "\n".join(lines[1:-1]).strip()
+        # If parse failed, retry once asking the model to fix it
+        if events is None:
+            print(f"  Retrying {batch_label} with JSON repair prompt...")
+            try:
+                repair_response = _call_with_retry(
+                    client, model, max_tokens,
+                    f"Your previous response was not valid JSON. Here is what you returned:\n\n"
+                    f"{text[:3000]}\n\n"
+                    f"Please return ONLY a valid JSON array of event dicts. No markdown, no explanation.",
+                    f"{batch_label} (repair)",
+                )
+                text2 = repair_response.content[0].text.strip()
+                events = _parse_json_response(text2)
+                if events is not None:
+                    usage2 = repair_response.usage
+                    total_input_tokens += usage2.input_tokens
+                    total_output_tokens += usage2.output_tokens
+                    print(f"  Repair succeeded!")
+            except Exception as e2:
+                print(f"  Repair also failed: {e2}")
 
-        try:
-            events = json.loads(text)
-        except json.JSONDecodeError as e:
-            print(f"PARSE ERROR: {e}")
-            print(f"  Raw response:\n{text[:500]}")
-            continue
-
-        if isinstance(events, dict) and "events" in events:
-            events = events["events"]
-
-        if not isinstance(events, list):
-            print(f"WARNING: response is not a list: {type(events)}")
+        if events is None:
+            print(f"  SKIPPING {batch_label}: could not parse JSON")
             continue
 
         usage = response.usage
