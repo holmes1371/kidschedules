@@ -35,3 +35,6 @@ blocklist_auto_audit.jsonl
 
 # OS
 .DS_Store
+
+# IDEs
+.idea/
