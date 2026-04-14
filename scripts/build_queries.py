@@ -172,7 +172,7 @@ def main() -> int:
         "filter_audit": audit,
         "loose_queries": loose_queries,
     }
-    json.dump(out, sys.stdout, indent=2)
+    json.dump(out, sys.stdout, indent=2, ensure_ascii=False)
     sys.stdout.write("\n")
     return 0
 

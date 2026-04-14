@@ -113,10 +113,10 @@ def step1b_filter_audit(
     loose_path = os.path.join(tempfile.gettempdir(), "kids-audit-loose.json")
     diff_path = os.path.join(tempfile.gettempdir(), "kids-audit-diff.json")
 
-    with open(tight_path, "w") as f:
-        json.dump(tight_results, f)
-    with open(loose_path, "w") as f:
-        json.dump(loose_results, f)
+    with open(tight_path, "w", encoding="utf-8") as f:
+        json.dump(tight_results, f, ensure_ascii=False)
+    with open(loose_path, "w", encoding="utf-8") as f:
+        json.dump(loose_results, f, ensure_ascii=False)
 
     run_script("diff_search_results.py", [
         "--loose", loose_path,
@@ -260,7 +260,7 @@ def _load_event_bank() -> list[dict[str, Any]]:
 def _save_event_bank(events: list[dict[str, Any]]) -> None:
     """Save far-future events to the persistent bank."""
     with open(FUTURE_EVENTS_PATH, "w", encoding="utf-8") as f:
-        json.dump(events, f, indent=2)
+        json.dump(events, f, indent=2, ensure_ascii=False)
     print(f"  Saved {len(events)} event(s) to future_events.json")
 
 
@@ -287,14 +287,14 @@ def step4_process_events(
     try:
         os.makedirs(os.path.dirname(LAST_RUN_FIXTURE_PATH), exist_ok=True)
         with open(LAST_RUN_FIXTURE_PATH, "w", encoding="utf-8") as f:
-            json.dump(all_candidates, f, indent=2)
+            json.dump(all_candidates, f, indent=2, ensure_ascii=False)
     except OSError as e:
         print(f"  WARNING: could not write last_run fixture: {e}")
 
     with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".json", delete=False
+        mode="w", suffix=".json", delete=False, encoding="utf-8"
     ) as f:
-        json.dump(all_candidates, f)
+        json.dump(all_candidates, f, ensure_ascii=False)
         candidates_path = f.name
 
     body_path = candidates_path.replace(".json", "-body.txt")

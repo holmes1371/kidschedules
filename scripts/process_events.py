@@ -741,7 +741,7 @@ def main() -> int:
             for ev in banked
         ]
         with open(args.banked_out, "w", encoding="utf-8") as f:
-            json.dump(banked_clean, f, indent=2)
+            json.dump(banked_clean, f, indent=2, ensure_ascii=False)
 
     meta = {
         "subject": f"Kids' Schedule — {today.strftime('%B %-d, %Y')}",
@@ -759,7 +759,7 @@ def main() -> int:
     }
     if args.meta_out:
         with open(args.meta_out, "w", encoding="utf-8") as f:
-            json.dump(meta, f, indent=2)
+            json.dump(meta, f, indent=2, ensure_ascii=False)
     else:
         sys.stderr.write(json.dumps(meta, indent=2) + "\n")
     return 0

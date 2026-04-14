@@ -52,7 +52,7 @@ def main() -> int:
     }
 
     with open(args.audit_state, "w", encoding="utf-8") as f:
-        json.dump(state, f, indent=2)
+        json.dump(state, f, indent=2, ensure_ascii=False)
         f.write("\n")
 
     sys.stdout.write(
