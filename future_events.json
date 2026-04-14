@@ -1,0 +1,152 @@
+[
+  {
+    "name": "Cuppett Recital Dress Rehearsal (Mandatory) \u2014 Day 1",
+    "date": "2026-06-17",
+    "time": "TBD",
+    "location": "Cuppett Performing Arts Center, 135 Park Street SE, Vienna, VA 22180",
+    "category": "Sports & Extracurriculars",
+    "child": "TBD",
+    "source": "Kids' Schedule \u2014 March 30, 2026 (Mar 30)",
+    "id": "cf2b003ea771"
+  },
+  {
+    "name": "Cuppett Recital Dress Rehearsal (Mandatory) \u2014 Day 2",
+    "date": "2026-06-18",
+    "time": "TBD",
+    "location": "Cuppett Performing Arts Center, 135 Park Street SE, Vienna, VA 22180",
+    "category": "Sports & Extracurriculars",
+    "child": "TBD",
+    "source": "Kids' Schedule \u2014 March 30, 2026 (Mar 30)",
+    "id": "b0acc99912d7"
+  },
+  {
+    "name": "Cuppett June Recitals",
+    "date": "2026-06-20",
+    "time": "TBD",
+    "location": "Cuppett Performing Arts Center, 135 Park Street SE, Vienna, VA 22180",
+    "category": "Sports & Extracurriculars",
+    "child": "TBD",
+    "source": "Kids' Schedule \u2014 March 30, 2026 (Mar 30)",
+    "id": "65db8d85fd1c"
+  },
+  {
+    "name": "VIP Summer Camp \u2014 Rising 7th & 8th Graders (July 1\u201330)",
+    "date": "2026-07-01",
+    "time": "9:00 AM \u2013 4:00 PM (drop off from 8:00 AM)",
+    "location": "Glasgow Middle School, 4101 Fairfax Pkwy, Lincolnia, VA 22312",
+    "category": "Sports & Extracurriculars",
+    "child": "Rising 7th & 8th graders",
+    "source": "FCPS News You Choose (Apr 10)",
+    "id": "0fbfc45f11d1"
+  },
+  {
+    "name": "VIP Summer Camp \u2014 Last Day",
+    "date": "2026-07-30",
+    "time": "9:00 AM \u2013 4:00 PM",
+    "location": "Glasgow Middle School, 4101 Fairfax Pkwy, Lincolnia, VA 22312",
+    "category": "Sports & Extracurriculars",
+    "child": "Rising 7th & 8th graders",
+    "source": "FCPS News You Choose (Apr 10)",
+    "id": "e892e2dcecdf"
+  },
+  {
+    "name": "NO VIP Camp \u2014 July 4th Holiday",
+    "date": "2026-07-03",
+    "time": "All day",
+    "location": "Location TBD",
+    "category": "School Activity",
+    "child": "Rising 7th & 8th graders",
+    "source": "FCPS News You Choose (Apr 10)",
+    "id": "0c99125bb1f4"
+  },
+  {
+    "name": "Children's Dental Appointment \u2014 Isla & Everly",
+    "date": "2026-10-07",
+    "time": "8:30 AM",
+    "location": "Children's Dentistry of Oakton",
+    "category": "Appointment",
+    "child": "Isla, Everly",
+    "source": "Children's Dentistry of Oakton (Apr 6)",
+    "id": "6bf7d8ebabd7"
+  },
+  {
+    "name": "Summer Chess Camp (LAES PTA)",
+    "date": "2026-06-22",
+    "time": "9:00 AM - 4:00 PM",
+    "location": "Louise Archer Elementary School Cafeteria",
+    "category": "Sports & Extracurriculars",
+    "child": "All LAES students",
+    "source": "LAES PTA Sunbeam (Mar 22)",
+    "id": "82bfa0e1fbc7"
+  },
+  {
+    "name": "Summer Chess Camp \u2014 Last Day (LAES PTA)",
+    "date": "2026-06-26",
+    "time": "9:00 AM - 4:00 PM",
+    "location": "Louise Archer Elementary School Cafeteria",
+    "category": "Sports & Extracurriculars",
+    "child": "All LAES students",
+    "source": "LAES PTA Sunbeam (Mar 22)",
+    "id": "9022140782f3"
+  },
+  {
+    "name": "Summer Sports Camp Session 1 (LAES PTA)",
+    "date": "2026-06-22",
+    "time": "9:00 AM - 2:00 PM",
+    "location": "Louise Archer Elementary School Gym",
+    "category": "Sports & Extracurriculars",
+    "child": "All LAES students",
+    "source": "LAES PTA Sunbeam (Mar 22)",
+    "id": "a962f74c03ae"
+  },
+  {
+    "name": "Summer Sports Camp Session 1 \u2014 Last Day (LAES PTA)",
+    "date": "2026-06-26",
+    "time": "9:00 AM - 2:00 PM",
+    "location": "Louise Archer Elementary School Gym",
+    "category": "Sports & Extracurriculars",
+    "child": "All LAES students",
+    "source": "LAES PTA Sunbeam (Mar 22)",
+    "id": "e2d4244f3ab2"
+  },
+  {
+    "name": "Summer Sports Camp Session 2 (LAES PTA)",
+    "date": "2026-07-27",
+    "time": "9:00 AM - 2:00 PM",
+    "location": "Louise Archer Elementary School Gym",
+    "category": "Sports & Extracurriculars",
+    "child": "All LAES students",
+    "source": "LAES PTA Sunbeam (Mar 22)",
+    "id": "39b1a0b4f118"
+  },
+  {
+    "name": "Summer Sports Camp Session 2 \u2014 Last Day (LAES PTA)",
+    "date": "2026-07-31",
+    "time": "9:00 AM - 2:00 PM",
+    "location": "Louise Archer Elementary School Gym",
+    "category": "Sports & Extracurriculars",
+    "child": "All LAES students",
+    "source": "LAES PTA Sunbeam (Mar 22)",
+    "id": "d5cb6c41a76b"
+  },
+  {
+    "name": "Summer Sports Camp Session 3 (LAES PTA)",
+    "date": "2026-08-03",
+    "time": "9:00 AM - 2:00 PM",
+    "location": "Louise Archer Elementary School Gym",
+    "category": "Sports & Extracurriculars",
+    "child": "All LAES students",
+    "source": "LAES PTA Sunbeam (Mar 22)",
+    "id": "889d571ca65c"
+  },
+  {
+    "name": "Summer Sports Camp Session 3 \u2014 Last Day (LAES PTA)",
+    "date": "2026-08-07",
+    "time": "9:00 AM - 2:00 PM",
+    "location": "Louise Archer Elementary School Gym",
+    "category": "Sports & Extracurriculars",
+    "child": "All LAES students",
+    "source": "LAES PTA Sunbeam (Mar 22)",
+    "id": "b49f8d18b1bf"
+  }
+]
