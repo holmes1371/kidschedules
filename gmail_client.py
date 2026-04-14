@@ -9,6 +9,7 @@ from __future__ import annotations
 import base64
 import json
 import os
+from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from typing import Any
 
@@ -154,10 +155,26 @@ class GmailClient:
         return plain or html or ""
 
     def create_draft(
-        self, subject: str, body: str, content_type: str = "text/plain"
+        self,
+        subject: str,
+        body: str,
+        content_type: str = "text/plain",
+        text_alternative: str | None = None,
     ) -> dict[str, Any]:
-        """Create a Gmail draft (no recipient) and return its metadata."""
-        mime_msg = MIMEText(body, "plain" if content_type == "text/plain" else "html")
+        """Create a Gmail draft (no recipient) and return its metadata.
+
+        If `text_alternative` is provided, builds a multipart/alternative
+        message with `body` as the primary part (honoring `content_type`)
+        and `text_alternative` as a plain-text fallback. Otherwise the
+        draft is a single-part message, matching prior behavior.
+        """
+        subtype = "plain" if content_type == "text/plain" else "html"
+        if text_alternative is not None:
+            mime_msg: MIMEText | MIMEMultipart = MIMEMultipart("alternative")
+            mime_msg.attach(MIMEText(text_alternative, "plain"))
+            mime_msg.attach(MIMEText(body, subtype))
+        else:
+            mime_msg = MIMEText(body, subtype)
         mime_msg["Subject"] = subject
         raw = base64.urlsafe_b64encode(mime_msg.as_bytes()).decode("utf-8")
         draft = (
