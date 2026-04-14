@@ -69,6 +69,13 @@ jobs:
           else
             echo "No prior blocklist_auto.txt — starting fresh."
           fi
+          if [ -f .state/blocklist_auto_audit.jsonl ]; then
+            cp .state/blocklist_auto_audit.jsonl blocklist_auto_audit.jsonl
+            COUNT=$(wc -l < blocklist_auto_audit.jsonl || echo 0)
+            echo "Restored blocklist_auto_audit.jsonl ($COUNT prior run(s) logged)."
+          else
+            echo "No prior blocklist_auto_audit.jsonl — starting fresh."
+          fi
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -123,7 +130,8 @@ jobs:
         if: ${{ github.event.inputs.dry_run != 'true' }}
         run: |
           if [ ! -f future_events.json ] && [ ! -f .filter_audit.json ] \
-             && [ ! -f blocklist_auto.txt ]; then
+             && [ ! -f blocklist_auto.txt ] \
+             && [ ! -f blocklist_auto_audit.jsonl ]; then
             echo "No persistent state produced — nothing to save."
             exit 0
           fi
@@ -143,12 +151,16 @@ jobs:
           if [ -f ../blocklist_auto.txt ]; then
             cp ../blocklist_auto.txt blocklist_auto.txt
           fi
+          if [ -f ../blocklist_auto_audit.jsonl ]; then
+            cp ../blocklist_auto_audit.jsonl blocklist_auto_audit.jsonl
+          fi
           # Only 'git add' files that actually exist — any one of these may be
           # absent on a given run (e.g. first run before filter audit stamps).
           FILES=""
           [ -f future_events.json ] && FILES="$FILES future_events.json"
           [ -f .filter_audit.json ] && FILES="$FILES .filter_audit.json"
           [ -f blocklist_auto.txt ] && FILES="$FILES blocklist_auto.txt"
+          [ -f blocklist_auto_audit.jsonl ] && FILES="$FILES blocklist_auto_audit.jsonl"
           git -c user.name="github-actions[bot]" \
               -c user.email="github-actions[bot]@users.noreply.github.com" \
               add $FILES

@@ -90,6 +90,9 @@ def main() -> int:
                    help="Path to blocklist_auto.txt (created if missing).")
     p.add_argument("--main-blocklist", required=True,
                    help="Read-only path to the hand-curated blocklist.txt.")
+    p.add_argument("--audit-log",
+                   help="Optional JSONL file; one line appended per run with "
+                        "added and rejected suggestions for week-over-week audit.")
     args = p.parse_args()
 
     try:
@@ -158,6 +161,17 @@ def main() -> int:
         "added": [{"from": a, "reason": r} for a, r in added],
     }
     print(json.dumps(summary), file=sys.stderr)
+
+    if args.audit_log:
+        entry = {
+            "run_iso": dt.date.today().isoformat(),
+            "suggestion_count": len(suggestions),
+            "added": [{"from": a, "reason": r} for a, r in added],
+            "rejected": [{"from": a, "why": w} for a, w in rejected],
+        }
+        with open(args.audit_log, "a", encoding="utf-8") as f:
+            f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+
     return 0
 
 

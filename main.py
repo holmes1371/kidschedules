@@ -38,6 +38,9 @@ WEBHOOK_URL_PATH = os.path.join(PROJECT_ROOT, "ignore_webhook_url.txt")
 IGNORED_EVENTS_PATH = os.path.join(PROJECT_ROOT, "ignored_events.json")
 BLOCKLIST_PATH = os.path.join(PROJECT_ROOT, "blocklist.txt")
 AUTO_BLOCKLIST_PATH = os.path.join(PROJECT_ROOT, "blocklist_auto.txt")
+AUTO_BLOCKLIST_AUDIT_PATH = os.path.join(
+    PROJECT_ROOT, "blocklist_auto_audit.jsonl"
+)
 
 
 def _load_webhook_url() -> str:
@@ -254,15 +257,17 @@ def step3_extract_events(
 def step3b_update_auto_blocklist(
     irrelevant_senders: list[dict[str, Any]],
 ) -> None:
-    """Merge agent-flagged senders into blocklist_auto.txt with guardrails."""
-    if not irrelevant_senders:
-        print("\n" + "=" * 60)
-        print("STEP 3b: Auto-blocklist update — no suggestions, skipping")
-        print("=" * 60)
-        return
+    """Merge agent-flagged senders into blocklist_auto.txt with guardrails.
 
+    Always runs (even when the agent flagged zero senders) so the audit log
+    records one line per pipeline run — empty suggestion lists are valuable
+    signal too.
+    """
     print("\n" + "=" * 60)
-    print("STEP 3b: Auto-blocklist update")
+    if irrelevant_senders:
+        print("STEP 3b: Auto-blocklist update")
+    else:
+        print("STEP 3b: Auto-blocklist update — no suggestions this run")
     print("=" * 60)
 
     with tempfile.NamedTemporaryFile(
@@ -277,6 +282,7 @@ def step3b_update_auto_blocklist(
                 "--suggestions", suggestions_path,
                 "--auto-blocklist", AUTO_BLOCKLIST_PATH,
                 "--main-blocklist", BLOCKLIST_PATH,
+                "--audit-log", AUTO_BLOCKLIST_AUDIT_PATH,
             ],
         )
     finally:
