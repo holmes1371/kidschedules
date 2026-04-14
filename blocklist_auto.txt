@@ -25,3 +25,19 @@ support3@info.myloancare.com  # auto 2026-04-14: Mortgage/loan payment reminder 
 noreply@dcbar.org  # auto 2026-04-14: D.C. Bar member event — adult legal professional organization, no children's con
 maryc@cake4kids.org  # auto 2026-04-14: Adult volunteer baker community event — children benefit from the charity but th
 communications@recreation.gov  # auto 2026-04-14: Recreation.gov reservation reminder — camping/outdoor recreation booking service
+service@virginiahousekeepers.com  # auto 2026-04-14: House cleaning service appointment reminder — adult home service, no children in
+noreply@patient-message.com  # auto 2026-04-14: Adult personal medical appointment reminders for Ellen at A Larry Miller MD — no
+noreply@haircuttery.com  # auto 2026-04-14: Adult hair salon appointment confirmation, no children's events
+claudine.czerny@rtx.com  # auto 2026-04-14: Adult professional job recruiting correspondence, no children's events
+info@email.lakeview.com  # auto 2026-04-14: Homeowners insurance renewal notice, adult financial/home services only
+newsletter@rickscott.senate.gov  # auto 2026-04-14: Political senator newsletter, adult political content only
+fidelity.investments@mail.fidelity.com  # auto 2026-04-14: Adult personal finance / retirement planning newsletter, no kids' content
+teladocbenefits@email.teladochealth.com  # auto 2026-04-14: Adult telehealth wellness newsletter addressed to Ellen, no children's content
+acuvue@e.helloworldemail.com  # auto 2026-04-14: Contact lens order confirmation for adult (Everly), no kids' events
+info@embracehomeloans.com  # auto 2026-04-14: Mortgage/home loan marketing email, entirely adult financial content with no kid
+newsletter@inhouseblog.com  # auto 2026-04-14: adult legal industry newsletter with job postings and professional events — enti
+support@zimadental.co  # auto 2026-04-14: Adult dental product marketing emails (FSA/HSA oral care appliances), no kids' e
+news@email.gramophone.co.uk  # auto 2026-04-14: Classical music magazine newsletter for adults, no kids' events
+support6@info.myloancare.com  # auto 2026-04-14: Mortgage/loan payment notification for adults, no kids' events
+builderpulse@zonda-newsletters.com  # auto 2026-04-14: Home building industry trade newsletter for adults, no kids' events
+admin@skinmedicinals.com  # auto 2026-04-14: Adult prescription refill reminder — no children involved
