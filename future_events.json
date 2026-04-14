@@ -1,22 +1,32 @@
 [
   {
-    "name": "Cuppett Recital Dress Rehearsal (Mandatory) \u2014 Day 1",
+    "name": "ViennArt Academy Spring Session 2 Ends",
+    "date": "2026-06-17",
+    "time": "Time TBD",
+    "location": "ViennArt Academy, Vienna, VA",
+    "category": "Sports & Extracurriculars",
+    "child": "Isla",
+    "source": "Kids' Schedule — April 6, 2026 (Apr 6)",
+    "id": "462a8490cd42"
+  },
+  {
+    "name": "Cuppett Recital Dress Rehearsal (Mandatory) — Day 1",
     "date": "2026-06-17",
     "time": "TBD",
     "location": "Cuppett Performing Arts Center, 135 Park Street SE, Vienna, VA 22180",
     "category": "Sports & Extracurriculars",
     "child": "TBD",
-    "source": "Kids' Schedule \u2014 March 30, 2026 (Mar 30)",
+    "source": "Kids' Schedule — March 30, 2026 (Mar 30)",
     "id": "cf2b003ea771"
   },
   {
-    "name": "Cuppett Recital Dress Rehearsal (Mandatory) \u2014 Day 2",
+    "name": "Cuppett Recital Dress Rehearsal (Mandatory) — Day 2",
     "date": "2026-06-18",
     "time": "TBD",
     "location": "Cuppett Performing Arts Center, 135 Park Street SE, Vienna, VA 22180",
     "category": "Sports & Extracurriculars",
     "child": "TBD",
-    "source": "Kids' Schedule \u2014 March 30, 2026 (Mar 30)",
+    "source": "Kids' Schedule — March 30, 2026 (Mar 30)",
     "id": "b0acc99912d7"
   },
   {
@@ -26,13 +36,13 @@
     "location": "Cuppett Performing Arts Center, 135 Park Street SE, Vienna, VA 22180",
     "category": "Sports & Extracurriculars",
     "child": "TBD",
-    "source": "Kids' Schedule \u2014 March 30, 2026 (Mar 30)",
+    "source": "Kids' Schedule — March 30, 2026 (Mar 30)",
     "id": "65db8d85fd1c"
   },
   {
-    "name": "HTM Sharks NVSL A Meet \u2014 HOME: Cottontail (CT) @ Hunter Mill",
+    "name": "HTM Sharks NVSL A Meet — HOME: Cottontail (CT) @ Hunter Mill",
     "date": "2026-06-20",
-    "time": "9:00 AM \u2013 12:00 PM",
+    "time": "9:00 AM – 12:00 PM",
     "location": "Hunter Mill, 10339 Brittenford Drive, Vienna, VA 22182",
     "category": "Sports & Extracurriculars",
     "child": "",
@@ -40,67 +50,7 @@
     "id": "ae0445135fcf"
   },
   {
-    "name": "VIP Summer Camp \u2014 Rising 7th & 8th Graders",
-    "date": "2026-07-01",
-    "time": "9:00 AM \u2013 4:00 PM",
-    "location": "Glasgow Middle School, 4101 Fairfax Pkwy, Lincolnia, VA 22312",
-    "category": "School Activity",
-    "child": "Rising 7th & 8th graders",
-    "source": "FCPS News You Choose (Apr 10)",
-    "id": "889afc24d162"
-  },
-  {
-    "name": "VIP Summer Camp \u2014 Ends",
-    "date": "2026-07-30",
-    "time": "4:00 PM",
-    "location": "Glasgow Middle School, 4101 Fairfax Pkwy, Lincolnia, VA 22312",
-    "category": "School Activity",
-    "child": "Rising 7th & 8th graders",
-    "source": "FCPS News You Choose (Apr 10)",
-    "id": "160a24b53547"
-  },
-  {
-    "name": "VIP Summer Camp \u2014 Last Day",
-    "date": "2026-07-30",
-    "time": "9:00 AM \u2013 4:00 PM",
-    "location": "Glasgow Middle School, 4101 Fairfax Pkwy, Lincolnia, VA 22312",
-    "category": "Sports & Extracurriculars",
-    "child": "Rising 7th & 8th graders",
-    "source": "FCPS News You Choose \u2014 VIP Camp (Apr 10)",
-    "id": "e892e2dcecdf"
-  },
-  {
-    "name": "NO VIP Camp \u2014 July 3rd",
-    "date": "2026-07-03",
-    "time": "All day",
-    "location": "Glasgow Middle School, 4101 Fairfax Pkwy, Lincolnia, VA 22312",
-    "category": "School Activity",
-    "child": "Rising 7th & 8th graders",
-    "source": "FCPS News You Choose (Apr 10)",
-    "id": "09ba480f8257"
-  },
-  {
-    "name": "VIP Summer Camp \u2014 NO CAMP",
-    "date": "2026-07-03",
-    "time": "All day",
-    "location": "Glasgow Middle School, 4101 Fairfax Pkwy, Lincolnia, VA 22312",
-    "category": "Sports & Extracurriculars",
-    "child": "Rising 7th & 8th graders",
-    "source": "FCPS News You Choose \u2014 VIP Camp (Apr 10)",
-    "id": "ef88087609ca"
-  },
-  {
-    "name": "NO VIP Camp \u2014 July 4th Holiday",
-    "date": "2026-07-03",
-    "time": "All day",
-    "location": "Location TBD",
-    "category": "School Activity",
-    "child": "Rising 7th & 8th graders",
-    "source": "FCPS News You Choose (Apr 10)",
-    "id": "0c99125bb1f4"
-  },
-  {
-    "name": "Dental Appointment \u2014 Isla & Everly at Children's Dentistry of Oakton",
+    "name": "Dental Appointment — Isla & Everly at Children's Dentistry of Oakton",
     "date": "2026-10-07",
     "time": "8:30 AM",
     "location": "Children's Dentistry of Oakton",
@@ -110,9 +60,69 @@
     "id": "f13e463b9f27"
   },
   {
+    "name": "VIP Summer Camp — Rising 7th & 8th Graders",
+    "date": "2026-07-01",
+    "time": "9:00 AM – 4:00 PM",
+    "location": "Glasgow Middle School, 4101 Fairfax Pkwy, Lincolnia, VA 22312",
+    "category": "School Activity",
+    "child": "Rising 7th & 8th graders",
+    "source": "FCPS News You Choose (Apr 10)",
+    "id": "889afc24d162"
+  },
+  {
+    "name": "VIP Summer Camp — Ends",
+    "date": "2026-07-30",
+    "time": "4:00 PM",
+    "location": "Glasgow Middle School, 4101 Fairfax Pkwy, Lincolnia, VA 22312",
+    "category": "School Activity",
+    "child": "Rising 7th & 8th graders",
+    "source": "FCPS News You Choose (Apr 10)",
+    "id": "160a24b53547"
+  },
+  {
+    "name": "VIP Summer Camp — Last Day",
+    "date": "2026-07-30",
+    "time": "9:00 AM – 4:00 PM",
+    "location": "Glasgow Middle School, 4101 Fairfax Pkwy, Lincolnia, VA 22312",
+    "category": "Sports & Extracurriculars",
+    "child": "Rising 7th & 8th graders",
+    "source": "FCPS News You Choose — VIP Camp (Apr 10)",
+    "id": "e892e2dcecdf"
+  },
+  {
+    "name": "NO VIP Camp — July 3rd",
+    "date": "2026-07-03",
+    "time": "All day",
+    "location": "Glasgow Middle School, 4101 Fairfax Pkwy, Lincolnia, VA 22312",
+    "category": "School Activity",
+    "child": "Rising 7th & 8th graders",
+    "source": "FCPS News You Choose (Apr 10)",
+    "id": "09ba480f8257"
+  },
+  {
+    "name": "VIP Summer Camp — NO CAMP",
+    "date": "2026-07-03",
+    "time": "All day",
+    "location": "Glasgow Middle School, 4101 Fairfax Pkwy, Lincolnia, VA 22312",
+    "category": "Sports & Extracurriculars",
+    "child": "Rising 7th & 8th graders",
+    "source": "FCPS News You Choose — VIP Camp (Apr 10)",
+    "id": "ef88087609ca"
+  },
+  {
+    "name": "NO VIP Camp — July 4th Holiday",
+    "date": "2026-07-03",
+    "time": "All day",
+    "location": "Location TBD",
+    "category": "School Activity",
+    "child": "Rising 7th & 8th graders",
+    "source": "FCPS News You Choose (Apr 10)",
+    "id": "0c99125bb1f4"
+  },
+  {
     "name": "Chess Camp at LAES",
     "date": "2026-06-22",
-    "time": "9:00 AM \u2013 4:00 PM",
+    "time": "9:00 AM – 4:00 PM",
     "location": "LAES Cafeteria, 324 Nutley St. NW, Vienna, VA 22180",
     "category": "School Activity",
     "child": "All LAES students",
@@ -120,9 +130,9 @@
     "id": "d4d239aa8ee2"
   },
   {
-    "name": "Sports Camp at LAES \u2014 Session 1",
+    "name": "Sports Camp at LAES — Session 1",
     "date": "2026-06-22",
-    "time": "9:00 AM \u2013 2:00 PM",
+    "time": "9:00 AM – 2:00 PM",
     "location": "LAES Gym, 324 Nutley St. NW, Vienna, VA 22180",
     "category": "Sports & Extracurriculars",
     "child": "All LAES students",
@@ -130,9 +140,9 @@
     "id": "50bc54922f4c"
   },
   {
-    "name": "Chess Camp at LAES \u2014 Last Day",
+    "name": "Chess Camp at LAES — Last Day",
     "date": "2026-06-26",
-    "time": "9:00 AM \u2013 4:00 PM",
+    "time": "9:00 AM – 4:00 PM",
     "location": "LAES Cafeteria, 324 Nutley St. NW, Vienna, VA 22180",
     "category": "School Activity",
     "child": "All LAES students",
@@ -140,9 +150,9 @@
     "id": "1b00300bea25"
   },
   {
-    "name": "Sports Camp at LAES \u2014 Session 1 Last Day",
+    "name": "Sports Camp at LAES — Session 1 Last Day",
     "date": "2026-06-26",
-    "time": "9:00 AM \u2013 2:00 PM",
+    "time": "9:00 AM – 2:00 PM",
     "location": "LAES Gym, 324 Nutley St. NW, Vienna, VA 22180",
     "category": "Sports & Extracurriculars",
     "child": "All LAES students",
@@ -160,7 +170,7 @@
     "id": "592a83c35325"
   },
   {
-    "name": "Sports Camp at LAES \u2014 Session 1 (End)",
+    "name": "Sports Camp at LAES — Session 1 (End)",
     "date": "2026-06-26",
     "time": "9:00 AM - 2:00 PM",
     "location": "LAES Gym",
@@ -170,9 +180,9 @@
     "id": "7265d5b7f106"
   },
   {
-    "name": "Sports Camp at LAES \u2014 Session 2",
+    "name": "Sports Camp at LAES — Session 2",
     "date": "2026-07-27",
-    "time": "9:00 AM \u2013 2:00 PM",
+    "time": "9:00 AM – 2:00 PM",
     "location": "LAES Gym, 324 Nutley St. NW, Vienna, VA 22180",
     "category": "Sports & Extracurriculars",
     "child": "All LAES students",
@@ -180,9 +190,9 @@
     "id": "a15530b711f7"
   },
   {
-    "name": "Sports Camp at LAES \u2014 Session 2 Last Day",
+    "name": "Sports Camp at LAES — Session 2 Last Day",
     "date": "2026-07-31",
-    "time": "9:00 AM \u2013 2:00 PM",
+    "time": "9:00 AM – 2:00 PM",
     "location": "LAES Gym, 324 Nutley St. NW, Vienna, VA 22180",
     "category": "Sports & Extracurriculars",
     "child": "All LAES students",
@@ -190,7 +200,7 @@
     "id": "621e8009c68b"
   },
   {
-    "name": "Sports Camp at LAES \u2014 Session 2 (End)",
+    "name": "Sports Camp at LAES — Session 2 (End)",
     "date": "2026-07-31",
     "time": "9:00 AM - 2:00 PM",
     "location": "LAES Gym",
@@ -200,9 +210,9 @@
     "id": "21b494b4a788"
   },
   {
-    "name": "Sports Camp at LAES \u2014 Session 3",
+    "name": "Sports Camp at LAES — Session 3",
     "date": "2026-08-03",
-    "time": "9:00 AM \u2013 2:00 PM",
+    "time": "9:00 AM – 2:00 PM",
     "location": "LAES Gym, 324 Nutley St. NW, Vienna, VA 22180",
     "category": "Sports & Extracurriculars",
     "child": "All LAES students",
@@ -210,9 +220,9 @@
     "id": "37be43b5f3a7"
   },
   {
-    "name": "Sports Camp at LAES \u2014 Session 3 Last Day",
+    "name": "Sports Camp at LAES — Session 3 Last Day",
     "date": "2026-08-07",
-    "time": "9:00 AM \u2013 2:00 PM",
+    "time": "9:00 AM – 2:00 PM",
     "location": "LAES Gym, 324 Nutley St. NW, Vienna, VA 22180",
     "category": "Sports & Extracurriculars",
     "child": "All LAES students",
@@ -220,7 +230,7 @@
     "id": "1c90d2f1fdf2"
   },
   {
-    "name": "Sports Camp at LAES \u2014 Session 3 (End)",
+    "name": "Sports Camp at LAES — Session 3 (End)",
     "date": "2026-08-07",
     "time": "9:00 AM - 2:00 PM",
     "location": "LAES Gym",
@@ -230,9 +240,9 @@
     "id": "6d797548083d"
   },
   {
-    "name": "HTM Sharks NVSL A Meet \u2014 HOME: Forest Hollow (FH) @ Hunter Mill",
+    "name": "HTM Sharks NVSL A Meet — HOME: Forest Hollow (FH) @ Hunter Mill",
     "date": "2026-06-27",
-    "time": "9:00 AM \u2013 12:00 PM",
+    "time": "9:00 AM – 12:00 PM",
     "location": "Hunter Mill, 10339 Brittenford Drive, Vienna, VA 22182",
     "category": "Sports & Extracurriculars",
     "child": "",
@@ -240,9 +250,9 @@
     "id": "920e19edba89"
   },
   {
-    "name": "HTM Sharks NVSL A Meet \u2014 AWAY: Hunter Mill @ Fairfax Station Swim & Tennis (FS)",
+    "name": "HTM Sharks NVSL A Meet — AWAY: Hunter Mill @ Fairfax Station Swim & Tennis (FS)",
     "date": "2026-07-04",
-    "time": "9:00 AM \u2013 12:00 PM",
+    "time": "9:00 AM – 12:00 PM",
     "location": "Fairfax Station Swim & Tennis, 6203 Old Arrington Lane, Fairfax Station, VA 22039",
     "category": "Sports & Extracurriculars",
     "child": "",
@@ -250,9 +260,9 @@
     "id": "d0abfd8ce676"
   },
   {
-    "name": "HTM Sharks NVSL A Meet \u2014 AWAY: Hunter Mill @ Greenbriar (G)",
+    "name": "HTM Sharks NVSL A Meet — AWAY: Hunter Mill @ Greenbriar (G)",
     "date": "2026-07-11",
-    "time": "9:00 AM \u2013 12:00 PM",
+    "time": "9:00 AM – 12:00 PM",
     "location": "Greenbriar, 13001 Point Pleasant Drive, Fairfax, VA 22033",
     "category": "Sports & Extracurriculars",
     "child": "",
@@ -260,9 +270,9 @@
     "id": "3c48282c9ff1"
   },
   {
-    "name": "HTM Sharks NVSL A Meet \u2014 HOME: Mount Vernon Park (MVP) @ Hunter Mill",
+    "name": "HTM Sharks NVSL A Meet — HOME: Mount Vernon Park (MVP) @ Hunter Mill",
     "date": "2026-07-18",
-    "time": "9:00 AM \u2013 12:00 PM",
+    "time": "9:00 AM – 12:00 PM",
     "location": "Hunter Mill, 10339 Brittenford Drive, Vienna, VA 22182",
     "category": "Sports & Extracurriculars",
     "child": "",

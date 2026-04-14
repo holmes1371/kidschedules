@@ -1,0 +1,27 @@
+# Auto-populated blocklist managed by the pipeline.
+# DO NOT hand-edit — edit blocklist.txt instead.
+# Each entry is a high-confidence agent flag. The weekly filter
+# audit can recommend removals if any entry hid real kid mail.
+amber.graves@salesforce.com  # auto 2026-04-14: adult legal recruiting call confirmation, no child involvement
+no-reply@mail.goodreads.com  # auto 2026-04-14: adult social reading/book update newsletter, no child events
+hello@edikted.com  # auto 2026-04-14: adult retail/fashion promotional email, no child events
+security@facebookmail.com  # auto 2026-04-14: Facebook security code notification, no child events
+ellen.n.holmes@gmail.com  # auto 2026-04-14: adult personal email about tax return, no child events
+email@theatlantic.com  # auto 2026-04-14: Adult magazine newsletter with no kids' content
+noreply@meevomail.com  # auto 2026-04-14: Adult hair salon appointment confirmations with no mention of children
+orders@oe.target.com  # auto 2026-04-14: Adult retail order confirmation (hair products, slow cooker) with no kids' conte
+orders@oe1.target.com  # auto 2026-04-14: Adult retail order confirmation/pickup notifications with no kids' content
+fcps@public.govdelivery.com  # auto 2026-04-14: FCPS Adult and Community Education newsletter — adult continuing education cours
+newsletters@myhealth.inova.org  # auto 2026-04-14: Adult women's wellness/hormone workshops with no children's content
+no-reply@alleoffers.com  # auto 2026-04-14: Adult cosmetic treatment (Botox) reminder for parent, no children's content
+venmo@email.venmo.com  # auto 2026-04-14: Adult financial rewards/cash back promotional email with no children's events
+ancestry@email.ancestry.com  # auto 2026-04-14: Adult genealogy/vital records service with no children's events
+loyalty@loyalty.ms.aa.com  # auto 2026-04-14: Adult airline loyalty program promotional email with no children's events
+morganstanleyatwork@msmail.morganstanley.com  # auto 2026-04-14: Adult employee stock plan enrollment email (BHP Shareplus) — entirely workplace/
+patch@mail.sailthru.com  # auto 2026-04-14: Local community events newsletter (adult-oriented activities like candy/coffee t
+jcarlin@paulweiss.com  # auto 2026-04-14: Adult legal/professional webinar invitation (national security, export controls,
+info@daliaforsupervisor.com  # auto 2026-04-14: Political fundraising email for a county supervisor candidate — purely adult/pol
+support3@info.myloancare.com  # auto 2026-04-14: Mortgage/loan payment reminder — adult financial, no kids' events
+noreply@dcbar.org  # auto 2026-04-14: D.C. Bar member event — adult legal professional organization, no children's con
+maryc@cake4kids.org  # auto 2026-04-14: Adult volunteer baker community event — children benefit from the charity but th
+communications@recreation.gov  # auto 2026-04-14: Recreation.gov reservation reminder — camping/outdoor recreation booking service
