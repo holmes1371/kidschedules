@@ -372,13 +372,14 @@ def extract_events(
             )
         user_message = "\n".join(parts)
 
-        try:
-            response = _call_with_retry(
-                client, model, max_tokens, user_message, batch_label
-            )
-        except Exception as e:
-            print(f"SKIPPING {batch_label}: {e}")
-            continue
+        # No try/except here: _call_with_retry already absorbs transient
+        # errors (429/500/503/529/connection/timeout) with backoff. Anything
+        # past that is a real failure (auth, persistent 5xx, unexpected
+        # status) and must fail the pipeline so the GitHub Actions run
+        # surfaces the push notification.
+        response = _call_with_retry(
+            client, model, max_tokens, user_message, batch_label
+        )
 
         # Parse the response
         text = response.content[0].text.strip()

@@ -17,6 +17,11 @@ on:
         required: false
         type: boolean
         default: false
+      intentional_failure:
+        description: "Intentional failure (tests Actions push notification)"
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write   # needed to push future_events.json to the state branch
@@ -123,6 +128,9 @@ jobs:
           fi
           if [ "${{ github.event.inputs.dry_run }}" == "true" ]; then
             ARGS="$ARGS --dry-run"
+          fi
+          if [ "${{ github.event.inputs.intentional_failure }}" == "true" ]; then
+            ARGS="$ARGS --intentional-failure"
           fi
           python main.py $ARGS
 

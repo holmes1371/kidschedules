@@ -446,7 +446,18 @@ def main() -> int:
         "--dry-run", action="store_true",
         help="Run the full pipeline but skip publishing."
     )
+    parser.add_argument(
+        "--intentional-failure", action="store_true",
+        help="Raise immediately to verify the Actions failure-notification "
+             "path end-to-end. Does no real work."
+    )
     args = parser.parse_args()
+
+    if args.intentional_failure:
+        raise RuntimeError(
+            "Intentional failure triggered via --intentional-failure. "
+            "This is a test of the GitHub Actions notification path."
+        )
 
     # Step 1: Build queries
     config = step1_build_queries(args.lookback_days)
