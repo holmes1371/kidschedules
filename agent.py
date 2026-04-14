@@ -101,7 +101,42 @@ KEY RULES:
 - Do NOT filter out past events — the downstream script handles that.
 - Do NOT skip items just because they seem administrative (yearbook
   deadlines, sign-up cutoffs, payment due dates). Parents need these.
-- Output ONLY the JSON array, no other text. If no events found: []
+
+IRRELEVANT SENDER FLAGGING (second deliverable):
+
+In addition to extracting events, identify any sender in this batch
+whose emails were entirely adult- or work-related and would NEVER
+produce kids' events. This feeds an auto-blocklist so noisy senders
+get filtered next run.
+
+Rules:
+- Only flag senders that produced ZERO kids' events in this batch.
+- Only flag with confidence "high" if you are sure the sender is
+  adult-only (work calendars, legal recruiting, personal finance,
+  adult appointments, etc.).
+- NEVER flag: schools (fcps.edu, any PTA/PTSA), extracurricular
+  providers (Cuppett, HTM Sharks, jackrabbittech, teamsnap,
+  signupgenius, myschoolbucks, lifetouch, school photo vendors),
+  or any medical/dental/therapy provider that could see a child.
+- Use the exact sender address as it appears in the email header
+  (e.g. "appointments@calendly.com"), NOT a bare domain.
+- When in doubt, omit. Leaving off a sender is always safe.
+
+OUTPUT FORMAT — return a single JSON object:
+
+{
+  "events": [ ...event dicts... ],
+  "irrelevant_senders": [
+    {
+      "from": "appointments@calendly.com",
+      "reason": "adult work calendar confirmation",
+      "confidence": "high"
+    }
+  ]
+}
+
+If no events: "events": []. If no irrelevant senders: "irrelevant_senders": [].
+Output ONLY the JSON object, no other text.
 """
 
 
@@ -234,10 +269,12 @@ def _call_with_retry(
     raise RuntimeError("Exhausted retries")
 
 
-def _parse_json_response(text: str) -> list[dict] | None:
-    """Try to parse a JSON array from the model's response text.
+def _parse_json_response(text: str) -> dict[str, list] | None:
+    """Parse the model's response into {'events': [...], 'irrelevant_senders': [...]}.
 
-    Handles ```json wrapping and returns None on failure.
+    Accepts either the current dict shape or a legacy bare-list shape
+    (treated as events-only, no irrelevant senders). Returns None on
+    unrecoverable parse failure.
     """
     # Strip markdown code fences
     if text.startswith("```"):
@@ -251,21 +288,29 @@ def _parse_json_response(text: str) -> list[dict] | None:
         print(f"  Raw response (first 500 chars):\n{text[:500]}")
         return None
 
-    if isinstance(result, dict) and "events" in result:
-        result = result["events"]
+    if isinstance(result, list):
+        return {"events": result, "irrelevant_senders": []}
 
-    if not isinstance(result, list):
-        print(f"WARNING: response is not a list: {type(result)}")
-        return None
+    if isinstance(result, dict):
+        events = result.get("events", [])
+        senders = result.get("irrelevant_senders", [])
+        if not isinstance(events, list):
+            print(f"WARNING: 'events' is not a list: {type(events)}")
+            events = []
+        if not isinstance(senders, list):
+            print(f"WARNING: 'irrelevant_senders' is not a list: {type(senders)}")
+            senders = []
+        return {"events": events, "irrelevant_senders": senders}
 
-    return result
+    print(f"WARNING: response is not a dict or list: {type(result)}")
+    return None
 
 
 def extract_events(
     emails: list[dict[str, Any]],
     model: str = "claude-sonnet-4-6",
     max_tokens: int = 16384,
-) -> list[dict[str, Any]]:
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     """Send email content to Claude in batches and collect event dicts.
 
     Args:
@@ -275,10 +320,11 @@ def extract_events(
         max_tokens: max response tokens per batch.
 
     Returns:
-        list of event dicts ready for process_events.py
+        (events, irrelevant_senders) — events are ready for
+        process_events.py; irrelevant_senders feeds update_auto_blocklist.py.
     """
     if not emails:
-        return []
+        return [], []
 
     # Split into batches
     batches = [
@@ -289,6 +335,7 @@ def extract_events(
           f"of up to {BATCH_SIZE}")
 
     all_events: list[dict[str, Any]] = []
+    all_irrelevant: list[dict[str, Any]] = []
     total_input_tokens = 0
     total_output_tokens = 0
 
@@ -321,22 +368,23 @@ def extract_events(
 
         # Parse the response
         text = response.content[0].text.strip()
-        events = _parse_json_response(text)
+        parsed = _parse_json_response(text)
 
         # If parse failed, retry once asking the model to fix it
-        if events is None:
+        if parsed is None:
             print(f"  Retrying {batch_label} with JSON repair prompt...")
             try:
                 repair_response = _call_with_retry(
                     client, model, max_tokens,
                     f"Your previous response was not valid JSON. Here is what you returned:\n\n"
                     f"{text[:3000]}\n\n"
-                    f"Please return ONLY a valid JSON array of event dicts. No markdown, no explanation.",
+                    f"Please return ONLY a valid JSON object with keys "
+                    f"'events' and 'irrelevant_senders'. No markdown, no explanation.",
                     f"{batch_label} (repair)",
                 )
                 text2 = repair_response.content[0].text.strip()
-                events = _parse_json_response(text2)
-                if events is not None:
+                parsed = _parse_json_response(text2)
+                if parsed is not None:
                     usage2 = repair_response.usage
                     total_input_tokens += usage2.input_tokens
                     total_output_tokens += usage2.output_tokens
@@ -344,22 +392,25 @@ def extract_events(
             except Exception as e2:
                 print(f"  Repair also failed: {e2}")
 
-        if events is None:
+        if parsed is None:
             print(f"  SKIPPING {batch_label}: could not parse JSON")
             continue
 
+        events = parsed["events"]
+        irrelevant = parsed["irrelevant_senders"]
         usage = response.usage
         total_input_tokens += usage.input_tokens
         total_output_tokens += usage.output_tokens
-        print(f"{len(events)} events extracted "
+        print(f"{len(events)} events, {len(irrelevant)} sender(s) flagged "
               f"({usage.input_tokens} in / {usage.output_tokens} out)")
 
         all_events.extend(events)
+        all_irrelevant.extend(irrelevant)
 
     print(f"  Total token usage: {total_input_tokens} input, "
           f"{total_output_tokens} output")
 
-    return all_events
+    return all_events, all_irrelevant
 
 
 def review_stripped_messages(

@@ -14,6 +14,7 @@ import sys
 
 _PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_BLOCKLIST = os.path.join(_PROJECT_ROOT, "blocklist.txt")
+DEFAULT_AUTO_BLOCKLIST = os.path.join(_PROJECT_ROOT, "blocklist_auto.txt")
 DEFAULT_AUDIT_STATE = os.path.join(_PROJECT_ROOT, ".filter_audit.json")
 
 
@@ -56,7 +57,12 @@ def load_audit_state(path: str, today: dt.date) -> dict:
 
 
 def load_blocklist(path: str) -> list[str]:
-    """Return a list of sender patterns (addresses or domains), deduped."""
+    """Return a list of sender patterns (addresses or domains), deduped.
+
+    Strips inline ``# ...`` comments so auto-added entries
+    (``addr  # auto YYYY-MM-DD: reason``) don't leak their comment into the
+    Gmail query.
+    """
     if not os.path.exists(path):
         return []
     out: list[str] = []
@@ -65,6 +71,10 @@ def load_blocklist(path: str) -> list[str]:
         for line in f:
             line = line.strip()
             if not line or line.startswith("#"):
+                continue
+            # Strip inline comments; auto-added entries carry "# auto ...".
+            line = line.split("#", 1)[0].strip()
+            if not line:
                 continue
             if line not in seen:
                 seen.add(line)
@@ -114,7 +124,9 @@ def main() -> int:
     p.add_argument("--today", type=str, default=None,
                    help="Override today (YYYY-MM-DD). Default: system date.")
     p.add_argument("--blocklist", type=str, default=DEFAULT_BLOCKLIST,
-                   help="Path to sender blocklist file. Pass '' to disable.")
+                   help="Path to the hand-curated blocklist. Pass '' to disable.")
+    p.add_argument("--auto-blocklist", type=str, default=DEFAULT_AUTO_BLOCKLIST,
+                   help="Path to the bot-owned blocklist_auto.txt. Pass '' to disable.")
     p.add_argument("--no-category-filter", action="store_true",
                    help="Do not append -category:promotions to queries.")
     p.add_argument("--audit-state", type=str, default=DEFAULT_AUDIT_STATE,
@@ -129,7 +141,18 @@ def main() -> int:
     after = start.strftime(gmail_fmt)
     before = today.strftime(gmail_fmt)
 
-    blocklist = load_blocklist(args.blocklist) if args.blocklist else []
+    blocklist_main = load_blocklist(args.blocklist) if args.blocklist else []
+    blocklist_auto = (
+        load_blocklist(args.auto_blocklist) if args.auto_blocklist else []
+    )
+    # Union while preserving order: main list first, then auto entries not
+    # already in main (dedupe case-insensitively).
+    seen_lower = {s.lower() for s in blocklist_main}
+    blocklist = list(blocklist_main)
+    for s in blocklist_auto:
+        if s.lower() not in seen_lower:
+            seen_lower.add(s.lower())
+            blocklist.append(s)
     exclusion = build_exclusion_clause(blocklist)
     if args.no_category_filter:
         exclusion = " ".join(
@@ -167,7 +190,11 @@ def main() -> int:
         "exclusions": {
             "category_promotions": not args.no_category_filter,
             "blocklist_path": args.blocklist if args.blocklist else None,
+            "auto_blocklist_path": (args.auto_blocklist
+                                    if args.auto_blocklist else None),
             "blocklist_size": len(blocklist),
+            "blocklist_size_main": len(blocklist_main),
+            "blocklist_size_auto": len(blocklist_auto),
         },
         "filter_audit": audit,
         "loose_queries": loose_queries,

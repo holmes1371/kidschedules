@@ -30,11 +30,7 @@ docs/20[0-9][0-9]-[0-1][0-9]-[0-3][0-9].html
 future_events.json
 ignored_events.json
 .filter_audit.json
+blocklist_auto.txt
 
 # OS
 .DS_Store
-Thumbs.db
-
-# IDE
-.vscode/
-.idea/

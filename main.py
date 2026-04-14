@@ -36,6 +36,8 @@ LAST_RUN_FIXTURE_PATH = os.path.join(
 )
 WEBHOOK_URL_PATH = os.path.join(PROJECT_ROOT, "ignore_webhook_url.txt")
 IGNORED_EVENTS_PATH = os.path.join(PROJECT_ROOT, "ignored_events.json")
+BLOCKLIST_PATH = os.path.join(PROJECT_ROOT, "blocklist.txt")
+AUTO_BLOCKLIST_PATH = os.path.join(PROJECT_ROOT, "blocklist_auto.txt")
 
 
 def _load_webhook_url() -> str:
@@ -70,7 +72,12 @@ def step1_build_queries(lookback_days: int) -> dict[str, Any]:
     print(f"  Today: {config['today_human']}")
     print(f"  Email window: {config['email_window']['after']} → "
           f"{config['email_window']['before']}")
-    print(f"  Blocklist: {config['exclusions']['blocklist_size']} senders excluded")
+    excl = config["exclusions"]
+    print(
+        f"  Blocklist: {excl['blocklist_size']} senders excluded "
+        f"({excl['blocklist_size_main']} hand-curated + "
+        f"{excl['blocklist_size_auto']} auto)"
+    )
     print(f"  Filter audit: {config['filter_audit']['reason']}")
     return config
 
@@ -230,7 +237,7 @@ def step2b_read_promising(
 def step3_extract_events(
     full_emails: list[dict[str, Any]],
     model: str,
-) -> list[dict[str, Any]]:
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     """Send emails to the Anthropic agent for event extraction."""
     print("\n" + "=" * 60)
     print("STEP 3: Agent event extraction (Anthropic API)")
@@ -238,9 +245,45 @@ def step3_extract_events(
     print(f"  Model: {model}")
     print(f"  Emails to process: {len(full_emails)}")
 
-    events = extract_events(full_emails, model=model)
+    events, irrelevant_senders = extract_events(full_emails, model=model)
     print(f"  Candidate events extracted: {len(events)}")
-    return events
+    print(f"  Irrelevant sender suggestions: {len(irrelevant_senders)}")
+    return events, irrelevant_senders
+
+
+def step3b_update_auto_blocklist(
+    irrelevant_senders: list[dict[str, Any]],
+) -> None:
+    """Merge agent-flagged senders into blocklist_auto.txt with guardrails."""
+    if not irrelevant_senders:
+        print("\n" + "=" * 60)
+        print("STEP 3b: Auto-blocklist update — no suggestions, skipping")
+        print("=" * 60)
+        return
+
+    print("\n" + "=" * 60)
+    print("STEP 3b: Auto-blocklist update")
+    print("=" * 60)
+
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=".json", delete=False, encoding="utf-8"
+    ) as f:
+        json.dump(irrelevant_senders, f, ensure_ascii=False)
+        suggestions_path = f.name
+    try:
+        run_script(
+            "update_auto_blocklist.py",
+            [
+                "--suggestions", suggestions_path,
+                "--auto-blocklist", AUTO_BLOCKLIST_PATH,
+                "--main-blocklist", BLOCKLIST_PATH,
+            ],
+        )
+    finally:
+        try:
+            os.unlink(suggestions_path)
+        except OSError:
+            pass
 
 
 def _load_event_bank() -> list[dict[str, Any]]:
@@ -417,9 +460,18 @@ def main() -> int:
     if not full_emails:
         print("\nNo emails found. The page will note an empty run.")
         candidates: list[dict] = []
+        irrelevant_senders: list[dict] = []
     else:
         # Step 3: Agent extraction
-        candidates = step3_extract_events(full_emails, model=args.model)
+        candidates, irrelevant_senders = step3_extract_events(
+            full_emails, model=args.model
+        )
+
+    # Step 3b: Feed agent-flagged senders into the auto-blocklist.
+    if not args.dry_run:
+        step3b_update_auto_blocklist(irrelevant_senders)
+    else:
+        print("\n  (dry-run: skipping auto-blocklist update)")
 
     # Step 4: Process events
     html, body, meta = step4_process_events(candidates)
