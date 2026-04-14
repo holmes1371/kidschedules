@@ -1,0 +1,38 @@
+[
+  {
+    "name": "Last Week's Field Trip",
+    "date": "2026-04-07",
+    "time": "9:00 AM",
+    "location": "Udvar-Hazy Center",
+    "category": "School Activity",
+    "child": "Isla",
+    "source": "LAES (Mar 28)"
+  },
+  {
+    "name": "Soccer Practice",
+    "date": "2026-04-21",
+    "time": "5:30 PM",
+    "location": "Wakefield Park",
+    "category": "Sports & Extracurriculars",
+    "child": "Isla",
+    "source": "NVSC (Apr 11)"
+  },
+  {
+    "name": "Summer Reading Kickoff",
+    "date": "2026-07-15",
+    "time": "10:00 AM",
+    "location": "Tysons-Pimmit Library",
+    "category": "School Activity",
+    "child": "",
+    "source": "FCPL newsletter (Apr 2)"
+  },
+  {
+    "name": "Yearbook Sales Deadline",
+    "date": "",
+    "time": "All day (deadline)",
+    "location": "",
+    "category": "Academic Due Date",
+    "child": "Isla",
+    "source": "LAES PTA (Apr 8)"
+  }
+]

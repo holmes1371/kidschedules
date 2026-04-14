@@ -1,0 +1,26 @@
+[
+  {
+    "name": "",
+    "date": "2026-04-20",
+    "time": "9:00 AM",
+    "location": "Nowhere",
+    "category": "School Activity",
+    "child": "Isla",
+    "source": "Broken sender (Apr 10)"
+  },
+  {
+    "name": "Odd Category Event",
+    "date": "2026-04-21",
+    "time": "10:00 AM",
+    "location": "LAES",
+    "category": "Mystery",
+    "child": "Isla",
+    "source": "Unknown (Apr 1)"
+  },
+  {
+    "name": "Sparse Event",
+    "date": "2026-04-22",
+    "category": "School Activity",
+    "source": "LAES (Apr 9)"
+  }
+]

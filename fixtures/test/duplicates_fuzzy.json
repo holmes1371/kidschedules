@@ -1,0 +1,38 @@
+[
+  {
+    "name": "ASL Club",
+    "date": "2026-04-20",
+    "time": "3:30 PM",
+    "location": "",
+    "category": "School Activity",
+    "child": "",
+    "source": "LAES newsletter (Apr 6)"
+  },
+  {
+    "name": "ASL Club Meeting",
+    "date": "2026-04-20",
+    "time": "3:30 PM",
+    "location": "LAES Room 204",
+    "category": "School Activity",
+    "child": "Isla",
+    "source": "Ms. Patel ASL club email (Apr 9)"
+  },
+  {
+    "name": "Swim — Ages 3-5",
+    "date": "2026-04-22",
+    "time": "5:00 PM",
+    "location": "HTM Pool",
+    "category": "Sports & Extracurriculars",
+    "child": "Everly",
+    "source": "HTM Sharks (Apr 4)"
+  },
+  {
+    "name": "Swim — Ages 6-8",
+    "date": "2026-04-22",
+    "time": "6:00 PM",
+    "location": "HTM Pool",
+    "category": "Sports & Extracurriculars",
+    "child": "Isla",
+    "source": "HTM Sharks (Apr 4)"
+  }
+]
