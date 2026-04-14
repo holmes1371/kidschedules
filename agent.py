@@ -385,4 +385,16 @@ def review_stripped_messages(
         f"{usage.output_tokens} out"
     )
 
+    # Defensive: the audit currently reuses EXTRACTION_SYSTEM_PROMPT, so the
+    # model may reply with a list instead of the expected dict. Coerce to the
+    # empty-recommendations shape rather than crashing the pipeline.
+    if not isinstance(result, dict):
+        print(
+            f"  Audit returned unexpected shape ({type(result).__name__}); "
+            f"treating as no recommendations."
+        )
+        return {"decisions": [], "senders_to_unblock": []}
+
+    result.setdefault("decisions", [])
+    result.setdefault("senders_to_unblock", [])
     return result
