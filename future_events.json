@@ -1,5 +1,285 @@
 [
   {
+    "name": "Cuppett Recital Dress Rehearsal (Mandatory)",
+    "date": "2026-06-17",
+    "time": "Time TBD",
+    "location": "Cuppett Performing Arts Center, 135 Park Street SE, Vienna, VA 22180",
+    "category": "Sports & Extracurriculars",
+    "child": "TBD",
+    "source": "Kids' Schedule \u2014 March 30, 2026 (Mar 30)",
+    "id": "ad6aac0517e3"
+  },
+  {
+    "name": "Cuppett Recital Dress Rehearsal (Mandatory)",
+    "date": "2026-06-18",
+    "time": "Time TBD",
+    "location": "Cuppett Performing Arts Center, 135 Park Street SE, Vienna, VA 22180",
+    "category": "Sports & Extracurriculars",
+    "child": "TBD",
+    "source": "Kids' Schedule \u2014 March 30, 2026 (Mar 30)",
+    "id": "07f062e7ed8a"
+  },
+  {
+    "name": "Cuppett June Recitals",
+    "date": "2026-06-20",
+    "time": "TBD",
+    "location": "Cuppett Performing Arts Center, 135 Park Street SE, Vienna, VA 22180",
+    "category": "Sports & Extracurriculars",
+    "child": "TBD",
+    "source": "Kids' Schedule \u2014 March 30, 2026 (Mar 30)",
+    "id": "65db8d85fd1c"
+  },
+  {
+    "name": "VIP Summer Camp for Rising 7th & 8th Graders",
+    "date": "2026-07-01",
+    "time": "9:00 AM \u2013 4:00 PM",
+    "location": "Glasgow Middle School, 4101 Fairfax Pkwy, Lincolnia, VA 22312",
+    "category": "Sports & Extracurriculars",
+    "child": "Rising 7th & 8th graders",
+    "source": "FCPS News You Choose (Apr 10)",
+    "id": "05153508d666"
+  },
+  {
+    "name": "VIP Summer Camp \u2014 No Camp",
+    "date": "2026-07-03",
+    "time": "All day",
+    "location": "Glasgow Middle School, 4101 Fairfax Pkwy, Lincolnia, VA 22312",
+    "category": "Sports & Extracurriculars",
+    "child": "Rising 7th & 8th graders",
+    "source": "FCPS News You Choose (Apr 10)",
+    "id": "ef88087609ca"
+  },
+  {
+    "name": "VIP Summer Camp (ends)",
+    "date": "2026-07-30",
+    "time": "9:00 AM \u2013 4:00 PM",
+    "location": "Glasgow Middle School, 4101 Fairfax Pkwy, Lincolnia, VA 22312",
+    "category": "Sports & Extracurriculars",
+    "child": "Rising 7th & 8th graders",
+    "source": "FCPS News You Choose (Apr 10)",
+    "id": "351c984a74dd"
+  },
+  {
+    "name": "Dental Appointment \u2014 Isla & Everly at Children's Dentistry of Oakton",
+    "date": "2026-10-07",
+    "time": "8:30 AM",
+    "location": "Children's Dentistry of Oakton",
+    "category": "Appointment",
+    "child": "Isla, Everly",
+    "source": "Children's Dentistry of Oakton (Apr 6)",
+    "id": "f13e463b9f27"
+  },
+  {
+    "name": "Chess Camp at LAES (Session 1)",
+    "date": "2026-06-22",
+    "time": "9:00 AM - 4:00 PM",
+    "location": "LAES Cafeteria",
+    "category": "School Activity",
+    "child": "All LAES students",
+    "source": "LAES PTA Sunbeam (Mar 22)",
+    "id": "24dc48433288"
+  },
+  {
+    "name": "Chess Camp at LAES (Session \u2014 Last Day)",
+    "date": "2026-06-26",
+    "time": "9:00 AM - 4:00 PM",
+    "location": "LAES Cafeteria",
+    "category": "School Activity",
+    "child": "All LAES students",
+    "source": "LAES PTA Sunbeam (Mar 22)",
+    "id": "52d741e8648c"
+  },
+  {
+    "name": "Sports Camp at LAES \u2014 Session 1",
+    "date": "2026-06-22",
+    "time": "9:00 AM - 2:00 PM",
+    "location": "LAES Gym",
+    "category": "School Activity",
+    "child": "All LAES students",
+    "source": "LAES PTA Sunbeam (Mar 22)",
+    "id": "50bc54922f4c"
+  },
+  {
+    "name": "Sports Camp at LAES \u2014 Session 1 Last Day",
+    "date": "2026-06-26",
+    "time": "9:00 AM - 2:00 PM",
+    "location": "LAES Gym",
+    "category": "School Activity",
+    "child": "All LAES students",
+    "source": "LAES PTA Sunbeam (Mar 22)",
+    "id": "1cdfe405800b"
+  },
+  {
+    "name": "Sports Camp at LAES \u2014 Session 2",
+    "date": "2026-07-27",
+    "time": "9:00 AM - 2:00 PM",
+    "location": "LAES Gym",
+    "category": "School Activity",
+    "child": "All LAES students",
+    "source": "LAES PTA Sunbeam (Mar 22)",
+    "id": "a15530b711f7"
+  },
+  {
+    "name": "Sports Camp at LAES \u2014 Session 2 Last Day",
+    "date": "2026-07-31",
+    "time": "9:00 AM - 2:00 PM",
+    "location": "LAES Gym",
+    "category": "School Activity",
+    "child": "All LAES students",
+    "source": "LAES PTA Sunbeam (Mar 22)",
+    "id": "621e8009c68b"
+  },
+  {
+    "name": "Sports Camp at LAES \u2014 Session 3",
+    "date": "2026-08-03",
+    "time": "9:00 AM - 2:00 PM",
+    "location": "LAES Gym",
+    "category": "School Activity",
+    "child": "All LAES students",
+    "source": "LAES PTA Sunbeam (Mar 22)",
+    "id": "37be43b5f3a7"
+  },
+  {
+    "name": "Sports Camp at LAES \u2014 Session 3 Last Day",
+    "date": "2026-08-07",
+    "time": "9:00 AM - 2:00 PM",
+    "location": "LAES Gym",
+    "category": "School Activity",
+    "child": "All LAES students",
+    "source": "LAES PTA Sunbeam (Mar 22)",
+    "id": "1c90d2f1fdf2"
+  },
+  {
+    "name": "Chess Camp at LAES (Session 1 Start)",
+    "date": "2026-06-22",
+    "time": "9:00 AM - 4:00 PM",
+    "location": "LAES Cafeteria",
+    "category": "School Activity",
+    "child": "All LAES students",
+    "source": "LAES PTA Sunbeam (Mar 15)",
+    "id": "b0aae86fa546"
+  },
+  {
+    "name": "Chess Camp at LAES (Session 1 End)",
+    "date": "2026-06-26",
+    "time": "9:00 AM - 4:00 PM",
+    "location": "LAES Cafeteria",
+    "category": "School Activity",
+    "child": "All LAES students",
+    "source": "LAES PTA Sunbeam (Mar 15)",
+    "id": "592a83c35325"
+  },
+  {
+    "name": "Sports Camp at LAES \u2014 Session 1 (Start)",
+    "date": "2026-06-22",
+    "time": "9:00 AM - 2:00 PM",
+    "location": "LAES Gym",
+    "category": "School Activity",
+    "child": "All LAES students",
+    "source": "LAES PTA Sunbeam (Mar 15)",
+    "id": "808c6cd59ddd"
+  },
+  {
+    "name": "Sports Camp at LAES \u2014 Session 1 (End)",
+    "date": "2026-06-26",
+    "time": "9:00 AM - 2:00 PM",
+    "location": "LAES Gym",
+    "category": "School Activity",
+    "child": "All LAES students",
+    "source": "LAES PTA Sunbeam (Mar 15)",
+    "id": "7265d5b7f106"
+  },
+  {
+    "name": "Sports Camp at LAES \u2014 Session 2 (Start)",
+    "date": "2026-07-27",
+    "time": "9:00 AM - 2:00 PM",
+    "location": "LAES Gym",
+    "category": "School Activity",
+    "child": "All LAES students",
+    "source": "LAES PTA Sunbeam (Mar 15)",
+    "id": "7a50b903e098"
+  },
+  {
+    "name": "Sports Camp at LAES \u2014 Session 2 (End)",
+    "date": "2026-07-31",
+    "time": "9:00 AM - 2:00 PM",
+    "location": "LAES Gym",
+    "category": "School Activity",
+    "child": "All LAES students",
+    "source": "LAES PTA Sunbeam (Mar 15)",
+    "id": "21b494b4a788"
+  },
+  {
+    "name": "Sports Camp at LAES \u2014 Session 3 (Start)",
+    "date": "2026-08-03",
+    "time": "9:00 AM - 2:00 PM",
+    "location": "LAES Gym",
+    "category": "School Activity",
+    "child": "All LAES students",
+    "source": "LAES PTA Sunbeam (Mar 15)",
+    "id": "bddb6dce94c6"
+  },
+  {
+    "name": "Sports Camp at LAES \u2014 Session 3 (End)",
+    "date": "2026-08-07",
+    "time": "9:00 AM - 2:00 PM",
+    "location": "LAES Gym",
+    "category": "School Activity",
+    "child": "All LAES students",
+    "source": "LAES PTA Sunbeam (Mar 15)",
+    "id": "6d797548083d"
+  },
+  {
+    "name": "HTM Sharks A Meet \u2014 HOME: Cottontail (CT) @ Hunter Mill",
+    "date": "2026-06-20",
+    "time": "9:00 AM - 12:00 PM",
+    "location": "Hunter Mill, 10339 Brittenford Drive, Vienna, VA 22182",
+    "category": "Sports & Extracurriculars",
+    "child": "",
+    "source": "HTM Sharks / Carly Reiley via SportsEngine Motion (Mar 4)",
+    "id": "80b7441a1967"
+  },
+  {
+    "name": "HTM Sharks A Meet \u2014 HOME: Forest Hollow (FH) @ Hunter Mill",
+    "date": "2026-06-27",
+    "time": "9:00 AM - 12:00 PM",
+    "location": "Hunter Mill, 10339 Brittenford Drive, Vienna, VA 22182",
+    "category": "Sports & Extracurriculars",
+    "child": "",
+    "source": "HTM Sharks / Carly Reiley via SportsEngine Motion (Mar 4)",
+    "id": "a667186efc7c"
+  },
+  {
+    "name": "HTM Sharks A Meet \u2014 AWAY: Hunter Mill @ Fairfax Station Swim & Tennis",
+    "date": "2026-07-04",
+    "time": "9:00 AM - 12:00 PM",
+    "location": "Fairfax Station Swim & Tennis, 6203 Old Arrington Lane, Fairfax Station, VA 22039",
+    "category": "Sports & Extracurriculars",
+    "child": "",
+    "source": "HTM Sharks / Carly Reiley via SportsEngine Motion (Mar 4)",
+    "id": "52067a2b531d"
+  },
+  {
+    "name": "HTM Sharks A Meet \u2014 AWAY: Hunter Mill @ Greenbriar",
+    "date": "2026-07-11",
+    "time": "9:00 AM - 12:00 PM",
+    "location": "Greenbriar, 13001 Point Pleasant Drive, Fairfax, VA 22033",
+    "category": "Sports & Extracurriculars",
+    "child": "",
+    "source": "HTM Sharks / Carly Reiley via SportsEngine Motion (Mar 4)",
+    "id": "09c3cc862745"
+  },
+  {
+    "name": "HTM Sharks A Meet \u2014 HOME: Mount Vernon Park (MVP) @ Hunter Mill",
+    "date": "2026-07-18",
+    "time": "9:00 AM - 12:00 PM",
+    "location": "Hunter Mill, 10339 Brittenford Drive, Vienna, VA 22182",
+    "category": "Sports & Extracurriculars",
+    "child": "",
+    "source": "HTM Sharks / Carly Reiley via SportsEngine Motion (Mar 4)",
+    "id": "f693a1c065a0"
+  },
+  {
     "name": "Cuppett Recital Dress Rehearsal (Mandatory) \u2014 Day 1",
     "date": "2026-06-17",
     "time": "TBD",
@@ -18,16 +298,6 @@
     "child": "TBD",
     "source": "Kids' Schedule \u2014 March 30, 2026 (Mar 30)",
     "id": "b0acc99912d7"
-  },
-  {
-    "name": "Cuppett June Recitals",
-    "date": "2026-06-20",
-    "time": "TBD",
-    "location": "Cuppett Performing Arts Center, 135 Park Street SE, Vienna, VA 22180",
-    "category": "Sports & Extracurriculars",
-    "child": "TBD",
-    "source": "Kids' Schedule \u2014 March 30, 2026 (Mar 30)",
-    "id": "65db8d85fd1c"
   },
   {
     "name": "VIP Summer Camp \u2014 Rising 7th & 8th Graders (July 1\u201330)",
