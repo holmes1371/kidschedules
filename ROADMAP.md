@@ -48,21 +48,21 @@ Render functions (`digest_subject`, `render_digest_text`, `render_digest_html`) 
 
 Commit trail: c89bd19 (design) · b5200cb (render + CLI + tests) · 2ffc458 (gmail_client) · 4838af0 (pages_url.txt) · 91cd5fb (main wiring + gate tests) · f312d90 (workflow).
 
-### 4. [ ] "New this week" badges
+### 4. [ ] Per-event `.ics` export button
+
+Embed the `.ics` body in a `data-ics` attribute on each card; a small "Add to calendar" button (next to Ignore) runs a JS handler that turns the attribute into a Blob download. The RFC 5545 generation lives in `process_events.py`. `DTSTART` uses `TZID=America/New_York` with a single `VTIMEZONE` block; all-day events use `VALUE=DATE` and no TZ. `UID` is tied to the 12-char event ID so re-imports overwrite rather than duplicate. Snapshot-test the `.ics` strings as part of the pytest suite.
+
+### 5. [ ] "New this week" badges
 
 Persist prior-run event IDs to a manifest file in the repo (e.g. `prior_events.json`). On each run, `process_events.py` diffs current IDs against the manifest and stamps cards whose IDs did not exist last week with a visible "NEW" badge. First run: manifest empty, no badges — degrade gracefully. The workflow commits the updated manifest alongside the other outputs.
 
-### 5. [ ] Per-kid filter chips
+### 6. [ ] Per-kid filter chips
 
 `process_events.py` renders a chip row at the top of the page from the unique children in this run, plus an "All" reset chip. Client JS toggles card visibility via a CSS class on click. Pure-UI, self-contained.
 
-### 6. [ ] Conflict highlighting
+### 7. [ ] Conflict highlighting
 
 In `process_events.py`, detect overlapping timed events on the same day via interval intersection; flag both cards with a visible conflict marker. Prioritize different-kid overlaps as the high-signal case. Same-day all-day + timed events should NOT be flagged as conflicts — they coexist by design.
-
-### 7. [ ] Per-event `.ics` export button
-
-Embed the `.ics` body in a `data-ics` attribute on each card; a small "Add to calendar" button (next to Ignore) runs a JS handler that turns the attribute into a Blob download. The RFC 5545 generation lives in `process_events.py`. `DTSTART` uses `TZID=America/New_York` with a single `VTIMEZONE` block; all-day events use `VALUE=DATE` and no TZ. `UID` is tied to the 12-char event ID so re-imports overwrite rather than duplicate. Snapshot-test the `.ics` strings as part of the pytest suite.
 
 ### 8. [ ] Undo recently ignored (5-minute toast)
 
