@@ -48,28 +48,34 @@ Render functions (`digest_subject`, `render_digest_text`, `render_digest_html`) 
 
 Commit trail: c89bd19 (design) · b5200cb (render + CLI + tests) · 2ffc458 (gmail_client) · 4838af0 (pages_url.txt) · 91cd5fb (main wiring + gate tests) · f312d90 (workflow).
 
-### 4. [~] Per-event `.ics` export button
+### 4. [~] Incremental extraction — skip already-processed Gmail messages
+
+Every run today sends up to 60 days of email through the Anthropic agent even though almost none of those messages have changed since last week. Cache extracted events in a committed `events_state.json` keyed by Gmail message ID; on each run, only send the agent messages whose IDs aren't already in the cache. Gmail search window stays at 60 days (cheap, self-healing). Event IDs are already stable (`sha1(name|date|child)[:12]`) so dedupe across runs is trivial. Garbage-collect `processed_messages` entries older than 2× lookback and events whose date is in the past. Subsumes `future_events.json` — retired in the final commit of this feature.
+
+**In progress** — plan approved 2026-04-14, design at `design/incremental-extraction.md`. Resume at commit 2 (`scripts/events_state.py` module + tests + fixtures, no wiring yet). Key decisions locked: no per-message event attribution (YAGNI); top-level `schema_version` with blow-away-and-rebuild on mismatch; atomic write via tempfile + `os.replace`; load-time GC; cache failure modes are always "warn and start empty".
+
+### 5. [ ] Per-event `.ics` export button
 
 Embed the `.ics` body in a `data-ics` attribute on each card; a small "Add to calendar" button (next to Ignore) runs a JS handler that turns the attribute into a Blob download. The RFC 5545 generation lives in `process_events.py`. `DTSTART` uses `TZID=America/New_York` with a single `VTIMEZONE` block; all-day events use `VALUE=DATE` and no TZ. `UID` is tied to the 12-char event ID so re-imports overwrite rather than duplicate. Snapshot-test the `.ics` strings as part of the pytest suite.
 
-**In progress** — plan approved 2026-04-14, no code yet. Full design + settled decisions + 4-step commit plan at `design/ics-export.md`. Resume there: next concrete action is commit 2 (`build_ics` + helpers + tests + two snapshots). Key judgment calls already locked: unparseable times fall back to all-day; timed events get `DURATION:PT1H`; UID domain is `kidschedules.holmes1371.github.io`; button only renders on dated cards.
+Plan approved 2026-04-14, no code yet. Full design + settled decisions + 4-step commit plan at `design/ics-export.md`. Resume there: next concrete action is commit 2 (`build_ics` + helpers + tests + two snapshots). Key judgment calls already locked: unparseable times fall back to all-day; timed events get `DURATION:PT1H`; UID domain is `kidschedules.holmes1371.github.io`; button only renders on dated cards.
 
-### 5. [ ] "New this week" badges
+### 6. [ ] "New this week" badges
 
 Persist prior-run event IDs to a manifest file in the repo (e.g. `prior_events.json`). On each run, `process_events.py` diffs current IDs against the manifest and stamps cards whose IDs did not exist last week with a visible "NEW" badge. First run: manifest empty, no badges — degrade gracefully. The workflow commits the updated manifest alongside the other outputs.
 
-### 6. [ ] Per-kid filter chips
+### 7. [ ] Per-kid filter chips
 
 `process_events.py` renders a chip row at the top of the page from the unique children in this run, plus an "All" reset chip. Client JS toggles card visibility via a CSS class on click. Pure-UI, self-contained.
 
-### 7. [ ] Conflict highlighting
+### 8. [ ] Conflict highlighting
 
 In `process_events.py`, detect overlapping timed events on the same day via interval intersection; flag both cards with a visible conflict marker. Prioritize different-kid overlaps as the high-signal case. Same-day all-day + timed events should NOT be flagged as conflicts — they coexist by design.
 
-### 8. [ ] Undo recently ignored (5-minute toast)
+### 9. [ ] Undo recently ignored (5-minute toast)
 
 After an ignore, show an "Undo" toast or button in the client for 5 minutes. Clicking: POSTs an unignore to a new Apps Script delete-row endpoint, restores the card visually, removes the localStorage entry. Auto-dismiss after 5 minutes. Matching endpoint work lives in `scripts/apps_script.gs`.
 
-### 9. [ ] "Ignore sender" button
+### 10. [ ] "Ignore sender" button
 
 Stamp each card with its sender domain. A new Apps Script endpoint appends to a separate "blocked senders" sheet (distinct from the ignored-events sheet). The workflow adds a step that syncs that sheet into `blocklist.txt` — merging with existing entries, deduping, preserving manual edits — and commits the updated file alongside `ignored_events.json`. Most infrastructure of any item; deliberately last.
