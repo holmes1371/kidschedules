@@ -7,7 +7,7 @@ Runs the full pipeline:
   3. Gmail API reads → full email bodies for promising messages
   4. Anthropic agent → candidate event dicts (judgment step)
   5. process_events.py → rendered HTML page + metadata
-  6. Commit index.html to gh-pages branch → GitHub Pages serves it
+  6. Write docs/index.html → workflow uploads docs/ as a Pages artifact
 
 Usage:
   python main.py                    # normal run
@@ -353,36 +353,25 @@ def step4_process_events(
 
 
 def step5_publish(html: str, meta: dict, dry_run: bool) -> None:
-    """Write index.html + dated archive copy to docs/ for GitHub Pages."""
+    """Write index.html to docs/ for the workflow to upload as a Pages artifact."""
     print("\n" + "=" * 60)
     print("STEP 5: Publishing to GitHub Pages")
     print("=" * 60)
 
-    today_iso = meta["today_iso"]  # e.g. "2026-04-13"
-
     if dry_run:
         print("  DRY RUN — skipping publish")
-        print(f"  Would write docs/index.html + docs/{today_iso}.html")
+        print("  Would write docs/index.html")
         return
 
     os.makedirs(PAGES_OUTPUT_DIR, exist_ok=True)
 
-    # Write the current schedule as index.html
     index_path = os.path.join(PAGES_OUTPUT_DIR, "index.html")
     with open(index_path, "w", encoding="utf-8") as f:
         f.write(html)
     print(f"  Wrote docs/index.html ({len(html)} chars)")
 
-    # Write a dated archive copy (e.g. docs/2026-04-13.html)
-    archive_path = os.path.join(PAGES_OUTPUT_DIR, f"{today_iso}.html")
-    with open(archive_path, "w", encoding="utf-8") as f:
-        f.write(html)
-    print(f"  Wrote docs/{today_iso}.html (archive copy)")
-
-    # Rebuild the archive index page
-    run_script("build_archive_index.py", ["--docs-dir", PAGES_OUTPUT_DIR])
-
-    # .nojekyll so GitHub Pages serves raw HTML
+    # .nojekyll so GitHub Pages serves raw HTML (harmless with Actions-based
+    # deploy, preserved in case the deploy source is ever switched back).
     nojekyll = os.path.join(PAGES_OUTPUT_DIR, ".nojekyll")
     if not os.path.exists(nojekyll):
         with open(nojekyll, "w") as f:

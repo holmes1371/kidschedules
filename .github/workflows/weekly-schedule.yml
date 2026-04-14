@@ -19,24 +19,43 @@ on:
         default: false
 
 permissions:
-  contents: write
+  contents: write   # needed to push future_events.json to the state branch
+  pages: write      # needed to deploy to GitHub Pages
+  id-token: write   # needed by actions/deploy-pages
+
+# Allow only one concurrent deployment; cancel in-progress runs when a newer run starts.
+concurrency:
+  group: pages
+  cancel-in-progress: false
 
 jobs:
-  run-schedule:
+  build:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repository (main)
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Pull latest changes
+      - name: Restore future_events.json from state branch
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git pull --rebase origin main
+          # Clone the state branch into .state/ if it exists.
+          # First-ever run: clone fails, we fall back to an empty dir.
+          if git clone --branch state --depth 1 \
+               "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" \
+               .state 2>/dev/null; then
+            echo "Cloned existing state branch."
+          else
+            echo "No state branch yet — first run."
+            mkdir -p .state
+          fi
+          if [ -f .state/future_events.json ]; then
+            cp .state/future_events.json future_events.json
+            COUNT=$(python3 -c "import json; print(len(json.load(open('future_events.json'))))")
+            echo "Restored future_events.json ($COUNT event(s))."
+          else
+            echo "No prior future_events.json — starting fresh."
+          fi
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -87,13 +106,48 @@ jobs:
           fi
           python main.py $ARGS
 
-      - name: Commit and push updated page
+      - name: Save future_events.json back to state branch
         if: ${{ github.event.inputs.dry_run != 'true' }}
         run: |
-          git add docs/ .filter_audit.json future_events.json ignored_events.json
-          if git diff --cached --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "Update kids schedule — $(date -u +%Y-%m-%d)"
-            git push
+          if [ ! -f future_events.json ]; then
+            echo "No future_events.json produced — nothing to save."
+            exit 0
           fi
+          cd .state
+          if [ ! -d .git ]; then
+            # First run: initialise a fresh orphan repo pointed at origin/state.
+            git init -q -b state
+            git remote add origin \
+              "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
+          fi
+          cp ../future_events.json future_events.json
+          git -c user.name="github-actions[bot]" \
+              -c user.email="github-actions[bot]@users.noreply.github.com" \
+              add future_events.json
+          if git diff --cached --quiet; then
+            echo "future_events.json unchanged — no state commit needed."
+          else
+            git -c user.name="github-actions[bot]" \
+                -c user.email="github-actions[bot]@users.noreply.github.com" \
+                commit -m "Update future_events.json — $(date -u +%Y-%m-%d)"
+            git push origin HEAD:state
+            echo "Pushed updated future_events.json to state branch."
+          fi
+
+      - name: Upload Pages artifact
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/
+
+  deploy:
+    needs: build
+    if: ${{ github.event.inputs.dry_run != 'true' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

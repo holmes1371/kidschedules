@@ -19,6 +19,18 @@ docs/dev_preview.html
 docs/dev_preview-meta.json
 fixtures/last_run_candidates.json
 
+# Bot-generated artifacts — built fresh each workflow run, not committed to main.
+# docs/*.html is rebuilt by main.py and uploaded as a Pages artifact.
+# future_events.json lives on the `state` branch, synced by the workflow.
+# ignored_events.json is fetched fresh from Apps Script each run.
+# .filter_audit.json is a local-only audit stamp.
+docs/index.html
+docs/archive.html
+docs/20[0-9][0-9]-[0-1][0-9]-[0-3][0-9].html
+future_events.json
+ignored_events.json
+.filter_audit.json
+
 # OS
 .DS_Store
 Thumbs.db
