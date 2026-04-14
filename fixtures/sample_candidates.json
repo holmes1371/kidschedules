@@ -1,0 +1,128 @@
+[
+  {
+    "name": "Early Release Day",
+    "date": "2026-04-15",
+    "time": "1:30 PM dismissal",
+    "location": "Glasgow Middle School",
+    "category": "School Activity",
+    "child": "Isla",
+    "source": "FCPS News You Choose (Apr 8)"
+  },
+  {
+    "name": "Pediatrician Check-up",
+    "date": "2026-04-16",
+    "time": "3:45 PM",
+    "location": "Tysons Pediatrics, 8350 Greensboro Dr",
+    "category": "Appointment",
+    "child": "Everly",
+    "source": "MyChart reminder (Apr 2)"
+  },
+  {
+    "name": "Book Report Due — Charlotte's Web",
+    "date": "2026-04-17",
+    "time": "Time TBD",
+    "location": "Location TBD",
+    "category": "Academic Due Date",
+    "child": "Isla",
+    "source": "Mrs. Patterson weekly newsletter (Apr 10)"
+  },
+  {
+    "name": "Early Release Day",
+    "date": "2026-04-15",
+    "time": "",
+    "location": "",
+    "category": "School Activity",
+    "child": "",
+    "source": "FCPS calendar (Apr 1)"
+  },
+  {
+    "name": "Soccer Practice",
+    "date": "2026-04-21",
+    "time": "5:30 PM – 6:45 PM",
+    "location": "Wakefield Park, Field 3",
+    "category": "Sports & Extracurriculars",
+    "child": "Isla",
+    "source": "NVSC team update (Apr 11)"
+  },
+  {
+    "name": "Ballet Recital Rehearsal",
+    "date": "2026-04-22",
+    "time": "4:00 PM",
+    "location": "Cuppett Performing Arts Center, 135 Park Street SE, Vienna, VA 22180",
+    "category": "Sports & Extracurriculars",
+    "child": "Everly",
+    "source": "Cuppett Studio email (Mar 30)"
+  },
+  {
+    "name": "Spring Concert",
+    "date": "2026-04-23",
+    "time": "7:00 PM",
+    "location": "Glasgow Middle School Auditorium",
+    "category": "School Activity",
+    "child": "Isla",
+    "source": "FCPS News You Choose (Apr 5)"
+  },
+  {
+    "name": "Math Unit 7 Test",
+    "date": "2026-04-29",
+    "time": "During homeroom",
+    "location": "Room 204",
+    "category": "Academic Due Date",
+    "child": "Isla",
+    "source": "Mrs. Patterson weekly newsletter (Apr 10)"
+  },
+  {
+    "name": "Dental Cleaning",
+    "date": "2026-05-04",
+    "time": "10:15 AM",
+    "location": "Children's Dentistry of Oakton",
+    "category": "Appointment",
+    "child": "Everly",
+    "source": "Children's Dentistry reminder (Apr 3)"
+  },
+  {
+    "name": "Science Fair Project Due",
+    "date": "2026-05-11",
+    "time": "Time TBD",
+    "location": "Location TBD",
+    "category": "Academic Due Date",
+    "child": "Isla",
+    "source": "Mrs. Patterson weekly newsletter (Apr 10)"
+  },
+  {
+    "name": "Summer Camp Registration Deadline",
+    "date": "",
+    "time": "Time TBD",
+    "location": "Location TBD",
+    "category": "School Activity",
+    "child": "",
+    "source": "FCPS summer camp brochure (Mar 28)"
+  },
+  {
+    "name": "Yearbook Order Form Due",
+    "date": "",
+    "time": "Time TBD",
+    "location": "Location TBD",
+    "category": "School Activity",
+    "child": "Isla",
+    "source": "School front office email (Apr 6)"
+  },
+  {
+    "name": "PTA Meeting",
+    "date": "2026-04-10",
+    "time": "7:00 PM",
+    "location": "Glasgow Middle School Cafeteria",
+    "category": "School Activity",
+    "child": "",
+    "source": "PTA newsletter (Apr 1)"
+  },
+  {
+    "name": "End-of-Year Field Trip to Mount Vernon",
+    "date": "2026-06-26",
+    "time": "8:30 AM departure",
+    "location": "Mount Vernon Estate",
+    "category": "School Activity",
+    "child": "Isla",
+    "source": "Mrs. Patterson field trip permission slip (Apr 9)"
+  }
+]

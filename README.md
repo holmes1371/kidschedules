@@ -56,6 +56,30 @@ Push this repo to GitHub. The workflow runs automatically every Monday at 6:30 A
 
 Your schedule will be live at `https://<your-username>.github.io/kids-schedule-github/`
 
+### 6. Ignore-button webhook (one time, optional)
+
+Each event card on the schedule page has an "Ignore" button. Clicking hides the card in the user's browser; if this webhook is configured, the ignore also sticks across future weekly runs.
+
+1. Go to [sheets.new](https://sheets.new) and rename the new sheet to **Kids Schedule — Ignored Events**.
+2. Extensions → Apps Script. Delete the starter code.
+3. Paste the contents of `scripts/apps_script.gs`.
+4. Generate a random secret (`openssl rand -hex 16` or any generator) and replace `REPLACE_ME_WITH_RANDOM_STRING` in the script with it.
+5. Save. Click **Deploy → New deployment**:
+   - Type: **Web app**
+   - Execute as: **Me**
+   - Who has access: **Anyone**
+6. Click **Deploy**, authorize when prompted, then copy the **Web app URL** (ends in `/exec`).
+7. Paste that URL into `ignore_webhook_url.txt` (in the repo root). Commit and push.
+8. In your GitHub repo → Settings → Secrets and variables → Actions, add:
+
+| Secret name | Value |
+|---|---|
+| `IGNORE_READ_SECRET` | The random string from step 4 |
+
+That's it. The next run (weekly or manual) will sync the ignore list from the sheet before rendering.
+
+**To unignore an event:** delete its row from the Google Sheet. Next run picks up the change.
+
 ## Local development
 
 ```bash

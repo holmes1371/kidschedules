@@ -47,6 +47,30 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Sync ignored events from Apps Script
+        env:
+          IGNORE_READ_SECRET: ${{ secrets.IGNORE_READ_SECRET }}
+        run: |
+          URL=$(cat ignore_webhook_url.txt 2>/dev/null || true)
+          if [ -z "$URL" ] || [ -z "$IGNORE_READ_SECRET" ]; then
+            echo "No webhook URL or IGNORE_READ_SECRET configured — skipping sync."
+            exit 0
+          fi
+          TMP=$(mktemp)
+          if curl -sSL --fail -o "$TMP" "${URL}?secret=${IGNORE_READ_SECRET}"; then
+            if python -c "import json,sys; d=json.load(open('$TMP')); assert isinstance(d, list)" 2>/dev/null; then
+              mv "$TMP" ignored_events.json
+              COUNT=$(python -c "import json; print(len(json.load(open('ignored_events.json'))))")
+              echo "Synced $COUNT ignored event(s) from Apps Script."
+            else
+              echo "Apps Script response was not a valid JSON list — keeping existing ignored_events.json."
+              rm -f "$TMP"
+            fi
+          else
+            echo "Fetch failed — keeping existing ignored_events.json."
+            rm -f "$TMP"
+          fi
+
       - name: Run kids schedule pipeline
         env:
           GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}
@@ -66,7 +90,7 @@ jobs:
       - name: Commit and push updated page
         if: ${{ github.event.inputs.dry_run != 'true' }}
         run: |
-          git add docs/ .filter_audit.json future_events.json
+          git add docs/ .filter_audit.json future_events.json ignored_events.json
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else

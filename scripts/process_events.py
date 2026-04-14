@@ -12,7 +12,9 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import hashlib
 import json
+import os
 import sys
 from collections import OrderedDict
 from typing import Any
@@ -28,6 +30,17 @@ VALID_CATEGORIES = {
 
 def _norm(s: str) -> str:
     return " ".join((s or "").strip().lower().split())
+
+
+def _event_id(name: str, date: str, child: str) -> str:
+    """Stable 12-char hash identifying an event across runs.
+
+    Re-extractions of the same underlying event (same normalized name,
+    same date, same normalized child) produce the same ID, so an
+    "ignore" decision can survive a future pipeline run.
+    """
+    key = "|".join([_norm(name), (date or "").strip(), _norm(child)])
+    return hashlib.sha1(key.encode("utf-8")).hexdigest()[:12]
 
 
 def _parse_date(s: str) -> dt.date | None:
@@ -52,19 +65,24 @@ def load_candidates(path: str) -> list[dict[str, Any]]:
 
 def classify(events: list[dict[str, Any]], cutoff: dt.date,
              horizon: dt.date | None = None,
+             ignored_ids: frozenset[str] = frozenset(),
              ) -> tuple[list[dict[str, Any]], list[dict[str, Any]],
-                        list[dict[str, Any]], list[dict[str, Any]], list[str]]:
-    """Return (display, undated, dropped_past, banked_far_future, warnings).
+                        list[dict[str, Any]], list[dict[str, Any]],
+                        list[dict[str, Any]], list[str]]:
+    """Return (display, undated, dropped_past, banked_far_future,
+               dropped_ignored, warnings).
 
     Args:
         cutoff: events before this date are "past" and dropped.
         horizon: if set, events after this date go to "banked" instead of
                  "display". Use for the 60-day display window.
+        ignored_ids: event IDs to drop entirely (user clicked Ignore on them).
     """
     display: list[dict[str, Any]] = []
     undated: list[dict[str, Any]] = []
     past: list[dict[str, Any]] = []
     banked: list[dict[str, Any]] = []
+    ignored: list[dict[str, Any]] = []
     warnings: list[str] = []
 
     for i, ev in enumerate(events):
@@ -84,6 +102,10 @@ def classify(events: list[dict[str, Any]], cutoff: dt.date,
             "child": (ev.get("child") or "").strip(),
             "source": (ev.get("source") or "").strip() or "unknown source",
         }
+        norm["id"] = _event_id(norm["name"], norm["date"], norm["child"])
+        if norm["id"] in ignored_ids:
+            ignored.append(norm)
+            continue
         d = _parse_date(norm["date"])
         if d is None:
             undated.append(norm)
@@ -95,7 +117,27 @@ def classify(events: list[dict[str, Any]], cutoff: dt.date,
         else:
             norm["_date_obj"] = d
             display.append(norm)
-    return display, undated, past, banked, warnings
+    return display, undated, past, banked, ignored, warnings
+
+
+def _load_ignored_ids(path: str | None) -> frozenset[str]:
+    """Read the committed ignored_events.json and return a set of IDs.
+
+    Tolerates missing/empty/malformed files (all → empty set).
+    """
+    if not path or not os.path.exists(path):
+        return frozenset()
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except (json.JSONDecodeError, OSError):
+        return frozenset()
+    if not isinstance(data, list):
+        return frozenset()
+    return frozenset(
+        e["id"] for e in data
+        if isinstance(e, dict) and isinstance(e.get("id"), str)
+    )
 
 
 def dedupe(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -217,8 +259,14 @@ def render_html(today: dt.date,
                 weeks: list[tuple[dt.date, list[dict[str, Any]]]],
                 undated: list[dict[str, Any]],
                 total_future: int,
-                lookback_days: int) -> str:
-    """Render a complete, self-contained HTML page for GitHub Pages."""
+                lookback_days: int,
+                webhook_url: str = "") -> str:
+    """Render a complete, self-contained HTML page for GitHub Pages.
+
+    webhook_url: if non-empty, the rendered page will POST ignore decisions
+    to this URL (expected to be a Google Apps Script web app). If empty,
+    Ignore clicks only hide the card locally via localStorage.
+    """
 
     def _event_card(ev: dict[str, Any]) -> str:
         d: dt.date = ev["_date_obj"]
@@ -229,7 +277,10 @@ def render_html(today: dt.date,
         child_html = (f'<span class="child">{ev["child"]}</span> &middot; '
                       if ev["child"] else "")
         return f"""\
-      <div class="event-card" style="border-left: 4px solid {fg};">
+      <div class="event-card" data-event-id="{ev["id"]}" style="border-left: 4px solid {fg};">
+        <button class="ignore-btn" aria-label="Ignore this event"
+                data-event-name="{ev["name"]}" data-event-date="{ev["date"]}"
+                type="button">Ignore</button>
         <div class="event-date">{day_name}, {month_day}</div>
         <div class="event-name">{ev["name"]}</div>
         <div class="event-details">
@@ -238,6 +289,7 @@ def render_html(today: dt.date,
           &middot; <span class="location">{ev["location"]}</span>
         </div>
         <div class="event-meta">{child_html}<span class="source">{ev["source"]}</span></div>
+        <div class="ignore-status" aria-live="polite"></div>
       </div>"""
 
     def _undated_card(ev: dict[str, Any]) -> str:
@@ -365,8 +417,42 @@ def render_html(today: dt.date,
       background: var(--surface);
       border-radius: 8px;
       padding: 0.75rem 1rem;
+      padding-right: 4.5rem;
       margin-bottom: 0.5rem;
       box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+      position: relative;
+      transition: opacity 0.25s ease;
+    }}
+    .event-card.fading {{
+      opacity: 0;
+    }}
+    .ignore-btn {{
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.2rem 0.55rem;
+      font-size: 0.72rem;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      line-height: 1.4;
+    }}
+    .ignore-btn:hover {{
+      background: var(--border);
+      color: var(--text);
+    }}
+    .ignore-status {{
+      font-size: 0.72rem;
+      color: #d93025;
+      margin-top: 0.3rem;
+      min-height: 0;
+    }}
+    .ignore-status:empty {{
+      display: none;
     }}
     .event-date {{
       font-size: 0.8rem;
@@ -448,6 +534,70 @@ def render_html(today: dt.date,
     Auto-generated from Gmail &middot; Updated every Monday
     <br><a href="archive.html" style="color:var(--accent);">View past schedules</a>
   </div>
+  <script>
+    (function () {{
+      var WEBHOOK_URL = {json.dumps(webhook_url)};
+      var STORAGE_KEY = "kids_schedule_ignored_ids";
+
+      function loadIgnored() {{
+        try {{
+          var raw = localStorage.getItem(STORAGE_KEY);
+          return raw ? JSON.parse(raw) : [];
+        }} catch (e) {{
+          return [];
+        }}
+      }}
+
+      function saveIgnored(ids) {{
+        try {{
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(ids));
+        }} catch (e) {{ /* storage unavailable */ }}
+      }}
+
+      // On load: hide any cards the user previously ignored in this browser.
+      var ignored = loadIgnored();
+      document.querySelectorAll(".event-card[data-event-id]").forEach(function (card) {{
+        if (ignored.indexOf(card.getAttribute("data-event-id")) !== -1) {{
+          card.style.display = "none";
+        }}
+      }});
+
+      // Click handler: fade the card, record locally, POST to the webhook.
+      document.querySelectorAll(".ignore-btn").forEach(function (btn) {{
+        btn.addEventListener("click", function () {{
+          var card = btn.closest(".event-card");
+          if (!card) return;
+          var id = card.getAttribute("data-event-id");
+          var name = btn.getAttribute("data-event-name") || "";
+          var date = btn.getAttribute("data-event-date") || "";
+          var status = card.querySelector(".ignore-status");
+          btn.disabled = true;
+          if (status) status.textContent = "";
+
+          var current = loadIgnored();
+          if (current.indexOf(id) === -1) current.push(id);
+          saveIgnored(current);
+          card.classList.add("fading");
+          setTimeout(function () {{ card.style.display = "none"; }}, 300);
+
+          if (!WEBHOOK_URL) return;  // dev/preview: no backend, hide only
+          fetch(WEBHOOK_URL, {{
+            method: "POST",
+            headers: {{ "Content-Type": "text/plain;charset=utf-8" }},
+            body: JSON.stringify({{ id: id, name: name, date: date }})
+          }}).catch(function () {{
+            // Restore the card so the user can retry.
+            card.style.display = "";
+            card.classList.remove("fading");
+            btn.disabled = false;
+            var remaining = loadIgnored().filter(function (x) {{ return x !== id; }});
+            saveIgnored(remaining);
+            if (status) status.textContent = "Could not sync — try again.";
+          }});
+        }});
+      }});
+    }})();
+  </script>
 </body>
 </html>
 """
@@ -470,13 +620,23 @@ def main() -> int:
                    help="Write JSON metadata (subject, counts, warnings) here.")
     p.add_argument("--banked-out", default=None,
                    help="Write far-future events JSON here (for the event bank).")
+    p.add_argument("--webhook-url", default="",
+                   help="Ignore-button webhook URL baked into the HTML. "
+                        "Leave empty to disable backend sync (dev preview).")
+    p.add_argument("--ignored", default=None,
+                   help="JSON file of previously-ignored events. Events "
+                        "whose ID matches an entry here are dropped before "
+                        "classifying. Missing/malformed file → no filter.")
     args = p.parse_args()
 
     today = (dt.date.fromisoformat(args.today) if args.today
              else dt.date.today())
     horizon = today + dt.timedelta(days=args.display_window_days)
     raw = load_candidates(args.candidates)
-    display, undated, past, banked, warnings = classify(raw, today, horizon)
+    ignored_ids = _load_ignored_ids(args.ignored)
+    display, undated, past, banked, ignored_dropped, warnings = classify(
+        raw, today, horizon, ignored_ids=ignored_ids
+    )
     display = dedupe(display)
     undated = dedupe(undated)
     banked = dedupe(banked)
@@ -490,7 +650,8 @@ def main() -> int:
         sys.stdout.write(body)
 
     if args.html_out:
-        html = render_html(today, weeks, undated, len(display), args.lookback_days)
+        html = render_html(today, weeks, undated, len(display),
+                           args.lookback_days, webhook_url=args.webhook_url)
         with open(args.html_out, "w", encoding="utf-8") as f:
             f.write(html)
 
@@ -512,6 +673,7 @@ def main() -> int:
             "undated": len(undated),
             "dropped_past": len(past),
             "banked_far_future": len(banked),
+            "dropped_ignored": len(ignored_dropped),
         },
         "warnings": warnings,
         "has_events": bool(display or undated),

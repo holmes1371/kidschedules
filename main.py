@@ -31,6 +31,22 @@ from agent import extract_events, review_stripped_messages
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 PAGES_OUTPUT_DIR = os.path.join(PROJECT_ROOT, "docs")
 FUTURE_EVENTS_PATH = os.path.join(PROJECT_ROOT, "future_events.json")
+LAST_RUN_FIXTURE_PATH = os.path.join(
+    PROJECT_ROOT, "fixtures", "last_run_candidates.json"
+)
+WEBHOOK_URL_PATH = os.path.join(PROJECT_ROOT, "ignore_webhook_url.txt")
+IGNORED_EVENTS_PATH = os.path.join(PROJECT_ROOT, "ignored_events.json")
+
+
+def _load_webhook_url() -> str:
+    """Return the Apps Script webhook URL committed to the repo, or ''."""
+    if not os.path.exists(WEBHOOK_URL_PATH):
+        return ""
+    try:
+        with open(WEBHOOK_URL_PATH, "r", encoding="utf-8") as f:
+            return f.read().strip()
+    except OSError:
+        return ""
 
 
 def run_script(script_name: str, args: list[str] | None = None) -> str:
@@ -266,6 +282,15 @@ def step4_process_events(
         print(f"  Loaded {len(banked_prev)} event(s) from future_events.json")
     all_candidates = candidates + banked_prev
 
+    # Dump the exact input to process_events.py so dev_render.py can replay
+    # it against the real data without hitting any APIs.
+    try:
+        os.makedirs(os.path.dirname(LAST_RUN_FIXTURE_PATH), exist_ok=True)
+        with open(LAST_RUN_FIXTURE_PATH, "w", encoding="utf-8") as f:
+            json.dump(all_candidates, f, indent=2)
+    except OSError as e:
+        print(f"  WARNING: could not write last_run fixture: {e}")
+
     with tempfile.NamedTemporaryFile(
         mode="w", suffix=".json", delete=False
     ) as f:
@@ -278,6 +303,7 @@ def step4_process_events(
     banked_path = candidates_path.replace(".json", "-banked.json")
 
     try:
+        webhook_url = _load_webhook_url()
         run_script(
             "process_events.py",
             [
@@ -287,6 +313,8 @@ def step4_process_events(
                 "--meta-out", meta_path,
                 "--banked-out", banked_path,
                 "--display-window-days", "60",
+                "--webhook-url", webhook_url,
+                "--ignored", IGNORED_EVENTS_PATH,
             ],
         )
 
@@ -310,6 +338,7 @@ def step4_process_events(
         print(f"  Banked (beyond 60 days): {counts.get('banked_far_future', 0)}")
         print(f"  Undated: {counts['undated']}")
         print(f"  Dropped (past): {counts['dropped_past']}")
+        print(f"  Dropped (ignored): {counts.get('dropped_ignored', 0)}")
         if meta["warnings"]:
             for w in meta["warnings"]:
                 print(f"  WARNING: {w}")
