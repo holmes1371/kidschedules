@@ -48,9 +48,11 @@ Render functions (`digest_subject`, `render_digest_text`, `render_digest_html`) 
 
 Commit trail: c89bd19 (design) · b5200cb (render + CLI + tests) · 2ffc458 (gmail_client) · 4838af0 (pages_url.txt) · 91cd5fb (main wiring + gate tests) · f312d90 (workflow).
 
-### 4. [ ] Per-event `.ics` export button
+### 4. [~] Per-event `.ics` export button
 
 Embed the `.ics` body in a `data-ics` attribute on each card; a small "Add to calendar" button (next to Ignore) runs a JS handler that turns the attribute into a Blob download. The RFC 5545 generation lives in `process_events.py`. `DTSTART` uses `TZID=America/New_York` with a single `VTIMEZONE` block; all-day events use `VALUE=DATE` and no TZ. `UID` is tied to the 12-char event ID so re-imports overwrite rather than duplicate. Snapshot-test the `.ics` strings as part of the pytest suite.
+
+**In progress** — plan approved 2026-04-14, no code yet. Full design + settled decisions + 4-step commit plan at `design/ics-export.md`. Resume there: next concrete action is commit 2 (`build_ics` + helpers + tests + two snapshots). Key judgment calls already locked: unparseable times fall back to all-day; timed events get `DURATION:PT1H`; UID domain is `kidschedules.holmes1371.github.io`; button only renders on dated cards.
 
 ### 5. [ ] "New this week" badges
 
