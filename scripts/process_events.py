@@ -15,6 +15,7 @@ import datetime as dt
 import hashlib
 import json
 import os
+import re
 import sys
 from collections import OrderedDict
 from typing import Any
@@ -22,6 +23,10 @@ from zoneinfo import ZoneInfo
 
 
 LOCAL_TZ = ZoneInfo("America/New_York")
+
+# Tokens of fewer than 3 chars are dropped from dedupe signatures to avoid
+# matching on filler like "no", "a", "of", "to".
+_NAME_TOKEN_SPLIT = re.compile(r"[^a-z0-9]+")
 
 
 VALID_CATEGORIES = {
@@ -144,8 +149,33 @@ def _load_ignored_ids(path: str | None) -> frozenset[str]:
     )
 
 
+def _name_signature(name: str) -> frozenset[str]:
+    """Significant-token set for fuzzy dedupe of near-duplicate event names.
+
+    Keeps any token ≥3 chars, plus standalone digit tokens regardless of
+    length — otherwise "Ages 3–5" and "Ages 6–8" produce identical
+    signatures and two concurrent age groups collapse wrongly.
+    """
+    return frozenset(
+        t for t in _NAME_TOKEN_SPLIT.split(name.lower())
+        if len(t) >= 3 or t.isdigit()
+    )
+
+
 def dedupe(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Key = (normalized name, date). Keep the most complete entry."""
+    """Two-pass dedupe.
+
+    Pass 1 (exact): collapse events with identical (normalized name, date),
+    keeping the most complete.
+
+    Pass 2 (fuzzy): within each same-date bucket, collapse events whose
+    significant-token signatures are in a subset relationship — e.g.
+    "ASL Club" ({asl, club}) and "ASL Club Meeting" ({asl, club, meeting}).
+    Union-find handles transitive chains ("ASL Club" links
+    "ASL Club Meeting" and "ASL Club — 6th grade" even though the outer
+    pair has no direct subset relation). Undated events skip the fuzzy
+    pass since we can't confirm same-day.
+    """
     def completeness(ev: dict[str, Any]) -> int:
         score = 0
         if ev["time"] != "Time TBD":
@@ -158,12 +188,54 @@ def dedupe(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
             score += 1
         return score
 
+    # Pass 1: exact match on normalized name + date.
     best: OrderedDict[tuple[str, str], dict[str, Any]] = OrderedDict()
     for ev in events:
         key = (_norm(ev["name"]), ev.get("date", ""))
         if key not in best or completeness(ev) > completeness(best[key]):
             best[key] = ev
-    return list(best.values())
+    unique = list(best.values())
+
+    # Pass 2: fuzzy match within same-date buckets via token-signature subset.
+    by_date: OrderedDict[str, list[dict[str, Any]]] = OrderedDict()
+    undated: list[dict[str, Any]] = []
+    for ev in unique:
+        d = ev.get("date") or ""
+        if d:
+            by_date.setdefault(d, []).append(ev)
+        else:
+            undated.append(ev)
+
+    merged: list[dict[str, Any]] = []
+    for bucket in by_date.values():
+        if len(bucket) == 1:
+            merged.append(bucket[0])
+            continue
+        sigs = [_name_signature(ev["name"]) for ev in bucket]
+        parent = list(range(len(bucket)))
+
+        def find(x: int) -> int:
+            while parent[x] != x:
+                parent[x] = parent[parent[x]]
+                x = parent[x]
+            return x
+
+        for i in range(len(bucket)):
+            if not sigs[i]:
+                continue
+            for j in range(i + 1, len(bucket)):
+                if sigs[j] and (sigs[i] <= sigs[j] or sigs[j] <= sigs[i]):
+                    ri, rj = find(i), find(j)
+                    if ri != rj:
+                        parent[ri] = rj
+
+        groups: OrderedDict[int, list[dict[str, Any]]] = OrderedDict()
+        for i, ev in enumerate(bucket):
+            groups.setdefault(find(i), []).append(ev)
+        for g in groups.values():
+            merged.append(max(g, key=completeness))
+
+    return merged + undated
 
 
 def week_start(d: dt.date) -> dt.date:
