@@ -113,32 +113,36 @@ def main() -> int:
         args.main_blocklist
     )
 
-    added: list[tuple[str, str]] = []     # (address, reason)
-    rejected: list[tuple[str, str]] = []  # (address, why)
+    # Each entry carries the agent's raw confidence value so the audit log
+    # preserves it alongside the guardrail decision.
+    added: list[tuple[str, str, str]] = []     # (address, reason, confidence)
+    rejected: list[tuple[str, str, str]] = []  # (address, why, confidence)
 
     for s in suggestions:
         if not isinstance(s, dict):
-            rejected.append((repr(s), "not a dict"))
+            rejected.append((repr(s), "not a dict", ""))
             continue
         addr = (s.get("from") or "").strip().lower()
         reason = (s.get("reason") or "").strip()
         conf = (s.get("confidence") or "").strip().lower()
 
         if conf != "high":
-            rejected.append((addr or repr(s), f"confidence={conf!r} (need 'high')"))
+            rejected.append(
+                (addr or repr(s), f"confidence={conf!r} (need 'high')", conf)
+            )
             continue
         domain = _domain_of(addr)
         if not domain:
-            rejected.append((addr or repr(s), "not a valid email address"))
+            rejected.append((addr or repr(s), "not a valid email address", conf))
             continue
         if _is_protected(domain):
-            rejected.append((addr, f"protected domain ({domain})"))
+            rejected.append((addr, f"protected domain ({domain})", conf))
             continue
         if addr in existing:
-            rejected.append((addr, "already in blocklist"))
+            rejected.append((addr, "already in blocklist", conf))
             continue
         existing.add(addr)
-        added.append((addr, reason))
+        added.append((addr, reason, conf))
 
     if added:
         today = dt.date.today().isoformat()
@@ -146,19 +150,22 @@ def main() -> int:
         with open(args.auto_blocklist, "a", encoding="utf-8") as f:
             if write_header:
                 f.write(_AUTO_HEADER)
-            for addr, reason in added:
+            for addr, reason, _conf in added:
                 short = reason[:80].replace("\n", " ").replace("#", "").strip()
                 f.write(f"{addr}  # auto {today}: {short}\n")
 
-    for addr, reason in added:
-        print(f"  AUTO-BLOCK: {addr} — {reason}")
-    for addr, why in rejected:
-        print(f"  rejected:   {addr} — {why}")
+    for addr, reason, conf in added:
+        print(f"  AUTO-BLOCK: {addr} [conf={conf}] — {reason}")
+    for addr, why, conf in rejected:
+        conf_display = conf if conf else "n/a"
+        print(f"  rejected:   {addr} [conf={conf_display}] — {why}")
 
     summary = {
         "added_count": len(added),
         "rejected_count": len(rejected),
-        "added": [{"from": a, "reason": r} for a, r in added],
+        "added": [
+            {"from": a, "reason": r, "confidence": c} for a, r, c in added
+        ],
     }
     print(json.dumps(summary), file=sys.stderr)
 
@@ -166,8 +173,14 @@ def main() -> int:
         entry = {
             "run_iso": dt.date.today().isoformat(),
             "suggestion_count": len(suggestions),
-            "added": [{"from": a, "reason": r} for a, r in added],
-            "rejected": [{"from": a, "why": w} for a, w in rejected],
+            "added": [
+                {"from": a, "reason": r, "confidence": c}
+                for a, r, c in added
+            ],
+            "rejected": [
+                {"from": a, "why": w, "confidence": c}
+                for a, w, c in rejected
+            ],
         }
         with open(args.audit_log, "a", encoding="utf-8") as f:
             f.write(json.dumps(entry, ensure_ascii=False) + "\n")
