@@ -379,4 +379,10 @@ def review_stripped_messages(
         print(f"  Audit parse error: {e}")
         return {"decisions": [], "senders_to_unblock": []}
 
-    usage = re
+    usage = response.usage
+    print(
+        f"  Audit review tokens: {usage.input_tokens} in / "
+        f"{usage.output_tokens} out"
+    )
+
+    return result
