@@ -66,6 +66,13 @@ jobs:
           else
             echo "No prior future_events.json — starting fresh."
           fi
+          if [ -f .state/events_state.json ]; then
+            cp .state/events_state.json events_state.json
+            COUNT=$(python3 -c "import json; d=json.load(open('events_state.json')); print(f\"{len(d.get('processed_messages',{}))} msg(s), {len(d.get('events',{}))} event(s)\")")
+            echo "Restored events_state.json ($COUNT)."
+          else
+            echo "No prior events_state.json — cache starts empty."
+          fi
           if [ -f .state/.filter_audit.json ]; then
             cp .state/.filter_audit.json .filter_audit.json
             echo "Restored .filter_audit.json."
@@ -148,7 +155,8 @@ jobs:
         run: |
           if [ ! -f future_events.json ] && [ ! -f .filter_audit.json ] \
              && [ ! -f blocklist_auto.txt ] \
-             && [ ! -f blocklist_auto_audit.jsonl ]; then
+             && [ ! -f blocklist_auto_audit.jsonl ] \
+             && [ ! -f events_state.json ]; then
             echo "No persistent state produced — nothing to save."
             exit 0
           fi
@@ -171,6 +179,9 @@ jobs:
           if [ -f ../blocklist_auto_audit.jsonl ]; then
             cp ../blocklist_auto_audit.jsonl blocklist_auto_audit.jsonl
           fi
+          if [ -f ../events_state.json ]; then
+            cp ../events_state.json events_state.json
+          fi
           # Only 'git add' files that actually exist — any one of these may be
           # absent on a given run (e.g. first run before filter audit stamps).
           FILES=""
@@ -178,6 +189,7 @@ jobs:
           [ -f .filter_audit.json ] && FILES="$FILES .filter_audit.json"
           [ -f blocklist_auto.txt ] && FILES="$FILES blocklist_auto.txt"
           [ -f blocklist_auto_audit.jsonl ] && FILES="$FILES blocklist_auto_audit.jsonl"
+          [ -f events_state.json ] && FILES="$FILES events_state.json"
           git -c user.name="github-actions[bot]" \
               -c user.email="github-actions[bot]@users.noreply.github.com" \
               add $FILES

@@ -1,11 +1,14 @@
-"""Unit tests for main.should_create_draft.
+"""Unit tests for main.should_create_draft and main.step2c_load_cache_and_filter.
 
-This gate is the load-bearing piece for the spam-prevention guarantee
-on the weekly Gmail digest. It is exhaustively parametrized across
-every combination of the three inputs so a future refactor cannot
+`should_create_draft` is the load-bearing piece for the spam-prevention
+guarantee on the weekly Gmail digest. It is exhaustively parametrized
+across every combination of the three inputs so a future refactor cannot
 silently flip the default.
 
-Truth table:
+`step2c_load_cache_and_filter` is the zero-new-messages short-circuit
+that prevents the Anthropic agent from re-processing cached messages.
+
+Truth table for should_create_draft:
     dry_run  create_draft  CREATE_DRAFT  → expected
     T        any           any           → False   (dry-run always wins)
     F        T             any           → True
@@ -14,6 +17,8 @@ Truth table:
 """
 from __future__ import annotations
 
+import datetime as dt
+import json
 import sys
 from pathlib import Path
 from types import SimpleNamespace
@@ -25,6 +30,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+import events_state as es  # noqa: E402
 import main  # noqa: E402
 
 
@@ -77,3 +83,59 @@ def test_env_var_other_values_do_not_opt_in(monkeypatch, env_value):
 def test_default_is_no_draft():
     # No env var, no flag, no dry-run.
     assert main.should_create_draft(_args(dry_run=False, create_draft=False)) is False
+
+
+# ── step2c cache filter (zero-new-messages short-circuit) ──────────────────
+
+
+TODAY = dt.date(2026, 4, 14)
+NOW_ISO = "2026-04-14T06:30:00-04:00"
+
+
+def _write_state(path: Path, processed_ids: list[str]) -> None:
+    state = es._empty_state()
+    for mid in processed_ids:
+        state["processed_messages"][mid] = NOW_ISO
+    path.write_text(json.dumps(state), encoding="utf-8")
+
+
+def test_step2c_all_cached_returns_empty_new_emails(tmp_path, capsys):
+    """Given every inbound messageId is already in the cache, step2c
+    returns new_emails=[]. main()'s guard then skips extract_events
+    entirely — the Anthropic call never happens."""
+    state_path = tmp_path / "events_state.json"
+    _write_state(state_path, ["m1", "m2", "m3"])
+    full_emails = [
+        {"messageId": "m1", "subject": "a"},
+        {"messageId": "m2", "subject": "b"},
+        {"messageId": "m3", "subject": "c"},
+    ]
+    state, new_emails = main.step2c_load_cache_and_filter(
+        full_emails, state_path=str(state_path), today=TODAY,
+    )
+    assert new_emails == []
+    assert len(state["processed_messages"]) == 3
+
+
+def test_step2c_partial_cache_returns_only_new(tmp_path):
+    state_path = tmp_path / "events_state.json"
+    _write_state(state_path, ["m1"])
+    full_emails = [
+        {"messageId": "m1", "subject": "cached"},
+        {"messageId": "m2", "subject": "new"},
+    ]
+    _, new_emails = main.step2c_load_cache_and_filter(
+        full_emails, state_path=str(state_path), today=TODAY,
+    )
+    assert [e["messageId"] for e in new_emails] == ["m2"]
+
+
+def test_step2c_empty_cache_returns_all_as_new(tmp_path):
+    """Fresh-install case: no cache file on disk yet."""
+    state_path = tmp_path / "events_state.json"  # doesn't exist
+    full_emails = [{"messageId": "m1"}, {"messageId": "m2"}]
+    state, new_emails = main.step2c_load_cache_and_filter(
+        full_emails, state_path=str(state_path), today=TODAY,
+    )
+    assert new_emails == full_emails
+    assert state["processed_messages"] == {}

@@ -17,13 +17,16 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import datetime as dt
 import json
 import os
 import subprocess
 import sys
 import tempfile
 from typing import Any
+from zoneinfo import ZoneInfo
 
+import events_state as es
 from gmail_client import GmailClient
 from agent import extract_events, review_stripped_messages
 
@@ -31,6 +34,7 @@ from agent import extract_events, review_stripped_messages
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 PAGES_OUTPUT_DIR = os.path.join(PROJECT_ROOT, "docs")
 FUTURE_EVENTS_PATH = os.path.join(PROJECT_ROOT, "future_events.json")
+EVENTS_STATE_PATH = os.path.join(PROJECT_ROOT, "events_state.json")
 LAST_RUN_FIXTURE_PATH = os.path.join(
     PROJECT_ROOT, "fixtures", "last_run_candidates.json"
 )
@@ -263,6 +267,47 @@ def step2b_read_promising(
 
     print(f"  Successfully read: {len(full_emails)} messages")
     return full_emails
+
+
+def _now_iso() -> str:
+    """Current local wall-clock time as an ISO 8601 string with offset."""
+    return dt.datetime.now(ZoneInfo("America/New_York")).isoformat(
+        timespec="seconds"
+    )
+
+
+def step2c_load_cache_and_filter(
+    full_emails: list[dict[str, Any]],
+    state_path: str = EVENTS_STATE_PATH,
+    today: dt.date | None = None,
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    """Load the event cache, GC stale entries, filter out processed messages.
+
+    Returns (state, new_emails). `new_emails` is the subset of `full_emails`
+    whose messageId is not already in `state.processed_messages` — that's
+    what step 3 should send to the agent. Cache statistics are logged.
+    """
+    print("\n" + "=" * 60)
+    print("STEP 2c: Cache filter (skip already-processed messages)")
+    print("=" * 60)
+
+    state = es.load_state(state_path)
+    gc_counts = es.gc_state(state, today or dt.date.today())
+    print(
+        f"  Loaded cache: {len(state['processed_messages'])} processed "
+        f"message(s), {len(state['events'])} event(s)"
+    )
+    print(
+        f"  GC dropped: {gc_counts['messages_dropped']} message(s), "
+        f"{gc_counts['events_dropped']} event(s)"
+    )
+
+    new_emails = es.filter_unprocessed(full_emails, state)
+    cached = len(full_emails) - len(new_emails)
+    print(f"  Total read: {len(full_emails)}")
+    print(f"  Cached (skip agent): {cached}")
+    print(f"  New (send to agent): {len(new_emails)}")
+    return state, new_emails
 
 
 def step3_extract_events(
@@ -562,15 +607,36 @@ def main() -> int:
     # Step 2b: Read promising messages
     full_emails = step2b_read_promising(gmail, search_results)
 
-    if not full_emails:
-        print("\nNo emails found. The page will note an empty run.")
+    # Step 2c: Load event cache + GC + filter out already-processed messages.
+    # Runs even when full_emails is empty so GC still happens and cached
+    # events still get rendered.
+    state, new_emails = step2c_load_cache_and_filter(full_emails)
+    now_iso = _now_iso()
+
+    if not new_emails:
+        if not full_emails:
+            print("\nNo emails found. Rendering from cache only.")
+        else:
+            print("\n  All messages cached — skipping agent extraction.")
         candidates: list[dict] = []
         irrelevant_senders: list[dict] = []
     else:
-        # Step 3: Agent extraction
+        # Step 3: Agent extraction (only for new, uncached messages)
         candidates, irrelevant_senders = step3_extract_events(
-            full_emails, model=args.model
+            new_emails, model=args.model
         )
+        # Merge newly-extracted events into the cache and mark the
+        # messages processed. Save before step 4 so the (expensive)
+        # agent call is durable even if rendering fails.
+        es.stamp_event_ids(candidates)
+        es.merge_events(state, candidates, now_iso)
+        es.mark_processed(
+            state, [e["messageId"] for e in new_emails], now_iso,
+        )
+
+    # Persist cache. `last_updated_iso` reflects this run even when no new
+    # emails were extracted — useful for observing GC-only runs.
+    es.save_state(EVENTS_STATE_PATH, state, now_iso)
 
     # Step 3b: Feed agent-flagged senders into the auto-blocklist.
     if not args.dry_run:
@@ -578,10 +644,11 @@ def main() -> int:
     else:
         print("\n  (dry-run: skipping auto-blocklist update)")
 
-    # Step 4: Process events
+    # Step 4: Process events — hand the merged cache as the candidate pool
+    # so stable events from prior runs survive without a re-extraction.
     pages_url = _load_pages_url()
     html, body, meta, digest_text, digest_html = step4_process_events(
-        candidates, pages_url=pages_url,
+        list(state["events"].values()), pages_url=pages_url,
     )
 
     # Step 5: Publish
