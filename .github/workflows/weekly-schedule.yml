@@ -22,6 +22,11 @@ on:
         required: false
         type: boolean
         default: false
+      create_draft:
+        description: "Create weekly Gmail digest draft (off by default for manual runs)"
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write   # needed to push future_events.json to the state branch
@@ -121,6 +126,10 @@ jobs:
           GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}
           GMAIL_REFRESH_TOKEN: ${{ secrets.GMAIL_REFRESH_TOKEN }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # Only the scheduled cron — or an explicit manual opt-in — creates
+          # a Gmail digest draft. Every other trigger leaves this as "0" so
+          # testing/debug runs cannot spam Ellen's drafts folder.
+          CREATE_DRAFT: ${{ (github.event_name == 'schedule' || github.event.inputs.create_draft == 'true') && '1' || '0' }}
         run: |
           ARGS=""
           if [ "${{ github.event.inputs.lookback_days }}" != "" ]; then
