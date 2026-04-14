@@ -124,26 +124,14 @@ def step1b_filter_audit(
         unblock = audit_result.get("senders_to_unblock", [])
 
         if unblock:
-            # Remove senders from blocklist
-            blocklist_path = os.path.join(PROJECT_ROOT, "blocklist.txt")
-            with open(blocklist_path, "r") as f:
-                lines = f.readlines()
-            removed = []
-            new_lines = []
-            for line in lines:
-                stripped_line = line.strip()
-                if stripped_line in unblock:
-                    removed.append(stripped_line)
-                else:
-                    new_lines.append(line)
-            if removed:
-                with open(blocklist_path, "w") as f:
-                    f.writelines(new_lines)
-                print(f"  Removed from blocklist: {removed}")
-
-                # Rebuild queries with updated blocklist
-                print("  Rebuilding queries with updated blocklist ...")
-                config = step1_build_queries(lookback_days)
+            # Print recommendations only — do NOT modify blocklist.txt
+            # (code changes should come from humans, not the bot)
+            print("  ⚠️ Filter audit recommends removing these senders from blocklist:")
+            for sender in unblock:
+                print(f"    - {sender}")
+            print("  (no changes made — edit blocklist.txt manually to apply)")
+        else:
+            print("  Audit reviewed stripped messages — no false positives.")
 
     # Stamp the audit regardless
     run_script("mark_filter_audit.py", [])
