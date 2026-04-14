@@ -18,6 +18,10 @@ import os
 import sys
 from collections import OrderedDict
 from typing import Any
+from zoneinfo import ZoneInfo
+
+
+LOCAL_TZ = ZoneInfo("America/New_York")
 
 
 VALID_CATEGORIES = {
@@ -339,7 +343,10 @@ def render_html(today: dt.date,
       <p>No upcoming kids' events were found in the last {lookback_days} days of email.</p>
     </section>"""
 
-    generated = today.strftime("%B %-d, %Y")
+    # Timestamp is rendered in local (Eastern) time so it lines up with when
+    # the cron actually fired for the family, not UTC when the runner kicked off.
+    now_local = dt.datetime.now(LOCAL_TZ)
+    generated = now_local.strftime("%B %-d, %Y @ %-I:%M%p")
 
     return f"""\
 <!DOCTYPE html>
