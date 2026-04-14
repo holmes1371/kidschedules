@@ -138,6 +138,41 @@ Output ONLY the JSON object, no other text.
 """
 
 
+AUDIT_SYSTEM_PROMPT = """\
+You are auditing a blocklist used to filter email senders out of a kids'
+schedule pipeline. The family has children at Louise Archer Elementary
+(LAES / FCPS), HTM Sharks swim, Cuppett Performing Arts dance, and other
+kids' extracurriculars.
+
+You will receive a batch of messages that the blocklist FILTERED OUT
+(from/subject/date/snippet). Your job is to identify any false positives —
+messages that were filtered but actually look like they might be about a
+child's event, appointment, deadline, or activity.
+
+Lean conservative: most filtered mail really is junk. Only flag a sender
+for unblocking if the message has clear kids-event relevance (mentions a
+school, team, child by name, or specific kid activity).
+
+Return ONLY a JSON object (no markdown, no commentary) with this shape:
+
+{
+  "decisions": [
+    {
+      "subject": "...",
+      "from": "...",
+      "verdict": "keep_blocked" | "unblock",
+      "reason": "short rationale"
+    }
+  ],
+  "senders_to_unblock": ["domain-or-address", ...]
+}
+
+The senders_to_unblock list should contain every distinct sender that had
+at least one "unblock" decision. Use the most specific form that would
+match (e.g. "campaigns@doublegood.com" or "m.lifetouch.com"), not a
+bare parent domain, to avoid collateral damage.
+"""
+
 # Maximum emails per API call. Smaller batches = better attention to
 # detail per email, at the cost of more API calls.
 BATCH_SIZE = 10
@@ -153,14 +188,21 @@ def _call_with_retry(
     max_tokens: int,
     user_message: str,
     batch_label: str,
+    system_prompt: str | None = None,
 ) -> anthropic.types.Message:
-    """Call the Anthropic API with exponential backoff on transient errors."""
+    """Call the Anthropic API with exponential backoff on transient errors.
+
+    system_prompt defaults to EXTRACTION_SYSTEM_PROMPT for back-compat with
+    existing event-extraction callers. The blocklist audit passes its own.
+    """
+    if system_prompt is None:
+        system_prompt = EXTRACTION_SYSTEM_PROMPT
     for attempt in range(1, MAX_RETRIES + 1):
         try:
             return client.messages.create(
                 model=model,
                 max_tokens=max_tokens,
-                system=EXTRACTION_SYSTEM_PROMPT,
+                system=system_prompt,
                 messages=[{"role": "user", "content": user_message}],
             )
         except (
@@ -362,7 +404,8 @@ def review_stripped_messages(
     client = _get_client()
     try:
         response = _call_with_retry(
-            client, model, max_tokens, user_message, "Audit review"
+            client, model, max_tokens, user_message, "Audit review",
+            system_prompt=AUDIT_SYSTEM_PROMPT,
         )
     except Exception as e:
         print(f"  Audit review failed: {e}")
@@ -385,9 +428,9 @@ def review_stripped_messages(
         f"{usage.output_tokens} out"
     )
 
-    # Defensive: the audit currently reuses EXTRACTION_SYSTEM_PROMPT, so the
-    # model may reply with a list instead of the expected dict. Coerce to the
-    # empty-recommendations shape rather than crashing the pipeline.
+    # Belt-and-suspenders: if the model ignores the schema and returns
+    # something other than a dict, treat it as no recommendations rather
+    # than crashing the pipeline.
     if not isinstance(result, dict):
         print(
             f"  Audit returned unexpected shape ({type(result).__name__}); "

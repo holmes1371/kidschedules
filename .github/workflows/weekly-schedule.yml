@@ -37,7 +37,7 @@ jobs:
       - name: Checkout repository (main)
         uses: actions/checkout@v4
 
-      - name: Restore future_events.json from state branch
+      - name: Restore persistent state from state branch
         run: |
           # Clone the state branch into .state/ if it exists.
           # First-ever run: clone fails, we fall back to an empty dir.
@@ -55,6 +55,12 @@ jobs:
             echo "Restored future_events.json ($COUNT event(s))."
           else
             echo "No prior future_events.json — starting fresh."
+          fi
+          if [ -f .state/.filter_audit.json ]; then
+            cp .state/.filter_audit.json .filter_audit.json
+            echo "Restored .filter_audit.json."
+          else
+            echo "No prior .filter_audit.json — audit will run on this invocation."
           fi
 
       - name: Set up Python
@@ -106,11 +112,11 @@ jobs:
           fi
           python main.py $ARGS
 
-      - name: Save future_events.json back to state branch
+      - name: Save persistent state back to state branch
         if: ${{ github.event.inputs.dry_run != 'true' }}
         run: |
-          if [ ! -f future_events.json ]; then
-            echo "No future_events.json produced — nothing to save."
+          if [ ! -f future_events.json ] && [ ! -f .filter_audit.json ]; then
+            echo "No persistent state produced — nothing to save."
             exit 0
           fi
           cd .state
@@ -120,18 +126,23 @@ jobs:
             git remote add origin \
               "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
           fi
-          cp ../future_events.json future_events.json
+          if [ -f ../future_events.json ]; then
+            cp ../future_events.json future_events.json
+          fi
+          if [ -f ../.filter_audit.json ]; then
+            cp ../.filter_audit.json .filter_audit.json
+          fi
           git -c user.name="github-actions[bot]" \
               -c user.email="github-actions[bot]@users.noreply.github.com" \
-              add future_events.json
+              add future_events.json .filter_audit.json
           if git diff --cached --quiet; then
-            echo "future_events.json unchanged — no state commit needed."
+            echo "Persistent state unchanged — no commit needed."
           else
             git -c user.name="github-actions[bot]" \
                 -c user.email="github-actions[bot]@users.noreply.github.com" \
-                commit -m "Update future_events.json — $(date -u +%Y-%m-%d)"
+                commit -m "Update persistent state — $(date -u +%Y-%m-%d)"
             git push origin HEAD:state
-            echo "Pushed updated future_events.json to state branch."
+            echo "Pushed persistent state updates to state branch."
           fi
 
       - name: Upload Pages artifact
