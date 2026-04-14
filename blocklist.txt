@@ -49,6 +49,7 @@ email.gopuff.com
 gobble.com
 greenchef.com
 wildgrain.com
+email-marriott.com
 
 # Finance / credit / jobs
 e.usa.experian.com
@@ -63,11 +64,14 @@ shareplus.com
 inhousecounsel.com
 goinhouse.com
 handshake.com
+match.indeed.com
 
 # Legal industry
 lexology.com
 seealso.com
 abovethelaw.com
+kharon.com
+paulweissinfo.com
 
 # Wellness / beauty / lifestyle marketing (not actual providers)
 bryanjohnson.com
@@ -76,6 +80,8 @@ emilyfieldrd.com
 amandanighbert.com
 lssnca.org
 breathe.calm.com
+joinmidi.com
+pinchofyum.com
 
 # Sales / business newsletters
 saleshacker.com
@@ -98,6 +104,9 @@ adoptapet.com
 # FSA / benefits admin
 wageworks.com
 healthequity.com
+
+# Neighborhood / social
+is.email.nextdoor.com
 
 # System noise
 googlealerts-noreply@google.com
