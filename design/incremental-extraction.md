@@ -13,7 +13,7 @@ Committed to the repo, same pattern as `ignored_events.json` and `future_events.
   "schema_version": 1,
   "last_updated_iso": "2026-04-14T06:30:00-04:00",
   "processed_messages": {
-    "<gmail_msg_id>": {"processed_at_iso": "2026-04-14T06:30:12-04:00"}
+    "<gmail_msg_id>": "2026-04-14T06:30:12-04:00"
   },
   "events": {
     "<12-char event_id>": {
@@ -87,9 +87,8 @@ Plus one integration test in `tests/test_main.py` (the file exists; item 3 added
 
 - `scripts/events_state.py` — new module: `load_state`, `save_state`, `filter_unprocessed`, `merge_events`, `gc_state`, `CURRENT_SCHEMA_VERSION`.
 - `main.py` — new step between `step2b_read_promising` and `step3_extract_events` that loads state, filters, and after `step3` merges + saves. Log cache-hit/cache-miss/GC counts.
-- `tests/test_events_state.py` — new file per fixture plan above.
+- `tests/test_events_state.py` — new file per fixture plan above. State dicts built inline as Python literals; no separate JSON fixture files.
 - `tests/test_main.py` — one new integration test for the zero-new-message short-circuit.
-- `fixtures/test/events_state_*.json` — small fixtures for the state-module tests.
 - `.github/workflows/weekly-schedule.yml` — add `events_state.json` to the committed outputs list.
 - `events_state.json` — the initial file (empty shape, committed at feature-complete).
 - `ROADMAP.md` — mark `[x]`.
