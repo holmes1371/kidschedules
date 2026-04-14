@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import hashlib
+import html as _html
 import json
 import os
 import re
@@ -682,6 +683,80 @@ def render_html(today: dt.date,
 """
 
 
+# ── Weekly Gmail digest ─────────────────────────────────────────
+
+
+def digest_subject(today: dt.date) -> str:
+    """Subject line for the weekly digest, anchored on this week's Monday."""
+    return f"Kids' Schedule — Week of {week_start(today).strftime('%B %-d')}"
+
+
+def _digest_this_week(weeks: list[tuple[dt.date, list[dict[str, Any]]]],
+                      today: dt.date) -> list[dict[str, Any]]:
+    """Events whose week_start matches today's week_start (Mon–Sun bucket)."""
+    target = week_start(today)
+    for w, evs in weeks:
+        if w == target:
+            return evs
+    return []
+
+
+def render_digest_text(weeks: list[tuple[dt.date, list[dict[str, Any]]]],
+                       today: dt.date,
+                       pages_url: str = "") -> str:
+    """Plain-text Gmail digest body."""
+    evs = _digest_this_week(weeks, today)
+    lines: list[str] = [digest_subject(today), ""]
+    if not evs:
+        lines.append("No events this week.")
+    else:
+        for ev in evs:
+            d: dt.date = ev["_date_obj"]
+            day = d.strftime("%A, %B %-d")
+            lines.append(f"{day} — {ev['name']} · {ev['time']}")
+    lines.append("")
+    if pages_url:
+        lines.append(f"Full 60-day view: {pages_url}")
+    return "\n".join(lines).rstrip() + "\n"
+
+
+def render_digest_html(weeks: list[tuple[dt.date, list[dict[str, Any]]]],
+                       today: dt.date,
+                       pages_url: str = "") -> str:
+    """HTML Gmail digest body. Event names/times are HTML-escaped."""
+    evs = _digest_this_week(weeks, today)
+    parts: list[str] = []
+    parts.append(
+        '<div style="font-family: -apple-system, BlinkMacSystemFont, '
+        '\'Segoe UI\', Roboto, sans-serif; max-width: 560px; color: #202124;">'
+    )
+    parts.append(
+        f'<h2 style="margin:0 0 12px 0;">{_html.escape(digest_subject(today))}</h2>'
+    )
+    if not evs:
+        parts.append('<p>No events this week.</p>')
+    else:
+        parts.append('<ul style="padding-left: 1.2em; margin: 0 0 12px 0;">')
+        for ev in evs:
+            d: dt.date = ev["_date_obj"]
+            day = _html.escape(d.strftime("%A, %B %-d"))
+            name = _html.escape(ev["name"])
+            time = _html.escape(ev["time"])
+            parts.append(
+                f'<li style="margin: 0 0 6px 0;">'
+                f'<strong>{day}</strong> — {name} '
+                f'<span style="color:#5f6368;">· {time}</span></li>'
+            )
+        parts.append('</ul>')
+    if pages_url:
+        parts.append(
+            f'<p><a href="{_html.escape(pages_url, quote=True)}" '
+            'style="color:#1a73e8;">View the full 60-day schedule</a></p>'
+        )
+    parts.append('</div>')
+    return "\n".join(parts) + "\n"
+
+
 def main() -> int:
     p = argparse.ArgumentParser()
     p.add_argument("--candidates", required=True,
@@ -706,6 +781,12 @@ def main() -> int:
                    help="JSON file of previously-ignored events. Events "
                         "whose ID matches an entry here are dropped before "
                         "classifying. Missing/malformed file → no filter.")
+    p.add_argument("--digest-html-out", default=None,
+                   help="Write weekly Gmail digest HTML body here.")
+    p.add_argument("--digest-text-out", default=None,
+                   help="Write weekly Gmail digest plain-text body here.")
+    p.add_argument("--pages-url", default="",
+                   help="GitHub Pages URL to link from the weekly digest.")
     args = p.parse_args()
 
     today = (dt.date.fromisoformat(args.today) if args.today
@@ -734,6 +815,17 @@ def main() -> int:
         with open(args.html_out, "w", encoding="utf-8") as f:
             f.write(html)
 
+    digest_text = render_digest_text(weeks, today, pages_url=args.pages_url)
+    digest_html = render_digest_html(weeks, today, pages_url=args.pages_url)
+    this_week_count = len(_digest_this_week(weeks, today))
+
+    if args.digest_text_out:
+        with open(args.digest_text_out, "w", encoding="utf-8") as f:
+            f.write(digest_text)
+    if args.digest_html_out:
+        with open(args.digest_html_out, "w", encoding="utf-8") as f:
+            f.write(digest_html)
+
     if args.banked_out:
         # Strip _date_obj before serializing
         banked_clean = [
@@ -756,6 +848,10 @@ def main() -> int:
         },
         "warnings": warnings,
         "has_events": bool(display or undated),
+        "digest": {
+            "subject": digest_subject(today),
+            "this_week_count": this_week_count,
+        },
     }
     if args.meta_out:
         with open(args.meta_out, "w", encoding="utf-8") as f:

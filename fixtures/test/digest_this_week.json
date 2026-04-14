@@ -1,0 +1,29 @@
+[
+  {
+    "name": "Art & Crafts",
+    "date": "2026-04-15",
+    "time": "3:30 PM",
+    "location": "LAES cafeteria",
+    "category": "School Activity",
+    "child": "Everly",
+    "source": "LAES newsletter (Apr 10)"
+  },
+  {
+    "name": "Book Report Due",
+    "date": "2026-04-17",
+    "time": "",
+    "location": "",
+    "category": "Academic Due Date",
+    "child": "Isla",
+    "source": "Mrs. Patterson weekly newsletter (Apr 10)"
+  },
+  {
+    "name": "Spring Concert",
+    "date": "2026-04-23",
+    "time": "7:00 PM",
+    "location": "Glasgow Middle School Auditorium",
+    "category": "School Activity",
+    "child": "Isla",
+    "source": "Music Dept (Apr 5)"
+  }
+]

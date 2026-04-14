@@ -304,6 +304,87 @@ def test_subject_line_format_via_cli(tmp_path):
     assert meta["today_iso"] == TODAY.isoformat()
 
 
+# ─── weekly digest ───────────────────────────────────────────────────────
+
+
+def _digest_weeks(fixture_name: str):
+    display = _classified_display(fixture_name)
+    display = pe.dedupe(display)
+    return pe.group_by_week(display)
+
+
+def test_digest_subject_uses_monday_of_this_week():
+    # TODAY is Tue 2026-04-14; Monday of that week is 2026-04-13.
+    assert pe.digest_subject(TODAY) == "Kids' Schedule — Week of April 13"
+
+
+def test_digest_text_lists_only_this_week_events():
+    weeks = _digest_weeks("digest_this_week")
+    text = pe.render_digest_text(weeks, TODAY, pages_url="https://example.com/sched")
+    assert "Art & Crafts" in text
+    assert "Book Report Due" in text
+    # Spring Concert is 2026-04-23 — next week — must not appear.
+    assert "Spring Concert" not in text
+    assert "https://example.com/sched" in text
+
+
+def test_digest_text_empty_week_message():
+    # Force an empty this-week bucket by supplying a today well past all events.
+    weeks = _digest_weeks("digest_this_week")
+    far_future = dt.date(2027, 1, 4)
+    text = pe.render_digest_text(weeks, far_future, pages_url="")
+    assert "No events this week." in text
+    # No pages link was supplied.
+    assert "http" not in text
+
+
+def test_digest_html_escapes_event_names():
+    weeks = _digest_weeks("digest_this_week")
+    html = pe.render_digest_html(weeks, TODAY, pages_url="https://example.com/s")
+    # The "&" in "Art & Crafts" must be escaped; the literal raw "&" must
+    # not appear outside of already-encoded entities.
+    assert "Art &amp; Crafts" in html
+    assert "Art & Crafts" not in html
+    # Link is present.
+    assert 'href="https://example.com/s"' in html
+
+
+def test_digest_html_empty_week_no_list():
+    weeks = _digest_weeks("digest_this_week")
+    html = pe.render_digest_html(weeks, dt.date(2027, 1, 4), pages_url="")
+    assert "No events this week." in html
+    assert "<ul" not in html
+
+
+def test_digest_meta_via_cli(tmp_path):
+    """CLI emits digest block in meta and writes both digest bodies."""
+    candidates_path = FIXTURES_DIR / "digest_this_week.json"
+    meta_path = tmp_path / "meta.json"
+    body_path = tmp_path / "body.txt"
+    dtext_path = tmp_path / "digest.txt"
+    dhtml_path = tmp_path / "digest.html"
+    subprocess.run(
+        [sys.executable,
+         str(REPO_ROOT / "scripts" / "process_events.py"),
+         "--candidates", str(candidates_path),
+         "--today", TODAY.isoformat(),
+         "--body-out", str(body_path),
+         "--meta-out", str(meta_path),
+         "--digest-text-out", str(dtext_path),
+         "--digest-html-out", str(dhtml_path),
+         "--pages-url", "https://example.com/s",
+         ],
+        check=True,
+    )
+    meta = json.loads(meta_path.read_text(encoding="utf-8"))
+    assert meta["digest"]["subject"] == "Kids' Schedule — Week of April 13"
+    # 2 this-week events: Art & Crafts (Apr 15), Book Report Due (Apr 17).
+    assert meta["digest"]["this_week_count"] == 2
+    # Bodies were written.
+    assert dtext_path.read_text(encoding="utf-8").strip()
+    assert dhtml_path.read_text(encoding="utf-8").strip()
+
+
 # ─── _load_ignored_ids tolerance ─────────────────────────────────────────
 
 
