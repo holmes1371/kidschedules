@@ -284,9 +284,23 @@ def _parse_json_response(text: str) -> dict[str, list] | None:
     try:
         result = json.loads(text)
     except json.JSONDecodeError as e:
-        print(f"PARSE ERROR: {e}")
-        print(f"  Raw response (first 500 chars):\n{text[:500]}")
-        return None
+        # Common failure mode: the model emits a valid JSON value followed by
+        # extra content (trailing commentary, a second object, a half-written
+        # continuation). raw_decode parses the first value and ignores the
+        # rest — if that works, we log and move on instead of forcing a
+        # repair round-trip.
+        try:
+            result, end = json.JSONDecoder().raw_decode(text)
+            trailing = text[end:].strip()
+            if trailing:
+                print(
+                    f"  WARNING: recovered via raw_decode; "
+                    f"ignored {len(trailing)} trailing char(s)"
+                )
+        except json.JSONDecodeError:
+            print(f"PARSE ERROR: {e}")
+            print(f"  Raw response (first 500 chars):\n{text[:500]}")
+            return None
 
     if isinstance(result, list):
         return {"events": result, "irrelevant_senders": []}
@@ -370,16 +384,24 @@ def extract_events(
         text = response.content[0].text.strip()
         parsed = _parse_json_response(text)
 
-        # If parse failed, retry once asking the model to fix it
+        # If parse failed, retry once asking the model to fix it. We re-send
+        # the full email batch alongside the broken response — without it the
+        # model has no context and tends to reply "please share the emails",
+        # wasting the repair round-trip.
         if parsed is None:
             print(f"  Retrying {batch_label} with JSON repair prompt...")
             try:
                 repair_response = _call_with_retry(
                     client, model, max_tokens,
-                    f"Your previous response was not valid JSON. Here is what you returned:\n\n"
+                    f"Your previous response to the email batch below was not "
+                    f"valid JSON. Here is what you returned:\n\n"
                     f"{text[:3000]}\n\n"
+                    f"And here are the original emails you were extracting "
+                    f"from:\n\n"
+                    f"{user_message}\n\n"
                     f"Please return ONLY a valid JSON object with keys "
-                    f"'events' and 'irrelevant_senders'. No markdown, no explanation.",
+                    f"'events' and 'irrelevant_senders'. No markdown, no "
+                    f"explanation, nothing after the closing brace.",
                     f"{batch_label} (repair)",
                 )
                 text2 = repair_response.content[0].text.strip()
