@@ -765,15 +765,14 @@ def main() -> int:
     p.add_argument("--lookback-days", type=int, default=60)
     p.add_argument("--display-window-days", type=int, default=60,
                    help="Only show events within this many days from today. "
-                        "Events beyond this go to --banked-out.")
+                        "Events beyond this are excluded from the render; "
+                        "main.py keeps them in events_state.json for later.")
     p.add_argument("--body-out", default=None,
                    help="Write rendered body here (default: stdout).")
     p.add_argument("--html-out", default=None,
                    help="Write rendered HTML page here for GitHub Pages.")
     p.add_argument("--meta-out", default=None,
                    help="Write JSON metadata (subject, counts, warnings) here.")
-    p.add_argument("--banked-out", default=None,
-                   help="Write far-future events JSON here (for the event bank).")
     p.add_argument("--webhook-url", default="",
                    help="Ignore-button webhook URL baked into the HTML. "
                         "Leave empty to disable backend sync (dev preview).")
@@ -825,15 +824,6 @@ def main() -> int:
     if args.digest_html_out:
         with open(args.digest_html_out, "w", encoding="utf-8") as f:
             f.write(digest_html)
-
-    if args.banked_out:
-        # Strip _date_obj before serializing
-        banked_clean = [
-            {k: v for k, v in ev.items() if k != "_date_obj"}
-            for ev in banked
-        ]
-        with open(args.banked_out, "w", encoding="utf-8") as f:
-            json.dump(banked_clean, f, indent=2, ensure_ascii=False)
 
     meta = {
         "subject": f"Kids' Schedule — {today.strftime('%B %-d, %Y')}",

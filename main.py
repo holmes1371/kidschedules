@@ -276,22 +276,56 @@ def _now_iso() -> str:
     )
 
 
+def _bootstrap_from_future_events(
+    state: dict[str, Any], now_iso: str
+) -> int:
+    """One-time migration: seed an empty cache from future_events.json.
+
+    Returns the number of events bootstrapped. No-op (returns 0) if the
+    cache already has events or the legacy file is missing.
+    """
+    if state["events"] or not os.path.exists(FUTURE_EVENTS_PATH):
+        return 0
+    try:
+        with open(FUTURE_EVENTS_PATH, "r", encoding="utf-8") as f:
+            banked = json.load(f)
+    except (json.JSONDecodeError, OSError):
+        return 0
+    if not isinstance(banked, list) or not banked:
+        return 0
+    es.stamp_event_ids(banked)
+    es.merge_events(state, banked, now_iso)
+    return len(banked)
+
+
 def step2c_load_cache_and_filter(
     full_emails: list[dict[str, Any]],
     state_path: str = EVENTS_STATE_PATH,
     today: dt.date | None = None,
+    now_iso: str | None = None,
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     """Load the event cache, GC stale entries, filter out processed messages.
 
     Returns (state, new_emails). `new_emails` is the subset of `full_emails`
     whose messageId is not already in `state.processed_messages` — that's
     what step 3 should send to the agent. Cache statistics are logged.
+
+    On first run after the cache was introduced, bootstraps from
+    future_events.json so the accumulated far-future bank isn't lost.
     """
     print("\n" + "=" * 60)
     print("STEP 2c: Cache filter (skip already-processed messages)")
     print("=" * 60)
 
     state = es.load_state(state_path)
+    bootstrapped = _bootstrap_from_future_events(
+        state, now_iso or _now_iso(),
+    )
+    if bootstrapped:
+        print(
+            f"  Bootstrapped {bootstrapped} event(s) from future_events.json "
+            f"(one-time migration)"
+        )
     gc_counts = es.gc_state(state, today or dt.date.today())
     print(
         f"  Loaded cache: {len(state['processed_messages'])} processed "
@@ -365,27 +399,6 @@ def step3b_update_auto_blocklist(
             pass
 
 
-def _load_event_bank() -> list[dict[str, Any]]:
-    """Load the persistent far-future event bank."""
-    if not os.path.exists(FUTURE_EVENTS_PATH):
-        return []
-    try:
-        with open(FUTURE_EVENTS_PATH, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        if isinstance(data, list):
-            return data
-    except (json.JSONDecodeError, OSError):
-        pass
-    return []
-
-
-def _save_event_bank(events: list[dict[str, Any]]) -> None:
-    """Save far-future events to the persistent bank."""
-    with open(FUTURE_EVENTS_PATH, "w", encoding="utf-8") as f:
-        json.dump(events, f, indent=2, ensure_ascii=False)
-    print(f"  Saved {len(events)} event(s) to future_events.json")
-
-
 def step4_process_events(
     candidates: list[dict[str, Any]],
     pages_url: str = "",
@@ -393,38 +406,32 @@ def step4_process_events(
     """Run process_events.py and return (html, body_text, meta,
     digest_text, digest_html).
 
-    Merges in any previously banked far-future events, then saves
-    newly banked events back to future_events.json.
+    Far-future events (beyond the 60-day display window) now persist
+    in events_state.json alongside everything else, so this step no
+    longer maintains a separate bank file.
     """
     print("\n" + "=" * 60)
     print("STEP 4: Processing events (filter, dedupe, sort, render)")
     print("=" * 60)
-
-    # Load previously banked far-future events and merge them in
-    banked_prev = _load_event_bank()
-    if banked_prev:
-        print(f"  Loaded {len(banked_prev)} event(s) from future_events.json")
-    all_candidates = candidates + banked_prev
 
     # Dump the exact input to process_events.py so dev_render.py can replay
     # it against the real data without hitting any APIs.
     try:
         os.makedirs(os.path.dirname(LAST_RUN_FIXTURE_PATH), exist_ok=True)
         with open(LAST_RUN_FIXTURE_PATH, "w", encoding="utf-8") as f:
-            json.dump(all_candidates, f, indent=2, ensure_ascii=False)
+            json.dump(candidates, f, indent=2, ensure_ascii=False)
     except OSError as e:
         print(f"  WARNING: could not write last_run fixture: {e}")
 
     with tempfile.NamedTemporaryFile(
         mode="w", suffix=".json", delete=False, encoding="utf-8"
     ) as f:
-        json.dump(all_candidates, f, ensure_ascii=False)
+        json.dump(candidates, f, ensure_ascii=False)
         candidates_path = f.name
 
     body_path = candidates_path.replace(".json", "-body.txt")
     html_path = candidates_path.replace(".json", "-page.html")
     meta_path = candidates_path.replace(".json", "-meta.json")
-    banked_path = candidates_path.replace(".json", "-banked.json")
     digest_text_path = candidates_path.replace(".json", "-digest.txt")
     digest_html_path = candidates_path.replace(".json", "-digest.html")
 
@@ -437,7 +444,6 @@ def step4_process_events(
                 "--body-out", body_path,
                 "--html-out", html_path,
                 "--meta-out", meta_path,
-                "--banked-out", banked_path,
                 "--digest-text-out", digest_text_path,
                 "--digest-html-out", digest_html_path,
                 "--pages-url", pages_url,
@@ -458,17 +464,10 @@ def step4_process_events(
         with open(digest_html_path, "r", encoding="utf-8") as f:
             digest_html = f.read()
 
-        # Save newly banked far-future events
-        banked_new = []
-        if os.path.exists(banked_path):
-            with open(banked_path, "r", encoding="utf-8") as f:
-                banked_new = json.load(f)
-        _save_event_bank(banked_new)
-
         counts = meta["counts"]
         print(f"  Candidates in: {counts['candidates_in']}")
         print(f"  Displayed (next 60 days): {counts['future_dated']}")
-        print(f"  Banked (beyond 60 days): {counts.get('banked_far_future', 0)}")
+        print(f"  Beyond window (kept in cache): {counts.get('banked_far_future', 0)}")
         print(f"  Undated: {counts['undated']}")
         print(f"  Dropped (past): {counts['dropped_past']}")
         print(f"  Dropped (ignored): {counts.get('dropped_ignored', 0)}")
@@ -479,7 +478,7 @@ def step4_process_events(
         return html, body, meta, digest_text, digest_html
     finally:
         for p in [candidates_path, body_path, html_path, meta_path,
-                  banked_path, digest_text_path, digest_html_path]:
+                  digest_text_path, digest_html_path]:
             try:
                 os.unlink(p)
             except OSError:

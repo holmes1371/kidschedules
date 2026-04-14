@@ -29,7 +29,7 @@ on:
         default: false
 
 permissions:
-  contents: write   # needed to push future_events.json to the state branch
+  contents: write   # needed to push events_state.json to the state branch
   pages: write      # needed to deploy to GitHub Pages
   id-token: write   # needed by actions/deploy-pages
 
@@ -59,12 +59,17 @@ jobs:
             echo "No state branch yet — first run."
             mkdir -p .state
           fi
+          # future_events.json is the LEGACY pre-cache event bank. It is
+          # restored one final time so main.py can bootstrap events_state.json
+          # from it on the first run after the retirement. After that run
+          # events_state.json is authoritative; this block can be deleted
+          # any time thereafter.
           if [ -f .state/future_events.json ]; then
             cp .state/future_events.json future_events.json
             COUNT=$(python3 -c "import json; print(len(json.load(open('future_events.json'))))")
-            echo "Restored future_events.json ($COUNT event(s))."
+            echo "Restored future_events.json ($COUNT event(s)) for one-time cache bootstrap."
           else
-            echo "No prior future_events.json — starting fresh."
+            echo "No prior future_events.json — cache bootstrap will be a no-op."
           fi
           if [ -f .state/events_state.json ]; then
             cp .state/events_state.json events_state.json
@@ -153,7 +158,7 @@ jobs:
       - name: Save persistent state back to state branch
         if: ${{ github.event.inputs.dry_run != 'true' }}
         run: |
-          if [ ! -f future_events.json ] && [ ! -f .filter_audit.json ] \
+          if [ ! -f .filter_audit.json ] \
              && [ ! -f blocklist_auto.txt ] \
              && [ ! -f blocklist_auto_audit.jsonl ] \
              && [ ! -f events_state.json ]; then
@@ -166,9 +171,6 @@ jobs:
             git init -q -b state
             git remote add origin \
               "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
-          fi
-          if [ -f ../future_events.json ]; then
-            cp ../future_events.json future_events.json
           fi
           if [ -f ../.filter_audit.json ]; then
             cp ../.filter_audit.json .filter_audit.json
@@ -184,8 +186,9 @@ jobs:
           fi
           # Only 'git add' files that actually exist — any one of these may be
           # absent on a given run (e.g. first run before filter audit stamps).
+          # future_events.json is intentionally NOT in this list — it was
+          # retired in favor of events_state.json (see restore step).
           FILES=""
-          [ -f future_events.json ] && FILES="$FILES future_events.json"
           [ -f .filter_audit.json ] && FILES="$FILES .filter_audit.json"
           [ -f blocklist_auto.txt ] && FILES="$FILES blocklist_auto.txt"
           [ -f blocklist_auto_audit.jsonl ] && FILES="$FILES blocklist_auto_audit.jsonl"

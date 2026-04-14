@@ -21,8 +21,10 @@ fixtures/last_run_candidates.json
 
 # Bot-generated artifacts — built fresh each workflow run, not committed to main.
 # docs/*.html is rebuilt by main.py and uploaded as a Pages artifact.
-# future_events.json lives on the `state` branch, synced by the workflow.
-# events_state.json (the per-message extraction cache) also lives on `state`.
+# events_state.json (the per-message extraction cache) lives on the `state`
+# branch, synced by the workflow.
+# future_events.json is retired (see events_state.json); its last copy on the
+# state branch is still restored once to bootstrap the cache.
 # ignored_events.json is fetched fresh from Apps Script each run.
 # .filter_audit.json is a local-only audit stamp.
 docs/index.html
