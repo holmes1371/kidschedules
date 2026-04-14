@@ -23,17 +23,11 @@ Status legend:
 
 ## Backlog (priority order)
 
-### 1. [~] Failure notifications via GitHub mobile app
+### 1. [x] Failure notifications via GitHub mobile app — c3d2e5b
 
 Tom enables Actions push notifications for the repo in the GitHub mobile app. On the code side, verify `main.py` and the workflow exit non-zero on real failures (Gmail token expiry, Anthropic 5xx, unexpected exceptions) so the push actually fires. Add a small dry-run or intentional-failure path to confirm the notification arrives end-to-end.
 
-**Done this session:**
-- Audited existing propagation paths — most were already correct (run_script check=True, Gmail RefreshError, missing env vars, no continue-on-error in workflow).
-- Removed the `except Exception: continue` in `agent.py::extract_events` so post-retry API failures propagate instead of silently returning `([], [])`. Parse failures and filter-audit failures remain tolerant by design (see `design/failure-notifications.md`).
-- Added `main.py --intentional-failure` that raises `RuntimeError` before any real work. Verified locally: exit code 1 with full traceback.
-- Plumbed a matching `intentional_failure` boolean into `workflow_dispatch.inputs` so Tom can trigger a test run from the GitHub mobile app.
-
-**Remaining:** Tom runs the workflow once with `intentional_failure: true` and confirms the push notification arrives on his phone. Flip to `[x]` with the verification SHA.
+Audited existing propagation paths (most were already correct). Removed the `except Exception: continue` in `agent.py::extract_events` so post-retry API failures propagate instead of silently returning `([], [])`; parse failures and filter-audit failures remain tolerant by design (see `design/failure-notifications.md`). Added `main.py --intentional-failure` plus a matching `intentional_failure` workflow_dispatch input. Tom verified the mobile push arrives when the intentional-failure run finishes.
 
 ### 2. [ ] Pytest suite for `scripts/process_events.py`
 
