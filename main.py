@@ -35,6 +35,7 @@ LAST_RUN_FIXTURE_PATH = os.path.join(
     PROJECT_ROOT, "fixtures", "last_run_candidates.json"
 )
 WEBHOOK_URL_PATH = os.path.join(PROJECT_ROOT, "ignore_webhook_url.txt")
+PAGES_URL_PATH = os.path.join(PROJECT_ROOT, "pages_url.txt")
 IGNORED_EVENTS_PATH = os.path.join(PROJECT_ROOT, "ignored_events.json")
 BLOCKLIST_PATH = os.path.join(PROJECT_ROOT, "blocklist.txt")
 AUTO_BLOCKLIST_PATH = os.path.join(PROJECT_ROOT, "blocklist_auto.txt")
@@ -52,6 +53,33 @@ def _load_webhook_url() -> str:
             return f.read().strip()
     except OSError:
         return ""
+
+
+def _load_pages_url() -> str:
+    """Return the GitHub Pages URL committed to the repo, or ''."""
+    if not os.path.exists(PAGES_URL_PATH):
+        return ""
+    try:
+        with open(PAGES_URL_PATH, "r", encoding="utf-8") as f:
+            return f.read().strip()
+    except OSError:
+        return ""
+
+
+def should_create_draft(args) -> bool:
+    """The single decision gate for creating a Gmail digest draft.
+
+    Default is no-draft. Explicit opt-in required via --create-draft or
+    the CREATE_DRAFT=1 env var (used by the scheduled workflow trigger).
+    --dry-run always suppresses. This is the only place the decision lives.
+    """
+    if args.dry_run:
+        return False
+    if args.create_draft:
+        return True
+    if os.environ.get("CREATE_DRAFT") == "1":
+        return True
+    return False
 
 
 def run_script(script_name: str, args: list[str] | None = None) -> str:
@@ -315,8 +343,10 @@ def _save_event_bank(events: list[dict[str, Any]]) -> None:
 
 def step4_process_events(
     candidates: list[dict[str, Any]],
-) -> tuple[str, str, dict]:
-    """Run process_events.py and return (html, body_text, meta).
+    pages_url: str = "",
+) -> tuple[str, str, dict, str, str]:
+    """Run process_events.py and return (html, body_text, meta,
+    digest_text, digest_html).
 
     Merges in any previously banked far-future events, then saves
     newly banked events back to future_events.json.
@@ -350,6 +380,8 @@ def step4_process_events(
     html_path = candidates_path.replace(".json", "-page.html")
     meta_path = candidates_path.replace(".json", "-meta.json")
     banked_path = candidates_path.replace(".json", "-banked.json")
+    digest_text_path = candidates_path.replace(".json", "-digest.txt")
+    digest_html_path = candidates_path.replace(".json", "-digest.html")
 
     try:
         webhook_url = _load_webhook_url()
@@ -361,6 +393,9 @@ def step4_process_events(
                 "--html-out", html_path,
                 "--meta-out", meta_path,
                 "--banked-out", banked_path,
+                "--digest-text-out", digest_text_path,
+                "--digest-html-out", digest_html_path,
+                "--pages-url", pages_url,
                 "--display-window-days", "60",
                 "--webhook-url", webhook_url,
                 "--ignored", IGNORED_EVENTS_PATH,
@@ -373,6 +408,10 @@ def step4_process_events(
             html = f.read()
         with open(meta_path, "r", encoding="utf-8") as f:
             meta = json.load(f)
+        with open(digest_text_path, "r", encoding="utf-8") as f:
+            digest_text = f.read()
+        with open(digest_html_path, "r", encoding="utf-8") as f:
+            digest_html = f.read()
 
         # Save newly banked far-future events
         banked_new = []
@@ -392,9 +431,10 @@ def step4_process_events(
             for w in meta["warnings"]:
                 print(f"  WARNING: {w}")
 
-        return html, body, meta
+        return html, body, meta, digest_text, digest_html
     finally:
-        for p in [candidates_path, body_path, html_path, meta_path, banked_path]:
+        for p in [candidates_path, body_path, html_path, meta_path,
+                  banked_path, digest_text_path, digest_html_path]:
             try:
                 os.unlink(p)
             except OSError:
@@ -430,6 +470,48 @@ def step5_publish(html: str, meta: dict, dry_run: bool) -> None:
     print(f"  Subject: {meta['subject']}")
 
 
+def step6_create_draft(
+    gmail: GmailClient,
+    meta: dict,
+    digest_text: str,
+    digest_html: str,
+    actually_create: bool,
+) -> None:
+    """Preview the weekly digest and (if gated on) create a Gmail draft.
+
+    Always logs a plain-text preview so local/manual runs can eyeball the
+    draft content without touching Gmail. If the gate is off, we stop
+    after the preview. Empty-week (this_week_count == 0) also short-
+    circuits — a "nothing this week" draft is spam by another name.
+    """
+    print("\n" + "=" * 60)
+    print("STEP 6: Weekly Gmail digest draft")
+    print("=" * 60)
+    subject = meta["digest"]["subject"]
+    this_week_count = meta["digest"]["this_week_count"]
+    print(f"  Subject: {subject}")
+    print(f"  Events this week: {this_week_count}")
+    print("  --- digest preview (plain text) ---")
+    for line in digest_text.splitlines():
+        print(f"  {line}")
+    print("  --- end preview ---")
+
+    if not actually_create:
+        print("  Draft gate = False — not creating a Gmail draft.")
+        return
+    if this_week_count == 0:
+        print("  No events this week — skipping draft (empty-week guard).")
+        return
+
+    result = gmail.create_draft(
+        subject=subject,
+        body=digest_html,
+        content_type="text/html",
+        text_alternative=digest_text,
+    )
+    print(f"  Draft created: {result['draftId']}")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="Kids Schedule — search Gmail, extract events, publish to GitHub Pages."
@@ -450,6 +532,12 @@ def main() -> int:
         "--intentional-failure", action="store_true",
         help="Raise immediately to verify the Actions failure-notification "
              "path end-to-end. Does no real work."
+    )
+    parser.add_argument(
+        "--create-draft", action="store_true",
+        help="Create a weekly Gmail digest draft. Default is OFF so manual "
+             "and local runs do not spam Ellen's drafts folder. The "
+             "scheduled workflow run passes CREATE_DRAFT=1 to flip this on."
     )
     args = parser.parse_args()
 
@@ -491,10 +579,19 @@ def main() -> int:
         print("\n  (dry-run: skipping auto-blocklist update)")
 
     # Step 4: Process events
-    html, body, meta = step4_process_events(candidates)
+    pages_url = _load_pages_url()
+    html, body, meta, digest_text, digest_html = step4_process_events(
+        candidates, pages_url=pages_url,
+    )
 
     # Step 5: Publish
     step5_publish(html, meta, args.dry_run)
+
+    # Step 6: Weekly Gmail digest draft (heavily gated — see should_create_draft)
+    step6_create_draft(
+        gmail, meta, digest_text, digest_html,
+        actually_create=should_create_draft(args),
+    )
 
     print("\n" + "=" * 60)
     print("DONE")
