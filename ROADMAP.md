@@ -48,11 +48,13 @@ Render functions (`digest_subject`, `render_digest_text`, `render_digest_html`) 
 
 Commit trail: c89bd19 (design) · b5200cb (render + CLI + tests) · 2ffc458 (gmail_client) · 4838af0 (pages_url.txt) · 91cd5fb (main wiring + gate tests) · f312d90 (workflow).
 
-### 4. [~] Incremental extraction — skip already-processed Gmail messages
+### 4. [x] Incremental extraction — skip already-processed Gmail messages — 008051c … 7528267
 
-Every run today sends up to 60 days of email through the Anthropic agent even though almost none of those messages have changed since last week. Cache extracted events in a committed `events_state.json` keyed by Gmail message ID; on each run, only send the agent messages whose IDs aren't already in the cache. Gmail search window stays at 60 days (cheap, self-healing). Event IDs are already stable (`sha1(name|date|child)[:12]`) so dedupe across runs is trivial. Garbage-collect `processed_messages` entries older than 2× lookback and events whose date is in the past. Subsumes `future_events.json` — retired in the final commit of this feature.
+Every run used to send up to 60 days of email through the Anthropic agent even though almost none of those messages had changed since last week. Fixed by caching extracted events in `events_state.json` (on the `state` branch) keyed by Gmail message ID; each run only sends the agent messages whose IDs aren't already in the cache. Gmail search window stays at 60 days (cheap, self-healing). Event IDs are stable (`sha1(name|date|child)[:12]`), so dedupe across runs is trivial. Garbage-collects `processed_messages` entries older than 2× lookback (120 days) and events whose date is past. Subsumes `future_events.json`, which is retired.
 
-**In progress** — plan approved 2026-04-14, design at `design/incremental-extraction.md`. Resume at commit 2 (`scripts/events_state.py` module + tests + fixtures, no wiring yet). Key decisions locked: no per-message event attribution (YAGNI); top-level `schema_version` with blow-away-and-rebuild on mismatch; atomic write via tempfile + `os.replace`; load-time GC; cache failure modes are always "warn and start empty".
+Live verification 2026-04-14: first run after retirement bootstrapped 168 events from `future_events.json` and filtered 0 of 66 emails (everything new); second run filtered 61 of 66 and sent only 5 to the agent — a ~92% reduction in agent load. Key decisions locked in the design note: no per-message event attribution (YAGNI); top-level `schema_version` with blow-away-and-rebuild on mismatch; atomic write via tempfile + `os.replace`; load-time GC; cache failure modes always "warn and start empty"; reschedule detection deferred (manual ignore is adequate for now — see design note "Explicit non-goals"). Full design at `design/incremental-extraction.md`.
+
+Commit trail: 008051c (design note + ROADMAP insert) · 440358f (`events_state.py` module + 33 unit tests) · bd56047 (main.py integration + workflow state-branch plumbing + zero-new-messages test) · 7528267 (retire `future_events.json`; one-time bootstrap).
 
 ### 5. [ ] Per-event `.ics` export button
 
