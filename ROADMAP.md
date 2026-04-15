@@ -2,12 +2,15 @@
 
 Authoritative backlog for quality-of-life improvements to the kids-schedule-github pipeline. Edit in place; commit changes alongside code.
 
+Always load the karpathy-guidelines skill before starting anything here. 
+
 ## For future agents
 
 Read this file at the start of any session where Tom mentions "kids-schedule", "the QoL list", or asks about the next feature. The prioritization below is settled — do not re-debate it without prompting. Work items in order unless Tom explicitly says otherwise.
 
 Session discipline:
 
+- Invoke the `karpathy-guidelines` skill via the Skill tool at the start of every session that touches code. Reading `reference/guidelines.md` directly does not count — the skill-load step is what anchors the discipline for the rest of the session.
 - Before starting a non-trivial feature, write a short design note to `design/{feature-name}.md` capturing the scope, the decisions already made, and the test fixtures needed. A fresh session should be able to pick up mid-feature from that note plus the last commit, without re-litigating choices.
 - Commit at every natural boundary, not just at feature completion. Half-finished work behind a clear commit message is recoverable; a dirty worktree is not.
 - End each session by updating this file — check off completed items, mark in-progress items, note any deviations or follow-ups — and commit the update.
@@ -86,4 +89,4 @@ After an ignore, show an "Undo" toast or button in the client for 5 minutes. Cli
 
 ### 11. [ ] "Ignore sender" button
 
-Stamp each card with its sender domain. A new Apps Script endpoint appends to a separate "blocked senders" sheet (distinct from the ignored-events sheet). The workflow adds a step that syncs that sheet into `blocklist.txt` — merging with existing entries, deduping, preserving manual edits — and commits the updated file alongside `ignored_events.json`. Most infrastructure of any item; deliberately last.
+Stamp each card with its sender domain. A new Apps Script endpoint appends to a separate "blocked senders" sheet (distinct from the ignored-events sheet). The workflow adds a step that syncs that sheet into `blocklist.txt` — merging with existing entries, deduping, preserving manual edits — and commits the updated file alongside 
