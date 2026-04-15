@@ -85,17 +85,48 @@ def test_classify_banks_far_future_events():
     assert all(e["name"] != "Summer Reading Kickoff" for e in display)
 
 
-def test_classify_drops_events_matching_ignored_ids():
+def test_classify_marks_ignored_events_and_keeps_them_in_display():
+    """Render-but-hide: ignored events flow through to their date bucket
+    (tagged is_ignored=True) AND are appended to the ignored bucket for
+    count logging. The page hides them via CSS; users can Unignore per-card."""
     events = load_fixture("past_future_banked")
-    # Compute the ID of the one future event we want ignored.
     soccer_id = pe._event_id("Soccer Practice", "2026-04-21", "Isla")
-    display, undated, past, banked, ignored_dropped, _ = pe.classify(
+    display, undated, past, banked, ignored, _ = pe.classify(
         events, cutoff=TODAY, horizon=HORIZON,
         ignored_ids=frozenset([soccer_id]),
     )
-    ignored_names = {e["name"] for e in ignored_dropped}
-    assert "Soccer Practice" in ignored_names
-    assert all(e["name"] != "Soccer Practice" for e in display)
+    # Still rendered (for hide-but-restorable UX), with is_ignored flag on.
+    soccer_in_display = [e for e in display if e["name"] == "Soccer Practice"]
+    assert len(soccer_in_display) == 1
+    assert soccer_in_display[0]["is_ignored"] is True
+    # And simultaneously counted in the ignored bucket for meta logging.
+    assert any(e["name"] == "Soccer Practice" for e in ignored)
+
+
+def test_classify_is_ignored_false_on_non_matching_events():
+    events = load_fixture("past_future_banked")
+    display, _, _, _, _, _ = pe.classify(
+        events, cutoff=TODAY, horizon=HORIZON,
+        ignored_ids=frozenset(),
+    )
+    assert display, "fixture must have at least one displayed event"
+    assert all(e["is_ignored"] is False for e in display)
+
+
+def test_classify_passes_through_sender_domain():
+    raw = [
+        {"name": "With Sender", "date": "2026-04-20", "sender_domain": "laes.org",
+         "category": "School Activity", "child": "Isla", "source": "x"},
+        {"name": "No Sender Key", "date": "2026-04-20",
+         "category": "School Activity", "child": "Isla", "source": "x"},
+        {"name": "Empty Sender", "date": "2026-04-20", "sender_domain": "",
+         "category": "School Activity", "child": "Isla", "source": "x"},
+    ]
+    display, _, _, _, _, _ = pe.classify(raw, cutoff=TODAY, horizon=HORIZON)
+    by_name = {e["name"]: e for e in display}
+    assert by_name["With Sender"]["sender_domain"] == "laes.org"
+    assert by_name["No Sender Key"]["sender_domain"] == ""
+    assert by_name["Empty Sender"]["sender_domain"] == ""
 
 
 def test_classify_warns_on_missing_name_and_skips():
@@ -334,6 +365,107 @@ def test_render_html_omits_ics_button_when_pages_url_empty():
 
     assert "Add to calendar" not in html
     assert 'href="https://holmes1371.github.io/kidschedules/ics/' not in html
+
+
+# ─── render_html ignored + sender markup ─────────────────────────────────
+
+
+def _render_ignored_fixture(ignored_names: tuple[str, ...] = ()) -> tuple[str, dict[str, dict]]:
+    """Load ignored_and_sender fixture, mark the named events as ignored,
+    and render the page. Returns (html, {name -> display event dict}) so
+    tests can pull the canonical event id for substring asserts."""
+    events = load_fixture("ignored_and_sender")
+    ignored_ids = frozenset(
+        pe._event_id(e["name"], e["date"], e.get("child", ""))
+        for e in events if e["name"] in ignored_names
+    )
+    display, undated, _, _, _, _ = pe.classify(
+        events, cutoff=TODAY, horizon=HORIZON, ignored_ids=ignored_ids,
+    )
+    display = pe.dedupe(display)
+    weeks = pe.group_by_week(display)
+    html = pe.render_html(
+        today=TODAY, weeks=weeks, undated=undated,
+        total_future=len(display), lookback_days=60, webhook_url="",
+    )
+    by_name = {e["name"]: e for e in display}
+    return html, by_name
+
+
+def test_render_html_ignored_card_has_class_and_display_none():
+    html, by_name = _render_ignored_fixture(("Ignored With Sender",))
+    ev = by_name["Ignored With Sender"]
+    # Find just this card to avoid cross-contamination from other cards.
+    start = html.find(f'data-event-id="{ev["id"]}"')
+    assert start != -1
+    card = html[html.rfind("<div", 0, start):html.find("</div>", start) + 6]
+    assert "event-card ignored" in card
+    assert 'data-ignored="1"' in card
+    assert "display:none" in card
+
+
+def test_render_html_ignored_card_has_unignore_button_not_ignore():
+    html, by_name = _render_ignored_fixture(("Ignored With Sender",))
+    ev = by_name["Ignored With Sender"]
+    start = html.find(f'data-event-id="{ev["id"]}"')
+    card = html[start:html.find("</div>", start) + 200]
+    # After the card's opening div we should see the Unignore button for this
+    # event and no Ignore-event button for the same event.
+    assert 'class="unignore-btn"' in card
+    assert 'data-event-name="Ignored With Sender"' in card
+    assert 'class="ignore-btn"' not in card
+    assert "Unignore event" in card
+
+
+def test_render_html_active_card_has_ignore_button_not_unignore():
+    html, by_name = _render_ignored_fixture(ignored_names=())
+    ev = by_name["Active With Sender"]
+    start = html.find(f'data-event-id="{ev["id"]}"')
+    card = html[start:html.find("</div>", start) + 200]
+    assert 'class="ignore-btn"' in card
+    assert 'class="unignore-btn"' not in card
+    assert "Ignore event" in card
+
+
+def test_render_html_data_sender_attr_present_only_when_sender_set():
+    html, _ = _render_ignored_fixture(ignored_names=())
+    assert 'data-sender="laes.org"' in html
+    assert 'data-sender="greenfield.k12.ny.us"' in html
+    # "Active No Sender" and "Ignored No Sender" have empty sender_domain —
+    # they must not get a data-sender attribute at all.
+    assert 'data-sender=""' not in html
+
+
+def test_render_html_ignore_sender_button_only_when_sender_set():
+    html, by_name = _render_ignored_fixture(ignored_names=())
+    # Card with sender → button present.
+    with_sender_id = by_name["Active With Sender"]["id"]
+    ws_start = html.find(f'data-event-id="{with_sender_id}"')
+    ws_end = html.find("</div>\n      </div>", ws_start)
+    assert 'class="ignore-sender-btn"' in html[ws_start:ws_end]
+    assert "Ignore sender (laes.org)" in html[ws_start:ws_end]
+
+    # Card without sender → no ignore-sender button.
+    no_sender_id = by_name["Active No Sender"]["id"]
+    ns_start = html.find(f'data-event-id="{no_sender_id}"')
+    ns_end = html.find("</div>\n      </div>", ns_start)
+    assert 'class="ignore-sender-btn"' not in html[ns_start:ns_end]
+
+
+def test_render_html_show_ignored_toggle_appears_with_count():
+    html, _ = _render_ignored_fixture(("Ignored With Sender", "Ignored No Sender"))
+    # Two ignored events in the display buckets (both are dated inside horizon).
+    assert 'class="show-ignored-toggle"' in html
+    assert "Show ignored (2)" in html
+    assert 'data-hide-label="Hide ignored (2)"' in html
+
+
+def test_render_html_show_ignored_toggle_omitted_when_none_ignored():
+    html, _ = _render_ignored_fixture(ignored_names=())
+    # The CSS rule for `.show-ignored-toggle` is always in the stylesheet —
+    # what we care about is that the *button element* isn't rendered.
+    assert 'class="show-ignored-toggle"' not in html
+    assert "Show ignored (" not in html
 
 
 # ─── subject + metadata ──────────────────────────────────────────────────

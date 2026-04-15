@@ -365,11 +365,17 @@ def classify(events: list[dict[str, Any]], cutoff: dt.date,
             "category": cat or "Uncategorized",
             "child": (ev.get("child") or "").strip(),
             "source": (ev.get("source") or "").strip() or "unknown source",
+            "sender_domain": (ev.get("sender_domain") or "").strip(),
         }
         norm["id"] = _event_id(norm["name"], norm["date"], norm["child"])
-        if norm["id"] in ignored_ids:
+        # Render-but-hide model: ignored events still flow into their date
+        # bucket (with is_ignored=True) so the page can offer an Unignore
+        # affordance. The `ignored` return list is retained as a count
+        # surrogate for meta logging — it duplicates the events that also
+        # appear in display/undated/past/banked.
+        norm["is_ignored"] = norm["id"] in ignored_ids
+        if norm["is_ignored"]:
             ignored.append(norm)
-            continue
         d = _parse_date(norm["date"])
         if d is None:
             undated.append(norm)
@@ -625,12 +631,39 @@ def render_html(today: dt.date,
                 f'<a class="ics-btn" href="{ics_href}" '
                 f'aria-label="Add this event to your calendar">Add to calendar</a>\n        '
             )
+        is_ignored = bool(ev.get("is_ignored"))
+        ignored_class = " ignored" if is_ignored else ""
+        ignored_attr = ' data-ignored="1"' if is_ignored else ""
+        card_style = (f"display:none; border-left: 4px solid {fg};" if is_ignored
+                      else f"border-left: 4px solid {fg};")
+        if is_ignored:
+            ignore_btn_html = (
+                f'<button class="unignore-btn" aria-label="Unignore this event"\n'
+                f'                data-event-name="{ev["name"]}" data-event-date="{ev["date"]}"\n'
+                f'                type="button">Unignore event</button>'
+            )
+        else:
+            ignore_btn_html = (
+                f'<button class="ignore-btn" aria-label="Ignore this event"\n'
+                f'                data-event-name="{ev["name"]}" data-event-date="{ev["date"]}"\n'
+                f'                type="button">Ignore event</button>'
+            )
+        sender = (ev.get("sender_domain") or "").strip()
+        sender_attr = f' data-sender="{sender}"' if sender else ""
+        sender_btn_html = ""
+        if sender:
+            sender_btn_html = (
+                '\n        <div class="event-actions-bottom">\n'
+                f'          <button class="ignore-sender-btn" '
+                f'aria-label="Ignore future events from this sender"\n'
+                f'                  data-sender="{sender}" type="button">'
+                f'Ignore sender ({sender})</button>\n'
+                '        </div>'
+            )
         return f"""\
-      <div class="event-card" data-event-id="{ev["id"]}"
-           style="border-left: 4px solid {fg};">
-        {ics_btn_html}<button class="ignore-btn" aria-label="Ignore this event"
-                data-event-name="{ev["name"]}" data-event-date="{ev["date"]}"
-                type="button">Ignore</button>
+      <div class="event-card{ignored_class}" data-event-id="{ev["id"]}"{ignored_attr}{sender_attr}
+           style="{card_style}">
+        {ics_btn_html}{ignore_btn_html}
         <div class="event-date">{day_name}, {month_day}</div>
         <div class="event-name">{ev["name"]}</div>
         <div class="event-details">
@@ -639,7 +672,7 @@ def render_html(today: dt.date,
           &middot; <span class="location">{ev["location"]}</span>
         </div>
         <div class="event-meta">{child_html}<span class="source">{ev["source"]}</span></div>
-        <div class="ignore-status" aria-live="polite"></div>
+        <div class="ignore-status" aria-live="polite"></div>{sender_btn_html}
       </div>"""
 
     def _undated_card(ev: dict[str, Any]) -> str:
@@ -649,8 +682,17 @@ def render_html(today: dt.date,
                       if ev["child"] else "")
         time_html = f' &middot; <span class="time">{ev["time"]}</span>' if ev["time"] != "Time TBD" else ""
         loc_html = f' &middot; <span class="location">{ev["location"]}</span>' if ev["location"] != "Location TBD" else ""
+        # Undated cards don't carry Ignore/Unignore affordances (pre-existing
+        # behavior — there's no UI path to ignore an undated event). If one
+        # arrives with is_ignored=True via a stale ignored_events.json entry
+        # we still honor it as a hide so the event doesn't leak through.
+        is_ignored = bool(ev.get("is_ignored"))
+        ignored_class = " ignored" if is_ignored else ""
+        ignored_attr = ' data-ignored="1"' if is_ignored else ""
+        card_style = ("display:none; border-left: 4px solid #f9ab00;" if is_ignored
+                      else "border-left: 4px solid #f9ab00;")
         return f"""\
-      <div class="event-card undated" style="border-left: 4px solid #f9ab00;">
+      <div class="event-card undated{ignored_class}"{ignored_attr} style="{card_style}">
         <div class="event-date">Date TBD</div>
         <div class="event-name">{ev["name"]}</div>
         <div class="event-details">
@@ -693,6 +735,24 @@ def render_html(today: dt.date,
     # the cron actually fired for the family, not UTC when the runner kicked off.
     now_local = dt.datetime.now(LOCAL_TZ)
     generated = now_local.strftime("%B %-d, %Y @ %-I:%M%p")
+
+    # Show-ignored toggle: rendered server-side only when there's at least one
+    # ignored event in the display buckets, so the header stays clean when
+    # nothing is hidden. Count follows the design note — display only, not
+    # undated.
+    ignored_n = sum(
+        1 for wk in weeks for ev in wk[1] if ev.get("is_ignored")
+    )
+    show_ignored_toggle_html = ""
+    if ignored_n > 0:
+        show_ignored_toggle_html = (
+            '\n    <div class="stats">\n'
+            f'      <button class="show-ignored-toggle" type="button"\n'
+            f'              data-show-label="Show ignored ({ignored_n})"\n'
+            f'              data-hide-label="Hide ignored ({ignored_n})">'
+            f'Show ignored ({ignored_n})</button>\n'
+            '    </div>'
+        )
 
     return f"""\
 <!DOCTYPE html>
@@ -779,10 +839,63 @@ def render_html(today: dt.date,
     .event-card.fading {{
       opacity: 0;
     }}
-    .ignore-btn {{
+    .ignore-btn, .unignore-btn {{
       position: absolute;
       top: 0.5rem;
       right: 0.5rem;
+      border-radius: 4px;
+      padding: 0.2rem 0.55rem;
+      font-size: 0.72rem;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      line-height: 1.4;
+    }}
+    .ignore-btn {{
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }}
+    .ignore-btn:hover {{
+      background: var(--border);
+      color: var(--text);
+    }}
+    .unignore-btn {{
+      background: #0d652d;
+      color: #ceead6;
+      border: 1px solid #0d652d;
+    }}
+    .unignore-btn:hover {{
+      filter: brightness(1.15);
+    }}
+    .event-card.ignored {{
+      display: none;
+    }}
+    .show-ignored .event-card.ignored {{
+      display: block !important;
+    }}
+    .show-ignored-toggle {{
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.2rem 0.55rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      line-height: 1.4;
+    }}
+    .show-ignored-toggle:hover {{
+      background: var(--border);
+      color: var(--text);
+    }}
+    .event-actions-bottom {{
+      margin-top: 0.5rem;
+      display: flex;
+      gap: 0.35rem;
+    }}
+    .ignore-sender-btn {{
       background: transparent;
       color: var(--text-secondary);
       border: 1px solid var(--border);
@@ -794,9 +907,13 @@ def render_html(today: dt.date,
       font-family: inherit;
       line-height: 1.4;
     }}
-    .ignore-btn:hover {{
+    .ignore-sender-btn:hover {{
       background: var(--border);
       color: var(--text);
+    }}
+    .ignore-sender-btn:disabled {{
+      opacity: 0.5;
+      cursor: default;
     }}
     .ics-btn {{
       position: absolute;
@@ -888,6 +1005,11 @@ def render_html(today: dt.date,
         --border: #3c4043;
         --accent: #8ab4f8;
       }}
+      .unignore-btn {{
+        background: #1e8e3e;
+        color: #e6f4ea;
+        border: 1px solid #1e8e3e;
+      }}
     }}
   </style>
 </head>
@@ -899,7 +1021,7 @@ def render_html(today: dt.date,
   <div class="stats">
     <div><span class="stat-value">{total_future}</span> event{"s" if total_future != 1 else ""}</div>
     <div><span class="stat-value">{lookback_days}</span> day lookback</div>
-  </div>
+  </div>{show_ignored_toggle_html}
   <div class="container">
 {weeks_html}
 {undated_html}

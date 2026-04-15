@@ -1,0 +1,42 @@
+[
+  {
+    "name": "Ignored With Sender",
+    "date": "2026-04-20",
+    "time": "10:00 AM",
+    "location": "Glasgow",
+    "category": "School Activity",
+    "child": "Isla",
+    "source": "LAES email (Apr 10)",
+    "sender_domain": "greenfield.k12.ny.us"
+  },
+  {
+    "name": "Ignored No Sender",
+    "date": "2026-04-21",
+    "time": "2:00 PM",
+    "location": "Home",
+    "category": "Appointment",
+    "child": "Everly",
+    "source": "unknown",
+    "sender_domain": ""
+  },
+  {
+    "name": "Active With Sender",
+    "date": "2026-04-22",
+    "time": "6:30 PM",
+    "location": "LAES",
+    "category": "School Activity",
+    "child": "Isla",
+    "source": "LAES PTA (Apr 11)",
+    "sender_domain": "laes.org"
+  },
+  {
+    "name": "Active No Sender",
+    "date": "2026-04-23",
+    "time": "7:00 PM",
+    "location": "Park",
+    "category": "Sports & Extracurriculars",
+    "child": "Isla",
+    "source": "coach email",
+    "sender_domain": ""
+  }
+]
