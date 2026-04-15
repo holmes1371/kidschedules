@@ -410,3 +410,86 @@ def test_load_ignored_ids_tolerant(tmp_path, file_contents, expected):
         path.write_text(file_contents, encoding="utf-8")
         result = pe._load_ignored_ids(str(path))
     assert result == expected
+
+
+# ─── .ics export ──────────────────────────────────────────────────────────
+
+
+from zoneinfo import ZoneInfo  # noqa: E402  (local to keep helpers tests cohesive)
+
+
+ICS_NOW = dt.datetime(2026, 4, 14, 12, 0, 0, tzinfo=ZoneInfo("UTC"))
+
+
+@pytest.mark.parametrize(
+    "raw,expected",
+    [
+        ("7:00 PM", dt.time(19, 0)),
+        ("3:45 PM", dt.time(15, 45)),
+        ("8 AM", dt.time(8, 0)),
+        ("8am", dt.time(8, 0)),
+        ("12 AM", dt.time(0, 0)),
+        ("12 PM", dt.time(12, 0)),
+        ("  7:00 PM  ", dt.time(19, 0)),
+        ("1:30 PM dismissal", None),
+        ("Time TBD", None),
+        ("All day (deadline)", None),
+        ("", None),
+        (None, None),
+        ("13:00 PM", None),  # hour out of 1-12 range
+    ],
+)
+def test_parse_clock_time(raw, expected):
+    assert pe._parse_clock_time(raw) == expected
+
+
+@pytest.mark.parametrize(
+    "raw,expected",
+    [
+        ("Spring Concert", "spring-concert"),
+        ("Book Report Due", "book-report-due"),
+        ("Pediatrician Check-up", "pediatrician-check-up"),
+        ("   ", "event"),
+        ("", "event"),
+        ("!!!", "event"),
+    ],
+)
+def test_ics_slug(raw, expected):
+    assert pe._ics_slug(raw) == expected
+
+
+def _fixture_event(name: str) -> dict:
+    events = load_fixture("basic_mixed")
+    for ev in events:
+        if ev["name"] == name:
+            return ev
+    raise KeyError(name)
+
+
+def test_build_ics_uid_stable_across_calls():
+    ev = _fixture_event("Spring Concert")
+    a = pe.build_ics(ev, now=ICS_NOW)
+    b = pe.build_ics(
+        ev, now=dt.datetime(2030, 1, 1, 0, 0, 0, tzinfo=ZoneInfo("UTC"))
+    )
+    # DTSTAMP will differ, but UID must be byte-identical across runs,
+    # so calendar apps overwrite rather than duplicate on re-import.
+    uid_a = [line for line in a.splitlines() if line.startswith("UID:")][0]
+    uid_b = [line for line in b.splitlines() if line.startswith("UID:")][0]
+    assert uid_a == uid_b
+
+
+def test_build_ics_timed_snapshot():
+    ev = _fixture_event("Spring Concert")
+    assert pe.build_ics(ev, now=ICS_NOW) == read_snapshot("ics_spring_concert")
+
+
+def test_build_ics_all_day_snapshot():
+    ev = _fixture_event("Book Report Due")
+    assert pe.build_ics(ev, now=ICS_NOW) == read_snapshot("ics_book_report")
+
+
+def test_build_ics_rejects_undated_event():
+    ev = {"name": "TBD", "date": "", "time": "", "child": ""}
+    with pytest.raises(ValueError):
+        pe.build_ics(ev, now=ICS_NOW)

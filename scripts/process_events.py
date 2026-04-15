@@ -63,6 +63,133 @@ def _parse_date(s: str) -> dt.date | None:
         return None
 
 
+# ─── .ics export helpers ──────────────────────────────────────────────────
+
+
+VTIMEZONE_NY = "\n".join([
+    "BEGIN:VTIMEZONE",
+    "TZID:America/New_York",
+    "BEGIN:DAYLIGHT",
+    "TZOFFSETFROM:-0500",
+    "TZOFFSETTO:-0400",
+    "TZNAME:EDT",
+    "DTSTART:19700308T020000",
+    "RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU",
+    "END:DAYLIGHT",
+    "BEGIN:STANDARD",
+    "TZOFFSETFROM:-0400",
+    "TZOFFSETTO:-0500",
+    "TZNAME:EST",
+    "DTSTART:19701101T020000",
+    "RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU",
+    "END:STANDARD",
+    "END:VTIMEZONE",
+])
+
+
+_CLOCK_RE = re.compile(r"(\d{1,2})(?::(\d{2}))?\s*([AaPp][Mm])")
+_SLUG_SPLIT = re.compile(r"[^a-z0-9]+")
+
+
+def _parse_clock_time(s: str) -> dt.time | None:
+    """Parse a clean clock time like '7:00 PM' or '8am' to a dt.time.
+
+    Uses fullmatch on the stripped input, so anything with extra text —
+    '1:30 PM dismissal', 'Time TBD', 'All day (deadline)' — returns None.
+    Callers treat None as "fall back to all-day", which keeps the .ics
+    export button available on every dated card without inventing a time.
+    """
+    m = _CLOCK_RE.fullmatch((s or "").strip())
+    if not m:
+        return None
+    hour = int(m.group(1))
+    minute = int(m.group(2) or 0)
+    ampm = m.group(3).upper()
+    if not (1 <= hour <= 12) or not (0 <= minute <= 59):
+        return None
+    if ampm == "AM":
+        hour = 0 if hour == 12 else hour
+    else:
+        hour = 12 if hour == 12 else hour + 12
+    return dt.time(hour, minute)
+
+
+def _ics_slug(name: str) -> str:
+    """Slug an event name for use in an .ics filename."""
+    parts = [p for p in _SLUG_SPLIT.split((name or "").lower()) if p]
+    return "-".join(parts) or "event"
+
+
+def _ics_escape(s: str) -> str:
+    """Escape text for an RFC 5545 property value."""
+    return (
+        (s or "")
+        .replace("\\", "\\\\")
+        .replace(";", "\\;")
+        .replace(",", "\\,")
+        .replace("\n", "\\n")
+    )
+
+
+def build_ics(ev: dict[str, Any], now: dt.datetime | None = None) -> str:
+    """Emit a VCALENDAR string for a single dated event.
+
+    Timed events (clean `_parse_clock_time` match) use
+    `DTSTART;TZID=America/New_York` with `DURATION:PT1H` and include a
+    single hand-coded `VTIMEZONE` block. Everything else falls back to an
+    all-day event with `VALUE=DATE` DTSTART/DTEND (RFC 5545 DTEND is
+    exclusive, hence next-day).
+
+    UID is keyed on the stable 12-char event ID so re-imports overwrite
+    rather than duplicate. `now` is injectable so snapshot tests pin
+    DTSTAMP; production uses wall-clock UTC.
+    """
+    if now is None:
+        now = dt.datetime.now(ZoneInfo("UTC"))
+    dtstamp = now.astimezone(ZoneInfo("UTC")).strftime("%Y%m%dT%H%M%SZ")
+
+    eid = ev.get("id") or _event_id(
+        ev.get("name", ""), ev.get("date", ""), ev.get("child", "")
+    )
+    uid = f"{eid}@kidschedules.holmes1371.github.io"
+
+    summary = _ics_escape((ev.get("name") or "").strip())
+    loc_raw = (ev.get("location") or "").strip()
+    loc = "" if loc_raw in ("", "Location TBD") else _ics_escape(loc_raw)
+
+    d = _parse_date(ev.get("date") or "")
+    if d is None:
+        raise ValueError("build_ics requires an event with a parseable date")
+
+    t = _parse_clock_time(ev.get("time") or "")
+
+    lines = [
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        "PRODID:-//kids-schedule//ics-export//EN",
+        "CALSCALE:GREGORIAN",
+    ]
+    if t is not None:
+        lines.append(VTIMEZONE_NY)
+    lines.append("BEGIN:VEVENT")
+    lines.append(f"UID:{uid}")
+    lines.append(f"DTSTAMP:{dtstamp}")
+    lines.append(f"SUMMARY:{summary}")
+    if loc:
+        lines.append(f"LOCATION:{loc}")
+    if t is not None:
+        start = f"{d.strftime('%Y%m%d')}T{t.strftime('%H%M%S')}"
+        lines.append(f"DTSTART;TZID=America/New_York:{start}")
+        lines.append("DURATION:PT1H")
+    else:
+        next_d = d + dt.timedelta(days=1)
+        lines.append(f"DTSTART;VALUE=DATE:{d.strftime('%Y%m%d')}")
+        lines.append(f"DTEND;VALUE=DATE:{next_d.strftime('%Y%m%d')}")
+    lines.append("END:VEVENT")
+    lines.append("END:VCALENDAR")
+    return "\n".join(lines) + "\n"
+
+
 def load_candidates(path: str) -> list[dict[str, Any]]:
     with open(path, "r", encoding="utf-8") as f:
         data = json.load(f)
