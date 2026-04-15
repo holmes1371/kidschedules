@@ -83,7 +83,7 @@ Progress against the 10-step commit plan:
 
 1. [x] Design note + ROADMAP insert — f7f3425 · 82979d6 (palette amendment)
 2. [x] `agent.py` schema bump (`source_message_id` field, prompt update, parser validation, 9 unit tests) — 518b4ad
-3. [ ] `main.py` sender-domain attachment + `tldextract` added to `requirements.txt`
+3. [x] `main.py` sender-domain attachment + `tldextract>=5.1.0` added to `requirements.txt` (10 unit tests) — eebae6f
 4. [ ] `events_state.py` schema v2 (optional `sender_domain` per event; blow-away-and-rebuild on mismatch)
 5. [ ] `process_events.py` render-but-hide model (classify/render changes, Show/Hide toggle, Ignore-sender button)
 6. [ ] `scripts/apps_script.gs` action router (`ignore` / `unignore` / `block_sender`; `?kind=blocked_senders` GET route)
@@ -92,7 +92,7 @@ Progress against the 10-step commit plan:
 9. [ ] Client JS in `docs/index.html` (Unignore, Show/Hide toggle, Ignore sender, toast helpers, localStorage hydration)
 10. [ ] ROADMAP status update + final SHAs, session-close
 
-Next agent: start from step 3. The design note is authoritative — don't re-debate locked decisions. Run `python -m pytest tests/` to confirm 150 baseline tests pass before touching anything.
+Next agent: start from step 4 (`events_state.py` schema v2). The design note is authoritative — don't re-debate locked decisions. Run `python -m pytest tests/` to confirm 160 baseline tests pass before touching anything.
 
 ### 8. [ ] "New this week" badges
 
