@@ -139,3 +139,114 @@ def test_step2c_empty_cache_returns_all_as_new(tmp_path):
     )
     assert new_emails == full_emails
     assert state["processed_messages"] == {}
+
+
+# ── _attach_sender_domains ────────────────────────────────────────────────
+
+
+def _email(mid: str, from_: str) -> dict:
+    """Minimal email dict as built by step2b_read_promising."""
+    return {"messageId": mid, "from_": from_}
+
+
+def _candidate(sid: str | None, name: str = "E") -> dict:
+    """Minimal candidate event dict; omits source_message_id when sid is None."""
+    ev: dict = {"name": name, "date": "2026-05-01"}
+    if sid is not None:
+        ev["source_message_id"] = sid
+    return ev
+
+
+def test_attach_sender_domain_name_addr_form():
+    """Classic `"Name" <addr@domain>` header shape — the common case."""
+    emails = [_email("m1", '"PTA President" <pta@school.org>')]
+    candidates = [_candidate("m1")]
+    main._attach_sender_domains(candidates, emails)
+    assert candidates[0]["sender_domain"] == "school.org"
+
+
+def test_attach_sender_domain_multi_level_tld_via_psl():
+    """The whole reason we pulled in tldextract — `k12.ny.us` is a
+    public suffix per the PSL, so the registrable domain is
+    greenfield.k12.ny.us, not ny.us. A naive dot-split would get this
+    wrong and would collapse every NY school district onto one block."""
+    emails = [_email("m1", "office@mail.greenfield.k12.ny.us")]
+    candidates = [_candidate("m1")]
+    main._attach_sender_domains(candidates, emails)
+    assert candidates[0]["sender_domain"] == "greenfield.k12.ny.us"
+
+
+def test_attach_sender_domain_lowercases_output():
+    emails = [_email("m1", "Alerts@SCHOOL.ORG")]
+    candidates = [_candidate("m1")]
+    main._attach_sender_domains(candidates, emails)
+    assert candidates[0]["sender_domain"] == "school.org"
+
+
+def test_attach_sender_domain_missing_source_id(capsys):
+    emails = [_email("m1", "pta@school.org")]
+    candidates = [_candidate(None)]
+    main._attach_sender_domains(candidates, emails)
+    assert candidates[0]["sender_domain"] == ""
+    assert "no sender_domain" in capsys.readouterr().out
+
+
+def test_attach_sender_domain_unknown_source_id():
+    """Candidate references a messageId not in this batch — possible if
+    the agent hallucinates past the upstream filter. Button simply
+    doesn't render; no crash, no warning spam per event."""
+    emails = [_email("m1", "pta@school.org")]
+    candidates = [_candidate("m2")]
+    main._attach_sender_domains(candidates, emails)
+    assert candidates[0]["sender_domain"] == ""
+
+
+def test_attach_sender_domain_empty_from_header():
+    emails = [_email("m1", "")]
+    candidates = [_candidate("m1")]
+    main._attach_sender_domains(candidates, emails)
+    assert candidates[0]["sender_domain"] == ""
+
+
+def test_attach_sender_domain_malformed_from():
+    """parseaddr returns ('', '') for junk like `not an email` —
+    guard ensures we don't pass an empty string into tldextract."""
+    emails = [_email("m1", "not an email at all")]
+    candidates = [_candidate("m1")]
+    main._attach_sender_domains(candidates, emails)
+    assert candidates[0]["sender_domain"] == ""
+
+
+def test_attach_sender_domain_bare_address_no_tld():
+    """tldextract returns '' for a bare host with no public suffix."""
+    emails = [_email("m1", "local@localhost")]
+    candidates = [_candidate("m1")]
+    main._attach_sender_domains(candidates, emails)
+    assert candidates[0]["sender_domain"] == ""
+
+
+def test_attach_sender_domain_mixed_batch_emits_one_summary_warning(capsys):
+    """Per-event warnings would be too noisy. The helper emits a single
+    summary line with the miss count instead."""
+    emails = [
+        _email("m1", "pta@school.org"),
+        _email("m2", ""),
+    ]
+    candidates = [
+        _candidate("m1", "good"),
+        _candidate("m2", "empty-from"),
+        _candidate(None, "no-sid"),
+    ]
+    main._attach_sender_domains(candidates, emails)
+    assert candidates[0]["sender_domain"] == "school.org"
+    assert candidates[1]["sender_domain"] == ""
+    assert candidates[2]["sender_domain"] == ""
+    out = capsys.readouterr().out
+    # One line, count = 2 (the two misses), not two separate warnings.
+    assert out.count("no sender_domain") == 1
+    assert "2 event(s)" in out
+
+
+def test_attach_sender_domain_empty_candidates_is_noop(capsys):
+    main._attach_sender_domains([], [_email("m1", "pta@school.org")])
+    assert capsys.readouterr().out == ""

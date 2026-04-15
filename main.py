@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import email.utils
 import json
 import os
 import subprocess
@@ -25,6 +26,8 @@ import sys
 import tempfile
 from typing import Any
 from zoneinfo import ZoneInfo
+
+import tldextract
 
 import events_state as es
 from gmail_client import GmailClient
@@ -344,6 +347,57 @@ def step2c_load_cache_and_filter(
     return state, new_emails
 
 
+def _attach_sender_domains(
+    candidates: list[dict[str, Any]],
+    new_emails: list[dict[str, Any]],
+) -> None:
+    """Stamp each candidate with its sender's registrable domain.
+
+    The agent echoes the source email's Message ID as
+    `event["source_message_id"]` (enforced upstream in agent.py). Here we
+    use that ID to look up the original From header in the batch we sent
+    to the agent, parse the address, and run it through tldextract so
+    multi-level TLDs like `greenfield.k12.ny.us` come out right.
+
+    Any failure along the way — missing ID, missing From, malformed
+    address, empty registered_domain — sets `sender_domain = ""`.
+    Downstream the Ignore-sender button simply won't render for that
+    event. Never raises. Matches the tolerant-parse posture in agent.py.
+
+    Mutates `candidates` in place.
+    """
+    from_by_id = {
+        em.get("messageId", ""): em.get("from_", "")
+        for em in new_emails
+    }
+    from_by_id.pop("", None)
+    missing = 0
+    for event in candidates:
+        sid = event.get("source_message_id", "")
+        from_header = from_by_id.get(sid, "")
+        if not from_header:
+            event["sender_domain"] = ""
+            missing += 1
+            continue
+        _, addr = email.utils.parseaddr(from_header)
+        if not addr:
+            event["sender_domain"] = ""
+            missing += 1
+            continue
+        extracted = tldextract.extract(addr)
+        # `top_domain_under_public_suffix` is the forward-compatible name
+        # (5.1+); the old `registered_domain` is deprecated for removal.
+        domain = (extracted.top_domain_under_public_suffix or "").lower()
+        event["sender_domain"] = domain
+        if not domain:
+            missing += 1
+    if missing:
+        print(
+            f"  WARNING: {missing} event(s) have no sender_domain "
+            f"(Ignore-sender button will be omitted for those)"
+        )
+
+
 def step3_extract_events(
     full_emails: list[dict[str, Any]],
     model: str,
@@ -627,6 +681,9 @@ def main() -> int:
         candidates, irrelevant_senders = step3_extract_events(
             new_emails, model=args.model
         )
+        # Attach sender_domain before caching so the Ignore-sender button
+        # can render deterministically on future re-paints.
+        _attach_sender_domains(candidates, new_emails)
         # Merge newly-extracted events into the cache and mark the
         # messages processed. Save before step 4 so the (expensive)
         # agent call is durable even if rendering fails.
