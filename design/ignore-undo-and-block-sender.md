@@ -7,7 +7,7 @@ Tom's framing locked in:
 - **No 5-minute toast.** Ignored events render with `display:none` + an `is_ignored` flag; a header toggle unhides them on demand. Unignore is a persistent per-card button on ignored cards, not a time-boxed affordance. Simpler state, less timer plumbing.
 - **"Ignore sender" operates on the registrable domain** (`greenfield.k12.ny.us`, not `office@greenfield.k12.ny.us` or `us`). PSL-aware via `tldextract`.
 - **Sender → event mapping is deterministic, not LLM-derived.** The agent returns a `source_message_id` per event; `main.py` looks up the raw `From:` header from the Gmail stubs and runs it through `tldextract`. The LLM's only structured job is to echo back an ID it was handed.
-- **Blocked senders live in the Google Sheet alongside ignored events, not in `blocklist.txt`.** The sheet is the single source of truth; the workflow fetches the list each run and writes a `blocked_senders.json` cache file (committed, mirrors the `ignored_events.json` pattern). Rows carry a `source` column (`manual` / `auto-button`) so Ellen can distinguish UI-added blocks from ones she seeds by hand. See the "Architecture update (2026-04-15)" section below for the reasoning and the ripple-through changes.
+- **Ignored senders live in the Google Sheet alongside ignored events, not in a text file.** The sheet is the single source of truth; the workflow fetches the list each run and writes an `ignored_senders.json` cache file (committed, mirrors the `ignored_events.json` pattern). Rows carry a `source` column (`manual` / `auto-button`) so Ellen can distinguish UI-added entries from ones she seeds by hand. The word "ignored" is used end-to-end (tab / cache / action / kind / script) to match the "Ignore sender" button copy — and to avoid colliding with the unrelated `blocklist.txt` used by the Gmail-search filter. See the "Architecture update (2026-04-15)" section below for the full reasoning.
 - **No undo grace window.** If an ignored event ages past its date, cache GC drops it. Accepted; the show-ignored toggle makes recovery easy inside that window and there's no stakeholder for longer-lived recovery.
 
 ## Rendering model: "render but hide"
@@ -54,9 +54,9 @@ Pure client-side class flip on a root container. No network call. On initial loa
 
 ### Ignore sender
 Click on the Ignore sender button:
-1. `POST {action:'block_sender', domain}` to Apps Script.
-2. On 2xx: show a confirmation toast — "Blocked {domain}. New events from this sender will stop appearing after the next refresh." No DOM manipulation (blocking takes effect next workflow run when the synced blocklist filters the Gmail search). Button disables to prevent duplicate calls.
-3. On non-2xx: toast "Block failed".
+1. `POST {action:'ignore_sender', domain}` to Apps Script.
+2. On 2xx: show a confirmation toast — "Ignoring {domain}. New events from this sender will stop appearing after the next refresh." No DOM manipulation — the effect lands on the next workflow run when the synced `ignored_senders.json` feeds into the Gmail-search exclusion. Button disables to prevent duplicate calls.
+3. On non-2xx: toast "Ignore failed".
 
 ### localStorage hydration
 Existing pattern: on page load, walk localStorage for ignore entries, flip matching cards to ignored state if the server rendered them as non-ignored (i.e. the ignore hasn't round-tripped through the next workflow run yet). Extend to handle the swap-button-to-Unignore case.
@@ -69,12 +69,12 @@ Three actions:
 
 - **`ignore`** — existing append behavior. Same id/name/date validation.
 - **`unignore`** — find all rows in the Ignored Events sheet with `id` matching the payload, delete them (loop from bottom up to avoid row-shift bugs). Return `ok` even if no rows matched (idempotent).
-- **`block_sender`** — validate `domain` matches `^[a-z0-9][a-z0-9.-]*\.[a-z]{2,}$` (conservative registrable-domain shape). Append `[timestamp, domain]` to a second sheet tab "Blocked Senders" in the same spreadsheet. Dedup on the client isn't needed — the workflow-side sync handles it.
+- **`ignore_sender`** — lowercase `domain` and validate against `^[a-z0-9][a-z0-9.-]*\.[a-z]{2,}$` (conservative registrable-domain shape). Append `[timestamp, domain, 'auto-button']` to a second sheet tab "Ignored Senders" in the same spreadsheet. Dedup on the client isn't needed — the workflow-side sync handles it.
 
 `doGet` grows a second route keyed on `?kind=`:
 
 - `?secret=X` (unchanged, defaults to `kind=ignored`) — returns ignored events JSON.
-- `?secret=X&kind=blocked_senders` — returns blocked senders JSON: `[{timestamp, domain}, ...]`.
+- `?secret=X&kind=ignored_senders` — returns ignored senders JSON: `[{timestamp, domain, source}, ...]`.
 
 Same `READ_SECRET` for both routes. Reusing the existing secret is fine — it's already gating the same spreadsheet, and this is one script with one deploy.
 
@@ -82,14 +82,15 @@ Same `READ_SECRET` for both routes. Reusing the existing secret is fine — it's
 
 New step after the existing "Sync ignored events from Apps Script" step:
 
-**Sync blocked senders from Apps Script** — curl `${URL}?secret=${IGNORE_READ_SECRET}&kind=blocked_senders`, parse JSON, merge each domain into `blocklist.txt` (dedup case-insensitive, preserve existing manual entries, sort alphabetically for stable diffs). If `blocklist.txt` changed, commit and push on `main` with a conventional message. If unchanged, skip commit.
+**Sync ignored senders from Apps Script** — curl `${URL}?secret=${IGNORE_READ_SECRET}&kind=ignored_senders`, normalize (lowercase, trim, dedup, sort), and write `ignored_senders.json`. If the file contents changed, commit and push on `main` with a conventional message. If unchanged, skip commit.
 
-Merge logic lives in a small helper script `scripts/sync_blocklist.py` so it's testable:
+Fetch-and-write lives in a small helper script `scripts/sync_ignored_senders.py` so it's testable:
 
-- Read existing `blocklist.txt` lines (preserve blank lines and comments as-is).
-- Read incoming domains from Apps Script response.
-- Union, case-normalize (lowercase), dedup, re-sort the domain entries while leaving comment blocks in place at the top.
-- Write back only if changed.
+- GET the JSON from Apps Script.
+- For each row: lowercase the domain, trim whitespace, skip anything that fails the domain regex.
+- Dedup, sort alphabetically.
+- Write `ignored_senders.json` (`[{"domain": "...", "source": "...", "timestamp": "..."}, ...]`, first-wins on domain).
+- Return `unchanged` when the serialized output matches the file on disk.
 
 Commit step uses the same `x-access-token` pattern as the existing state-branch push.
 
@@ -147,13 +148,13 @@ Schema bump to `schema_version: 2`. `events` entries grow an optional `sender_do
 - Parser drops events with missing `source_message_id` and warns.
 - Parser drops events with `source_message_id` not in the input batch.
 
-`tests/test_sync_blocklist.py` (new file):
+`tests/test_sync_ignored_senders.py` (new file):
 
-- Merge preserves comment block at top of file.
-- Merge dedups case-insensitively (`Foo.com` + `foo.com` → one entry).
-- Merge preserves manual entries that aren't in the Apps Script payload.
-- Merge returns `unchanged` when no new domains appear.
-- Merge sorts domain entries alphabetically.
+- Normalizes domains to lowercase, trims whitespace.
+- Dedups same-domain rows (first-wins on timestamp/source).
+- Drops rows that fail the domain regex.
+- Returns `unchanged` when the serialized output matches the file on disk.
+- Sorts domain entries alphabetically for stable diffs.
 
 Apps Script changes have no pytest coverage — same posture as today, and the action router is small enough that visual review + live smoke testing is adequate.
 
@@ -166,9 +167,9 @@ Commit at each natural boundary, not just at feature completion (session discipl
 3. **`main.py` sender-domain attachment** + `tldextract` added to `requirements.txt`. Integration test for the lookup path.
 4. **`events_state.py` schema v2** — migration policy, fixtures updated.
 5. **`process_events.py` render-but-hide model** — classify/render changes, fixture events for `is_ignored`, Show/Hide toggle markup, Ignore-sender button markup. Snapshot updated.
-6. **`scripts/apps_script.gs`** — action router, unignore endpoint, block_sender endpoint, blocked-senders GET route. (No automated tests; manual deploy + smoke.)
-7. **`scripts/sync_blocklist.py`** — merge helper + unit tests.
-8. **Workflow sync step** — new "Sync blocked senders" step + commit-on-main logic.
+6. **`scripts/apps_script.gs`** — action router, unignore endpoint, ignore_sender endpoint, ignored-senders GET route. (No automated tests; manual deploy + smoke.)
+7. **`scripts/sync_ignored_senders.py`** — fetch-and-write helper + unit tests.
+8. **Workflow sync step** — new "Sync ignored senders" step + commit-on-main logic.
 9. **Client JS in `docs/index.html` (rendered by `process_events.py`)** — Unignore button wiring, Show/Hide toggle handler, Ignore-sender button wiring, toast helpers, localStorage hydration updates.
 10. **ROADMAP status update + SHAs**, session-close.
 
@@ -184,8 +185,8 @@ Following the standing order — deterministic work in scripts, agent (LLM) does
 | Echo back source `messageId` per event | validates, rejects invalid | ✅ echoes the ID it was given |
 | Parse `From:` header → email address | ✅ `email.utils.parseaddr` | — |
 | Email address → registrable domain | ✅ `tldextract` | — |
-| Domain case normalization + dedup | ✅ `sync_blocklist.py` | — |
-| `blocklist.txt` merge + sort + diff-check | ✅ `sync_blocklist.py` | — |
+| Domain case normalization + dedup | ✅ `sync_ignored_senders.py` | — |
+| `ignored_senders.json` sort + diff-check | ✅ `sync_ignored_senders.py` | — |
 | Classify ignored vs displayed | ✅ `process_events.py::classify` | — |
 | Render card HTML + buttons + toggle count | ✅ `process_events.py::render_html` | — |
 | Apps Script row delete / append | ✅ `apps_script.gs` (deterministic code) | — |
@@ -197,28 +198,30 @@ No runtime LLM calls are introduced by this feature beyond the existing extracti
 
 After step 5 landed, Tom pushed back on the original split (ignored events in a sheet, blocked senders in `blocklist.txt`): having two storage shapes for two parallel opt-out lists meant two merge policies, two docs, two code paths for the same user intent. The sheet wins on symmetry and on Ellen-editability (no git round-trip to manage blocks manually).
 
+Separately, the word "blocklist" already has a load-bearing meaning elsewhere in the repo — `blocklist.txt` + `blocklist_auto.txt` are the Gmail-search exclusion files managed by `update_auto_blocklist.py` and the step-1b filter audit. That system predates this feature and is unrelated. Reusing the word for the new sender-level opt-out would have created an ambiguous vocabulary across the codebase. The feature is therefore called "ignored senders" end-to-end (sheet tab, cache file, POST action, GET kind, helper script) so every surface matches the user-facing "Ignore sender" button.
+
 Amended decisions:
 
-- **Single Google Sheet, two tabs.** The existing "Ignored Events" tab is unchanged. A new "Blocked Senders" tab holds `[timestamp, domain, source]` rows. `source` is `"auto-button"` when appended via the schedule page's Ignore-sender button, `"manual"` when Ellen edits the sheet directly. Script code reads both indiscriminately; the column is informational.
-- **`blocked_senders.json` is a committed cache file**, not a git-source. Same shape relationship as `ignored_events.json` → the pipeline fetches the sheet, writes the JSON, and commits on `main` when it changes. The file exists so the Gmail-search step has a fast local read and so diffs show blocklist churn in git history.
-- **No `blocklist.txt`.** Removed from scope entirely. The file never lands in the repo.
-- **`sync_blocklist.py` becomes fetch-and-write, not merge.** There's no "manual entries to preserve" problem now — the sheet is the sole source, and any manual additions Ellen wants to make happen in the sheet. The helper pulls `?kind=blocked_senders`, normalizes (lowercase, trim, dedup), sorts, and writes `blocked_senders.json`. If the file's contents are unchanged, skip commit. Tests collapse to: normalization correctness + no-change short-circuit.
-- **Apps Script `block_sender` appends with `source: "auto-button"`.** `doGet?kind=blocked_senders` returns the full rows including source, so Ellen can filter/report in a spreadsheet view if she ever wants to.
+- **Single Google Sheet, two tabs.** The existing "Ignored Events" tab is unchanged. A new "Ignored Senders" tab holds `[timestamp, domain, source]` rows. `source` is `"auto-button"` when appended via the schedule page's Ignore-sender button, `"manual"` when Ellen edits the sheet directly. Script code reads every row authoritatively; the column is informational.
+- **`ignored_senders.json` is a committed cache file**, not a git-source. Same shape relationship as `ignored_events.json` → the pipeline fetches the sheet, writes the JSON, and commits on `main` when it changes. The file exists so the Gmail-search step has a fast local read and so diffs show ignored-sender churn in git history.
+- **No `blocklist.txt` entry for this feature.** The old `blocklist.txt` / `blocklist_auto.txt` pair is left alone — they serve the Gmail-search filter and aren't touched by this work.
+- **`sync_ignored_senders.py` is fetch-and-write, not merge.** There's no "manual entries to preserve" problem — the sheet is the sole source, and any manual additions Ellen wants to make happen in the sheet. The helper pulls `?kind=ignored_senders`, normalizes (lowercase, trim, dedup), sorts, and writes `ignored_senders.json`. If the file's contents are unchanged, skip commit. Tests collapse to: normalization correctness + no-change short-circuit.
+- **Apps Script `ignore_sender` appends with `source: "auto-button"`.** `doGet?kind=ignored_senders` returns the full rows including source, so Ellen can filter/report in a spreadsheet view if she ever wants to.
 
 Ripple through the commit plan:
 
-- Step 6 (Apps Script) gains the `source` column on append and the `?kind=blocked_senders` GET.
-- Step 7 (`sync_blocklist.py`) is simpler — no comment-block preservation, no case-insensitive manual merge, no alphabetic resort of a mixed file. Just fetch-normalize-write.
-- Step 8 (workflow) still commits on `main` — not because a blocklist file is configuration (the previous framing), but because `blocked_senders.json` is a cache that we want versioned alongside `ignored_events.json` for historical forensics.
+- Step 6 (Apps Script) gains the `source` column on append and the `?kind=ignored_senders` GET.
+- Step 7 (`sync_ignored_senders.py`) is simpler — no comment-block preservation, no case-insensitive manual merge, no alphabetic resort of a mixed file. Just fetch-normalize-write.
+- Step 8 (workflow) still commits on `main` — not because an ignored-senders file is configuration (the previous framing), but because `ignored_senders.json` is a cache that we want versioned alongside `ignored_events.json` for historical forensics.
 - Nothing in steps 2–5 is affected; those are already landed.
 
-Responsibility table stays accurate — the table now reads "`sync_blocklist.py` owns fetch + normalize + dedup + write", no other changes.
+Responsibility table stays accurate — the table now reads "`sync_ignored_senders.py` owns fetch + normalize + dedup + write", no other changes.
 
 ## Open for future work
 
 Not doing now (explicit non-goals):
 
 - **Bulk unignore** — no "clear all" button. Individual Unignore per card is fine at current volume (<20 ignored events at any time).
-- **Blocked-sender UI on the schedule page** — no list/manage view. Users edit the "Blocked Senders" sheet tab directly if they need to remove a block. Cheap fallback.
-- **Soft-block** (block with override) — the blocklist is a hard filter at the Gmail-search level. Un-blocking requires a commit. Acceptable.
+- **Ignored-sender UI on the schedule page** — no list/manage view. Users edit the "Ignored Senders" sheet tab directly if they need to un-ignore a domain. Cheap fallback.
+- **Soft-ignore** (ignore with override) — the ignored-senders list is a hard filter at the Gmail-search level. Un-ignoring requires editing the sheet. Acceptable.
 - **Unignore notifications** — no server-side audit beyond the Apps Script sheet. If needed later, the existing weekly-digest path can be extended.

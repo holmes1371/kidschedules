@@ -85,15 +85,15 @@ Progress against the 10-step commit plan:
 1. [x] Design note + ROADMAP insert — f7f3425 · 82979d6 (palette amendment)
 2. [x] `agent.py` schema bump (`source_message_id` field, prompt update, parser validation, 9 unit tests) — 518b4ad
 3. [x] `main.py` sender-domain attachment + `tldextract>=5.1.0` added to `requirements.txt` (10 unit tests) — eebae6f
-4. [ ] `events_state.py` schema v2 (optional `sender_domain` per event; blow-away-and-rebuild on mismatch)
-5. [ ] `process_events.py` render-but-hide model (classify/render changes, Show/Hide toggle, Ignore-sender button)
-6. [ ] `scripts/apps_script.gs` action router (`ignore` / `unignore` / `block_sender`; `?kind=blocked_senders` GET route)
-7. [ ] `scripts/sync_blocklist.py` merge helper + unit tests
-8. [ ] Workflow "Sync blocked senders" step + commit-on-main logic
+4. [x] `events_state.py` schema v2 (optional `sender_domain` per event; blow-away-and-rebuild on mismatch) — 96795dd
+5. [x] `process_events.py` render-but-hide model (classify/render changes, Show/Hide toggle, Ignore-sender button) — 220b083; design amended post-step-5 to standardize on "ignored senders" vocabulary end-to-end (b07bdf7)
+6. [ ] `scripts/apps_script.gs` action router (`ignore` / `unignore` / `ignore_sender`; `?kind=ignored_senders` GET route; second tab "Ignored Senders")
+7. [ ] `scripts/sync_ignored_senders.py` fetch-and-write helper + unit tests (writes committed cache `ignored_senders.json`)
+8. [ ] Workflow "Sync ignored senders" step + commit-on-main logic
 9. [ ] Client JS in `docs/index.html` (Unignore, Show/Hide toggle, Ignore sender, toast helpers, localStorage hydration)
 10. [ ] ROADMAP status update + final SHAs, session-close
 
-Next agent: start from step 4 (`events_state.py` schema v2). The design note is authoritative — don't re-debate locked decisions. Run `python -m pytest tests/` to confirm 160 baseline tests pass before touching anything.
+Next agent: start from step 7 (`scripts/sync_ignored_senders.py`). The design note is authoritative — don't re-debate locked decisions, including the post-step-5 vocabulary standardization. Run `python -m pytest tests/` to confirm 172 baseline tests pass before touching anything.
 
 ### 8. [ ] "New this week" badges
 
