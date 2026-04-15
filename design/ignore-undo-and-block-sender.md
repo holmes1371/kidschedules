@@ -17,8 +17,20 @@ Tom's framing locked in:
 `render_html` treats `is_ignored` as purely a style hint:
 
 - Card element gets `class="event-card ignored"` and `style="display:none"` and `data-ignored="1"`.
-- The `<div class="event-actions">` row emits an **Unignore** button instead of the normal **Ignore** button.
+- The `<div class="event-actions">` row emits an **Unignore** button instead of the normal **Ignore** button. Same slot, drop-in replacement — the only difference is the label and the color treatment (see below).
 - An **Ignore sender** button is emitted on every card regardless of ignore state (see below — unless the event has no `sender_domain`, in which case it's omitted).
+
+### Unignore button color treatment
+
+The Unignore button uses a solid-green variant so ignored cards stand out visually once the show-ignored toggle is on (at a glance you can tell which cards are ignored and how to restore them). New CSS class `.unignore-btn` with its own palette; the existing `.ignore-btn` is untouched on non-ignored cards.
+
+- Light mode: `background: #0d652d` (matches the Sports & Extracurriculars accent already in the palette), `color: #ceead6`, `border: 1px solid #0d652d`.
+- Dark mode: `background: #1e8e3e`, `color: #e6f4ea`, `border: 1px solid #1e8e3e`. Applied via the existing `@media (prefers-color-scheme: dark)` block that today overrides `:root`.
+- Hover: `filter: brightness(1.15)` on both modes (simplest cross-mode affordance).
+
+These are new additions to the stylesheet — no existing color variables or text-color rules are modified. Specifically, `.event-name`, `.event-date`, `.event-meta`, and the category-badge colors are out of scope for this feature and stay exactly as they are in prod.
+
+### Header toggle
 
 A header control: **Show ignored (N)** / **Hide ignored (N)**. N = `sum(1 for e in display if e.get("is_ignored"))`. Count is rendered server-side; label toggles client-side. Click flips a class on the card container that overrides `display:none` for `.event-card.ignored`.
 
