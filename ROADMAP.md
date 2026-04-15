@@ -73,13 +73,26 @@ Commit trail: 52ebd73 (design note + ROADMAP insert) · e0a8aa6 (`build_ics` + h
 
 Design note: `design/ics-export.md` (includes both pivot rationales).
 
-### 6. [ ] Undo recently ignored (5-minute toast)
+### 6. [~] Undo recently ignored + 7. "Ignore sender" (bundled)
 
-After an ignore, show an "Undo" toast or button in the client for 5 minutes. Clicking: POSTs an unignore to a new Apps Script delete-row endpoint, restores the card visually, removes the localStorage entry. Auto-dismiss after 5 minutes. Matching endpoint work lives in `scripts/apps_script.gs`.
+Bundled because they share all their surfaces — Apps Script routing, a second Google Sheet tab, client-side button/toggle work in the rendered HTML, and a new workflow sync step. Full design: `design/ignore-undo-and-block-sender.md` (includes locked decisions, 10-step commit plan, responsibility table, non-goals).
 
-### 7. [ ] "Ignore sender" button
+Locked model (from the design note, not re-debated): render-but-hide (no 5-minute toast); per-card Unignore button in solid-green variant replaces Ignore on ignored cards; header **Show ignored (N)** toggle; registrable-domain blocking via `tldextract`; LLM echoes `source_message_id` → Python does all sender parsing.
 
-Stamp each card with its sender domain. A new Apps Script endpoint appends to a separate "blocked senders" sheet (distinct from the ignored-events sheet). The workflow adds a step that syncs that sheet into `blocklist.txt` — merging with existing entries, deduping, preserving manual edits — and commits the updated file alongside the other outputs.
+Progress against the 10-step commit plan:
+
+1. [x] Design note + ROADMAP insert — f7f3425 · 82979d6 (palette amendment)
+2. [x] `agent.py` schema bump (`source_message_id` field, prompt update, parser validation, 9 unit tests) — 518b4ad
+3. [ ] `main.py` sender-domain attachment + `tldextract` added to `requirements.txt`
+4. [ ] `events_state.py` schema v2 (optional `sender_domain` per event; blow-away-and-rebuild on mismatch)
+5. [ ] `process_events.py` render-but-hide model (classify/render changes, Show/Hide toggle, Ignore-sender button)
+6. [ ] `scripts/apps_script.gs` action router (`ignore` / `unignore` / `block_sender`; `?kind=blocked_senders` GET route)
+7. [ ] `scripts/sync_blocklist.py` merge helper + unit tests
+8. [ ] Workflow "Sync blocked senders" step + commit-on-main logic
+9. [ ] Client JS in `docs/index.html` (Unignore, Show/Hide toggle, Ignore sender, toast helpers, localStorage hydration)
+10. [ ] ROADMAP status update + final SHAs, session-close
+
+Next agent: start from step 3. The design note is authoritative — don't re-debate locked decisions. Run `python -m pytest tests/` to confirm 150 baseline tests pass before touching anything.
 
 ### 8. [ ] "New this week" badges
 
