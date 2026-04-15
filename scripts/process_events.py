@@ -480,8 +480,14 @@ def render_html(today: dt.date,
         month_day = d.strftime("%B %-d")
         child_html = (f'<span class="child">{ev["child"]}</span> &middot; '
                       if ev["child"] else "")
+        ics_body = _html.escape(build_ics(ev), quote=True)
+        ics_filename = f"{_ics_slug(ev['name'])}-{ev['date']}.ics"
         return f"""\
-      <div class="event-card" data-event-id="{ev["id"]}" style="border-left: 4px solid {fg};">
+      <div class="event-card" data-event-id="{ev["id"]}"
+           data-ics="{ics_body}" data-ics-filename="{ics_filename}"
+           style="border-left: 4px solid {fg};">
+        <button class="ics-btn" aria-label="Add this event to your calendar"
+                type="button">Add to calendar</button>
         <button class="ignore-btn" aria-label="Ignore this event"
                 data-event-name="{ev["name"]}" data-event-date="{ev["date"]}"
                 type="button">Ignore</button>
@@ -652,6 +658,25 @@ def render_html(today: dt.date,
       background: var(--border);
       color: var(--text);
     }}
+    .ics-btn {{
+      position: absolute;
+      top: 0.5rem;
+      right: 4.25rem;
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.2rem 0.55rem;
+      font-size: 0.72rem;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      line-height: 1.4;
+    }}
+    .ics-btn:hover {{
+      background: var(--border);
+      color: var(--text);
+    }}
     .ignore-status {{
       font-size: 0.72rem;
       color: #d93025;
@@ -801,6 +826,26 @@ def render_html(today: dt.date,
             saveIgnored(remaining);
             if (status) status.textContent = "Could not sync — try again.";
           }});
+        }});
+      }});
+
+      // Add-to-calendar: each card carries the full .ics body in data-ics.
+      // The handler just pipes it through a Blob download; no network.
+      document.querySelectorAll(".ics-btn").forEach(function (btn) {{
+        btn.addEventListener("click", function () {{
+          var card = btn.closest(".event-card");
+          if (!card) return;
+          var ics = card.getAttribute("data-ics") || "";
+          var filename = card.getAttribute("data-ics-filename") || "event.ics";
+          var blob = new Blob([ics], {{ type: "text/calendar;charset=utf-8" }});
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement("a");
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(function () {{ URL.revokeObjectURL(url); }}, 100);
         }});
       }});
     }})();

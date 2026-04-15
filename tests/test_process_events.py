@@ -279,6 +279,39 @@ def test_render_html_empty_state_when_no_events():
     assert 'class="event-card undated"' not in html
 
 
+def test_render_html_includes_ics_button_and_body():
+    """Every dated card gets an Add-to-calendar button and an .ics body
+    attribute; undated cards skip the button entirely."""
+    display = _classified_display("basic_mixed")
+    display = pe.dedupe(display)
+    events = load_fixture("basic_mixed")
+    _, undated, _, _, _, _ = pe.classify(events, cutoff=TODAY, horizon=HORIZON)
+    undated = pe.dedupe(undated)
+    weeks = pe.group_by_week(display)
+
+    html = pe.render_html(
+        today=TODAY, weeks=weeks, undated=undated,
+        total_future=len(display), lookback_days=60, webhook_url="",
+    )
+
+    # The button text and ICS payload anchor must both appear.
+    assert "Add to calendar" in html
+    assert 'data-ics="BEGIN:VCALENDAR' in html
+
+    # Filenames follow <slug>-<YYYY-MM-DD>.ics.
+    assert 'data-ics-filename="spring-concert-2026-04-23.ics"' in html
+    assert 'data-ics-filename="book-report-due-2026-04-17.ics"' in html
+
+    # The undated section has no .ics button — no valid DTSTART to emit.
+    undated_card_start = html.find('class="event-card undated"')
+    assert undated_card_start != -1, "expected an undated card in this fixture"
+    # Look at the slice from the undated card to the next <div class="event-card"
+    # or the end of the undated section's containing block.
+    undated_slice = html[undated_card_start:undated_card_start + 1500]
+    assert "Add to calendar" not in undated_slice
+    assert "data-ics=" not in undated_slice
+
+
 # ─── subject + metadata ──────────────────────────────────────────────────
 
 
