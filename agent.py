@@ -29,9 +29,10 @@ family with children at Louise Archer Elementary School (LAES) in Fairfax
 County (FCPS). The family also has kids in swim team (HTM Sharks / Hunter
 Mill), dance/ballet (Cuppett Performing Arts), and other extracurriculars.
 
-You will receive a batch of email messages (subject, sender, date sent,
-and body text). Your job is to identify ALL events, deadlines, and dates
-relevant to children and return them as a JSON array.
+You will receive a batch of email messages. Each message includes a
+Message ID, sender, date sent, subject, and body text. Your job is to
+identify ALL events, deadlines, and dates relevant to children and
+return them as a JSON array.
 
 WHAT TO EXTRACT — be thorough and extract ALL of these:
 
@@ -84,6 +85,12 @@ For each event, output a dict with exactly these keys:
 - "source": string — brief label including sender name or newsletter
   title AND the email's sent date, e.g. "LAES PTA Sunbeam (Apr 6)"
   or "FCPS School Board Update (Apr 10)"
+- "source_message_id": string — the exact Message ID of the email this
+  event was drawn from. Copy the value verbatim from the "Message ID:"
+  line at the top of that email block. If the event synthesizes details
+  from multiple emails, pick the one that contained the dated details
+  (or omit the event rather than guess). Format is a 16-character hex
+  string; do not invent, truncate, or edit it.
 
 KEY RULES:
 - Extract EVERY date you find, even if it seems minor. It is much better
@@ -320,6 +327,43 @@ def _parse_json_response(text: str) -> dict[str, list] | None:
     return None
 
 
+def _filter_events_by_source_id(
+    events: list[dict[str, Any]],
+    batch_message_ids: set[str],
+) -> list[dict[str, Any]]:
+    """Drop events whose source_message_id is missing or not in the batch.
+
+    The agent is instructed to echo back the Message ID of the email each
+    event came from. If the model omits the field or hallucinates an ID,
+    we cannot map the event back to a sender — the Ignore-sender button
+    would be wrong — so the event is dropped with a warning. Matches the
+    tolerant-parse posture elsewhere in this module: warn, don't crash.
+    """
+    kept: list[dict[str, Any]] = []
+    dropped_missing = 0
+    dropped_unknown = 0
+    for event in events:
+        sid = event.get("source_message_id", "")
+        if not isinstance(sid, str) or not sid:
+            dropped_missing += 1
+            continue
+        if sid not in batch_message_ids:
+            dropped_unknown += 1
+            continue
+        kept.append(event)
+    if dropped_missing:
+        print(
+            f"  WARNING: dropped {dropped_missing} event(s) with missing "
+            f"source_message_id"
+        )
+    if dropped_unknown:
+        print(
+            f"  WARNING: dropped {dropped_unknown} event(s) whose "
+            f"source_message_id did not match any email in the batch"
+        )
+    return kept
+
+
 def extract_events(
     emails: list[dict[str, Any]],
     model: str = "claude-sonnet-4-6",
@@ -360,17 +404,24 @@ def extract_events(
         print(f"  {batch_label}: "
               f"{len(batch)} emails ...", end=" ", flush=True)
 
-        # Build the user message for this batch
+        # Build the user message for this batch. The Message ID line is
+        # what the model echoes back in each event's source_message_id,
+        # so downstream Python can map events → original senders.
         parts = []
         for i, email in enumerate(batch, 1):
             parts.append(
                 f"--- EMAIL {i} ---\n"
+                f"Message ID: {email.get('messageId', '')}\n"
                 f"From: {email.get('from_', '')}\n"
                 f"Date sent: {email.get('date_sent', '')}\n"
                 f"Subject: {email.get('subject', '')}\n"
                 f"Body:\n{email.get('body', '')}\n"
             )
         user_message = "\n".join(parts)
+        batch_message_ids = {
+            email.get("messageId", "") for email in batch
+        }
+        batch_message_ids.discard("")
 
         # No try/except here: _call_with_retry already absorbs transient
         # errors (429/500/503/529/connection/timeout) with backoff. Anything
@@ -421,6 +472,7 @@ def extract_events(
 
         events = parsed["events"]
         irrelevant = parsed["irrelevant_senders"]
+        events = _filter_events_by_source_id(events, batch_message_ids)
         usage = response.usage
         total_input_tokens += usage.input_tokens
         total_output_tokens += usage.output_tokens
