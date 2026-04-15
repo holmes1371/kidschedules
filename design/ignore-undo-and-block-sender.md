@@ -7,7 +7,7 @@ Tom's framing locked in:
 - **No 5-minute toast.** Ignored events render with `display:none` + an `is_ignored` flag; a header toggle unhides them on demand. Unignore is a persistent per-card button on ignored cards, not a time-boxed affordance. Simpler state, less timer plumbing.
 - **"Ignore sender" operates on the registrable domain** (`greenfield.k12.ny.us`, not `office@greenfield.k12.ny.us` or `us`). PSL-aware via `tldextract`.
 - **Sender → event mapping is deterministic, not LLM-derived.** The agent returns a `source_message_id` per event; `main.py` looks up the raw `From:` header from the Gmail stubs and runs it through `tldextract`. The LLM's only structured job is to echo back an ID it was handed.
-- **Ignored senders live in the Google Sheet alongside ignored events, not in a text file.** The sheet is the single source of truth; the workflow fetches the list each run and writes an `ignored_senders.json` cache file (committed, mirrors the `ignored_events.json` pattern). Rows carry a `source` column (`manual` / `auto-button`) so Ellen can distinguish UI-added entries from ones she seeds by hand. The word "ignored" is used end-to-end (tab / cache / action / kind / script) to match the "Ignore sender" button copy — and to avoid colliding with the unrelated `blocklist.txt` used by the Gmail-search filter. See the "Architecture update (2026-04-15)" section below for the full reasoning.
+- **Ignored senders live in the Google Sheet alongside ignored events, not in a text file.** The sheet is the single source of truth; the workflow fetches the list each run and writes an `ignored_senders.json` cache file into the runner's working dir — ephemeral, read-once, discarded with the runner. Matches the already-existing pattern for `ignored_senders`' sibling `ignored_events.json` (which is also fetched per-run, not committed). Rows carry a `source` column (`manual` / `auto-button`) so Ellen can distinguish UI-added entries from ones she seeds by hand; the sheet itself keeps the audit trail. The word "ignored" is used end-to-end (tab / cache / action / kind / script) to match the "Ignore sender" button copy — and to avoid colliding with the unrelated `blocklist.txt` used by the Gmail-search filter. See the "Architecture update (2026-04-15)" section below for the full reasoning.
 - **No undo grace window.** If an ignored event ages past its date, cache GC drops it. Accepted; the show-ignored toggle makes recovery easy inside that window and there's no stakeholder for longer-lived recovery.
 
 ## Rendering model: "render but hide"
@@ -82,7 +82,7 @@ Same `READ_SECRET` for both routes. Reusing the existing secret is fine — it's
 
 New step after the existing "Sync ignored events from Apps Script" step:
 
-**Sync ignored senders from Apps Script** — curl `${URL}?secret=${IGNORE_READ_SECRET}&kind=ignored_senders`, normalize (lowercase, trim, dedup, sort), and write `ignored_senders.json`. If the file contents changed, commit and push on `main` with a conventional message. If unchanged, skip commit.
+**Sync ignored senders from Apps Script** — curl `${URL}?secret=${IGNORE_READ_SECRET}&kind=ignored_senders`, normalize (lowercase, trim, dedup, sort), and write `ignored_senders.json` to the runner's working directory. Ephemeral — not committed, same posture as the sibling `ignored_events.json` sync. On fetch failure the helper exits 0 and leaves no file; downstream consumers handle the missing file gracefully.
 
 Fetch-and-write lives in a small helper script `scripts/sync_ignored_senders.py` so it's testable:
 
@@ -90,9 +90,9 @@ Fetch-and-write lives in a small helper script `scripts/sync_ignored_senders.py`
 - For each row: lowercase the domain, trim whitespace, skip anything that fails the domain regex.
 - Dedup, sort alphabetically.
 - Write `ignored_senders.json` (`[{"domain": "...", "source": "...", "timestamp": "..."}, ...]`, first-wins on domain).
-- Return `unchanged` when the serialized output matches the file on disk.
+- Return `unchanged` when the serialized output matches the file on disk (future-proofing; not used since the file is ephemeral anyway).
 
-Commit step uses the same `x-access-token` pattern as the existing state-branch push.
+No commit step — `ignored_senders.json` lives only for the duration of the run.
 
 ## Sender-domain attribution
 
@@ -169,7 +169,7 @@ Commit at each natural boundary, not just at feature completion (session discipl
 5. **`process_events.py` render-but-hide model** — classify/render changes, fixture events for `is_ignored`, Show/Hide toggle markup, Ignore-sender button markup. Snapshot updated.
 6. **`scripts/apps_script.gs`** — action router, unignore endpoint, ignore_sender endpoint, ignored-senders GET route. (No automated tests; manual deploy + smoke.)
 7. **`scripts/sync_ignored_senders.py`** — fetch-and-write helper + unit tests.
-8. **Workflow sync step** — new "Sync ignored senders" step + commit-on-main logic.
+8. **Workflow sync step** — new "Sync ignored senders" step. Ephemeral write to runner working dir, no commit (matches the existing `ignored_events.json` sync).
 9. **Client JS in `docs/index.html` (rendered by `process_events.py`)** — Unignore button wiring, Show/Hide toggle handler, Ignore-sender button wiring, toast helpers, localStorage hydration updates.
 10. **ROADMAP status update + SHAs**, session-close.
 
@@ -203,7 +203,7 @@ Separately, the word "blocklist" already has a load-bearing meaning elsewhere in
 Amended decisions:
 
 - **Single Google Sheet, two tabs.** The existing "Ignored Events" tab is unchanged. A new "Ignored Senders" tab holds `[timestamp, domain, source]` rows. `source` is `"auto-button"` when appended via the schedule page's Ignore-sender button, `"manual"` when Ellen edits the sheet directly. Script code reads every row authoritatively; the column is informational.
-- **`ignored_senders.json` is a committed cache file**, not a git-source. Same shape relationship as `ignored_events.json` → the pipeline fetches the sheet, writes the JSON, and commits on `main` when it changes. The file exists so the Gmail-search step has a fast local read and so diffs show ignored-sender churn in git history.
+- **`ignored_senders.json` is an ephemeral runtime file**, not committed. Written to the runner's working dir during the weekly workflow, consumed by the pipeline on that same run, torn down with the runner. The sheet is the only persistent record; the `timestamp` + `source` columns on each sheet row are the audit trail. (The original design note said "committed cache file, mirrors the `ignored_events.json` pattern" — that description was wrong about the existing pattern; `ignored_events.json` has always been per-run-ephemeral. The plan now matches what actually happens for its sibling.)
 - **No `blocklist.txt` entry for this feature.** The old `blocklist.txt` / `blocklist_auto.txt` pair is left alone — they serve the Gmail-search filter and aren't touched by this work.
 - **`sync_ignored_senders.py` is fetch-and-write, not merge.** There's no "manual entries to preserve" problem — the sheet is the sole source, and any manual additions Ellen wants to make happen in the sheet. The helper pulls `?kind=ignored_senders`, normalizes (lowercase, trim, dedup), sorts, and writes `ignored_senders.json`. If the file's contents are unchanged, skip commit. Tests collapse to: normalization correctness + no-change short-circuit.
 - **Apps Script `ignore_sender` appends with `source: "auto-button"`.** `doGet?kind=ignored_senders` returns the full rows including source, so Ellen can filter/report in a spreadsheet view if she ever wants to.
@@ -212,7 +212,7 @@ Ripple through the commit plan:
 
 - Step 6 (Apps Script) gains the `source` column on append and the `?kind=ignored_senders` GET.
 - Step 7 (`sync_ignored_senders.py`) is simpler — no comment-block preservation, no case-insensitive manual merge, no alphabetic resort of a mixed file. Just fetch-normalize-write.
-- Step 8 (workflow) still commits on `main` — not because an ignored-senders file is configuration (the previous framing), but because `ignored_senders.json` is a cache that we want versioned alongside `ignored_events.json` for historical forensics.
+- Step 8 (workflow) is a plain sync step — no commit-on-main. Fetch, write to runner's working dir, let downstream consumers read it during the same run. Revised from the earlier "commit on main" framing once we verified `ignored_events.json` already works this way.
 - Nothing in steps 2–5 is affected; those are already landed.
 
 Responsibility table stays accurate — the table now reads "`sync_ignored_senders.py` owns fetch + normalize + dedup + write", no other changes.

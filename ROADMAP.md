@@ -87,13 +87,13 @@ Progress against the 10-step commit plan:
 3. [x] `main.py` sender-domain attachment + `tldextract>=5.1.0` added to `requirements.txt` (10 unit tests) — eebae6f
 4. [x] `events_state.py` schema v2 (optional `sender_domain` per event; blow-away-and-rebuild on mismatch) — 96795dd
 5. [x] `process_events.py` render-but-hide model (classify/render changes, Show/Hide toggle, Ignore-sender button) — 220b083; design amended post-step-5 to standardize on "ignored senders" vocabulary end-to-end (b07bdf7)
-6. [ ] `scripts/apps_script.gs` action router (`ignore` / `unignore` / `ignore_sender`; `?kind=ignored_senders` GET route; second tab "Ignored Senders")
-7. [ ] `scripts/sync_ignored_senders.py` fetch-and-write helper + unit tests (writes committed cache `ignored_senders.json`)
-8. [ ] Workflow "Sync ignored senders" step + commit-on-main logic
+6. [x] `scripts/apps_script.gs` action router (`ignore` / `unignore` / `ignore_sender`; `?kind=ignored_senders` GET route; second tab "Ignored Senders") — 9935d60
+7. [x] `scripts/sync_ignored_senders.py` fetch-and-write helper + 13 unit tests — 8d51750
+8. [~] Workflow "Sync ignored senders" step — YAML + design-doc corrections staged locally, not yet committed. `ignored_senders.json` is ephemeral (option A): written to the runner's working dir only, no commit-on-main — matches the existing `ignored_events.json` sibling. Design note updated to reflect this (sections: intro, architecture-update, Workflow changes, Commit plan step 8, ripple-through).
 9. [ ] Client JS in `docs/index.html` (Unignore, Show/Hide toggle, Ignore sender, toast helpers, localStorage hydration)
 10. [ ] ROADMAP status update + final SHAs, session-close
 
-Next agent: start from step 7 (`scripts/sync_ignored_senders.py`). The design note is authoritative — don't re-debate locked decisions, including the post-step-5 vocabulary standardization. Run `python -m pytest tests/` to confirm 172 baseline tests pass before touching anything.
+Next agent: commit step 8 (two staged files: `.github/workflows/weekly-schedule.yml` + `design/ignore-undo-and-block-sender.md`), mark it `[x]` here, then proceed to step 9. The design note is authoritative — don't re-debate locked decisions (including the post-step-5 vocabulary standardization and the step-8 ephemeral-cache decision). Run `python -m pytest tests/` to confirm 188 baseline tests pass before touching anything.
 
 ### 8. [ ] "New this week" badges
 

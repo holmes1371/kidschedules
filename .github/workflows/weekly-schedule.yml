@@ -134,6 +134,25 @@ jobs:
             rm -f "$TMP"
           fi
 
+      - name: Sync ignored senders from Apps Script
+        env:
+          IGNORE_READ_SECRET: ${{ secrets.IGNORE_READ_SECRET }}
+        run: |
+          URL=$(cat ignore_webhook_url.txt 2>/dev/null || true)
+          if [ -z "$URL" ] || [ -z "$IGNORE_READ_SECRET" ]; then
+            echo "No webhook URL or IGNORE_READ_SECRET configured — skipping sync."
+            exit 0
+          fi
+          # Ephemeral: sync_ignored_senders.py writes ignored_senders.json to
+          # the runner's working dir for this run only. Same pattern as the
+          # ignored-events sync above — no commit back to main. On fetch
+          # failure the helper exits 0 with no file written; downstream
+          # consumers must handle a missing file gracefully.
+          python scripts/sync_ignored_senders.py \
+            --url "$URL" \
+            --secret "$IGNORE_READ_SECRET" \
+            --out ignored_senders.json
+
       - name: Run kids schedule pipeline
         env:
           GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}
