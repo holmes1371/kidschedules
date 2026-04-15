@@ -5,23 +5,31 @@ opens the native calendar app with the event pre-populated.
 
 ## Status
 
-Shipped. Initial implementation (Blob download from inline `data-ics`)
-pivoted to hosted `.ics` files + `webcal://` links after live testing
-showed iOS routes downloads to the Files app and offers the wrong
-handler. See "Pivot to hosted files + webcal" below for the reasoning
-and the final architecture.
+Shipped. Path taken: Blob download → hosted files + `webcal://` →
+hosted files + `https://` with time-range parsing. Each pivot driven
+by live iOS testing surfacing a concrete problem the prior version
+couldn't solve. See "Pivot to hosted files + webcal" and "Second pivot:
+https + range parsing" below for the full reasoning.
 
 ## Settled decisions
 
-**Time parsing.** Regex extracts the first `\d{1,2}(?::\d{2})?\s*[AaPp][Mm]`
-from `ev["time"]`. Clean match → timed event. Anything else (including
-"Time TBD", "1:30 PM dismissal", "All day (deadline)") → all-day fallback.
-This keeps the button available on every dated card without inventing fake
-times.
+**Time parsing.** Two passes, in order:
+
+1. `_parse_time_range` — matches `H[:MM][am/pm]? (-|–|—|to) H[:MM]am/pm`.
+   End meridian required; start meridian optional (inherits from end, and
+   flips if that would put start after end, so "11-1 PM" → 11 AM–1 PM).
+   Returns `(start, end)` → real timed event with a real duration.
+2. `_parse_clock_time` — single-time fullmatch as before. Clean match →
+   timed event with `PT1H` default.
+
+Anything else (including "Time TBD", "1:30 PM dismissal",
+"All day (deadline)") → all-day fallback. The dismissal-as-all-day case is
+deliberate: strings like "1:30 PM dismissal" describe a deadline inside a
+day, not a meeting — fullmatch rejects them, which is the right call.
 
 **Timed events.** `DTSTART;TZID=America/New_York:YYYYMMDDTHHMMSS` plus
-`DURATION:PT1H` (one-hour default — simple, predictable, revisit later if
-it's wrong for specific cases). Single hand-coded America/New_York
+either `DURATION:PT{h}H{m}M` (range) or `DURATION:PT1H` (single time —
+simple, predictable default). Single hand-coded America/New_York
 `VTIMEZONE` block included in the VCALENDAR.
 
 **All-day events.** `DTSTART;VALUE=DATE:YYYYMMDD` and
@@ -84,28 +92,59 @@ card.
 before writing, so stale entries never leak between runs. Non-`.ics`
 files are preserved.
 
+## Second pivot: https + range parsing
+
+**Problem 1 — subscription flow.** `webcal://` is iOS's scheme for
+calendar *subscriptions*: tapping a `webcal://` link opens Calendar's
+"Subscribe to calendar?" sheet, which adds a remote feed rather than a
+one-off event. Wrong UX for a per-event "add this to my calendar" button.
+
+**Fix 1.** Swap the anchor scheme to plain `https://`. GitHub Pages serves
+`.ics` with `Content-Type: text/calendar`, and iOS recognizes that MIME
+type as a calendar event — tapping opens Calendar's single-event preview
+sheet ("Add Event"), pre-populated, with no subscription step. Works in
+every iOS browser because the handoff is MIME-driven at the OS level.
+
+**Problem 2 — ranges fall through to all-day.** `_parse_clock_time` uses
+`re.fullmatch` with a single-time pattern, so strings like "2:00 PM -
+5:00 PM" don't match and the event silently degrades to all-day. The
+original design note explicitly ruled out range parsing; that turned out
+to be wrong for real fixtures (e.g. "Peter Pan Ballet Camp 2PM - 5PM").
+
+**Fix 2.** Add `_parse_time_range` ahead of the single-time parser.
+Accepts hyphen, en dash, em dash, or the word "to" as separator; end
+meridian required; start meridian optional with share/flip inference.
+Emits `DURATION:PT{h}H{m}M` via `_format_ics_duration`. Falls back to the
+existing single-time path when the range parser returns `None`, which in
+turn falls back to all-day — so nothing that already worked regresses.
+
 ## Where rendering lives
 
-`scripts/process_events.py` adds:
+`scripts/process_events.py`:
 
 - `VTIMEZONE_NY: str` — module-level constant, hand-coded STANDARD +
   DAYLIGHT subcomponents with RRULE transitions.
-- `_parse_clock_time(s: str) -> dt.time | None` — regex parser; returns
-  `None` when no clean time found.
-- `_ics_slug(name: str) -> str` — filename slug helper.
-- `build_ics(ev: dict) -> str` — pure function, full VCALENDAR text.
-
-`_event_card` in `render_html` embeds the escaped `.ics` body in
-`data-ics` and renders the "Add to calendar" button. A small inline JS
-handler wires the button to `new Blob([ics])` + `URL.createObjectURL` +
-anchor click.
+- `_parse_time_range(s) -> tuple[dt.time, dt.time] | None` — range parser
+  (see "Second pivot" above).
+- `_parse_clock_time(s) -> dt.time | None` — single-time fullmatch;
+  returns `None` when no clean time found.
+- `_format_ics_duration(start, end) -> str` — emits `PT{h}H{m}M` /
+  `PT{h}H` / `PT{m}M`; `PT1H` for degenerate input.
+- `_webcal_base(pages_url) -> str` — strips scheme, normalizes trailing
+  slash; empty input → empty output (caller gates rendering on this).
+- `build_ics(ev, now) -> str` — pure function, full VCALENDAR text.
+- `write_ics_files(events, out_dir, now)` — wipes `.ics` in `out_dir`
+  (preserves non-.ics siblings like `.nojekyll`), writes one file per
+  dated event named `{event_id}.ics`.
+- `render_html(..., pages_url="")` — passes `pages_url` through to
+  `_event_card`, which renders an `<a class="ics-btn" href="https://...">`
+  only when the base is non-empty.
 
 ## Explicit non-goals
 
 - No VALARM / reminders (roadmap doesn't ask).
 - No RRULE / recurrence — every event is a one-off.
-- No parsing of ranges like "3:00–4:30 PM" — clean single time or all-day.
-- No server-side download endpoint — client-side Blob is enough.
+- No server-side endpoint — static files on Pages are enough.
 
 ## Commit plan
 
