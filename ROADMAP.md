@@ -111,3 +111,13 @@ Threat model accepted: the shared secret is effectively public (embedded in page
 ### 11. [ ] Conflict highlighting
 
 In `process_events.py`, detect overlapping timed events on the same day via interval intersection; flag both cards with a visible conflict marker. Prioritize different-kid overlaps as the high-signal case. Same-day all-day + timed events should NOT be flagged as conflicts — they coexist by design.
+
+### 12. [ ] Node 20 → Node 24 action upgrades (before 2026-06-02)
+
+Every workflow run currently prints:
+
+> Warning: Node.js 20 actions are deprecated. The following actions are running on Node.js 20 and may not work as expected: actions/deploy-pages@v4.
+
+GitHub timeline: Node 24 becomes the default on 2026-06-02 and Node 20 is removed from runners on 2026-09-16 (see https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/). The warning names `actions/deploy-pages@v4` specifically; also audit the other pinned actions in `.github/workflows/weekly-schedule.yml` and `.github/workflows/tests.yml` — `actions/checkout@v4`, `actions/setup-python@v5`, `actions/upload-pages-artifact@v3` — and bump any that are still on the Node 20 runtime.
+
+Approach: check each action's latest major for a Node 24-compatible release, pin to the lowest version that silences the warning, run the workflow via `workflow_dispatch` with `dry_run=true` to verify no behavioral change, and only then commit. If a new major is not yet available for one of the actions by late May, the `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true` env var is an acceptable bridge — but prefer a real version bump.
