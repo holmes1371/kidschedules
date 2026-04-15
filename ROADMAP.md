@@ -89,11 +89,11 @@ Progress against the 10-step commit plan:
 5. [x] `process_events.py` render-but-hide model (classify/render changes, Show/Hide toggle, Ignore-sender button) — 220b083; design amended post-step-5 to standardize on "ignored senders" vocabulary end-to-end (b07bdf7)
 6. [x] `scripts/apps_script.gs` action router (`ignore` / `unignore` / `ignore_sender`; `?kind=ignored_senders` GET route; second tab "Ignored Senders") — 9935d60
 7. [x] `scripts/sync_ignored_senders.py` fetch-and-write helper + 13 unit tests — 8d51750
-8. [~] Workflow "Sync ignored senders" step — YAML + design-doc corrections staged locally, not yet committed. `ignored_senders.json` is ephemeral (option A): written to the runner's working dir only, no commit-on-main — matches the existing `ignored_events.json` sibling. Design note updated to reflect this (sections: intro, architecture-update, Workflow changes, Commit plan step 8, ripple-through).
+8. [x] Workflow "Sync ignored senders" step — a9f070c. `ignored_senders.json` is ephemeral (option A): written to the runner's working dir only, no commit-on-main — matches the existing `ignored_events.json` sibling. Design note updated to reflect this (sections: intro, architecture-update, Workflow changes, Commit plan step 8, ripple-through).
 9. [ ] Client JS in `docs/index.html` (Unignore, Show/Hide toggle, Ignore sender, toast helpers, localStorage hydration)
 10. [ ] ROADMAP status update + final SHAs, session-close
 
-Next agent: commit step 8 (two staged files: `.github/workflows/weekly-schedule.yml` + `design/ignore-undo-and-block-sender.md`), mark it `[x]` here, then proceed to step 9. The design note is authoritative — don't re-debate locked decisions (including the post-step-5 vocabulary standardization and the step-8 ephemeral-cache decision). Run `python -m pytest tests/` to confirm 188 baseline tests pass before touching anything.
+Next agent: start from step 9 (client JS in `docs/index.html`, rendered by `process_events.py`). Scope: wire the Unignore button, the Show/Hide toggle, and the Ignore-sender button to the Apps Script endpoints; add toast helpers; hydrate state from `localStorage` so UI reflects pending ignores before the next build. The design note is authoritative — don't re-debate locked decisions (including the post-step-5 vocabulary standardization and the step-8 ephemeral-cache decision). Run `python -m pytest tests/` to confirm 188 baseline tests pass before touching anything. Before Tom deploys the Apps Script changes from step 6, client JS can be written and unit-reviewed but not smoke-tested end-to-end; plan the commit so the JS diff is landable independently and Tom can deploy + manually verify.
 
 ### 8. [ ] "New this week" badges
 
