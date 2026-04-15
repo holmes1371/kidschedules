@@ -350,3 +350,45 @@ def test_gc_returns_counts_dict_shape():
     counts = es.gc_state(state, TODAY)
     assert set(counts.keys()) == {"messages_dropped", "events_dropped"}
     assert counts == {"messages_dropped": 0, "events_dropped": 0}
+
+
+# ─── schema v2: sender_domain passthrough ────────────────────────────────
+
+
+def test_schema_v2_sender_domain_roundtrips(tmp_path):
+    """sender_domain is opaque metadata — it should survive save → load."""
+    path = tmp_path / "state.json"
+    state = es._empty_state()
+    ev = _mk_event(time="6:30 PM", sender_domain="greenfield.k12.ny.us")
+    es.merge_events(state, [ev], NOW_ISO)
+    es.save_state(str(path), state, NOW_ISO)
+
+    reloaded = es.load_state(str(path))
+    assert reloaded["events"][ev["id"]]["sender_domain"] == "greenfield.k12.ny.us"
+
+
+def test_merge_events_preserves_sender_domain_on_insert():
+    state = es._empty_state()
+    ev = _mk_event(sender_domain="laes.org")
+    es.merge_events(state, [ev], NOW_ISO)
+    assert state["events"][ev["id"]]["sender_domain"] == "laes.org"
+
+
+def test_load_state_v1_on_disk_is_blown_away(tmp_path, capsys):
+    """Schema bump policy: any prior version → empty state, not a migration."""
+    path = tmp_path / "state.json"
+    path.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "processed_messages": {"m1": NOW_ISO},
+                "events": {"abc123": {"name": "Concert", "date": "2026-05-01"}},
+            }
+        ),
+        encoding="utf-8",
+    )
+    state = es.load_state(str(path))
+    assert state["schema_version"] == 2
+    assert state["processed_messages"] == {}
+    assert state["events"] == {}
+    assert "WARNING" in capsys.readouterr().out

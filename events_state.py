@@ -21,7 +21,7 @@ import os
 from typing import Any
 
 
-CURRENT_SCHEMA_VERSION = 1
+CURRENT_SCHEMA_VERSION = 2
 
 # Drop cache entries older than this many days. Default is 2x the 60-day
 # Gmail search window so entries that can never come back into the
