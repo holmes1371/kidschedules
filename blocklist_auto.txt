@@ -41,3 +41,15 @@ news@email.gramophone.co.uk  # auto 2026-04-14: Classical music magazine newslet
 support6@info.myloancare.com  # auto 2026-04-14: Mortgage/loan payment notification for adults, no kids' events
 builderpulse@zonda-newsletters.com  # auto 2026-04-14: Home building industry trade newsletter for adults, no kids' events
 admin@skinmedicinals.com  # auto 2026-04-14: Adult prescription refill reminder — no children involved
+reminders@divinesalon.com  # auto 2026-04-15: Adult spa/salon anniversary reminder, no connection to children
+interstitialcystitisassociationica@mailman.bloomerang-mail.com  # auto 2026-04-15: Adult medical condition newsletter (Interstitial Cystitis Association), entirely
+updates@message.noom.com  # auto 2026-04-15: Adult weight/medication program email addressed to Ellen, no children involved
+noreply@jnjvision.com  # auto 2026-04-15: Adult contact lens order confirmation for 'Everly', no children's events
+tommy.price@nordstrom.com  # auto 2026-04-15: Retail beauty event promotional email, adult-only consumer marketing
+info@e.mail.washingtonpost.com  # auto 2026-04-15: News digest email with adult-focused articles, no kids' events
+news@insideapple.apple.com  # auto 2026-04-15: Apple product warranty/AppleCare promotional email, adult consumer product
+business5726381@mindbodyonline.com  # auto 2026-04-15: Sales receipt / purchase confirmation only — no event dates for children, purely
+bill@sinocism.com  # auto 2026-04-15: Adult geopolitical/economic newsletter with no kids' content
+kendrabrownlee8@gmail.com  # auto 2026-04-15: Mulch sale fundraiser solicitation from a high school student — no kids' events,
+rescue@idogdoodlerescue.org  # auto 2026-04-15: Dog rescue organization sending pet neuter deadline reminder — adult/pet matter
+rocketmortgage@e.rocketmortgage.com  # auto 2026-04-15: Adult homeowner/mortgage marketing newsletter with no children's content
