@@ -176,6 +176,17 @@
       "source": "Rohde, Meredith / Third Grade Newsletter (Mar 25)",
       "time": "School hours"
     },
+    "31616b5bf27f": {
+      "category": "Sports & Extracurriculars",
+      "child": "Everly",
+      "date": "2026-04-11",
+      "first_seen_iso": "2026-04-15T08:13:21-04:00",
+      "id": "31616b5bf27f",
+      "location": "Fredericksburg Convention Center, 2371 Carl D Silver Pkwy, Fredericksburg, VA 22401",
+      "name": "Reverb Dance Competition (B2D - ECHO Team)",
+      "source": "TeamSnap Team Coordinator (Apr 4)",
+      "time": "Arrival 9:02 AM, Event 11:01 AM"
+    },
     "34a009b302ac": {
       "category": "Academic Due Date",
       "child": "All LAES students",
@@ -185,17 +196,6 @@
       "location": "https://drive.google.com/drive/folders/1D-X2Jh5aPCXkMH23JLYLMqfOpzPHJ79S?usp=sharing",
       "name": "Yearbook Photo Upload Deadline (Back to School photos)",
       "source": "LAES PTA Vice President (Mar 23)",
-      "time": "All day (deadline)"
-    },
-    "37059359e1f4": {
-      "category": "Academic Due Date",
-      "child": "6th grade AAP",
-      "date": "2026-04-14",
-      "first_seen_iso": "2026-04-14T20:06:15-04:00",
-      "id": "37059359e1f4",
-      "location": "Louise Archer Elementary School",
-      "name": "National Portrait Gallery Field Trip — Photography Release/Waiver Form Due",
-      "source": "Pinkman, Brandi L. (Apr 14)",
       "time": "All day (deadline)"
     },
     "37be43b5f3a7": {
@@ -274,6 +274,17 @@
       "name": "ViennArt Academy Spring Session 2 Ends",
       "source": "Kids' Schedule — April 6, 2026 (Apr 6)",
       "time": "Time TBD"
+    },
+    "48364524e211": {
+      "category": "Academic Due Date",
+      "child": "Isla",
+      "date": "2026-03-16",
+      "first_seen_iso": "2026-04-15T08:13:21-04:00",
+      "id": "48364524e211",
+      "location": "",
+      "name": "Lifetouch School Photo Order Deadline (Midnight)",
+      "source": "Isla L.'s School Photography by Lifetouch (Mar 16)",
+      "time": "11:59 PM (deadline)"
     },
     "485109e6dc06": {
       "category": "Academic Due Date",
@@ -1002,7 +1013,7 @@
       "time": "6:00 PM – 7:30 PM"
     }
   },
-  "last_updated_iso": "2026-04-14T20:06:15-04:00",
+  "last_updated_iso": "2026-04-15T08:13:21-04:00",
   "processed_messages": {
     "19c61753200b848d": "2026-04-14T19:59:36-04:00",
     "19c6718c1fe505c1": "2026-04-14T19:59:36-04:00",
@@ -1023,6 +1034,7 @@
     "19ce890fa43f4a69": "2026-04-14T19:59:36-04:00",
     "19cf401cfed1d063": "2026-04-14T19:59:36-04:00",
     "19cf4b7054b58927": "2026-04-14T19:59:36-04:00",
+    "19cf69ffd482e394": "2026-04-15T08:13:21-04:00",
     "19cf6ae592b994dd": "2026-04-14T20:06:15-04:00",
     "19cf842c5c458c25": "2026-04-14T19:59:36-04:00",
     "19cf842d2b4b3814": "2026-04-14T19:59:36-04:00",
@@ -1046,6 +1058,7 @@
     "19d416bbe74c38f5": "2026-04-14T19:59:36-04:00",
     "19d4a7f648c82a45": "2026-04-14T19:59:36-04:00",
     "19d4a7f814c8bfeb": "2026-04-14T19:59:36-04:00",
+    "19d59d8b61a1f50b": "2026-04-15T08:13:21-04:00",
     "19d59e02e826f269": "2026-04-14T19:59:36-04:00",
     "19d620f5a4ff1768": "2026-04-14T19:59:36-04:00",
     "19d6372ec266ca49": "2026-04-14T19:59:36-04:00",
