@@ -7,7 +7,7 @@ Tom's framing locked in:
 - **No 5-minute toast.** Ignored events render with `display:none` + an `is_ignored` flag; a header toggle unhides them on demand. Unignore is a persistent per-card button on ignored cards, not a time-boxed affordance. Simpler state, less timer plumbing.
 - **"Ignore sender" operates on the registrable domain** (`greenfield.k12.ny.us`, not `office@greenfield.k12.ny.us` or `us`). PSL-aware via `tldextract`.
 - **Sender → event mapping is deterministic, not LLM-derived.** The agent returns a `source_message_id` per event; `main.py` looks up the raw `From:` header from the Gmail stubs and runs it through `tldextract`. The LLM's only structured job is to echo back an ID it was handed.
-- **`blocklist.txt` updates commit to `main`**, not the `state` branch. A blocklist entry is repo configuration, not runtime state; history is useful.
+- **Blocked senders live in the Google Sheet alongside ignored events, not in `blocklist.txt`.** The sheet is the single source of truth; the workflow fetches the list each run and writes a `blocked_senders.json` cache file (committed, mirrors the `ignored_events.json` pattern). Rows carry a `source` column (`manual` / `auto-button`) so Ellen can distinguish UI-added blocks from ones she seeds by hand. See the "Architecture update (2026-04-15)" section below for the reasoning and the ripple-through changes.
 - **No undo grace window.** If an ignored event ages past its date, cache GC drops it. Accepted; the show-ignored toggle makes recovery easy inside that window and there's no stakeholder for longer-lived recovery.
 
 ## Rendering model: "render but hide"
@@ -193,11 +193,32 @@ Following the standing order — deterministic work in scripts, agent (LLM) does
 
 No runtime LLM calls are introduced by this feature beyond the existing extraction path.
 
+## Architecture update (2026-04-15)
+
+After step 5 landed, Tom pushed back on the original split (ignored events in a sheet, blocked senders in `blocklist.txt`): having two storage shapes for two parallel opt-out lists meant two merge policies, two docs, two code paths for the same user intent. The sheet wins on symmetry and on Ellen-editability (no git round-trip to manage blocks manually).
+
+Amended decisions:
+
+- **Single Google Sheet, two tabs.** The existing "Ignored Events" tab is unchanged. A new "Blocked Senders" tab holds `[timestamp, domain, source]` rows. `source` is `"auto-button"` when appended via the schedule page's Ignore-sender button, `"manual"` when Ellen edits the sheet directly. Script code reads both indiscriminately; the column is informational.
+- **`blocked_senders.json` is a committed cache file**, not a git-source. Same shape relationship as `ignored_events.json` → the pipeline fetches the sheet, writes the JSON, and commits on `main` when it changes. The file exists so the Gmail-search step has a fast local read and so diffs show blocklist churn in git history.
+- **No `blocklist.txt`.** Removed from scope entirely. The file never lands in the repo.
+- **`sync_blocklist.py` becomes fetch-and-write, not merge.** There's no "manual entries to preserve" problem now — the sheet is the sole source, and any manual additions Ellen wants to make happen in the sheet. The helper pulls `?kind=blocked_senders`, normalizes (lowercase, trim, dedup), sorts, and writes `blocked_senders.json`. If the file's contents are unchanged, skip commit. Tests collapse to: normalization correctness + no-change short-circuit.
+- **Apps Script `block_sender` appends with `source: "auto-button"`.** `doGet?kind=blocked_senders` returns the full rows including source, so Ellen can filter/report in a spreadsheet view if she ever wants to.
+
+Ripple through the commit plan:
+
+- Step 6 (Apps Script) gains the `source` column on append and the `?kind=blocked_senders` GET.
+- Step 7 (`sync_blocklist.py`) is simpler — no comment-block preservation, no case-insensitive manual merge, no alphabetic resort of a mixed file. Just fetch-normalize-write.
+- Step 8 (workflow) still commits on `main` — not because a blocklist file is configuration (the previous framing), but because `blocked_senders.json` is a cache that we want versioned alongside `ignored_events.json` for historical forensics.
+- Nothing in steps 2–5 is affected; those are already landed.
+
+Responsibility table stays accurate — the table now reads "`sync_blocklist.py` owns fetch + normalize + dedup + write", no other changes.
+
 ## Open for future work
 
 Not doing now (explicit non-goals):
 
 - **Bulk unignore** — no "clear all" button. Individual Unignore per card is fine at current volume (<20 ignored events at any time).
-- **Blocked-sender UI on the schedule page** — no list/manage view. Users edit `blocklist.txt` in git if they need to remove a block. Cheap fallback.
+- **Blocked-sender UI on the schedule page** — no list/manage view. Users edit the "Blocked Senders" sheet tab directly if they need to remove a block. Cheap fallback.
 - **Soft-block** (block with override) — the blocklist is a hard filter at the Gmail-search level. Un-blocking requires a commit. Acceptable.
 - **Unignore notifications** — no server-side audit beyond the Apps Script sheet. If needed later, the existing weekly-digest path can be extended.
