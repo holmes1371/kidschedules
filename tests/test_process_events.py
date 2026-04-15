@@ -591,6 +591,63 @@ def test_write_ics_files_writes_one_per_event_and_wipes_stale(tmp_path):
         assert f"UID:{ev['id']}@" in body
 
 
+@pytest.mark.parametrize("raw,expected", [
+    # Shared end meridian, various separators
+    ("2 PM - 5 PM", ((14, 0), (17, 0))),
+    ("2:00 PM - 5:00 PM", ((14, 0), (17, 0))),
+    ("2PM-5PM", ((14, 0), (17, 0))),
+    ("2:00 PM \u2013 5:00 PM", ((14, 0), (17, 0))),   # en dash
+    ("2:00 PM \u2014 5:00 PM", ((14, 0), (17, 0))),   # em dash
+    ("2 PM to 5 PM", ((14, 0), (17, 0))),
+    # Start meridian omitted → shared with end
+    ("2-5 PM", ((14, 0), (17, 0))),
+    ("2:30-4:00 PM", ((14, 30), (16, 0))),
+    # Start meridian omitted, shared would put start after end → flip
+    ("11-1 PM", ((11, 0), (13, 0))),
+    ("11:30-12:30 PM", ((11, 30), (12, 30))),
+    # Crossing meridian with both meridians explicit
+    ("10 AM - 12 PM", ((10, 0), (12, 0))),
+    ("11:00 AM - 1:00 PM", ((11, 0), (13, 0))),
+    # Rejects
+    ("Time TBD", None),
+    ("2 PM", None),
+    ("2-5", None),
+    ("", None),
+])
+def test_parse_time_range(raw, expected):
+    got = pe._parse_time_range(raw)
+    if expected is None:
+        assert got is None
+    else:
+        (sh, sm), (eh, em) = expected
+        assert got == (dt.time(sh, sm), dt.time(eh, em))
+
+
+@pytest.mark.parametrize("start,end,expected", [
+    ((14, 0), (17, 0), "PT3H"),
+    ((14, 30), (16, 0), "PT1H30M"),
+    ((10, 0), (10, 30), "PT30M"),
+    ((10, 0), (10, 0), "PT1H"),   # degenerate: fallback to default
+    ((10, 0), (9, 0), "PT1H"),    # invalid: fallback
+])
+def test_format_ics_duration(start, end, expected):
+    assert pe._format_ics_duration(dt.time(*start), dt.time(*end)) == expected
+
+
+def test_build_ics_range_snapshot():
+    ev = {
+        "id": "",  # let build_ics compute the deterministic ID
+        "name": "Peter Pan Ballet Camp",
+        "date": "2026-04-22",
+        "time": "2:00 PM - 5:00 PM",
+        "location": "Dance Studio",
+        "child": "Ellen",
+        "source": "camp email",
+        "category": "Sports & Extracurriculars",
+    }
+    assert pe.build_ics(ev, now=ICS_NOW) == read_snapshot("ics_range_event")
+
+
 def test_write_ics_files_skips_undated_events(tmp_path):
     """Events with no parseable date cause build_ics to raise; the writer
     should silently skip them rather than crashing the whole run."""

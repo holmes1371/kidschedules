@@ -90,6 +90,14 @@ VTIMEZONE_NY = "\n".join([
 _CLOCK_RE = re.compile(r"(\d{1,2})(?::(\d{2}))?\s*([AaPp][Mm])")
 _SLUG_SPLIT = re.compile(r"[^a-z0-9]+")
 
+# Range separators: ASCII hyphen, en dash, em dash, or the word "to".
+_RANGE_RE = re.compile(
+    r"^(\d{1,2})(?::(\d{2}))?\s*([AaPp][Mm])?"
+    r"\s*(?:-|\u2013|\u2014|to)\s*"
+    r"(\d{1,2})(?::(\d{2}))?\s*([AaPp][Mm])$",
+    re.IGNORECASE,
+)
+
 
 def _parse_clock_time(s: str) -> dt.time | None:
     """Parse a clean clock time like '7:00 PM' or '8am' to a dt.time.
@@ -112,6 +120,67 @@ def _parse_clock_time(s: str) -> dt.time | None:
     else:
         hour = 12 if hour == 12 else hour + 12
     return dt.time(hour, minute)
+
+
+def _parse_time_range(s: str) -> tuple[dt.time, dt.time] | None:
+    """Parse a clock-time range like '2 PM - 5 PM' or '2:00-5:00 PM'.
+
+    Returns (start, end) when the whole string is a valid range. Accepts
+    hyphen, en/em dash, or the word 'to' as separator. The end meridian
+    is required; the start meridian is optional and defaults to the end
+    meridian, flipped when that would make start > end (e.g. '11-1 PM'
+    resolves to 11 AM → 1 PM). Returns None for non-range inputs — the
+    caller falls back to single-time parsing.
+    """
+    m = _RANGE_RE.fullmatch((s or "").strip())
+    if not m:
+        return None
+    sh = int(m.group(1))
+    sm = int(m.group(2) or 0)
+    sam = (m.group(3) or "").upper() or None
+    eh = int(m.group(4))
+    em = int(m.group(5) or 0)
+    eam = m.group(6).upper()
+    if not (1 <= sh <= 12 and 1 <= eh <= 12):
+        return None
+    if not (0 <= sm <= 59 and 0 <= em <= 59):
+        return None
+
+    def _to24(h: int, ampm: str) -> int:
+        if ampm == "AM":
+            return 0 if h == 12 else h
+        return 12 if h == 12 else h + 12
+
+    end_24 = _to24(eh, eam)
+    if sam is None:
+        start_shared = _to24(sh, eam)
+        if start_shared * 60 + sm <= end_24 * 60 + em:
+            start_24 = start_shared
+        else:
+            start_24 = _to24(sh, "AM" if eam == "PM" else "PM")
+    else:
+        start_24 = _to24(sh, sam)
+
+    return dt.time(start_24, sm), dt.time(end_24, em)
+
+
+def _format_ics_duration(start: dt.time, end: dt.time) -> str:
+    """Format a start→end clock-time gap as an RFC 5545 DURATION value.
+
+    Falls back to PT1H when end <= start (invalid range) — the all-day
+    path is preferable in practice, but callers already gate on
+    `_parse_time_range` returning a valid range so this is belt-and-
+    suspenders.
+    """
+    mins = (end.hour * 60 + end.minute) - (start.hour * 60 + start.minute)
+    if mins <= 0:
+        return "PT1H"
+    h, m = divmod(mins, 60)
+    if h and m:
+        return f"PT{h}H{m}M"
+    if h:
+        return f"PT{h}H"
+    return f"PT{m}M"
 
 
 def _ics_slug(name: str) -> str:
@@ -210,7 +279,11 @@ def build_ics(ev: dict[str, Any], now: dt.datetime | None = None) -> str:
     if d is None:
         raise ValueError("build_ics requires an event with a parseable date")
 
-    t = _parse_clock_time(ev.get("time") or "")
+    # Try range first (emits real DURATION); fall back to single-time (PT1H
+    # default); fall back to all-day when neither matches.
+    rng = _parse_time_range(ev.get("time") or "")
+    t = None if rng is not None else _parse_clock_time(ev.get("time") or "")
+    timed = rng is not None or t is not None
 
     lines = [
         "BEGIN:VCALENDAR",
@@ -218,7 +291,7 @@ def build_ics(ev: dict[str, Any], now: dt.datetime | None = None) -> str:
         "PRODID:-//kids-schedule//ics-export//EN",
         "CALSCALE:GREGORIAN",
     ]
-    if t is not None:
+    if timed:
         lines.append(VTIMEZONE_NY)
     lines.append("BEGIN:VEVENT")
     lines.append(f"UID:{uid}")
@@ -226,7 +299,12 @@ def build_ics(ev: dict[str, Any], now: dt.datetime | None = None) -> str:
     lines.append(f"SUMMARY:{summary}")
     if loc:
         lines.append(f"LOCATION:{loc}")
-    if t is not None:
+    if rng is not None:
+        start_t, end_t = rng
+        start = f"{d.strftime('%Y%m%d')}T{start_t.strftime('%H%M%S')}"
+        lines.append(f"DTSTART;TZID=America/New_York:{start}")
+        lines.append(f"DURATION:{_format_ics_duration(start_t, end_t)}")
+    elif t is not None:
         start = f"{d.strftime('%Y%m%d')}T{t.strftime('%H%M%S')}"
         lines.append(f"DTSTART;TZID=America/New_York:{start}")
         lines.append("DURATION:PT1H")
