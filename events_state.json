@@ -176,17 +176,6 @@
       "source": "Rohde, Meredith / Third Grade Newsletter (Mar 25)",
       "time": "School hours"
     },
-    "31616b5bf27f": {
-      "category": "Sports & Extracurriculars",
-      "child": "Everly",
-      "date": "2026-04-11",
-      "first_seen_iso": "2026-04-15T08:13:21-04:00",
-      "id": "31616b5bf27f",
-      "location": "Fredericksburg Convention Center, 2371 Carl D Silver Pkwy, Fredericksburg, VA 22401",
-      "name": "Reverb Dance Competition (B2D - ECHO Team)",
-      "source": "TeamSnap Team Coordinator (Apr 4)",
-      "time": "Arrival 9:02 AM, Event 11:01 AM"
-    },
     "34a009b302ac": {
       "category": "Academic Due Date",
       "child": "All LAES students",
@@ -274,17 +263,6 @@
       "name": "ViennArt Academy Spring Session 2 Ends",
       "source": "Kids' Schedule — April 6, 2026 (Apr 6)",
       "time": "Time TBD"
-    },
-    "48364524e211": {
-      "category": "Academic Due Date",
-      "child": "Isla",
-      "date": "2026-03-16",
-      "first_seen_iso": "2026-04-15T08:13:21-04:00",
-      "id": "48364524e211",
-      "location": "",
-      "name": "Lifetouch School Photo Order Deadline (Midnight)",
-      "source": "Isla L.'s School Photography by Lifetouch (Mar 16)",
-      "time": "11:59 PM (deadline)"
     },
     "485109e6dc06": {
       "category": "Academic Due Date",
@@ -1013,7 +991,7 @@
       "time": "6:00 PM – 7:30 PM"
     }
   },
-  "last_updated_iso": "2026-04-15T08:13:21-04:00",
+  "last_updated_iso": "2026-04-15T08:33:14-04:00",
   "processed_messages": {
     "19c61753200b848d": "2026-04-14T19:59:36-04:00",
     "19c6718c1fe505c1": "2026-04-14T19:59:36-04:00",
