@@ -279,10 +279,11 @@ def test_render_html_empty_state_when_no_events():
     assert 'class="event-card undated"' not in html
 
 
-def test_render_html_ics_button_is_webcal_link():
-    """Every dated card gets a webcal:// Add-to-calendar anchor when a
-    pages_url is supplied; undated cards never do. Empty pages_url
-    suppresses the button entirely."""
+def test_render_html_ics_button_is_https_link():
+    """Every dated card gets an https:// Add-to-calendar anchor when a
+    pages_url is supplied; undated cards never do. https (not webcal) so
+    iOS treats the tap as a one-shot event import rather than a calendar
+    subscription."""
     display = _classified_display("basic_mixed")
     display = pe.dedupe(display)
     events = load_fixture("basic_mixed")
@@ -296,16 +297,17 @@ def test_render_html_ics_button_is_webcal_link():
         pages_url="https://holmes1371.github.io/kidschedules/",
     )
 
-    # Webcal link with stable event-ID filename under the pages path.
     assert "Add to calendar" in html
-    assert 'href="webcal://holmes1371.github.io/kidschedules/ics/' in html
+    assert 'href="https://holmes1371.github.io/kidschedules/ics/' in html
+    # Must not emit webcal:// anywhere — that's the subscription flow we
+    # explicitly moved away from.
+    assert "webcal://" not in html
 
     # At least one timed and one all-day event ID should appear in an href.
-    # Use event_id helper (same one production uses) to derive expected IDs.
     timed = next(e for e in display if e["name"] == "Spring Concert")
     allday = next(e for e in display if e["name"] == "Book Report Due")
-    assert f'href="webcal://holmes1371.github.io/kidschedules/ics/{timed["id"]}.ics"' in html
-    assert f'href="webcal://holmes1371.github.io/kidschedules/ics/{allday["id"]}.ics"' in html
+    assert f'href="https://holmes1371.github.io/kidschedules/ics/{timed["id"]}.ics"' in html
+    assert f'href="https://holmes1371.github.io/kidschedules/ics/{allday["id"]}.ics"' in html
 
     # No inline .ics body on any card — we host the files now.
     assert "data-ics=" not in html
@@ -315,12 +317,11 @@ def test_render_html_ics_button_is_webcal_link():
     assert undated_card_start != -1, "expected an undated card in this fixture"
     undated_slice = html[undated_card_start:undated_card_start + 1500]
     assert "Add to calendar" not in undated_slice
-    assert "webcal://" not in undated_slice
 
 
 def test_render_html_omits_ics_button_when_pages_url_empty():
-    """No pages_url → no webcal host → no button. Dev preview degrades
-    gracefully rather than emitting a broken link."""
+    """No pages_url → no host to link to → no button. Dev preview
+    degrades gracefully rather than emitting a broken link."""
     display = _classified_display("basic_mixed")
     display = pe.dedupe(display)
     weeks = pe.group_by_week(display)
@@ -332,7 +333,7 @@ def test_render_html_omits_ics_button_when_pages_url_empty():
     )
 
     assert "Add to calendar" not in html
-    assert "webcal://" not in html
+    assert 'href="https://holmes1371.github.io/kidschedules/ics/' not in html
 
 
 # ─── subject + metadata ──────────────────────────────────────────────────

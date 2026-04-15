@@ -600,8 +600,12 @@ def render_html(today: dt.date,
     Ignore clicks only hide the card locally via localStorage.
 
     pages_url: if non-empty, each dated card gets an Add-to-calendar link
-    pointing at `webcal://<host>/<path>/ics/<event_id>.ics`. Empty
-    pages_url hides the button (e.g. dev preview without a deploy URL).
+    pointing at `https://<host>/<path>/ics/<event_id>.ics`. iOS Safari
+    recognizes the text/calendar MIME GitHub Pages serves and offers a
+    one-shot "Add to Calendar" sheet — distinct from `webcal://` which
+    triggers a calendar-subscription flow (the wrong behavior for a
+    single event). Empty pages_url hides the button (e.g. dev preview
+    without a deploy URL).
     """
 
     webcal_base = _webcal_base(pages_url)
@@ -616,7 +620,7 @@ def render_html(today: dt.date,
                       if ev["child"] else "")
         ics_btn_html = ""
         if webcal_base:
-            ics_href = f"webcal://{webcal_base}ics/{ev['id']}.ics"
+            ics_href = f"https://{webcal_base}ics/{ev['id']}.ics"
             ics_btn_html = (
                 f'<a class="ics-btn" href="{ics_href}" '
                 f'aria-label="Add this event to your calendar">Add to calendar</a>\n        '
