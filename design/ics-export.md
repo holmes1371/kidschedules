@@ -1,15 +1,15 @@
 # Per-event `.ics` export button
 
-Roadmap item 4. Each dated event card gets an "Add to calendar" button that
-downloads an RFC 5545 `.ics` file via a `Blob` in the browser. All
-mechanical work (parsing, generation, UID stability) lives in Python; the
-browser side is a ~10-line handler that turns a `data-ics` attribute into
-a download.
+Roadmap item 5. Each dated event card gets an "Add to calendar" link that
+opens the native calendar app with the event pre-populated.
 
 ## Status
 
-Plan approved by Tom; no code written yet. Resume directly at the commit
-plan below.
+Shipped. Initial implementation (Blob download from inline `data-ics`)
+pivoted to hosted `.ics` files + `webcal://` links after live testing
+showed iOS routes downloads to the Files app and offers the wrong
+handler. See "Pivot to hosted files + webcal" below for the reasoning
+and the final architecture.
 
 ## Settled decisions
 
@@ -38,10 +38,51 @@ lowercased with non-alphanum runs collapsed to `-`.
 **Button placement.** On each dated card, to the left of Ignore. Undated
 cards skip the button entirely (no valid DTSTART).
 
-**Attribute encoding.** HTML-escape the full `.ics` body and put it in
-`data-ics="..."`. Newlines survive attribute parsing; calendar apps accept
-LF endings in practice. If this turns out not to be true we pivot to
-base64 later.
+**Attribute encoding (superseded).** Initial version HTML-escaped the
+full `.ics` body into `data-ics="..."` and let client JS build a Blob
+for download. Worked on desktop but on iOS the `a.download` flow writes
+to Files and then offers "Add to Reminders" (wrong app). Replaced with
+hosted files + webcal links — see below.
+
+## Pivot to hosted files + webcal (final design)
+
+**Problem.** iOS Safari/Edge/Chrome all use WebKit and all treat
+`a.download` of `.ics` Blobs the same way: save to Files, let the user
+re-open from there. That's two taps in the wrong place and the wrong
+default-app picker.
+
+**Fix.** Commit one `.ics` file per displayed event to
+`docs/ics/{event_id}.ics`; the card's button is a plain `<a>` whose
+`href` is `webcal://<pages-host>/<path>/ics/{event_id}.ics`. iOS routes
+the `webcal://` scheme at the OS level, so Calendar opens directly
+regardless of browser. No JS, no Blob, no download folder.
+
+**Where it lives.**
+- `scripts/process_events.py::_webcal_base(pages_url)` strips the scheme
+  and normalizes trailing slash. Empty pages_url → empty base → button
+  not rendered. Dev preview degrades gracefully.
+- `scripts/process_events.py::write_ics_files(events, out_dir)` wipes
+  `.ics` files in `out_dir` (preserves non-.ics siblings, e.g.
+  `.nojekyll`) and writes one file per event named by the stable
+  12-char event ID.
+- `render_html(... pages_url=...)` is the new signature; each card
+  renders the webcal anchor only when `_webcal_base` is non-empty.
+- `main.py::step4_process_events` passes `--ics-out-dir docs/ics` when
+  `dry_run=False`; dry-run skips the write so the publish dir stays
+  clean.
+- No workflow change needed: `docs/` is not tracked in git (except
+  `.nojekyll`); it's rebuilt each run and uploaded as the Pages
+  artifact via `actions/upload-pages-artifact@v3` with `path: docs/`,
+  which picks up `docs/ics/` automatically.
+
+**Filename.** `{event_id}.ics` (not `{slug}-{date}.ics`). Stable across
+runs, guaranteed unique, no slug collisions. The download-filename slug
+helper is retained for potential future use but unused by the current
+card.
+
+**Cleanup.** `write_ics_files` deletes every `.ics` in the target dir
+before writing, so stale entries never leak between runs. Non-`.ics`
+files are preserved.
 
 ## Where rendering lives
 

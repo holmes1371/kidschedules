@@ -59,11 +59,15 @@ Live verification 2026-04-14: first run after retirement bootstrapped 168 events
 
 Commit trail: 008051c (design note + ROADMAP insert) · 440358f (`events_state.py` module + 33 unit tests) · bd56047 (main.py integration + workflow state-branch plumbing + zero-new-messages test) · 7528267 (retire `future_events.json`; one-time bootstrap).
 
-### 5. [ ] Per-event `.ics` export button
+### 5. [x] Per-event `.ics` export button — 52ebd73 … 2082da8
 
-Embed the `.ics` body in a `data-ics` attribute on each card; a small "Add to calendar" button (next to Ignore) runs a JS handler that turns the attribute into a Blob download. The RFC 5545 generation lives in `process_events.py`. `DTSTART` uses `TZID=America/New_York` with a single `VTIMEZONE` block; all-day events use `VALUE=DATE` and no TZ. `UID` is tied to the 12-char event ID so re-imports overwrite rather than duplicate. Snapshot-test the `.ics` strings as part of the pytest suite.
+RFC 5545 generator in `scripts/process_events.py` (`build_ics`) plus an "Add to calendar" anchor on every dated card. Initial implementation was a `Blob` download from an inline `data-ics` attribute, but live testing on iOS showed Safari/Edge/Chrome all route `.ics` downloads through the Files app and offer the wrong default handler (Reminders instead of Calendar). Pivoted to per-event hosted `.ics` files at `docs/ics/{event_id}.ics` linked via `webcal://` scheme — iOS treats `webcal://` as a URL-scheme handoff at the OS level, so Calendar opens directly regardless of browser, with all event fields pre-populated.
 
-Plan approved 2026-04-14, no code yet. Full design + settled decisions + 4-step commit plan at `design/ics-export.md`. Resume there: next concrete action is commit 2 (`build_ics` + helpers + tests + two snapshots). Key judgment calls already locked: unparseable times fall back to all-day; timed events get `DURATION:PT1H`; UID domain is `kidschedules.holmes1371.github.io`; button only renders on dated cards.
+Architecture (final): `write_ics_files()` wipes and repopulates `docs/ics/` on every non-dry-run; `_webcal_base(pages_url)` strips the scheme and returns the host+path used to build the anchor href; render gracefully omits the button when `pages_url` is empty (dev preview). UID stays `{event_id}@kidschedules.holmes1371.github.io` (opaque — UIDs don't need to resolve); timed events get `DTSTART;TZID=America/New_York` + `DURATION:PT1H` + a single hand-coded `VTIMEZONE`; all-day events get `VALUE=DATE` with exclusive `DTEND`. No workflow change needed — `docs/` is rebuilt each run and uploaded via `actions/upload-pages-artifact`.
+
+Commit trail: 52ebd73 (design note + ROADMAP insert) · e0a8aa6 (`build_ics` + helpers + snapshots + parser tests) · 8c060b9 (UI card — Blob version, superseded) · 2082da8 (pivot to hosted files + webcal://, final).
+
+Design note: `design/ics-export.md` (includes the pivot rationale).
 
 ### 6. [ ] Manual "refresh now" button in the UI
 
