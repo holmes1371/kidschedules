@@ -131,6 +131,55 @@ def _ics_escape(s: str) -> str:
     )
 
 
+def _webcal_base(pages_url: str) -> str:
+    """Return the webcal-ready 'host/path/' for pages_url, or ''.
+
+    'https://holmes1371.github.io/kidschedules/' → 'holmes1371.github.io/kidschedules/'.
+    Empty or malformed pages_url returns ''; callers must gate on that to
+    decide whether to render the Add-to-calendar button at all.
+    """
+    s = (pages_url or "").strip()
+    if not s:
+        return ""
+    for prefix in ("https://", "http://"):
+        if s.startswith(prefix):
+            s = s[len(prefix):]
+            break
+    if not s.endswith("/"):
+        s += "/"
+    return s
+
+
+def write_ics_files(events: list[dict[str, Any]], out_dir: str,
+                    now: dt.datetime | None = None) -> int:
+    """Wipe out_dir of .ics files and write one per dated event.
+
+    Filename is '{event_id}.ics' (stable 12-char sha1). Events that fail
+    build_ics (undated, bad date) are skipped. Returns count written.
+    """
+    os.makedirs(out_dir, exist_ok=True)
+    for name in os.listdir(out_dir):
+        if name.endswith(".ics"):
+            try:
+                os.unlink(os.path.join(out_dir, name))
+            except OSError:
+                pass
+    count = 0
+    for ev in events:
+        try:
+            body = build_ics(ev, now=now)
+        except ValueError:
+            continue
+        eid = ev.get("id") or _event_id(
+            ev.get("name", ""), ev.get("date", ""), ev.get("child", "")
+        )
+        path = os.path.join(out_dir, f"{eid}.ics")
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(body)
+        count += 1
+    return count
+
+
 def build_ics(ev: dict[str, Any], now: dt.datetime | None = None) -> str:
     """Emit a VCALENDAR string for a single dated event.
 
@@ -464,13 +513,20 @@ def render_html(today: dt.date,
                 undated: list[dict[str, Any]],
                 total_future: int,
                 lookback_days: int,
-                webhook_url: str = "") -> str:
+                webhook_url: str = "",
+                pages_url: str = "") -> str:
     """Render a complete, self-contained HTML page for GitHub Pages.
 
     webhook_url: if non-empty, the rendered page will POST ignore decisions
     to this URL (expected to be a Google Apps Script web app). If empty,
     Ignore clicks only hide the card locally via localStorage.
+
+    pages_url: if non-empty, each dated card gets an Add-to-calendar link
+    pointing at `webcal://<host>/<path>/ics/<event_id>.ics`. Empty
+    pages_url hides the button (e.g. dev preview without a deploy URL).
     """
+
+    webcal_base = _webcal_base(pages_url)
 
     def _event_card(ev: dict[str, Any]) -> str:
         d: dt.date = ev["_date_obj"]
@@ -480,15 +536,17 @@ def render_html(today: dt.date,
         month_day = d.strftime("%B %-d")
         child_html = (f'<span class="child">{ev["child"]}</span> &middot; '
                       if ev["child"] else "")
-        ics_body = _html.escape(build_ics(ev), quote=True)
-        ics_filename = f"{_ics_slug(ev['name'])}-{ev['date']}.ics"
+        ics_btn_html = ""
+        if webcal_base:
+            ics_href = f"webcal://{webcal_base}ics/{ev['id']}.ics"
+            ics_btn_html = (
+                f'<a class="ics-btn" href="{ics_href}" '
+                f'aria-label="Add this event to your calendar">Add to calendar</a>\n        '
+            )
         return f"""\
       <div class="event-card" data-event-id="{ev["id"]}"
-           data-ics="{ics_body}" data-ics-filename="{ics_filename}"
            style="border-left: 4px solid {fg};">
-        <button class="ics-btn" aria-label="Add this event to your calendar"
-                type="button">Add to calendar</button>
-        <button class="ignore-btn" aria-label="Ignore this event"
+        {ics_btn_html}<button class="ignore-btn" aria-label="Ignore this event"
                 data-event-name="{ev["name"]}" data-event-date="{ev["date"]}"
                 type="button">Ignore</button>
         <div class="event-date">{day_name}, {month_day}</div>
@@ -672,6 +730,8 @@ def render_html(today: dt.date,
       cursor: pointer;
       font-family: inherit;
       line-height: 1.4;
+      display: inline-block;
+      text-decoration: none;
     }}
     .ics-btn:hover {{
       background: var(--border);
@@ -829,25 +889,6 @@ def render_html(today: dt.date,
         }});
       }});
 
-      // Add-to-calendar: each card carries the full .ics body in data-ics.
-      // The handler just pipes it through a Blob download; no network.
-      document.querySelectorAll(".ics-btn").forEach(function (btn) {{
-        btn.addEventListener("click", function () {{
-          var card = btn.closest(".event-card");
-          if (!card) return;
-          var ics = card.getAttribute("data-ics") || "";
-          var filename = card.getAttribute("data-ics-filename") || "event.ics";
-          var blob = new Blob([ics], {{ type: "text/calendar;charset=utf-8" }});
-          var url = URL.createObjectURL(blob);
-          var a = document.createElement("a");
-          a.href = url;
-          a.download = filename;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          setTimeout(function () {{ URL.revokeObjectURL(url); }}, 100);
-        }});
-      }});
     }})();
   </script>
 </body>
@@ -958,6 +999,10 @@ def main() -> int:
                    help="Write weekly Gmail digest plain-text body here.")
     p.add_argument("--pages-url", default="",
                    help="GitHub Pages URL to link from the weekly digest.")
+    p.add_argument("--ics-out-dir", default="",
+                   help="If set, wipe the directory and write one .ics per "
+                        "displayed event ({event_id}.ics). The rendered "
+                        "page links to webcal://<pages-host>/ics/<id>.ics.")
     args = p.parse_args()
 
     today = (dt.date.fromisoformat(args.today) if args.today
@@ -982,9 +1027,14 @@ def main() -> int:
 
     if args.html_out:
         html = render_html(today, weeks, undated, len(display),
-                           args.lookback_days, webhook_url=args.webhook_url)
+                           args.lookback_days, webhook_url=args.webhook_url,
+                           pages_url=args.pages_url)
         with open(args.html_out, "w", encoding="utf-8") as f:
             f.write(html)
+
+    if args.ics_out_dir:
+        count = write_ics_files(display, args.ics_out_dir)
+        print(f"Wrote {count} .ics files to {args.ics_out_dir}", file=sys.stderr)
 
     digest_text = render_digest_text(weeks, today, pages_url=args.pages_url)
     digest_html = render_digest_html(weeks, today, pages_url=args.pages_url)

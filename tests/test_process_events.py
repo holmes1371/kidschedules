@@ -279,9 +279,10 @@ def test_render_html_empty_state_when_no_events():
     assert 'class="event-card undated"' not in html
 
 
-def test_render_html_includes_ics_button_and_body():
-    """Every dated card gets an Add-to-calendar button and an .ics body
-    attribute; undated cards skip the button entirely."""
+def test_render_html_ics_button_is_webcal_link():
+    """Every dated card gets a webcal:// Add-to-calendar anchor when a
+    pages_url is supplied; undated cards never do. Empty pages_url
+    suppresses the button entirely."""
     display = _classified_display("basic_mixed")
     display = pe.dedupe(display)
     events = load_fixture("basic_mixed")
@@ -292,24 +293,46 @@ def test_render_html_includes_ics_button_and_body():
     html = pe.render_html(
         today=TODAY, weeks=weeks, undated=undated,
         total_future=len(display), lookback_days=60, webhook_url="",
+        pages_url="https://holmes1371.github.io/kidschedules/",
     )
 
-    # The button text and ICS payload anchor must both appear.
+    # Webcal link with stable event-ID filename under the pages path.
     assert "Add to calendar" in html
-    assert 'data-ics="BEGIN:VCALENDAR' in html
+    assert 'href="webcal://holmes1371.github.io/kidschedules/ics/' in html
 
-    # Filenames follow <slug>-<YYYY-MM-DD>.ics.
-    assert 'data-ics-filename="spring-concert-2026-04-23.ics"' in html
-    assert 'data-ics-filename="book-report-due-2026-04-17.ics"' in html
+    # At least one timed and one all-day event ID should appear in an href.
+    # Use event_id helper (same one production uses) to derive expected IDs.
+    timed = next(e for e in display if e["name"] == "Spring Concert")
+    allday = next(e for e in display if e["name"] == "Book Report Due")
+    assert f'href="webcal://holmes1371.github.io/kidschedules/ics/{timed["id"]}.ics"' in html
+    assert f'href="webcal://holmes1371.github.io/kidschedules/ics/{allday["id"]}.ics"' in html
 
-    # The undated section has no .ics button — no valid DTSTART to emit.
+    # No inline .ics body on any card — we host the files now.
+    assert "data-ics=" not in html
+
+    # Undated cards have no button.
     undated_card_start = html.find('class="event-card undated"')
     assert undated_card_start != -1, "expected an undated card in this fixture"
-    # Look at the slice from the undated card to the next <div class="event-card"
-    # or the end of the undated section's containing block.
     undated_slice = html[undated_card_start:undated_card_start + 1500]
     assert "Add to calendar" not in undated_slice
-    assert "data-ics=" not in undated_slice
+    assert "webcal://" not in undated_slice
+
+
+def test_render_html_omits_ics_button_when_pages_url_empty():
+    """No pages_url → no webcal host → no button. Dev preview degrades
+    gracefully rather than emitting a broken link."""
+    display = _classified_display("basic_mixed")
+    display = pe.dedupe(display)
+    weeks = pe.group_by_week(display)
+
+    html = pe.render_html(
+        today=TODAY, weeks=weeks, undated=[],
+        total_future=len(display), lookback_days=60, webhook_url="",
+        pages_url="",
+    )
+
+    assert "Add to calendar" not in html
+    assert "webcal://" not in html
 
 
 # ─── subject + metadata ──────────────────────────────────────────────────
@@ -526,3 +549,59 @@ def test_build_ics_rejects_undated_event():
     ev = {"name": "TBD", "date": "", "time": "", "child": ""}
     with pytest.raises(ValueError):
         pe.build_ics(ev, now=ICS_NOW)
+
+
+@pytest.mark.parametrize("raw,expected", [
+    ("https://holmes1371.github.io/kidschedules/", "holmes1371.github.io/kidschedules/"),
+    ("http://example.com/x", "example.com/x/"),
+    ("holmes1371.github.io/kidschedules/", "holmes1371.github.io/kidschedules/"),
+    ("", ""),
+    ("   ", ""),
+    ("https://a.b/", "a.b/"),
+])
+def test_webcal_base(raw, expected):
+    assert pe._webcal_base(raw) == expected
+
+
+def test_write_ics_files_writes_one_per_event_and_wipes_stale(tmp_path):
+    """write_ics_files should write {event_id}.ics per dated event and
+    remove any .ics file that isn't in the current set."""
+    out_dir = tmp_path / "ics"
+    out_dir.mkdir()
+    # Pre-seed a stale .ics and an unrelated file that must survive.
+    (out_dir / "stale123.ics").write_text("STALE", encoding="utf-8")
+    (out_dir / "keepme.txt").write_text("KEEP", encoding="utf-8")
+
+    display = _classified_display("basic_mixed")
+    display = pe.dedupe(display)
+
+    count = pe.write_ics_files(display, str(out_dir), now=ICS_NOW)
+
+    assert count == len(display)
+    # Stale file is gone.
+    assert not (out_dir / "stale123.ics").exists()
+    # Non-.ics file is untouched.
+    assert (out_dir / "keepme.txt").read_text() == "KEEP"
+    # Every dated event has a file at {id}.ics with a VCALENDAR body.
+    for ev in display:
+        fp = out_dir / f"{ev['id']}.ics"
+        assert fp.exists()
+        body = fp.read_text()
+        assert body.startswith("BEGIN:VCALENDAR")
+        assert f"UID:{ev['id']}@" in body
+
+
+def test_write_ics_files_skips_undated_events(tmp_path):
+    """Events with no parseable date cause build_ics to raise; the writer
+    should silently skip them rather than crashing the whole run."""
+    out_dir = tmp_path / "ics"
+    events = [
+        {"id": "abc123def456", "name": "TBD event", "date": "", "time": "",
+         "location": "", "child": "", "source": ""},
+        {"id": "f00dcafe0000", "name": "Real Event", "date": "2026-04-20",
+         "time": "10:00 AM", "location": "", "child": "", "source": ""},
+    ]
+    count = pe.write_ics_files(events, str(out_dir), now=ICS_NOW)
+    assert count == 1
+    assert (out_dir / "f00dcafe0000.ics").exists()
+    assert not (out_dir / "abc123def456.ics").exists()

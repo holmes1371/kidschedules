@@ -402,6 +402,7 @@ def step3b_update_auto_blocklist(
 def step4_process_events(
     candidates: list[dict[str, Any]],
     pages_url: str = "",
+    dry_run: bool = False,
 ) -> tuple[str, str, dict, str, str]:
     """Run process_events.py and return (html, body_text, meta,
     digest_text, digest_html).
@@ -437,21 +438,23 @@ def step4_process_events(
 
     try:
         webhook_url = _load_webhook_url()
-        run_script(
-            "process_events.py",
-            [
-                "--candidates", candidates_path,
-                "--body-out", body_path,
-                "--html-out", html_path,
-                "--meta-out", meta_path,
-                "--digest-text-out", digest_text_path,
-                "--digest-html-out", digest_html_path,
-                "--pages-url", pages_url,
-                "--display-window-days", "60",
-                "--webhook-url", webhook_url,
-                "--ignored", IGNORED_EVENTS_PATH,
-            ],
-        )
+        script_args = [
+            "--candidates", candidates_path,
+            "--body-out", body_path,
+            "--html-out", html_path,
+            "--meta-out", meta_path,
+            "--digest-text-out", digest_text_path,
+            "--digest-html-out", digest_html_path,
+            "--pages-url", pages_url,
+            "--display-window-days", "60",
+            "--webhook-url", webhook_url,
+            "--ignored", IGNORED_EVENTS_PATH,
+        ]
+        # Per-event .ics files land in docs/ics/ for the Pages artifact to
+        # pick up; skipped on dry-run to avoid churning the publish dir.
+        if not dry_run:
+            script_args += ["--ics-out-dir", os.path.join(PAGES_OUTPUT_DIR, "ics")]
+        run_script("process_events.py", script_args)
 
         with open(body_path, "r", encoding="utf-8") as f:
             body = f.read()
@@ -648,6 +651,7 @@ def main() -> int:
     pages_url = _load_pages_url()
     html, body, meta, digest_text, digest_html = step4_process_events(
         list(state["events"].values()), pages_url=pages_url,
+        dry_run=args.dry_run,
     )
 
     # Step 5: Publish
