@@ -527,18 +527,19 @@ def test_render_html_js_ignore_sender_queries_sibling_cards():
 
 def test_render_html_js_ignore_sender_hides_siblings_and_bumps_counter():
     html, _ = _render_ignored_fixture(ignored_names=())
-    # Sweep path calls setIgnored on each sibling and bumps the counter by
-    # the number actually swept — not the total siblings (already-ignored
+    # Sweep path tags each sibling with reason=sender and bumps the counter
+    # by the number actually swept — not the total siblings (already-ignored
     # cards are skipped to avoid double-counting).
-    assert "setIgnored(card)" in html
+    assert 'setIgnored(card, "sender")' in html
     assert "bumpToggle(swept.length)" in html
 
 
 def test_render_html_js_ignore_sender_reverts_sweep_on_failure():
     html, _ = _render_ignored_fixture(ignored_names=())
-    # On POST failure every swept card must be restored, its id dropped from
-    # localStorage, and the counter decremented to match.
-    assert "setActive(s.card)" in html
+    # On POST failure every swept card is restored, the domain is dropped
+    # from the ignored-senders store, and the counter is decremented.
+    assert "setActive(card)" in html
+    assert "saveIgnoredSenders(remainingSenders)" in html
     assert "bumpToggle(-swept.length)" in html
 
 
@@ -577,6 +578,93 @@ def test_render_html_js_unignore_event_still_decrements_counter():
     assert u_start != -1
     # Scan forward a bounded window for the decrement call.
     assert "bumpToggle(-1)" in html[u_start:u_start + 1500]
+
+
+# ─── Unignore-sender + sender-column schema bump (sub-item 14) ────────────
+
+# Sub-item 14 adds the unignore-sender action, a dedicated
+# `kids_schedule_ignored_senders` localStorage key, a `data-ignored-reason`
+# attribute on cards, and flips both Unignore paths to optimistic so their
+# latency matches Ignore.
+
+
+def test_render_html_ignored_card_carries_ignored_reason_event():
+    html, by_name = _render_ignored_fixture(("Ignored With Sender",))
+    ev = by_name["Ignored With Sender"]
+    start = html.find(f'data-event-id="{ev["id"]}"')
+    assert start != -1
+    card = html[html.rfind("<div", 0, start):html.find("</div>", start) + 6]
+    # Server-side is_ignored always means reason=event (individual ignore
+    # from ignored_events.json). Sender-swept state is client-only.
+    assert 'data-ignored-reason="event"' in card
+
+
+def test_render_html_css_hides_ignore_sender_btn_on_ignored_card():
+    html, _ = _render_ignored_fixture(ignored_names=())
+    # CSS rule must hide the Ignore-sender button once a card is in the
+    # ignored state (regardless of reason). Simpler than re-rendering.
+    assert '.event-card[data-ignored="1"] .ignore-sender-btn' in html
+    assert "display: none" in html
+
+
+def test_render_html_js_ignore_event_posts_sender():
+    html, _ = _render_ignored_fixture(ignored_names=())
+    # Ignore payload now carries sender so the Apps Script can tag the row
+    # for later bulk-delete by Unignore-sender.
+    assert "sender: sender" in html
+    assert 'action: "ignore"' in html or '"action": "ignore"' in html
+
+
+def test_render_html_js_ignore_sender_uses_senders_storage_key():
+    html, _ = _render_ignored_fixture(ignored_names=())
+    # Under X semantics, sender-sweep persists only the domain — not the
+    # swept event-ids — so Ignored Events stays a pure record of individual
+    # user ignores.
+    assert 'SENDERS_STORAGE_KEY = "kids_schedule_ignored_senders"' in html
+    assert "saveIgnoredSenders(currentSenders)" in html
+
+
+def test_render_html_js_has_unignore_sender_handler():
+    html, _ = _render_ignored_fixture(ignored_names=())
+    # New click branch + new POST action.
+    assert 'classList.contains("unignore-sender-btn")' in html
+    assert 'action: "unignore_sender"' in html or '"action": "unignore_sender"' in html
+
+
+def test_render_html_js_unignore_sender_restores_all_matching_cards():
+    html, _ = _render_ignored_fixture(ignored_names=())
+    u_start = html.find('classList.contains("unignore-sender-btn")')
+    assert u_start != -1
+    branch = html[u_start:u_start + 3000]
+    # Walks every card with matching data-sender and setActive's the ignored ones.
+    assert ".event-card[data-sender=" in branch
+    assert "setActive(card)" in branch
+    # Event-reason ids are dropped from the ids store, domain dropped from senders.
+    assert "saveIgnoredSenders(remainingDomains)" in branch
+    assert "bumpToggle(-restored.length)" in branch
+
+
+def test_render_html_js_unignore_event_is_optimistic():
+    html, _ = _render_ignored_fixture(ignored_names=())
+    u_start = html.find('classList.contains("unignore-btn")')
+    assert u_start != -1
+    # Bounded window covering just the unignore-event branch.
+    branch = html[u_start:u_start + 1200]
+    # Optimistic: setActive fires before the POST, not inside its .then.
+    set_active_pos = branch.find("setActive(ucard)")
+    post_pos = branch.find('postAction({ action: "unignore"')
+    assert set_active_pos != -1
+    assert post_pos != -1
+    assert set_active_pos < post_pos
+
+
+def test_render_html_js_hydration_reads_both_stores():
+    html, _ = _render_ignored_fixture(ignored_names=())
+    # Hydration now applies sender-swept state (reason=sender) before
+    # individually-ignored ids (reason=event takes precedence on overlap).
+    assert "loadIgnoredSenders()" in html
+    assert 'setIgnored(card, "sender")' in html
+    assert 'setIgnored(card, "event")' in html
 
 
 # ─── subject + metadata ──────────────────────────────────────────────────

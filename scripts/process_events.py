@@ -637,7 +637,11 @@ def render_html(today: dt.date,
             )
         is_ignored = bool(ev.get("is_ignored"))
         ignored_class = " ignored" if is_ignored else ""
-        ignored_attr = ' data-ignored="1"' if is_ignored else ""
+        # Server-side is_ignored always reflects ignored_events.json (i.e.
+        # an individually-ignored event). Sender-swept state is client-only
+        # and gets written via setIgnored(card, "sender") during hydration.
+        ignored_attr = (' data-ignored="1" data-ignored-reason="event"'
+                        if is_ignored else "")
         card_style = (f"display:none; border-left: 4px solid {fg};" if is_ignored
                       else f"border-left: 4px solid {fg};")
         if is_ignored:
@@ -852,7 +856,7 @@ def render_html(today: dt.date,
       flex-wrap: wrap;
       margin-bottom: 0.25rem;
     }}
-    .ignore-btn, .unignore-btn {{
+    .ignore-btn, .unignore-btn, .unignore-sender-btn {{
       border-radius: 4px;
       padding: 0.2rem 0.55rem;
       font-size: 0.72rem;
@@ -870,13 +874,20 @@ def render_html(today: dt.date,
       background: var(--border);
       color: var(--text);
     }}
-    .unignore-btn {{
+    .unignore-btn, .unignore-sender-btn {{
       background: #0d652d;
       color: #ceead6;
       border: 1px solid #0d652d;
     }}
-    .unignore-btn:hover {{
+    .unignore-btn:hover, .unignore-sender-btn:hover {{
       filter: brightness(1.15);
+    }}
+    /* Hide the Ignore-sender button on ignored cards — for sender-swept
+       cards it's meaningless (the sender is already ignored), and for
+       event-ignored cards the Unignore-event affordance is what the user
+       wants. Unignore-sender lives in the top action row via class swap. */
+    .event-card[data-ignored="1"] .ignore-sender-btn {{
+      display: none;
     }}
     .event-card.ignored {{
       display: none;
@@ -1033,7 +1044,7 @@ def render_html(today: dt.date,
         --border: #3c4043;
         --accent: #8ab4f8;
       }}
-      .unignore-btn {{
+      .unignore-btn, .unignore-sender-btn {{
         background: #1e8e3e;
         color: #e6f4ea;
         border: 1px solid #1e8e3e;
@@ -1061,7 +1072,8 @@ def render_html(today: dt.date,
   <script>
     (function () {{
       var WEBHOOK_URL = {json.dumps(webhook_url)};
-      var STORAGE_KEY = "kids_schedule_ignored_ids";
+      var STORAGE_KEY         = "kids_schedule_ignored_ids";
+      var SENDERS_STORAGE_KEY = "kids_schedule_ignored_senders";
 
       function loadIgnored() {{
         try {{
@@ -1073,6 +1085,19 @@ def render_html(today: dt.date,
       }}
       function saveIgnored(ids) {{
         try {{ localStorage.setItem(STORAGE_KEY, JSON.stringify(ids)); }}
+        catch (e) {{ /* storage unavailable */ }}
+      }}
+
+      function loadIgnoredSenders() {{
+        try {{
+          var raw = localStorage.getItem(SENDERS_STORAGE_KEY);
+          return raw ? JSON.parse(raw) : [];
+        }} catch (e) {{
+          return [];
+        }}
+      }}
+      function saveIgnoredSenders(domains) {{
+        try {{ localStorage.setItem(SENDERS_STORAGE_KEY, JSON.stringify(domains)); }}
         catch (e) {{ /* storage unavailable */ }}
       }}
 
@@ -1095,15 +1120,31 @@ def render_html(today: dt.date,
       }}
 
       // ── Card state swap helpers ───────────────────────────
-      function setIgnored(card) {{
+      // `reason` is "event" (default) or "sender". It drives both the
+      // data-ignored-reason attribute (used by CSS + the click router to
+      // dispatch the right Unignore action) and the button's label/class.
+      function setIgnored(card, reason) {{
+        var r = reason === "sender" ? "sender" : "event";
         card.classList.add("ignored");
         card.style.display = "none";
         card.setAttribute("data-ignored", "1");
-        var btn = card.querySelector(".ignore-btn");
+        card.setAttribute("data-ignored-reason", r);
+        var btn = card.querySelector(
+          ".ignore-btn, .unignore-btn, .unignore-sender-btn"
+        );
         if (btn) {{
-          btn.className = "unignore-btn";
-          btn.textContent = "Unignore event";
-          btn.setAttribute("aria-label", "Unignore this event");
+          if (r === "sender") {{
+            var domain = card.getAttribute("data-sender") || "";
+            btn.className = "unignore-sender-btn";
+            btn.textContent = domain
+              ? "Unignore sender (" + domain + ")"
+              : "Unignore sender";
+            btn.setAttribute("aria-label", "Unignore this sender");
+          }} else {{
+            btn.className = "unignore-btn";
+            btn.textContent = "Unignore event";
+            btn.setAttribute("aria-label", "Unignore this event");
+          }}
           btn.disabled = false;
         }}
       }}
@@ -1111,7 +1152,8 @@ def render_html(today: dt.date,
         card.classList.remove("ignored");
         card.style.display = "";
         card.removeAttribute("data-ignored");
-        var btn = card.querySelector(".unignore-btn");
+        card.removeAttribute("data-ignored-reason");
+        var btn = card.querySelector(".unignore-btn, .unignore-sender-btn");
         if (btn) {{
           btn.className = "ignore-btn";
           btn.textContent = "Ignore event";
@@ -1160,14 +1202,23 @@ def render_html(today: dt.date,
       }}
 
       // ── localStorage hydration ────────────────────────────
-      // For each locally-stored id, hide the matching card AND swap its
-      // button to Unignore so the Show-ignored toggle + Unignore flow work
-      // before the next workflow run picks up the server-side list.
+      // Apply sender-swept state first, then individually-ignored ids.
+      // Ids take precedence because the event-level ignore is a deliberate
+      // per-card user choice that should win over a bulk sender sweep.
+      var localSenders = loadIgnoredSenders();
+      if (localSenders.length) {{
+        document.querySelectorAll(".event-card[data-sender]").forEach(function (card) {{
+          if (localSenders.indexOf(card.getAttribute("data-sender")) === -1) return;
+          if (card.getAttribute("data-ignored") === "1") return;
+          setIgnored(card, "sender");
+        }});
+      }}
       var localIds = loadIgnored();
       document.querySelectorAll(".event-card[data-event-id]").forEach(function (card) {{
         if (localIds.indexOf(card.getAttribute("data-event-id")) === -1) return;
-        if (card.getAttribute("data-ignored") === "1") return;
-        setIgnored(card);
+        // If already sender-ignored, upgrade to reason=event so Unignore-event
+        // is the surfaced affordance.
+        setIgnored(card, "event");
       }});
 
       // ── POST helper ───────────────────────────────────────
@@ -1184,24 +1235,29 @@ def render_html(today: dt.date,
       document.addEventListener("click", function (e) {{
         var t = e.target;
 
-        // Ignore event — optimistic hide, restore on failure.
+        // Ignore event — optimistic hide, restore on failure. Sender is
+        // included in the POST so the Apps Script can tag the Ignored
+        // Events row for later bulk-delete by Unignore-sender.
         if (t.classList.contains("ignore-btn")) {{
           var card = t.closest(".event-card");
           if (!card) return;
           var id = card.getAttribute("data-event-id");
           var name = t.getAttribute("data-event-name") || "";
           var date = t.getAttribute("data-event-date") || "";
+          var sender = card.getAttribute("data-sender") || "";
           t.disabled = true;
           var current = loadIgnored();
           if (current.indexOf(id) === -1) current.push(id);
           saveIgnored(current);
           card.classList.add("fading");
           setTimeout(function () {{
-            setIgnored(card);
+            setIgnored(card, "event");
             card.classList.remove("fading");
           }}, 300);
           bumpToggle(1);
-          postAction({{ action: "ignore", id: id, name: name, date: date }}).catch(function () {{
+          postAction({{
+            action: "ignore", id: id, name: name, date: date, sender: sender
+          }}).catch(function () {{
             setActive(card);
             var remaining = loadIgnored().filter(function (x) {{ return x !== id; }});
             saveIgnored(remaining);
@@ -1211,19 +1267,23 @@ def render_html(today: dt.date,
           return;
         }}
 
-        // Unignore event — pessimistic, apply only after 2xx.
+        // Unignore event — optimistic reveal, restore on failure. Matches
+        // the Ignore latency; the POST runs in the background.
         if (t.classList.contains("unignore-btn")) {{
           var ucard = t.closest(".event-card");
           if (!ucard) return;
           var uid = ucard.getAttribute("data-event-id");
           t.disabled = true;
-          postAction({{ action: "unignore", id: uid }}).then(function () {{
-            setActive(ucard);
-            var remaining = loadIgnored().filter(function (x) {{ return x !== uid; }});
-            saveIgnored(remaining);
-            bumpToggle(-1);
-          }}).catch(function () {{
-            t.disabled = false;
+          setActive(ucard);
+          var remainingU = loadIgnored().filter(function (x) {{ return x !== uid; }});
+          saveIgnored(remainingU);
+          bumpToggle(-1);
+          postAction({{ action: "unignore", id: uid }}).catch(function () {{
+            setIgnored(ucard, "event");
+            var restoredU = loadIgnored();
+            if (restoredU.indexOf(uid) === -1) restoredU.push(uid);
+            saveIgnored(restoredU);
+            bumpToggle(1);
             showToast("Unignore failed — try again");
           }});
           return;
@@ -1239,41 +1299,97 @@ def render_html(today: dt.date,
         }}
 
         // Ignore sender — optimistic sweep: hide every sibling card from the
-        // same domain locally, persist their IDs to the shared ignored-events
-        // store, and bump the counter by the number newly hidden. Revert the
-        // whole sweep on POST failure. No fade (staggered fades across many
-        // cards read as jank; the toast covers the "something happened" cue).
+        // same domain locally under reason=sender, persist the domain to the
+        // ignored-senders store, and bump the counter by the number newly
+        // hidden. Event-ids are deliberately NOT pushed to the ignored-events
+        // store — the Gmail query already excludes this sender on the next
+        // build, so those events won't be fetched. Keeping Ignored Events
+        // as a pure record of individual user ignores makes Unignore-sender
+        // a clean single-delete on the sheet.
         if (t.classList.contains("ignore-sender-btn")) {{
           var domain = t.getAttribute("data-sender") || "";
           if (!domain) return;
           t.disabled = true;
+          var currentSenders = loadIgnoredSenders();
+          if (currentSenders.indexOf(domain) === -1) currentSenders.push(domain);
+          saveIgnoredSenders(currentSenders);
           var siblings = document.querySelectorAll(
             '.event-card[data-sender="' + domain + '"]'
           );
-          var current = loadIgnored();
           var swept = [];
           siblings.forEach(function (card) {{
             if (card.getAttribute("data-ignored") === "1") return;
-            var sid = card.getAttribute("data-event-id");
-            if (!sid) return;
-            if (current.indexOf(sid) === -1) current.push(sid);
-            setIgnored(card);
-            swept.push({{ id: sid, card: card }});
+            setIgnored(card, "sender");
+            swept.push(card);
           }});
-          saveIgnored(current);
           if (swept.length) bumpToggle(swept.length);
           postAction({{ action: "ignore_sender", domain: domain }}).then(function () {{
             showToast("Ignoring " + domain + ". New events will stop appearing after the next refresh.");
           }}).catch(function () {{
-            swept.forEach(function (s) {{ setActive(s.card); }});
-            var sweptIds = swept.map(function (s) {{ return s.id; }});
-            var remaining = loadIgnored().filter(function (x) {{
-              return sweptIds.indexOf(x) === -1;
+            swept.forEach(function (card) {{ setActive(card); }});
+            var remainingSenders = loadIgnoredSenders().filter(function (d) {{
+              return d !== domain;
             }});
-            saveIgnored(remaining);
+            saveIgnoredSenders(remainingSenders);
             if (swept.length) bumpToggle(-swept.length);
             t.disabled = false;
             showToast("Ignore failed — try again");
+          }});
+          return;
+        }}
+
+        // Unignore sender — optimistic: reveal every card from this sender
+        // (whether sender-swept or individually ignored), drop matching ids
+        // and the domain from localStorage, and POST unignore_sender. The
+        // server-side handler clears both the Ignored Senders row and every
+        // Ignored Events row tagged with this sender — so independently-
+        // ignored events also come back, matching the "clean slate for this
+        // sender" intent. Revert the full restore on POST failure.
+        if (t.classList.contains("unignore-sender-btn")) {{
+          var scard = t.closest(".event-card");
+          if (!scard) return;
+          var sdomain = scard.getAttribute("data-sender") || "";
+          if (!sdomain) return;
+          t.disabled = true;
+          var restored = [];
+          document.querySelectorAll(
+            '.event-card[data-sender="' + sdomain + '"]'
+          ).forEach(function (card) {{
+            if (card.getAttribute("data-ignored") !== "1") return;
+            var cid = card.getAttribute("data-event-id");
+            var creason = card.getAttribute("data-ignored-reason") || "event";
+            setActive(card);
+            restored.push({{ card: card, id: cid, reason: creason }});
+          }});
+          var restoredEventIds = restored
+            .filter(function (r) {{ return r.reason === "event"; }})
+            .map(function (r) {{ return r.id; }});
+          if (restoredEventIds.length) {{
+            var remainingIds = loadIgnored().filter(function (x) {{
+              return restoredEventIds.indexOf(x) === -1;
+            }});
+            saveIgnored(remainingIds);
+          }}
+          var remainingDomains = loadIgnoredSenders().filter(function (d) {{
+            return d !== sdomain;
+          }});
+          saveIgnoredSenders(remainingDomains);
+          if (restored.length) bumpToggle(-restored.length);
+          postAction({{ action: "unignore_sender", domain: sdomain }}).catch(function () {{
+            restored.forEach(function (r) {{ setIgnored(r.card, r.reason); }});
+            if (restoredEventIds.length) {{
+              var currentIds = loadIgnored();
+              restoredEventIds.forEach(function (id) {{
+                if (currentIds.indexOf(id) === -1) currentIds.push(id);
+              }});
+              saveIgnored(currentIds);
+            }}
+            var currentDomains = loadIgnoredSenders();
+            if (currentDomains.indexOf(sdomain) === -1) currentDomains.push(sdomain);
+            saveIgnoredSenders(currentDomains);
+            if (restored.length) bumpToggle(restored.length);
+            t.disabled = false;
+            showToast("Unignore failed — try again");
           }});
           return;
         }}
