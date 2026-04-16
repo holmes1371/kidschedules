@@ -217,6 +217,23 @@ Ripple through the commit plan:
 
 Responsibility table stays accurate — the table now reads "`sync_ignored_senders.py` owns fetch + normalize + dedup + write", no other changes.
 
+## Closing the gap (2026-04-15)
+
+The step 1–10 commits shipped the end-to-end Ignore-sender UI and the Apps Script round-trip, but `ignored_senders.json` was only being read by the render pass (to drive the Show ignored toggle's sender-tab lookup) — never by `build_queries.py`, the component that actually constructs the Gmail exclusion clause. The symptom: clicking "Ignore sender" hid the card locally and wrote a row into the sheet, but next week's search still pulled mail from that sender and the event came back.
+
+Fix (commit `e97f1b0`): `build_queries.py` gained `load_ignored_senders()` and an `--ignored-senders` CLI flag defaulting to `ignored_senders.json` at the repo root. The loader is tolerant of a missing or malformed file — the sync helper degrades gracefully on network failure, and this side matches that posture. The union dedupes case-insensitively against the hand-curated and auto blocklists so a repeat UI click doesn't inflate the clause. The `exclusions` meta block emits `blocklist_size_ignored_senders` and the pipeline log prints the three-way breakdown (`hand + auto + UI-ignored`). `main.py` threads `IGNORED_SENDERS_PATH` into the step-1 call; the workflow already writes `ignored_senders.json` to the runner cwd before `main.py` runs, so the workflow needed no change.
+
+## Protected senders guardrail (2026-04-15)
+
+The NEVER-add prose comment at the top of `blocklist.txt` lists domains the user must never block at the Gmail-query level — schools, PTAs, team-management platforms, and health providers — because they carry real kids' events even when the subject line looks promotional. The shipped Ignore-sender button had no code-level enforcement of that guidance; a user could click "Ignore sender (louisearcherpta.org)" and silently drop future field-trip notices.
+
+Fix (commit `2393d31`): `protected_senders.txt` at the repo root (seeded from the NEVER-add list: `fcps.edu`, `*pta.org`, `*ptsa.org`, `jackrabbittech.com`, `teamsnap.com`, `signupgenius.com`, `myschoolbucks.com`, `lifetouch.com`) plus a shared loader in `scripts/protected_senders.py`. Two independent consumers read the same file:
+
+- `process_events.render_html` — suppresses the `<button class="ignore-sender-btn">` element on any card whose `sender_domain` matches a protected pattern, so the user can't click it. The Ignore-event button on the same card is unaffected.
+- `build_queries.main` — filters protected domains out of the `ignored_senders.json` → Gmail-exclusion union as defense in depth, so a stale sheet row, a direct sheet edit, or a bug upstream can't land a protected domain in the Gmail query even if the button were somehow bypassed.
+
+File format is documented at the top of `protected_senders.txt` itself — bare domain (exact match), `*`-prefix (suffix match), `#`-comments, case-insensitive. Adding a domain is a single-line commit, no code changes needed, so a future agent (or Ellen herself) can extend the list without reading either consumer.
+
 ## Open for future work
 
 Not doing now (explicit non-goals):

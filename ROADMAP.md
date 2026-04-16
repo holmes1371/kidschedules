@@ -74,7 +74,7 @@ Commit trail: 52ebd73 (design note + ROADMAP insert) · e0a8aa6 (`build_ics` + h
 
 Design note: `design/ics-export.md` (includes both pivot rationales).
 
-### 6. [~] Undo recently ignored + 7. "Ignore sender" (bundled)
+### 6. [x] Undo recently ignored + 7. "Ignore sender" (bundled)
 
 Bundled because they share all their surfaces — Apps Script routing, a second Google Sheet tab, client-side button/toggle work in the rendered HTML, and a new workflow sync step. Full design: `design/ignore-undo-and-block-sender.md` (includes locked decisions, 10-step commit plan, responsibility table, non-goals).
 
@@ -90,10 +90,10 @@ Progress against the 10-step commit plan:
 6. [x] `scripts/apps_script.gs` action router (`ignore` / `unignore` / `ignore_sender`; `?kind=ignored_senders` GET route; second tab "Ignored Senders") — 9935d60
 7. [x] `scripts/sync_ignored_senders.py` fetch-and-write helper + 13 unit tests — 8d51750
 8. [x] Workflow "Sync ignored senders" step — a9f070c. `ignored_senders.json` is ephemeral (option A): written to the runner's working dir only, no commit-on-main — matches the existing `ignored_events.json` sibling. Design note updated to reflect this (sections: intro, architecture-update, Workflow changes, Commit plan step 8, ripple-through).
-9. [ ] Client JS in `docs/index.html` (Unignore, Show/Hide toggle, Ignore sender, toast helpers, localStorage hydration)
-10. [ ] ROADMAP status update + final SHAs, session-close
-
-Next agent: start from step 9 (client JS in `docs/index.html`, rendered by `process_events.py`). Scope: wire the Unignore button, the Show/Hide toggle, and the Ignore-sender button to the Apps Script endpoints; add toast helpers; hydrate state from `localStorage` so UI reflects pending ignores before the next build. The design note is authoritative — don't re-debate locked decisions (including the post-step-5 vocabulary standardization and the step-8 ephemeral-cache decision). Run `python -m pytest tests/` to confirm 188 baseline tests pass before touching anything. Before Tom deploys the Apps Script changes from step 6, client JS can be written and unit-reviewed but not smoke-tested end-to-end; plan the commit so the JS diff is landable independently and Tom can deploy + manually verify.
+9. [x] Client JS in `docs/index.html` (Unignore, Show/Hide toggle, Ignore sender, toast helpers, localStorage hydration) — 646993c
+10. [x] CSS fix for action-row overlap (flex wrapper for Add-to-calendar + Ignore event buttons) — bf34506
+11. [x] Gap closure: wire `ignored_senders.json` into `build_queries.py` so UI-clicked Ignore-sender decisions actually exclude those domains from Gmail searches at fetch time — e97f1b0
+12. [x] Protected-senders guardrail: `protected_senders.txt` at repo root (seeded from `blocklist.txt`'s NEVER-add list) + shared `scripts/protected_senders.py` loader. Both `process_events.render_html` (suppresses the Ignore-sender button) and `build_queries.main` (filters protected domains out of the ignored_senders union) read the same file — defense in depth so the user can't accidentally block schools, PTAs, team-management platforms, or health providers — 2393d31
 
 ### 8. [ ] "New this week" badges
 
