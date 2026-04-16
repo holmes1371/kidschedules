@@ -11,7 +11,11 @@
 //      Copy the /exec URL into ignore_webhook_url.txt in the repo.
 //
 // Two tabs in the same spreadsheet:
-//   "Ignored Events"  — one row per (id, name, date) the user dismissed.
+//   "Ignored Events"  — one row per (timestamp, id, name, date, sender) the
+//                       user dismissed. `sender` was added in the unignore-
+//                       sender pass; pre-existing rows carry only the first
+//                       four columns. Legacy rows are left as-is — they can
+//                       only be cleared by individual unignore-event.
 //   "Ignored Senders" — one row per (timestamp, domain, source) — either
 //                       the UI Ignore-sender button (source="auto-button")
 //                       or a hand-seeded row (source="manual" by convention).
@@ -21,14 +25,19 @@
 // POST /exec        — action router. Body JSON: {"action": "...", ...}.
 //   action="ignore" (also the default when action is absent — backward
 //                   compat for the first-wave client):
-//     {"id": "<12-hex>", "name": "...", "date": "..."}  →  append to
-//     Ignored Events.
+//     {"id": "<12-hex>", "name": "...", "date": "...", "sender": "..."}
+//     →  append to Ignored Events. `sender` is optional and stored only
+//     when it validates as a domain; invalid or missing values write as "".
 //   action="unignore":
 //     {"id": "<12-hex>"}  →  delete every Ignored Events row matching id.
 //     Idempotent: returns 'ok' even if no row matched.
 //   action="ignore_sender":
 //     {"domain": "..."}  →  validate, lowercase, append to Ignored Senders
 //     with source="auto-button".
+//   action="unignore_sender":
+//     {"domain": "..."}  →  delete every Ignored Senders row matching
+//     domain AND every Ignored Events row where the sender column matches.
+//     Idempotent: returns 'ok' even if no rows matched.
 //
 // GET  /exec?secret=... — read route. Gated by READ_SECRET.
 //   (default) or ?kind=ignored          → Ignored Events JSON
@@ -44,9 +53,10 @@ function doPost(e) {
   try {
     const payload = JSON.parse(e.postData.contents);
     const action = String(payload.action || 'ignore');
-    if (action === 'ignore')        return _handleIgnore(payload);
-    if (action === 'unignore')      return _handleUnignore(payload);
-    if (action === 'ignore_sender') return _handleIgnoreSender(payload);
+    if (action === 'ignore')          return _handleIgnore(payload);
+    if (action === 'unignore')        return _handleUnignore(payload);
+    if (action === 'ignore_sender')   return _handleIgnoreSender(payload);
+    if (action === 'unignore_sender') return _handleUnignoreSender(payload);
     return _text('bad action');
   } catch (err) {
     return _text('err: ' + err.message);
@@ -70,7 +80,11 @@ function _handleIgnore(payload) {
   if (!/^[a-f0-9]{12}$/.test(id)) return _text('bad id');
   const name = String(payload.name || '').slice(0, 200);
   const date = String(payload.date || '').slice(0, 20);
-  _getIgnoredEventsSheet().appendRow([new Date().toISOString(), id, name, date]);
+  const senderRaw = String(payload.sender || '').trim().toLowerCase();
+  const sender = DOMAIN_RE.test(senderRaw) ? senderRaw : '';
+  _getIgnoredEventsSheet().appendRow(
+    [new Date().toISOString(), id, name, date, sender]
+  );
   return _text('ok');
 }
 
@@ -95,6 +109,30 @@ function _handleIgnoreSender(payload) {
   _getIgnoredSendersSheet().appendRow(
     [new Date().toISOString(), domain, 'auto-button']
   );
+  return _text('ok');
+}
+
+function _handleUnignoreSender(payload) {
+  const domain = String(payload.domain || '').trim().toLowerCase();
+  if (!DOMAIN_RE.test(domain)) return _text('bad domain');
+  // Delete the domain row(s) from Ignored Senders.
+  const sendersSheet = _getIgnoredSendersSheet();
+  const sendersData = sendersSheet.getDataRange().getValues();
+  for (let i = sendersData.length - 1; i >= 0; i--) {
+    if (String(sendersData[i][1] || '').trim().toLowerCase() === domain) {
+      sendersSheet.deleteRow(i + 1);
+    }
+  }
+  // Bulk-delete Ignored Events rows tagged with this sender. Column 5
+  // (index 4) holds the sender string; legacy 4-column rows return '' and
+  // are skipped by design (see design/unignore-sender.md).
+  const eventsSheet = _getIgnoredEventsSheet();
+  const eventsData = eventsSheet.getDataRange().getValues();
+  for (let i = eventsData.length - 1; i >= 0; i--) {
+    if (String(eventsData[i][4] || '').trim().toLowerCase() === domain) {
+      eventsSheet.deleteRow(i + 1);
+    }
+  }
   return _text('ok');
 }
 
