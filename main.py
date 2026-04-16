@@ -50,6 +50,7 @@ AUTO_BLOCKLIST_AUDIT_PATH = os.path.join(
     PROJECT_ROOT, "blocklist_auto_audit.jsonl"
 )
 IGNORED_SENDERS_PATH = os.path.join(PROJECT_ROOT, "ignored_senders.json")
+PROTECTED_SENDERS_PATH = os.path.join(PROJECT_ROOT, "protected_senders.txt")
 
 
 def _load_webhook_url() -> str:
@@ -108,6 +109,7 @@ def step1_build_queries(lookback_days: int) -> dict[str, Any]:
     args = [
         "--lookback-days", str(lookback_days),
         "--ignored-senders", IGNORED_SENDERS_PATH,
+        "--protected-senders", PROTECTED_SENDERS_PATH,
     ]
     output = run_script("build_queries.py", args)
     config = json.loads(output)
@@ -508,6 +510,7 @@ def step4_process_events(
             "--display-window-days", "60",
             "--webhook-url", webhook_url,
             "--ignored", IGNORED_EVENTS_PATH,
+            "--protected-senders", PROTECTED_SENDERS_PATH,
         ]
         # Per-event .ics files land in docs/ics/ for the Pages artifact to
         # pick up; skipped on dry-run to avoid churning the publish dir.

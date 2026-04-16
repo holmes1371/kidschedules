@@ -1,0 +1,33 @@
+# Domains the user must NEVER be allowed to Ignore-sender on, even if an
+# event from them looks like spam. These senders carry legitimate kids'
+# events (school notices, team schedules, health appointments, etc.) and
+# blocking them at the Gmail-query level would drop real events silently.
+#
+# The Ignore-event button is still available on cards from these senders —
+# only the Ignore-sender affordance is suppressed.
+#
+# Format:
+#   - One pattern per line.
+#   - Lines starting with # (or blank) are ignored.
+#   - A bare domain (e.g. fcps.edu) matches that exact registrable domain.
+#   - A pattern starting with * (e.g. *pta.org) matches any domain that
+#     ends with the literal part after the asterisk — covers all local
+#     PTA domains like louisearcherpta.org, canterburyptsa.org, etc.
+#   - Matching is case-insensitive.
+#
+# To add a domain:
+#   1. Append a new line below in the format above.
+#   2. Commit. No code changes needed — process_events.py and
+#      build_queries.py both read this file at runtime.
+#
+# Seeded from the "NEVER add" prose comment at the top of blocklist.txt
+# on 2026-04-15. Keep the two lists in sync if that comment changes.
+
+fcps.edu
+*pta.org
+*ptsa.org
+jackrabbittech.com
+teamsnap.com
+signupgenius.com
+myschoolbucks.com
+lifetouch.com

@@ -11,11 +11,14 @@ import json
 import os
 import sys
 
+from protected_senders import is_protected, load_protected_senders
+
 
 _PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_BLOCKLIST = os.path.join(_PROJECT_ROOT, "blocklist.txt")
 DEFAULT_AUTO_BLOCKLIST = os.path.join(_PROJECT_ROOT, "blocklist_auto.txt")
 DEFAULT_IGNORED_SENDERS = os.path.join(_PROJECT_ROOT, "ignored_senders.json")
+DEFAULT_PROTECTED_SENDERS = os.path.join(_PROJECT_ROOT, "protected_senders.txt")
 DEFAULT_AUDIT_STATE = os.path.join(_PROJECT_ROOT, ".filter_audit.json")
 
 
@@ -166,6 +169,11 @@ def main() -> int:
     p.add_argument("--ignored-senders", type=str, default=DEFAULT_IGNORED_SENDERS,
                    help="Path to ignored_senders.json (runner-ephemeral cache "
                         "of UI-clicked Ignore-sender domains). Pass '' to disable.")
+    p.add_argument("--protected-senders", type=str,
+                   default=DEFAULT_PROTECTED_SENDERS,
+                   help="Path to protected_senders.txt. Protected domains are "
+                        "filtered OUT of the ignored_senders union as a "
+                        "defense-in-depth guardrail. Pass '' to disable.")
     p.add_argument("--no-category-filter", action="store_true",
                    help="Do not append -category:promotions to queries.")
     p.add_argument("--audit-state", type=str, default=DEFAULT_AUDIT_STATE,
@@ -184,9 +192,23 @@ def main() -> int:
     blocklist_auto = (
         load_blocklist(args.auto_blocklist) if args.auto_blocklist else []
     )
-    blocklist_ignored_senders = (
+    blocklist_ignored_senders_raw = (
         load_ignored_senders(args.ignored_senders) if args.ignored_senders
         else []
+    )
+    protected = (
+        load_protected_senders(args.protected_senders)
+        if args.protected_senders else []
+    )
+    # Defense in depth: even though the UI suppresses the Ignore-sender
+    # button for protected domains, a stale ignored_senders.json row or a
+    # direct sheet edit must never land a protected domain in the Gmail
+    # exclusion clause.
+    blocklist_ignored_senders = [
+        d for d in blocklist_ignored_senders_raw if not is_protected(d, protected)
+    ]
+    dropped_protected = (
+        len(blocklist_ignored_senders_raw) - len(blocklist_ignored_senders)
     )
     # Union while preserving order: main list first, then auto entries, then
     # UI-ignored senders — each step dedupes case-insensitively against what
@@ -242,10 +264,14 @@ def main() -> int:
                                     if args.auto_blocklist else None),
             "ignored_senders_path": (args.ignored_senders
                                      if args.ignored_senders else None),
+            "protected_senders_path": (args.protected_senders
+                                       if args.protected_senders else None),
             "blocklist_size": len(blocklist),
             "blocklist_size_main": len(blocklist_main),
             "blocklist_size_auto": len(blocklist_auto),
             "blocklist_size_ignored_senders": len(blocklist_ignored_senders),
+            "ignored_senders_dropped_protected": dropped_protected,
+            "protected_senders_size": len(protected),
         },
         "filter_audit": audit,
         "loose_queries": loose_queries,

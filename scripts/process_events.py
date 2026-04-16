@@ -22,6 +22,8 @@ from collections import OrderedDict
 from typing import Any
 from zoneinfo import ZoneInfo
 
+from protected_senders import is_protected, load_protected_senders
+
 
 LOCAL_TZ = ZoneInfo("America/New_York")
 
@@ -598,7 +600,8 @@ def render_html(today: dt.date,
                 total_future: int,
                 lookback_days: int,
                 webhook_url: str = "",
-                pages_url: str = "") -> str:
+                pages_url: str = "",
+                protected_senders: list[str] | None = None) -> str:
     """Render a complete, self-contained HTML page for GitHub Pages.
 
     webhook_url: if non-empty, the rendered page will POST ignore decisions
@@ -615,6 +618,7 @@ def render_html(today: dt.date,
     """
 
     webcal_base = _webcal_base(pages_url)
+    protected = protected_senders or []
 
     def _event_card(ev: dict[str, Any]) -> str:
         d: dt.date = ev["_date_obj"]
@@ -651,7 +655,11 @@ def render_html(today: dt.date,
         sender = (ev.get("sender_domain") or "").strip()
         sender_attr = f' data-sender="{sender}"' if sender else ""
         sender_btn_html = ""
-        if sender:
+        # Never render the Ignore-sender button for protected domains
+        # (schools, PTAs, health providers, team-management platforms) —
+        # blocking those at the Gmail-query level would drop real events.
+        # The Ignore-event button on the same card is unaffected.
+        if sender and not is_protected(sender, protected):
             sender_btn_html = (
                 '\n        <div class="event-actions-bottom">\n'
                 f'          <button class="ignore-sender-btn" '
@@ -1338,6 +1346,10 @@ def main() -> int:
                    help="If set, wipe the directory and write one .ics per "
                         "displayed event ({event_id}.ics). The rendered "
                         "page links to webcal://<pages-host>/ics/<id>.ics.")
+    p.add_argument("--protected-senders", default="",
+                   help="Path to protected_senders.txt. Events whose sender "
+                        "domain matches one of these patterns render without "
+                        "the Ignore-sender button. Missing file → empty list.")
     args = p.parse_args()
 
     today = (dt.date.fromisoformat(args.today) if args.today
@@ -1361,9 +1373,14 @@ def main() -> int:
         sys.stdout.write(body)
 
     if args.html_out:
+        protected = (
+            load_protected_senders(args.protected_senders)
+            if args.protected_senders else []
+        )
         html = render_html(today, weeks, undated, len(display),
                            args.lookback_days, webhook_url=args.webhook_url,
-                           pages_url=args.pages_url)
+                           pages_url=args.pages_url,
+                           protected_senders=protected)
         with open(args.html_out, "w", encoding="utf-8") as f:
             f.write(html)
 
