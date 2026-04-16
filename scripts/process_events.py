@@ -629,7 +629,7 @@ def render_html(today: dt.date,
             ics_href = f"https://{webcal_base}ics/{ev['id']}.ics"
             ics_btn_html = (
                 f'<a class="ics-btn" href="{ics_href}" '
-                f'aria-label="Add this event to your calendar">Add to calendar</a>\n        '
+                f'aria-label="Add this event to your calendar">Add to calendar</a>'
             )
         is_ignored = bool(ev.get("is_ignored"))
         ignored_class = " ignored" if is_ignored else ""
@@ -663,7 +663,7 @@ def render_html(today: dt.date,
         return f"""\
       <div class="event-card{ignored_class}" data-event-id="{ev["id"]}"{ignored_attr}{sender_attr}
            style="{card_style}">
-        {ics_btn_html}{ignore_btn_html}
+        <div class="event-actions-top">{ics_btn_html}{ignore_btn_html}</div>
         <div class="event-date">{day_name}, {month_day}</div>
         <div class="event-name">{ev["name"]}</div>
         <div class="event-details">
@@ -830,19 +830,21 @@ def render_html(today: dt.date,
       background: var(--surface);
       border-radius: 8px;
       padding: 0.75rem 1rem;
-      padding-right: 4.5rem;
       margin-bottom: 0.5rem;
       box-shadow: 0 1px 2px rgba(0,0,0,0.06);
-      position: relative;
       transition: opacity 0.25s ease;
     }}
     .event-card.fading {{
       opacity: 0;
     }}
+    .event-actions-top {{
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.35rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.25rem;
+    }}
     .ignore-btn, .unignore-btn {{
-      position: absolute;
-      top: 0.5rem;
-      right: 0.5rem;
       border-radius: 4px;
       padding: 0.2rem 0.55rem;
       font-size: 0.72rem;
@@ -916,9 +918,6 @@ def render_html(today: dt.date,
       cursor: default;
     }}
     .ics-btn {{
-      position: absolute;
-      top: 0.5rem;
-      right: 4.25rem;
       background: transparent;
       color: var(--text-secondary);
       border: 1px solid var(--border);
