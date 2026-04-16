@@ -120,14 +120,11 @@ Footer string in `scripts/process_events.py` now reads `Auto-generated from Gmai
 
 Follow-up archive-infrastructure rip handled in 2640c4b: deleted `scripts/build_archive_index.py` (170-line orphan, no callers) and the vestigial `docs/archive.html` + dated-snapshot (`docs/20[0-9][0-9]-[0-1][0-9]-[0-3][0-9].html`) patterns from `.gitignore`. Also removed the local `docs/2026-04-14.html` artifact. Zero residual `archive` references remain outside the live-view rule in this file. 224 tests still pass.
 
-### 10. [ ] Gmail draft gating: Monday runs only
+### 10. [~] Gmail draft gating: Monday runs only — 65c86f3 (awaiting cron verification)
 
-Today `.github/workflows/weekly-schedule.yml` sets `CREATE_DRAFT=1` whenever `github.event_name == 'schedule'` (line 165), which fires on all three cron days. Ellen only wants a draft on Mondays. Options (decide in a short design note before implementing):
+Picked option (b) from the original note: split the cron into two entries (`15 10 * * 1` and `15 10 * * 3,6`) and gate `CREATE_DRAFT` on `github.event.schedule == '15 10 * * 1'`. All logic stays declarative in the `env:` expression; no shell-date math. Manual `workflow_dispatch` opt-in via `inputs.create_draft` is preserved through the OR branch. Python `should_create_draft` unchanged — already exhaustively unit-tested. Workflow comment flags the cron-string/gate coupling so a future time edit doesn't silently drop drafts. Design note at `design/monday-only-draft-gating.md`. 224 tests still pass.
 
-- (a) Keep the single cron entry and gate `CREATE_DRAFT` on day-of-week inside the step (`date -u +%u` check, then export the env var).
-- (b) Split the cron into two entries — Mon-only sets `CREATE_DRAFT=1`, Wed/Sat does not. Cleaner isolation, doubles the cron surface.
-
-Existing unit tests on `should_create_draft` in `scripts/process_events.py` are exhaustive; the new surface is the workflow gate. Add a shell-smoke test or a comment asserting which triggers produce drafts.
+Pending verification (Tom): (1) `workflow_dispatch` with `create_draft: true` creates a draft; (2) `workflow_dispatch` with defaults creates no draft; (3) next Monday cron creates a draft; (4) next Wed or Sat cron creates no draft. Flip to `[x]` once all four land.
 
 ### 11. [ ] Card information redesign (supersedes per-kid split)
 
