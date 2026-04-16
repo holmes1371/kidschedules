@@ -49,6 +49,7 @@ AUTO_BLOCKLIST_PATH = os.path.join(PROJECT_ROOT, "blocklist_auto.txt")
 AUTO_BLOCKLIST_AUDIT_PATH = os.path.join(
     PROJECT_ROOT, "blocklist_auto_audit.jsonl"
 )
+IGNORED_SENDERS_PATH = os.path.join(PROJECT_ROOT, "ignored_senders.json")
 
 
 def _load_webhook_url() -> str:
@@ -104,7 +105,10 @@ def step1_build_queries(lookback_days: int) -> dict[str, Any]:
     print("=" * 60)
     print("STEP 1: Building queries and date windows")
     print("=" * 60)
-    args = ["--lookback-days", str(lookback_days)]
+    args = [
+        "--lookback-days", str(lookback_days),
+        "--ignored-senders", IGNORED_SENDERS_PATH,
+    ]
     output = run_script("build_queries.py", args)
     config = json.loads(output)
     print(f"  Today: {config['today_human']}")
@@ -114,7 +118,8 @@ def step1_build_queries(lookback_days: int) -> dict[str, Any]:
     print(
         f"  Blocklist: {excl['blocklist_size']} senders excluded "
         f"({excl['blocklist_size_main']} hand-curated + "
-        f"{excl['blocklist_size_auto']} auto)"
+        f"{excl['blocklist_size_auto']} auto + "
+        f"{excl.get('blocklist_size_ignored_senders', 0)} UI-ignored)"
     )
     print(f"  Filter audit: {config['filter_audit']['reason']}")
     return config

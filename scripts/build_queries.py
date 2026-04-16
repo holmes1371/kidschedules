@@ -15,6 +15,7 @@ import sys
 _PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_BLOCKLIST = os.path.join(_PROJECT_ROOT, "blocklist.txt")
 DEFAULT_AUTO_BLOCKLIST = os.path.join(_PROJECT_ROOT, "blocklist_auto.txt")
+DEFAULT_IGNORED_SENDERS = os.path.join(_PROJECT_ROOT, "ignored_senders.json")
 DEFAULT_AUDIT_STATE = os.path.join(_PROJECT_ROOT, ".filter_audit.json")
 
 
@@ -82,6 +83,41 @@ def load_blocklist(path: str) -> list[str]:
     return out
 
 
+def load_ignored_senders(path: str) -> list[str]:
+    """Return the domain strings from the ephemeral ignored_senders.json cache.
+
+    The file is produced by scripts/sync_ignored_senders.py and is a JSON
+    list of ``{"domain": ..., "source": ..., "timestamp": ...}`` dicts.
+    This loader pulls the domain values out in list order so they can be
+    unioned into the Gmail exclusion clause alongside the hand-curated and
+    auto blocklists.
+
+    Missing file, malformed JSON, or a non-list payload all degrade
+    silently to ``[]`` — matches the posture of the sync helper, which
+    keeps the on-disk cache rather than zeroing it out on fetch failure.
+    """
+    if not os.path.exists(path):
+        return []
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except (json.JSONDecodeError, OSError):
+        return []
+    if not isinstance(data, list):
+        return []
+    out: list[str] = []
+    for row in data:
+        if not isinstance(row, dict):
+            continue
+        domain = row.get("domain")
+        if not isinstance(domain, str):
+            continue
+        domain = domain.strip()
+        if domain:
+            out.append(domain)
+    return out
+
+
 def build_exclusion_clause(blocklist: list[str]) -> str:
     """Build the `-category:promotions -from:...` clause appended to each query."""
     bits = ["-category:promotions"]
@@ -127,6 +163,9 @@ def main() -> int:
                    help="Path to the hand-curated blocklist. Pass '' to disable.")
     p.add_argument("--auto-blocklist", type=str, default=DEFAULT_AUTO_BLOCKLIST,
                    help="Path to the bot-owned blocklist_auto.txt. Pass '' to disable.")
+    p.add_argument("--ignored-senders", type=str, default=DEFAULT_IGNORED_SENDERS,
+                   help="Path to ignored_senders.json (runner-ephemeral cache "
+                        "of UI-clicked Ignore-sender domains). Pass '' to disable.")
     p.add_argument("--no-category-filter", action="store_true",
                    help="Do not append -category:promotions to queries.")
     p.add_argument("--audit-state", type=str, default=DEFAULT_AUDIT_STATE,
@@ -145,11 +184,20 @@ def main() -> int:
     blocklist_auto = (
         load_blocklist(args.auto_blocklist) if args.auto_blocklist else []
     )
-    # Union while preserving order: main list first, then auto entries not
-    # already in main (dedupe case-insensitively).
+    blocklist_ignored_senders = (
+        load_ignored_senders(args.ignored_senders) if args.ignored_senders
+        else []
+    )
+    # Union while preserving order: main list first, then auto entries, then
+    # UI-ignored senders — each step dedupes case-insensitively against what
+    # came before.
     seen_lower = {s.lower() for s in blocklist_main}
     blocklist = list(blocklist_main)
     for s in blocklist_auto:
+        if s.lower() not in seen_lower:
+            seen_lower.add(s.lower())
+            blocklist.append(s)
+    for s in blocklist_ignored_senders:
         if s.lower() not in seen_lower:
             seen_lower.add(s.lower())
             blocklist.append(s)
@@ -192,9 +240,12 @@ def main() -> int:
             "blocklist_path": args.blocklist if args.blocklist else None,
             "auto_blocklist_path": (args.auto_blocklist
                                     if args.auto_blocklist else None),
+            "ignored_senders_path": (args.ignored_senders
+                                     if args.ignored_senders else None),
             "blocklist_size": len(blocklist),
             "blocklist_size_main": len(blocklist_main),
             "blocklist_size_auto": len(blocklist_auto),
+            "blocklist_size_ignored_senders": len(blocklist_ignored_senders),
         },
         "filter_audit": audit,
         "loose_queries": loose_queries,
