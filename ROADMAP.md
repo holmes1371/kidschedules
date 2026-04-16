@@ -118,7 +118,7 @@ Unignore already decremented via `bumpToggle(-1)` on success, but Ignore had the
 
 Footer string in `scripts/process_events.py` now reads `Auto-generated from Gmail · Updated Mon, Wed, and Sat`, matching the Mon/Wed/Sat cron in `.github/workflows/weekly-schedule.yml:8`. Also dropped the adjacent `<a href="archive.html">View past schedules</a>` link — `archive.html` is never generated in CI (no workflow step calls `scripts/build_archive_index.py`) and the affordance contradicts the live-view rule in session discipline. `Updated {generated}` subtitle (actual line 1058) is in the header, not the footer, and is already prominent — no restyle needed. The expected snapshot re-record turned out to be unnecessary: `tests/snapshots/basic_body.txt` is the plain-text email body, and no test asserts on the HTML footer string. All 224 tests pass.
 
-Follow-up archive-infrastructure rip handled in the next commit.
+Follow-up archive-infrastructure rip handled in 2640c4b: deleted `scripts/build_archive_index.py` (170-line orphan, no callers) and the vestigial `docs/archive.html` + dated-snapshot (`docs/20[0-9][0-9]-[0-1][0-9]-[0-3][0-9].html`) patterns from `.gitignore`. Also removed the local `docs/2026-04-14.html` artifact. Zero residual `archive` references remain outside the live-view rule in this file. 224 tests still pass.
 
 ### 10. [ ] Gmail draft gating: Monday runs only
 
