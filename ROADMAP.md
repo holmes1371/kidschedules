@@ -8,19 +8,13 @@ Always load the karpathy-guidelines skill before starting anything here.
 
 Replace this block at the end of each session. Keep it to what the next agent actually needs to walk in cold: what just closed, what's open, where to pick up, and any non-obvious observations that aren't captured under a numbered item.
 
-**2026-04-16 (continued)**
+**2026-04-16**
 
-- **In progress: #16** — Node 20 → Node 24 action upgrades (`ea081da`). Bumped `actions/checkout` v4→v5, `actions/setup-python` v5→v6, `actions/upload-pages-artifact` v3→v5, `actions/deploy-pages` v4→v5 across `weekly-schedule.yml` and `tests.yml`. Added `include-hidden-files: true` to the Upload Pages artifact step because v4 made hidden-file exclusion the default and `docs/.nojekyll` must ship with the artifact. Design note at `design/node-24-action-upgrades.md` captures the bumps, the `.nojekyll` gotcha, and the `ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION` fallback (not applied — all four actions already have Node 24 majors). Also restored the truncated fallback sentence in #16 itself that this session's observation flagged.
-- **Pending verification for #16**: pytest (`tests.yml`) runs automatically on push and exercises `checkout@v5` + `setup-python@v6` — a green run proves those two. `upload-pages-artifact@v5` + `deploy-pages@v5` are only exercised on a real non-dry run because the existing `if: dry_run != 'true'` guards short-circuit both Pages steps on a dry_run. First smoke path is the next Monday cron (`15 10 * * 1`) or a manual non-dry `workflow_dispatch`. Success criteria: Pages deploys, the published site renders (so `.nojekyll` got through), no Node 20 deprecation warnings in the Actions log.
-
-**2026-04-16 (earlier in day)**
-
-- **Closed: #9** — footer tempo copy updated to `Mon, Wed, and Sat` (`756428c`); dead `<a href="archive.html">View past schedules</a>` link removed in the same commit.
-- **Closed: follow-up to #9** — full archive-infrastructure rip (`2640c4b`): deleted `scripts/build_archive_index.py` (orphaned, no callers), removed the vestigial `docs/archive.html` + dated-snapshot (`docs/20[0-9][0-9]-[0-1][0-9]-[0-3][0-9].html`) patterns from `.gitignore`, and deleted the local `docs/2026-04-14.html` artifact. Nothing in the repo now produces or references an archive page.
-- **Closed: #10** — Monday-only Gmail draft gating (`65c86f3`) via cron split + `github.event.schedule` match. See `design/monday-only-draft-gating.md`.
-- **Session-discipline rule added** (6f40164): do not flip an item to `[x]` without explicit user signoff. The close-out pattern is: land the final code commit, leave the item `[~]` with the SHA + a pending-verification summary, let Tom push and smoke-test, then the *next* session flips to `[x]` with the SHA preserved.
-- **Next up after #16 lands**: #11 — card information redesign. Remember that #11 supersedes the original per-kid split and **blocks #13** (per-kid filter chips); don't start chip work until the card redesign lands. Design-note-first per the item body.
-- **Repo state**: 224 tests passing on `main` prior to the #16 bumps. After `ea081da` pushes, `tests.yml` on Node 24 runs will be the first real validation of the new checkout+setup-python pins.
+- **Closed: #16** — Node 20 → Node 24 action upgrades (`ea081da`). Bumped `actions/checkout` v4→v5, `actions/setup-python` v5→v6, `actions/upload-pages-artifact` v3→v5, `actions/deploy-pages` v4→v5 across `weekly-schedule.yml` and `tests.yml`. Added `include-hidden-files: true` to the Upload Pages artifact step because v4 made hidden-file exclusion the default and `docs/.nojekyll` must ship with the artifact. Design note at `design/node-24-action-upgrades.md`. Also restored the truncated `FORCE_JAVAS…` fallback sentence in #16 (now documenting `ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION`). Tom verified: `tests.yml` green on Node 24 pins, Pages deployed cleanly, no deprecation warnings.
+- **Closed (earlier session): #9** — footer tempo copy (`756428c`) + archive-infrastructure rip (`2640c4b`).
+- **Closed (earlier session): #10** — Monday-only Gmail draft gating (`65c86f3`). See `design/monday-only-draft-gating.md`.
+- **Next up: #11** — card information redesign. Supersedes the original per-kid split and **blocks #13** (per-kid filter chips); don't start chip work until the card redesign lands. Design-note-first per the item body.
+- **Repo state**: 224 tests passing. All workflow actions now on Node 24 majors.
 
 ## For future agents
 
@@ -164,7 +158,7 @@ Threat model accepted: the shared secret is effectively public (embedded in page
 
 In `process_events.py`, detect overlapping timed events on the same day via interval intersection; flag both cards with a visible conflict marker. Prioritize different-kid overlaps as the high-signal case. Same-day all-day + timed events should NOT be flagged as conflicts — they coexist by design.
 
-### 16. [~] Node 20 → Node 24 action upgrades (before 2026-06-02) — ea081da
+### 16. [x] Node 20 → Node 24 action upgrades (before 2026-06-02) — ea081da
 
 Every workflow run was printing:
 
@@ -174,6 +168,6 @@ GitHub timeline: Node 24 becomes the default on 2026-06-02 and Node 20 is remove
 
 Bumps landed in `ea081da`: `actions/checkout` v4→v5, `actions/setup-python` v5→v6, `actions/upload-pages-artifact` v3→v5 (with `include-hidden-files: true` to preserve `docs/.nojekyll` across the v4 breaking change), `actions/deploy-pages` v4→v5. Full scope, the `.nojekyll` gotcha, and the verification plan live in `design/node-24-action-upgrades.md`.
 
-Pending verification: `tests.yml` on push validates `checkout@v5` + `setup-python@v6`; the upload/deploy bumps are only exercised on a real non-dry `weekly-schedule.yml` run because the existing `if: dry_run != 'true'` guards short-circuit both Pages steps on a dry run. First live validation is the next Monday cron (`15 10 * * 1`) or a manual non-dry `workflow_dispatch`. Close this once that run ships green Pages and the Actions log shows no Node 20 deprecation warnings.
+Verified: `tests.yml` green on push (`checkout@v5` + `setup-python@v6`); non-dry `weekly-schedule.yml` run confirmed Pages deployed cleanly with `upload-pages-artifact@v5` + `deploy-pages@v5`, no Node 20 deprecation warnings in the Actions log.
 
 Fallback (not applied — all four actions already have Node 24 majors, documented here for a future feature that pulls in a less-maintained action): if an action has no Node 24 major by 2026-06-02, set `ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true` as an env on the step (or on the runner) to keep it on Node 20 past the default flip. This only buys time until 2026-09-16, when Node 20 is removed from runners entirely. The older `FORCE_JAVASCRIPT_ACTIONS_TO_NODE20` env var is the historical predecessor and is not the forward-looking escape hatch.
