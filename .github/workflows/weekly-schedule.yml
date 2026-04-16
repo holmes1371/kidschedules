@@ -51,7 +51,7 @@ jobs:
 
     steps:
       - name: Checkout repository (main)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Restore persistent state from state branch
         run: |
@@ -106,7 +106,7 @@ jobs:
           fi
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: "pip"
@@ -236,9 +236,14 @@ jobs:
 
       - name: Upload Pages artifact
         if: ${{ github.event.inputs.dry_run != 'true' }}
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: docs/
+          # v4 introduced a breaking change — hidden files are excluded from
+          # the artifact by default. docs/.nojekyll must ship so GitHub Pages
+          # skips Jekyll processing (required for docs/ics/*.ics routing and
+          # any leading-underscore paths).
+          include-hidden-files: true
 
   deploy:
     needs: build
@@ -250,4 +255,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
