@@ -114,9 +114,11 @@ Progress against the 10-step commit plan:
 
 Unignore already decremented via `bumpToggle(-1)` on success, but Ignore had the mirror-image gap. Added `bumpToggle(1)` to the `ignore-btn` branch right after the local `setIgnored` + localStorage push, and `bumpToggle(-1)` in the POST-failure catch alongside the existing `setActive` + `saveIgnored` rollback. Zero-to-one creation (counter appearing when the page built with `ignored_n == 0`) is served by the `bumpToggle` rework in 7cf8cb3. 2 regression tests in `tests/test_process_events.py`.
 
-### 9. [ ] Footer refresh-tempo copy out of date
+### 9. [x] Footer refresh-tempo copy out of date — 756428c
 
-`scripts/process_events.py:1058` renders `Auto-generated from Gmail · Updated every Monday`. Actual cron in `.github/workflows/weekly-schedule.yml:8` is Mon/Wed/Sat at 6:15 AM ET. Update the footer string to reflect the tri-weekly cadence and confirm the `Updated {generated}` timestamp (line 1047) is still prominent enough that no reader confuses staleness for outage. Snapshot tests will need to re-record.
+Footer string in `scripts/process_events.py` now reads `Auto-generated from Gmail · Updated Mon, Wed, and Sat`, matching the Mon/Wed/Sat cron in `.github/workflows/weekly-schedule.yml:8`. Also dropped the adjacent `<a href="archive.html">View past schedules</a>` link — `archive.html` is never generated in CI (no workflow step calls `scripts/build_archive_index.py`) and the affordance contradicts the live-view rule in session discipline. `Updated {generated}` subtitle (actual line 1058) is in the header, not the footer, and is already prominent — no restyle needed. The expected snapshot re-record turned out to be unnecessary: `tests/snapshots/basic_body.txt` is the plain-text email body, and no test asserts on the HTML footer string. All 224 tests pass.
+
+Follow-ups flagged but deferred: `scripts/build_archive_index.py` and any dated `docs/YYYY-MM-DD.html` snapshots (e.g. `docs/2026-04-14.html`) are fuller archive-infrastructure artifacts that also contradict the live-view rule and could be ripped out in a separate cleanup.
 
 ### 10. [ ] Gmail draft gating: Monday runs only
 
