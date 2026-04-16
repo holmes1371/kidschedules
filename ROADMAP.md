@@ -15,7 +15,7 @@ Session discipline:
 - Before starting a non-trivial feature, write a short design note to `design/{feature-name}.md` capturing the scope, the decisions already made, and the test fixtures needed. A fresh session should be able to pick up mid-feature from that note plus the last commit, without re-litigating choices.
 - Commit at every natural boundary, not just at feature completion. Half-finished work behind a clear commit message is recoverable; a dirty worktree is not.
 - Use the built-in TodoWrite tool before starting each commit, and keep it current as you work. Tom watches the todo widget to see where you are in the plan; a stale or absent list means he can't track progress. At the start of every new commit, add/refresh todos for that commit's sub-tasks and mark one `in_progress`.
-- End each session by updating this file — check off completed items, mark in-progress items, note any deviations or follow-ups — and commit the update.
+- End each session by updating this file — mark in-progress items, note any deviations or follow-ups — and commit the update. **Do not flip an item to `[x]` without explicit user signoff.** When the final code commit for an item lands, leave the item in `[~]`, record the SHA, and summarize what's pending manual verification. Tom pushes, tests manually, and either confirms the close (then the next session flips it to `[x]` with the SHA preserved) or returns feedback to address. Closing on your own reads as premature.
 - Any feature that modifies `scripts/process_events.py` must extend the pytest fixtures in step with the change, not after. Item 2 below establishes the suite.
 - Tests live in `tests/` and run on every push + PR via `.github/workflows/tests.yml`. A red test check blocks merge; don't mark a feature done with tests failing.
 - Honor the standing order: deterministic work lives in Python scripts; the agent does only judgment and interpretation. If a feature tempts you to move mechanical work into agent-handled text, push back.
@@ -114,9 +114,11 @@ Progress against the 10-step commit plan:
 
 Unignore already decremented via `bumpToggle(-1)` on success, but Ignore had the mirror-image gap. Added `bumpToggle(1)` to the `ignore-btn` branch right after the local `setIgnored` + localStorage push, and `bumpToggle(-1)` in the POST-failure catch alongside the existing `setActive` + `saveIgnored` rollback. Zero-to-one creation (counter appearing when the page built with `ignored_n == 0`) is served by the `bumpToggle` rework in 7cf8cb3. 2 regression tests in `tests/test_process_events.py`.
 
-### 9. [x] Footer refresh-tempo copy out of date — 756428c
+### 9. [~] Footer refresh-tempo copy out of date — 756428c (awaiting manual smoke test)
 
 Footer string in `scripts/process_events.py` now reads `Auto-generated from Gmail · Updated Mon, Wed, and Sat`, matching the Mon/Wed/Sat cron in `.github/workflows/weekly-schedule.yml:8`. Also dropped the adjacent `<a href="archive.html">View past schedules</a>` link — `archive.html` is never generated in CI (no workflow step calls `scripts/build_archive_index.py`) and the affordance contradicts the live-view rule in session discipline. `Updated {generated}` subtitle (actual line 1058) is in the header, not the footer, and is already prominent — no restyle needed. The expected snapshot re-record turned out to be unnecessary: `tests/snapshots/basic_body.txt` is the plain-text email body, and no test asserts on the HTML footer string. All 224 tests pass.
+
+Pending: Tom to push + smoke-test the rendered page. Flip to `[x]` once confirmed.
 
 Follow-ups flagged but deferred: `scripts/build_archive_index.py` and any dated `docs/YYYY-MM-DD.html` snapshots (e.g. `docs/2026-04-14.html`) are fuller archive-infrastructure artifacts that also contradict the live-view rule and could be ripped out in a separate cleanup.
 
