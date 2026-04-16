@@ -1200,10 +1200,12 @@ def render_html(today: dt.date,
             setIgnored(card);
             card.classList.remove("fading");
           }}, 300);
+          bumpToggle(1);
           postAction({{ action: "ignore", id: id, name: name, date: date }}).catch(function () {{
             setActive(card);
             var remaining = loadIgnored().filter(function (x) {{ return x !== id; }});
             saveIgnored(remaining);
+            bumpToggle(-1);
             showToast("Ignore failed — try again");
           }});
           return;

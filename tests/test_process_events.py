@@ -552,6 +552,33 @@ def test_render_html_js_bump_toggle_creates_row_when_absent():
     assert "if (delta <= 0) return;" in html
 
 
+# ─── Ignore/Unignore counter parity (ROADMAP #8) ─────────────────────────
+
+# Unignore has always called bumpToggle(-1) on success; Ignore must mirror
+# it with bumpToggle(+1) so the "Show ignored (N)" badge stays accurate
+# mid-session, plus bumpToggle(-1) in the failure path to unwind the
+# optimistic bump.
+
+
+def test_render_html_js_ignore_event_bumps_counter():
+    html, _ = _render_ignored_fixture(ignored_names=())
+    # The ignore-btn branch increments, and the catch decrements on failure.
+    assert "bumpToggle(1)" in html
+    assert "bumpToggle(-1)" in html
+
+
+def test_render_html_js_unignore_event_still_decrements_counter():
+    # Regression guard: the existing unignore path must keep its bumpToggle.
+    html, _ = _render_ignored_fixture(ignored_names=())
+    # Locate the unignore branch by its class-contains check and assert the
+    # decrement is still reachable from there (substring-level — the branch
+    # is short and bumpToggle(-1) only appears in two places, both intended).
+    u_start = html.find('classList.contains("unignore-btn")')
+    assert u_start != -1
+    # Scan forward a bounded window for the decrement call.
+    assert "bumpToggle(-1)" in html[u_start:u_start + 1500]
+
+
 # ─── subject + metadata ──────────────────────────────────────────────────
 
 
