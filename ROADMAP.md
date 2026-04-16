@@ -151,6 +151,8 @@ Picked option (b) from the original note: split the cron into two entries (`15 1
 
 The initial "group by child" split (Everly / Isla) isn't landing. Deliberately redesign what fields show on each card and how, rather than iterating on the current layout. Design-note-first at `design/card-redesign.md`: inventory the current fields end-to-end, name the redundancies (child label when already grouped, sender line when obvious, repeated date/time formatting), propose 1–2 layouts in mock HTML, pick one, then implement. Call out in the design note that this reshapes the problem space for item 12 (per-kid filter chips) — chips should be revisited only after this lands.
 
+Design note at `design/card-redesign.md` (SHA pending) captures the Layout A locked decisions, render/ingest ripple through `scripts/process_events.py`, the `_is_all_day` / `_is_suppressible_location` helpers, the fixture/test plan, the responsibility table, and the #12 chip-colour ripple. Mockup at `design/card-redesign-mockup.html` (`787abd0`). Status stays `[ ]` until the implementation commit lands.
+
 ### 12. [ ] Per-kid filter chips — next up after #11
 
 `process_events.py` renders a chip row at the top of the page from the unique children in this run, plus an "All" reset chip. Client JS toggles card visibility via a CSS class on click. Pure-UI, self-contained. With the card redesign (item 11) promoting child to a first-class visual chip per card, the top-of-page filter chips should reuse the same colors so the two affordances reinforce each other instead of competing.
