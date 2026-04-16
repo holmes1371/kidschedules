@@ -28,8 +28,6 @@ fixtures/last_run_candidates.json
 # ignored_events.json is fetched fresh from Apps Script each run.
 # .filter_audit.json is a local-only audit stamp.
 docs/index.html
-docs/archive.html
-docs/20[0-9][0-9]-[0-1][0-9]-[0-3][0-9].html
 future_events.json
 events_state.json
 ignored_events.json
