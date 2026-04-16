@@ -19,6 +19,7 @@ Session discipline:
 - Tests live in `tests/` and run on every push + PR via `.github/workflows/tests.yml`. A red test check blocks merge; don't mark a feature done with tests failing.
 - Honor the standing order: deterministic work lives in Python scripts; the agent does only judgment and interpretation. If a feature tempts you to move mechanical work into agent-handled text, push back.
 - The `Ellen's ToDo` mount in this project is retired and should be ignored (see memory). All work happens in `kids-schedule-github/`.
+- The site is a live view, not an archive. Old `docs/index.html` commits persist in git history but they are not a feature — do not design affordances for "view prior schedules" or commit versioned weekly snapshots under dated filenames.
 
 Status legend:
 
@@ -102,25 +103,48 @@ Progress against the 10-step commit plan:
     - Add a pytest for the render output: nothing to check at render time (this is pure client behavior), but a JS-free smoke test that the script block contains a `document.querySelectorAll('.event-card[data-sender=' + ...)` pattern in the `ignore_sender` branch is a cheap regression guard.
     - Karpathy-discipline note: the existing `postAction` / click-router structure already handles all three actions (`ignore`, `unignore`, `ignore_sender`) through a single helper. The new DOM work should slot into the existing `ignore_sender` branch — resist the urge to refactor the helper; just add the card-sweep after the successful POST. Surgical change.
 
-### 8. [ ] "New this week" badges
+### 8. [ ] Bug: "Show ignored (N)" counter doesn't update mid-session
+
+When the user clicks Ignore on a card, the card hides optimistically but the header `Show ignored (N)` badge stays stale until the next full page load; Unignore has the mirror-image gap on the way back down. The count is correct on load (hydrated from `localStorage`) and after the next rebuild — it's the live-click path that doesn't touch the counter.
+
+Scope: in the rendered `<script>` block of `scripts/process_events.py`, after the successful POST in the `ignore` branch, increment the counter text; mirror in the `unignore` branch to decrement. Add a pytest that asserts the counter-update call is present in the rendered HTML for both branches. Karpathy note: this lives in the same `postAction` helper as pending sub-item 13 under the bundled 6+7 block (Ignore-sender should hide sibling cards locally) — sequence them together so the JS is touched once.
+
+### 9. [ ] Footer refresh-tempo copy out of date
+
+`scripts/process_events.py:1058` renders `Auto-generated from Gmail · Updated every Monday`. Actual cron in `.github/workflows/weekly-schedule.yml:8` is Mon/Wed/Sat at 6:15 AM ET. Update the footer string to reflect the tri-weekly cadence and confirm the `Updated {generated}` timestamp (line 1047) is still prominent enough that no reader confuses staleness for outage. Snapshot tests will need to re-record.
+
+### 10. [ ] Gmail draft gating: Monday runs only
+
+Today `.github/workflows/weekly-schedule.yml` sets `CREATE_DRAFT=1` whenever `github.event_name == 'schedule'` (line 165), which fires on all three cron days. Ellen only wants a draft on Mondays. Options (decide in a short design note before implementing):
+
+- (a) Keep the single cron entry and gate `CREATE_DRAFT` on day-of-week inside the step (`date -u +%u` check, then export the env var).
+- (b) Split the cron into two entries — Mon-only sets `CREATE_DRAFT=1`, Wed/Sat does not. Cleaner isolation, doubles the cron surface.
+
+Existing unit tests on `should_create_draft` in `scripts/process_events.py` are exhaustive; the new surface is the workflow gate. Add a shell-smoke test or a comment asserting which triggers produce drafts.
+
+### 11. [ ] Card information redesign (supersedes per-kid split)
+
+The initial "group by child" split (Everly / Isla) isn't landing. Deliberately redesign what fields show on each card and how, rather than iterating on the current layout. Design-note-first at `design/card-redesign.md`: inventory the current fields end-to-end, name the redundancies (child label when already grouped, sender line when obvious, repeated date/time formatting), propose 1–2 layouts in mock HTML, pick one, then implement. Call out in the design note that this reshapes the problem space for item 13 (per-kid filter chips) — chips should be revisited only after this lands.
+
+### 12. [ ] "New this week" badges
 
 Persist prior-run event IDs to a manifest file in the repo (e.g. `prior_events.json`). On each run, `process_events.py` diffs current IDs against the manifest and stamps cards whose IDs did not exist last week with a visible "NEW" badge. First run: manifest empty, no badges — degrade gracefully. The workflow commits the updated manifest alongside the other outputs.
 
-### 9. [ ] Per-kid filter chips
+### 13. [ ] Per-kid filter chips — revisit after item 11
 
-`process_events.py` renders a chip row at the top of the page from the unique children in this run, plus an "All" reset chip. Client JS toggles card visibility via a CSS class on click. Pure-UI, self-contained.
+Blocked on the card redesign in item 11: if the per-child split gets rethought at the card level, the chip affordance has to be re-scoped against whatever replaces it. Original plan, preserved for reference: `process_events.py` renders a chip row at the top of the page from the unique children in this run, plus an "All" reset chip. Client JS toggles card visibility via a CSS class on click. Pure-UI, self-contained.
 
-### 10. [ ] Manual "refresh now" button in the UI
+### 14. [ ] Manual "refresh now" button in the UI
 
 Button in `docs/index.html` that triggers the weekly workflow on demand, so a fresh build can be forced after a late schedule email without waiting for the next scheduled run or opening GitHub. GitHub's `workflow_dispatch` API requires an authenticated call, so the existing Apps Script webhook grows a new `action=refresh` endpoint that holds a fine-grained PAT (scope: `workflow`, single-repo) as a Script Property and POSTs to the dispatches endpoint. Client fires `fetch(APPS_SCRIPT_URL, {method:'POST', body: JSON.stringify({secret, action:'refresh'})})` and shows a "Rebuilding… reload in ~2 min" toast; no live polling.
 
 Threat model accepted: the shared secret is effectively public (embedded in page source on a page with near-zero organic traffic), worst case is a handful of wasted workflow runs. Defense in depth: Apps Script rate-limits to one dispatch per 5 minutes via `PropertiesService`. The workflow's existing `concurrency: {group: pages, cancel-in-progress: false}` already prevents pileups from rapid clicks. PAT rotation: 1-year expiry with a calendar reminder.
 
-### 11. [ ] Conflict highlighting
+### 15. [ ] Conflict highlighting
 
 In `process_events.py`, detect overlapping timed events on the same day via interval intersection; flag both cards with a visible conflict marker. Prioritize different-kid overlaps as the high-signal case. Same-day all-day + timed events should NOT be flagged as conflicts — they coexist by design.
 
-### 12. [ ] Node 20 → Node 24 action upgrades (before 2026-06-02)
+### 16. [ ] Node 20 → Node 24 action upgrades (before 2026-06-02)
 
 Every workflow run currently prints:
 
