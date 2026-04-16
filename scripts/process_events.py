@@ -1120,10 +1120,28 @@ def render_html(today: dt.date,
         }}
       }}
 
-      // ── Show-ignored toggle counter (server-rendered) ─────
+      // ── Show-ignored toggle counter ────────────────────────
+      // Server renders the toggle only when ignored_n > 0 at build time.
+      // Mid-session we may need to create it (first local ignore on a page
+      // that built with zero ignored events) or remove it (count hits zero).
       function bumpToggle(delta) {{
         var btn = document.querySelector(".show-ignored-toggle");
-        if (!btn) return;
+        if (!btn) {{
+          if (delta <= 0) return;
+          var mainStats = document.querySelector(".stats");
+          if (!mainStats) return;
+          var wrap = document.createElement("div");
+          wrap.className = "stats";
+          var newBtn = document.createElement("button");
+          newBtn.className = "show-ignored-toggle";
+          newBtn.type = "button";
+          newBtn.setAttribute("data-show-label", "Show ignored (" + delta + ")");
+          newBtn.setAttribute("data-hide-label", "Hide ignored (" + delta + ")");
+          newBtn.textContent = "Show ignored (" + delta + ")";
+          wrap.appendChild(newBtn);
+          mainStats.insertAdjacentElement("afterend", wrap);
+          return;
+        }}
         var showLabel = btn.getAttribute("data-show-label") || "";
         var m = showLabel.match(/\((\d+)\)/);
         var n = m ? parseInt(m[1], 10) + delta : 0;
@@ -1218,14 +1236,40 @@ def render_html(today: dt.date,
           return;
         }}
 
-        // Ignore sender — toast on resolution, disable on success.
+        // Ignore sender — optimistic sweep: hide every sibling card from the
+        // same domain locally, persist their IDs to the shared ignored-events
+        // store, and bump the counter by the number newly hidden. Revert the
+        // whole sweep on POST failure. No fade (staggered fades across many
+        // cards read as jank; the toast covers the "something happened" cue).
         if (t.classList.contains("ignore-sender-btn")) {{
           var domain = t.getAttribute("data-sender") || "";
           if (!domain) return;
           t.disabled = true;
+          var siblings = document.querySelectorAll(
+            '.event-card[data-sender="' + domain + '"]'
+          );
+          var current = loadIgnored();
+          var swept = [];
+          siblings.forEach(function (card) {{
+            if (card.getAttribute("data-ignored") === "1") return;
+            var sid = card.getAttribute("data-event-id");
+            if (!sid) return;
+            if (current.indexOf(sid) === -1) current.push(sid);
+            setIgnored(card);
+            swept.push({{ id: sid, card: card }});
+          }});
+          saveIgnored(current);
+          if (swept.length) bumpToggle(swept.length);
           postAction({{ action: "ignore_sender", domain: domain }}).then(function () {{
             showToast("Ignoring " + domain + ". New events will stop appearing after the next refresh.");
           }}).catch(function () {{
+            swept.forEach(function (s) {{ setActive(s.card); }});
+            var sweptIds = swept.map(function (s) {{ return s.id; }});
+            var remaining = loadIgnored().filter(function (x) {{
+              return sweptIds.indexOf(x) === -1;
+            }});
+            saveIgnored(remaining);
+            if (swept.length) bumpToggle(-swept.length);
             t.disabled = false;
             showToast("Ignore failed — try again");
           }});

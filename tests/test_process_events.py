@@ -510,6 +510,48 @@ def test_render_html_js_hydration_swaps_button_to_unignore():
     assert "function setActive(" in html
 
 
+# ─── Ignore-sender sweeps sibling cards locally (6+7 sub-item 13) ────────
+
+# Ignore-sender should hide every sibling card from the same domain in the
+# current view (not just toast and wait for the next rebuild). These are
+# substring guards — the richer interaction is browser-tested against the
+# live Apps Script deploy.
+
+
+def test_render_html_js_ignore_sender_queries_sibling_cards():
+    html, _ = _render_ignored_fixture(ignored_names=())
+    # Sweep selector must target cards by data-sender so all siblings are hit.
+    assert "querySelectorAll(" in html
+    assert ".event-card[data-sender=" in html
+
+
+def test_render_html_js_ignore_sender_hides_siblings_and_bumps_counter():
+    html, _ = _render_ignored_fixture(ignored_names=())
+    # Sweep path calls setIgnored on each sibling and bumps the counter by
+    # the number actually swept — not the total siblings (already-ignored
+    # cards are skipped to avoid double-counting).
+    assert "setIgnored(card)" in html
+    assert "bumpToggle(swept.length)" in html
+
+
+def test_render_html_js_ignore_sender_reverts_sweep_on_failure():
+    html, _ = _render_ignored_fixture(ignored_names=())
+    # On POST failure every swept card must be restored, its id dropped from
+    # localStorage, and the counter decremented to match.
+    assert "setActive(s.card)" in html
+    assert "bumpToggle(-swept.length)" in html
+
+
+def test_render_html_js_bump_toggle_creates_row_when_absent():
+    # Zero → one transition: on a page that built with ignored_n == 0 the
+    # toggle row doesn't exist, so bumpToggle(+N) must build it.
+    html, _ = _render_ignored_fixture(ignored_names=())
+    assert 'createElement("button")' in html
+    assert 'insertAdjacentElement("afterend"' in html
+    # Decrement with no existing button is a no-op (don't create a negative row).
+    assert "if (delta <= 0) return;" in html
+
+
 # ─── subject + metadata ──────────────────────────────────────────────────
 
 
