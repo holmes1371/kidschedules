@@ -665,19 +665,6 @@
       "source": "LAES PTA Sunbeam (Mar 22)",
       "time": "9:00 AM – 2:00 PM"
     },
-    "a38e3f5e47bf": {
-      "category": "Sports & Extracurriculars",
-      "child": "Everly",
-      "date": "2026-04-11",
-      "first_seen_iso": "2026-04-15T20:50:08-04:00",
-      "id": "a38e3f5e47bf",
-      "location": "Fredericksburg Convention Center, 2371 Carl D Silver Pkwy, Fredericksburg, VA 22401",
-      "name": "Reverb Dance Comp — B2D IGNITE Team (Everly)",
-      "sender_domain": "teamsnap.com",
-      "source": "TeamSnap Team Coordinator (Apr 4)",
-      "source_message_id": "19d59e02e826f269",
-      "time": "9:40 AM (Arrival 7:45 AM)"
-    },
     "a903e23c8d23": {
       "category": "Sports & Extracurriculars",
       "child": "",
@@ -1135,19 +1122,6 @@
       "source_message_id": "19d6ccaa06e52900",
       "time": "All day (deadline)"
     },
-    "fc45d83ee7ac": {
-      "category": "Sports & Extracurriculars",
-      "child": "Everly",
-      "date": "2026-04-11",
-      "first_seen_iso": "2026-04-15T20:50:08-04:00",
-      "id": "fc45d83ee7ac",
-      "location": "Fredericksburg Convention Center, 2371 Carl D Silver Pkwy, Fredericksburg, VA 22401",
-      "name": "Reverb Dance Comp — B2D ECHO Team (Everly)",
-      "sender_domain": "teamsnap.com",
-      "source": "TeamSnap Team Coordinator (Apr 4)",
-      "source_message_id": "19d59d8b61a1f50b",
-      "time": "11:01 AM (Arrival 9:02 AM)"
-    },
     "fccc94572634": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -1175,7 +1149,7 @@
       "time": "9:00 AM - 2:00 PM"
     }
   },
-  "last_updated_iso": "2026-04-15T20:50:08-04:00",
+  "last_updated_iso": "2026-04-15T21:34:12-04:00",
   "processed_messages": {
     "19c887239c6630a3": "2026-04-15T20:23:18-04:00",
     "19c889d02a70ec60": "2026-04-15T20:23:18-04:00",
