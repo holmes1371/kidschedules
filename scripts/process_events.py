@@ -362,8 +362,8 @@ def classify(events: list[dict[str, Any]], cutoff: dt.date,
         norm = {
             "name": name,
             "date": (ev.get("date") or "").strip(),
-            "time": (ev.get("time") or "").strip() or "Time TBD",
-            "location": (ev.get("location") or "").strip() or "Location TBD",
+            "time": (ev.get("time") or "").strip(),
+            "location": (ev.get("location") or "").strip(),
             "category": cat or "Uncategorized",
             "child": (ev.get("child") or "").strip(),
             "source": (ev.get("source") or "").strip() or "unknown source",
@@ -441,9 +441,9 @@ def dedupe(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """
     def completeness(ev: dict[str, Any]) -> int:
         score = 0
-        if ev["time"] != "Time TBD":
+        if ev["time"]:
             score += 2
-        if ev["location"] != "Location TBD":
+        if ev["location"]:
             score += 2
         if ev["child"]:
             score += 1
@@ -531,24 +531,25 @@ CATEGORY_COLORS = {
 def render_event(ev: dict[str, Any]) -> str:
     d: dt.date = ev["_date_obj"]
     header = f"{d.strftime('%A, %B %-d')} — {ev['name']}"
+    lines = [header]
+    if ev["time"]:
+        lines.append(f"Time: {ev['time']}")
+    if ev["location"]:
+        lines.append(f"Location: {ev['location']}")
+    lines.append(f"Category: {ev['category']}")
     child_source = []
     if ev["child"]:
         child_source.append(f"Child: {ev['child']}")
     child_source.append(f"Source: {ev['source']}")
-    return (
-        f"{header}\n"
-        f"Time: {ev['time']}\n"
-        f"Location: {ev['location']}\n"
-        f"Category: {ev['category']}\n"
-        f"{' | '.join(child_source)}\n"
-    )
+    lines.append(" | ".join(child_source))
+    return "\n".join(lines) + "\n"
 
 
 def render_undated(ev: dict[str, Any]) -> str:
     bits = [f"- {ev['name']}"]
-    if ev["time"] != "Time TBD":
+    if ev["time"]:
         bits.append(f"  Time: {ev['time']}")
-    if ev["location"] != "Location TBD":
+    if ev["location"]:
         bits.append(f"  Location: {ev['location']}")
     bits.append(f"  Category: {ev['category']}")
     tail = []
@@ -594,6 +595,46 @@ def render_body(today: dt.date,
     return "\n".join(lines).rstrip() + "\n"
 
 
+# ─── HTML card render helpers ─────────────────────────────────────
+
+# All three ingest/agent synonyms collapse to the same grey "All day"
+# pill on the rendered card. Empty string is also classified here so
+# the ingest-side flip to "" (dropping the legacy "Time TBD" sentinel)
+# continues to render as all-day.
+_ALL_DAY_STRINGS = frozenset({"", "time tbd", "all day", "all day (deadline)"})
+
+
+def _is_all_day(time_str: str) -> bool:
+    """Return True for time strings that should render as the all-day pill."""
+    return (time_str or "").strip().lower() in _ALL_DAY_STRINGS
+
+
+# Conservative email-address match: something@domain.tld. Intentionally
+# does NOT catch bare domains like "camps.fcps.edu" — those are rare,
+# still legible, and pattern-matching risks false positives against
+# real venues that contain dots (e.g. "Mt. Vernon High School").
+_SUPPRESS_LOCATION_EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[a-z]{2,}$")
+
+
+def _is_suppressible_location(loc: str) -> bool:
+    """Return True for locations that should be omitted from the card.
+
+    Catches URL-only (http:// or https://) and email-only locations the
+    agent sometimes emits instead of a real venue, plus the stale
+    "Location TBD" literal for fixtures that predate the ingest flip.
+    Mixed strings ("Tysons Pediatrics, 8350 Greensboro Dr") are preserved.
+    Empty strings are handled upstream by the caller's truthy check.
+    """
+    s = (loc or "").strip().lower()
+    if not s:
+        return False
+    if s == "location tbd":
+        return True
+    if s.startswith("http://") or s.startswith("https://"):
+        return True
+    return bool(_SUPPRESS_LOCATION_EMAIL_RE.match(s))
+
+
 def render_html(today: dt.date,
                 weeks: list[tuple[dt.date, list[dict[str, Any]]]],
                 undated: list[dict[str, Any]],
@@ -623,11 +664,35 @@ def render_html(today: dt.date,
     def _event_card(ev: dict[str, Any]) -> str:
         d: dt.date = ev["_date_obj"]
         cat = ev["category"]
-        fg, bg = CATEGORY_COLORS.get(cat, CATEGORY_COLORS["Uncategorized"])
-        day_name = d.strftime("%A")
-        month_day = d.strftime("%B %-d")
-        child_html = (f'<span class="child">{ev["child"]}</span> &middot; '
-                      if ev["child"] else "")
+        # `_` was the old badge background — the category badge is gone
+        # under Layout A; the coloured left rail (inline border-left: fg)
+        # is the sole category signal now.
+        fg, _ = CATEGORY_COLORS.get(cat, CATEGORY_COLORS["Uncategorized"])
+        day_label = d.strftime("%a, %b %-d")
+        # Child renders one of three ways: a coloured initial chip for
+        # named kids (Everly/Isla), a small audience line for non-kid
+        # values ("All LAES students", "6th grade AAP"), or nothing at
+        # all when empty.
+        child = (ev.get("child") or "").strip()
+        if child in ("Everly", "Isla"):
+            chip_html = (f'<span class="child-chip {child.lower()}" '
+                         f'title="{child}">{child[0]}</span>')
+            audience_html = ""
+        elif child:
+            chip_html = ""
+            audience_html = f'\n        <div class="event-audience">For: {child}</div>'
+        else:
+            chip_html = ""
+            audience_html = ""
+        if _is_all_day(ev["time"]):
+            time_html = '<span class="time allday">All day</span>'
+        else:
+            time_html = f'<span class="time">{ev["time"]}</span>'
+        loc_raw = ev["location"]
+        if loc_raw and not _is_suppressible_location(loc_raw):
+            location_html = f'\n        <div class="event-location">{loc_raw}</div>'
+        else:
+            location_html = ""
         ics_btn_html = ""
         if webcal_base:
             ics_href = f"https://{webcal_base}ics/{ev['id']}.ics"
@@ -676,24 +741,36 @@ def render_html(today: dt.date,
       <div class="event-card{ignored_class}" data-event-id="{ev["id"]}"{ignored_attr}{sender_attr}
            style="{card_style}">
         <div class="event-actions-top">{ics_btn_html}{ignore_btn_html}</div>
-        <div class="event-date">{day_name}, {month_day}</div>
-        <div class="event-name">{ev["name"]}</div>
-        <div class="event-details">
-          <span class="badge" style="background:{bg};color:{fg};">{cat}</span>
-          <span class="time">{ev["time"]}</span>
-          &middot; <span class="location">{ev["location"]}</span>
+        <div class="meta-strip">
+          {chip_html}<span class="day">{day_label}</span>
+          <span class="sep">·</span>
+          {time_html}
         </div>
-        <div class="event-meta">{child_html}<span class="source">{ev["source"]}</span></div>
+        <div class="event-name">{ev["name"]}</div>{audience_html}{location_html}
         <div class="ignore-status" aria-live="polite"></div>{sender_btn_html}
       </div>"""
 
     def _undated_card(ev: dict[str, Any]) -> str:
-        cat = ev["category"]
-        fg, bg = CATEGORY_COLORS.get(cat, CATEGORY_COLORS["Uncategorized"])
-        child_html = (f'<span class="child">{ev["child"]}</span> &middot; '
-                      if ev["child"] else "")
-        time_html = f' &middot; <span class="time">{ev["time"]}</span>' if ev["time"] != "Time TBD" else ""
-        loc_html = f' &middot; <span class="location">{ev["location"]}</span>' if ev["location"] != "Location TBD" else ""
+        child = (ev.get("child") or "").strip()
+        if child in ("Everly", "Isla"):
+            chip_html = (f'<span class="child-chip {child.lower()}" '
+                         f'title="{child}">{child[0]}</span>')
+            audience_html = ""
+        elif child:
+            chip_html = ""
+            audience_html = f'\n        <div class="event-audience">For: {child}</div>'
+        else:
+            chip_html = ""
+            audience_html = ""
+        if _is_all_day(ev["time"]):
+            time_html = '<span class="time allday">All day</span>'
+        else:
+            time_html = f'<span class="time">{ev["time"]}</span>'
+        loc_raw = ev["location"]
+        if loc_raw and not _is_suppressible_location(loc_raw):
+            location_html = f'\n        <div class="event-location">{loc_raw}</div>'
+        else:
+            location_html = ""
         # Undated cards don't carry Ignore/Unignore affordances (pre-existing
         # behavior — there's no UI path to ignore an undated event). If one
         # arrives with is_ignored=True via a stale ignored_events.json entry
@@ -705,12 +782,12 @@ def render_html(today: dt.date,
                       else "border-left: 4px solid #f9ab00;")
         return f"""\
       <div class="event-card undated{ignored_class}"{ignored_attr} style="{card_style}">
-        <div class="event-date">Date TBD</div>
-        <div class="event-name">{ev["name"]}</div>
-        <div class="event-details">
-          <span class="badge" style="background:{bg};color:{fg};">{cat}</span>{time_html}{loc_html}
+        <div class="meta-strip">
+          {chip_html}<span class="day">Date TBD</span>
+          <span class="sep">·</span>
+          {time_html}
         </div>
-        <div class="event-meta">{child_html}<span class="source">{ev["source"]}</span></div>
+        <div class="event-name">{ev["name"]}</div>{audience_html}{location_html}
       </div>"""
 
     # Build week sections
@@ -779,8 +856,13 @@ def render_html(today: dt.date,
       --surface: #ffffff;
       --text: #202124;
       --text-secondary: #5f6368;
+      --text-tertiary: #80868b;
       --border: #e0e0e0;
       --accent: #1a73e8;
+      --everly: #ec407a;
+      --everly-bg: #fce4ec;
+      --isla: #5c6bc0;
+      --isla-bg: #e8eaf6;
     }}
     * {{ box-sizing: border-box; margin: 0; padding: 0; }}
     body {{
@@ -963,40 +1045,61 @@ def render_html(today: dt.date,
     .ignore-status:empty {{
       display: none;
     }}
-    .event-date {{
-      font-size: 0.8rem;
+    .meta-strip {{
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.82rem;
       color: var(--text-secondary);
-      font-weight: 500;
+      margin-bottom: 0.2rem;
+      flex-wrap: wrap;
+    }}
+    .child-chip {{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      font-size: 0.72rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }}
+    .child-chip.everly {{ background: var(--everly); color: #fff; }}
+    .child-chip.isla   {{ background: var(--isla);   color: #fff; }}
+    .meta-strip .sep {{
+      color: var(--text-tertiary);
+    }}
+    .meta-strip .day {{
+      font-weight: 600;
+      color: var(--text);
+    }}
+    .meta-strip .time.allday {{
+      background: #f1f3f4;
+      color: var(--text-secondary);
+      padding: 0.05rem 0.45rem;
+      border-radius: 10px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
     }}
     .event-name {{
       font-size: 1.05rem;
       font-weight: 600;
-      margin: 0.15rem 0 0.35rem;
+      line-height: 1.3;
+      margin: 0.1rem 0 0.2rem;
     }}
-    .event-details {{
-      font-size: 0.85rem;
+    .event-location {{
+      font-size: 0.82rem;
       color: var(--text-secondary);
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 0.35rem;
+      margin-bottom: 0.15rem;
     }}
-    .badge {{
-      display: inline-block;
-      font-size: 0.7rem;
-      font-weight: 600;
-      padding: 0.1rem 0.5rem;
-      border-radius: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.3px;
+    .event-audience {{
+      font-size: 0.75rem;
+      color: var(--text-tertiary);
+      margin-bottom: 0.15rem;
     }}
-    .event-meta {{
-      font-size: 0.78rem;
-      color: var(--text-secondary);
-      margin-top: 0.3rem;
-      opacity: 0.75;
-    }}
-    .child {{ font-weight: 500; }}
     .undated-note {{
       font-size: 0.85rem;
       color: var(--text-secondary);
@@ -1041,8 +1144,13 @@ def render_html(today: dt.date,
         --surface: #2d2d2d;
         --text: #e8eaed;
         --text-secondary: #9aa0a6;
+        --text-tertiary: #80868b;
         --border: #3c4043;
         --accent: #8ab4f8;
+      }}
+      .meta-strip .time.allday {{
+        background: #3c4043;
+        color: var(--text-secondary);
       }}
       .unignore-btn, .unignore-sender-btn {{
         background: #1e8e3e;

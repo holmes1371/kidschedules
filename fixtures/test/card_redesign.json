@@ -1,0 +1,62 @@
+[
+  {
+    "name": "Pediatrician Check-up",
+    "date": "2026-04-16",
+    "time": "3:45 PM",
+    "location": "Tysons Pediatrics, 8350 Greensboro Dr",
+    "category": "Appointment",
+    "child": "Everly",
+    "source": "MyChart reminder (Apr 2)",
+    "sender_domain": "mychart.org"
+  },
+  {
+    "name": "Yearbook Photos Submission Deadline",
+    "date": "2026-04-17",
+    "time": "All day (deadline)",
+    "location": "https://drive.google.com/drive/folders/1D-X2Jh5aPCXkMH23JLYLMqfOpzPHJ79S",
+    "category": "Academic Due Date",
+    "child": "All LAES students",
+    "source": "LAES PTA Vice President (Apr 8)",
+    "sender_domain": "louisearcherpta.org"
+  },
+  {
+    "name": "Book Report Due Charlottes Web",
+    "date": "2026-04-17",
+    "time": "",
+    "location": "",
+    "category": "Academic Due Date",
+    "child": "Isla",
+    "source": "Mrs. Patterson weekly newsletter (Apr 10)",
+    "sender_domain": "fcps.edu"
+  },
+  {
+    "name": "Soccer Practice",
+    "date": "2026-04-21",
+    "time": "5:30 - 6:45 PM",
+    "location": "Wakefield Park, Field 3",
+    "category": "Sports & Extracurriculars",
+    "child": "Isla",
+    "source": "NVSC team update (Apr 11)",
+    "sender_domain": "teamsnap.com"
+  },
+  {
+    "name": "Early Release Day",
+    "date": "2026-04-15",
+    "time": "1:30 PM dismissal",
+    "location": "Louise Archer Elementary",
+    "category": "School Activity",
+    "child": "",
+    "source": "FCPS News You Choose (Apr 8)",
+    "sender_domain": "fcps.edu"
+  },
+  {
+    "name": "Ballet Recital Rehearsal",
+    "date": "2026-04-22",
+    "time": "4:00 PM",
+    "location": "Cuppett Performing Arts Center, Vienna VA",
+    "category": "Sports & Extracurriculars",
+    "child": "Everly",
+    "source": "Ballet school weekly (Apr 12)",
+    "sender_domain": "cuppettdance.com"
+  }
+]

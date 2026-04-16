@@ -18,8 +18,6 @@ Category: Appointment
 Child: Everly | Source: MyChart reminder (Apr 2)
 
 Friday, April 17 — Book Report Due
-Time: Time TBD
-Location: Location TBD
 Category: Academic Due Date
 Child: Isla | Source: Mrs. Patterson weekly newsletter (Apr 10)
 

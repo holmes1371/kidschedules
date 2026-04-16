@@ -152,13 +152,18 @@ def test_classify_warns_on_unknown_category_but_keeps_event():
 
 
 def test_classify_applies_field_defaults_to_sparse_event():
+    """After the Layout A flip (design/card-redesign.md), missing time/
+    location become empty strings — not "Time TBD" / "Location TBD"
+    sentinels. Render helpers now use truthy guards, so the sentinels
+    are no longer needed and would be distinguishable from a real
+    'TBD' string if one ever came in from a sender."""
     events = load_fixture("edge_cases")
     display, _, _, _, _, _ = pe.classify(
         events, cutoff=TODAY, horizon=HORIZON
     )
     sparse = next(e for e in display if e["name"] == "Sparse Event")
-    assert sparse["time"] == "Time TBD"
-    assert sparse["location"] == "Location TBD"
+    assert sparse["time"] == ""
+    assert sparse["location"] == ""
     assert sparse["child"] == ""
     assert sparse["source"] == "LAES (Apr 9)"
 
@@ -665,6 +670,195 @@ def test_render_html_js_hydration_reads_both_stores():
     assert "loadIgnoredSenders()" in html
     assert 'setIgnored(card, "sender")' in html
     assert 'setIgnored(card, "event")' in html
+
+
+# ─── card redesign (Layout A) ────────────────────────────────────────────
+
+
+def _render_cr() -> tuple[str, list[dict]]:
+    """Render the card_redesign fixture with no ignored events. Returns
+    (html, display_events) for substring probing in the tests below."""
+    events = load_fixture("card_redesign")
+    display, undated, _, _, _, _ = pe.classify(
+        events, cutoff=TODAY, horizon=HORIZON,
+    )
+    display = pe.dedupe(display)
+    undated = pe.dedupe(undated)
+    weeks = pe.group_by_week(display)
+    html = pe.render_html(
+        today=TODAY, weeks=weeks, undated=undated,
+        total_future=len(display), lookback_days=60, webhook_url="",
+    )
+    return html, display
+
+
+def _card_slice(html: str, needle: str, width: int = 1200) -> str:
+    """Return a single card's HTML by walking back from an event-name
+    occurrence to the nearest `<div class="event-card`. Keeps asserts
+    from bleeding between cards when substrings are common."""
+    idx = html.find(needle)
+    assert idx != -1, f"expected to find {needle!r} in render"
+    open_idx = html.rfind('<div class="event-card', 0, idx)
+    assert open_idx != -1, "no opening event-card tag before needle"
+    return html[open_idx:open_idx + width]
+
+
+def test_layout_a_meta_strip_has_day_label_separator_and_time():
+    """Dated cards emit `<div class="meta-strip">` with the abbreviated
+    day (e.g. `Thu, Apr 16`), a middot separator, and a `.time` span.
+    The old standalone `.event-date` block is gone."""
+    html, _ = _render_cr()
+    card = _card_slice(html, "Pediatrician Check-up")
+    assert 'class="meta-strip"' in card
+    assert '<span class="day">Thu, Apr 16</span>' in card
+    assert '<span class="sep">·</span>' in card
+    assert '<span class="time">3:45 PM</span>' in card
+    assert 'class="event-date"' not in card
+
+
+def test_layout_a_child_chip_renders_for_everly():
+    html, _ = _render_cr()
+    card = _card_slice(html, "Pediatrician Check-up")
+    assert '<span class="child-chip everly" title="Everly">E</span>' in card
+
+
+def test_layout_a_child_chip_renders_for_isla():
+    html, _ = _render_cr()
+    card = _card_slice(html, "Soccer Practice")
+    assert '<span class="child-chip isla" title="Isla">I</span>' in card
+
+
+def test_layout_a_no_chip_or_audience_when_child_empty():
+    """Early Release Day's fixture entry has child="" — no chip, no
+    audience line."""
+    html, _ = _render_cr()
+    card = _card_slice(html, "Early Release Day")
+    assert "child-chip" not in card
+    assert "event-audience" not in card
+
+
+def test_layout_a_audience_line_for_non_kid_child():
+    """Yearbook fixture entry's child is "All LAES students" — renders
+    as an audience line rather than a chip."""
+    html, _ = _render_cr()
+    card = _card_slice(html, "Yearbook Photos Submission Deadline")
+    assert "child-chip" not in card
+    assert '<div class="event-audience">For: All LAES students</div>' in card
+
+
+def test_layout_a_all_day_pill_for_blank_time():
+    """Book Report Due has time="" after the ingest flip — the card
+    renders the all-day pill instead of a bare `<span class="time">`."""
+    html, _ = _render_cr()
+    card = _card_slice(html, "Book Report Due")
+    assert '<span class="time allday">All day</span>' in card
+
+
+def test_layout_a_all_day_pill_for_deadline_time_string():
+    """`All day (deadline)` normalizes to the same pill as empty time —
+    the user-facing label collapses either shape to `All day`."""
+    html, _ = _render_cr()
+    card = _card_slice(html, "Yearbook Photos Submission Deadline")
+    assert '<span class="time allday">All day</span>' in card
+
+
+def test_layout_a_time_range_preserved_verbatim():
+    """Non-deadline times (including ranges) render verbatim in
+    `<span class="time">` — no `.allday` class, no reformatting."""
+    html, _ = _render_cr()
+    card = _card_slice(html, "Soccer Practice")
+    assert '<span class="time">5:30 - 6:45 PM</span>' in card
+    assert "time allday" not in card
+
+
+def test_layout_a_location_renders_when_plain_string():
+    html, _ = _render_cr()
+    card = _card_slice(html, "Pediatrician Check-up")
+    assert ('<div class="event-location">Tysons Pediatrics, '
+            '8350 Greensboro Dr</div>') in card
+
+
+def test_layout_a_url_location_is_suppressed():
+    """A drive.google.com URL in the location field is suppressed — a
+    raw URL isn't a useful "place" on the card."""
+    html, _ = _render_cr()
+    card = _card_slice(html, "Yearbook Photos Submission Deadline")
+    assert "drive.google.com" not in card
+    assert "event-location" not in card
+
+
+def test_layout_a_empty_location_emits_no_location_div():
+    """Book Report Due has location="" after the ingest flip — the
+    card should not emit any `.event-location` element at all."""
+    html, _ = _render_cr()
+    card = _card_slice(html, "Book Report Due")
+    assert "event-location" not in card
+
+
+def test_layout_a_drops_deprecated_badge_and_meta_classes():
+    """Regression guard: none of the pre-Layout-A class names leak
+    onto any rendered card (checks whole HTML, not a slice, so we
+    catch orphans anywhere in the render)."""
+    html, _ = _render_cr()
+    assert 'class="badge"' not in html
+    assert 'class="event-meta"' not in html
+    assert 'class="event-details"' not in html
+    assert '<span class="child"' not in html
+    assert '<span class="source"' not in html
+    assert 'class="event-date"' not in html
+
+
+def test_layout_a_undated_card_uses_meta_strip_with_date_tbd():
+    """The Needs-Verification card shares the Layout A shell — same
+    meta-strip, child-chip, all-day pill — but with `Date TBD` as the
+    day label. `camps.fcps.edu` is a bare domain (not http:// and not
+    an email), so the location line still renders."""
+    raw = [{
+        "name": "Camp Signup",
+        "date": "",
+        "time": "All day (deadline)",
+        "location": "camps.fcps.edu",
+        "category": "Academic Due Date",
+        "child": "Isla",
+        "source": "FCPS camps (Apr 3)",
+        "sender_domain": "fcps.edu",
+    }]
+    _, undated, _, _, _, _ = pe.classify(
+        raw, cutoff=TODAY, horizon=HORIZON,
+    )
+    undated = pe.dedupe(undated)
+    html = pe.render_html(
+        today=TODAY, weeks=[], undated=undated,
+        total_future=0, lookback_days=60, webhook_url="",
+    )
+    idx = html.find('class="event-card undated"')
+    assert idx != -1, "expected an undated card in this render"
+    card = html[idx:idx + 1500]
+    assert 'class="meta-strip"' in card
+    assert '<span class="day">Date TBD</span>' in card
+    assert '<span class="time allday">All day</span>' in card
+    assert '<span class="child-chip isla" title="Isla">I</span>' in card
+    assert '<div class="event-location">camps.fcps.edu</div>' in card
+    # Parallel regression guards:
+    assert 'class="event-date"' not in card
+    assert 'class="badge"' not in card
+
+
+def test_layout_a_css_ships_new_tokens_and_selectors():
+    """Smoke-check that the CSS block ships the Layout A design tokens
+    and selectors — catches accidental stylesheet regressions."""
+    html, _ = _render_cr()
+    # Design tokens
+    assert "--text-tertiary" in html
+    assert "--everly" in html
+    assert "--isla" in html
+    # Selectors
+    assert ".meta-strip" in html
+    assert ".child-chip.everly" in html
+    assert ".child-chip.isla" in html
+    assert ".meta-strip .time.allday" in html
+    assert ".event-location" in html
+    assert ".event-audience" in html
 
 
 # ─── subject + metadata ──────────────────────────────────────────────────
