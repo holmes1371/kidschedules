@@ -56,3 +56,7 @@ rocketmortgage@e.rocketmortgage.com  # auto 2026-04-15: Adult homeowner/mortgage
 notifications-noreply@linkedin.com  # auto 2026-04-15: LinkedIn weekly analytics recap — adult professional networking, no kids' conten
 talent@ibm.com  # auto 2026-04-15: IBM talent acquisition / job recruiting newsletter — adult career content only
 mail@serviceautopilot.com  # auto 2026-04-15: Lawn care and mosquito repellent service reminder — adult home services, no kids
+icamail@ichelp.org  # auto 2026-04-16: Adult medical research digest about interstitial cystitis — entirely adult healt
+columbiapikeanimalhospital@gmail.com  # auto 2026-04-16: Veterinary records for a pet (Tux), no children involved
+invitations@linkedin.com  # auto 2026-04-16: Adult professional networking invitation, no children's events
+no-reply@dancestudio-pro.com  # auto 2026-04-16: Marketing email from an unaffiliated dance studio (Adrenaline) advertising their
