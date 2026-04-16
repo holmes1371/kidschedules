@@ -462,10 +462,52 @@ def test_render_html_show_ignored_toggle_appears_with_count():
 
 def test_render_html_show_ignored_toggle_omitted_when_none_ignored():
     html, _ = _render_ignored_fixture(ignored_names=())
-    # The CSS rule for `.show-ignored-toggle` is always in the stylesheet —
-    # what we care about is that the *button element* isn't rendered.
+    # The CSS rule for `.show-ignored-toggle` is always in the stylesheet,
+    # and the client JS references the same label template for its
+    # counter-update helper — what we care about is that the *button
+    # element* isn't rendered. Check the attribute form so the test is
+    # robust to the label literal appearing elsewhere in the script.
     assert 'class="show-ignored-toggle"' not in html
-    assert "Show ignored (" not in html
+    assert 'data-show-label="Show ignored (' not in html
+
+
+# ─── render_html client JS wiring (step 9) ───────────────────────────────
+
+# These tests lock in that the delegated click router in the rendered page
+# references each Apps Script action name and the selectors it binds to.
+# They're intentionally substring-level — richer behavior is validated
+# manually in the browser against the live Apps Script deploy.
+
+
+def test_render_html_js_posts_action_names():
+    html, _ = _render_ignored_fixture(ignored_names=())
+    # All three Apps Script actions are wired into the client POST body.
+    assert '"action": "ignore"' in html or 'action: "ignore"' in html
+    assert '"action": "unignore"' in html or 'action: "unignore"' in html
+    assert '"action": "ignore_sender"' in html or 'action: "ignore_sender"' in html
+
+
+def test_render_html_js_binds_new_selectors():
+    html, _ = _render_ignored_fixture(("Ignored With Sender",))
+    # Delegated router inspects each of the three button classes.
+    assert 'classList.contains("unignore-btn")' in html
+    assert 'classList.contains("show-ignored-toggle")' in html
+    assert 'classList.contains("ignore-sender-btn")' in html
+
+
+def test_render_html_js_has_toast_helper():
+    html, _ = _render_ignored_fixture(ignored_names=())
+    # Single toast helper is used for failure + confirmation paths.
+    assert "function showToast(" in html
+    assert 'id="toast"' in html or 'createElement("div")' in html
+
+
+def test_render_html_js_hydration_swaps_button_to_unignore():
+    html, _ = _render_ignored_fixture(ignored_names=())
+    # Hydration must call setIgnored on locally-ignored cards so the button
+    # flips to Unignore even without a server-side round-trip.
+    assert "function setIgnored(" in html
+    assert "function setActive(" in html
 
 
 # ─── subject + metadata ──────────────────────────────────────────────────

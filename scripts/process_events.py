@@ -996,6 +996,27 @@ def render_html(today: dt.date,
       font-size: 0.75rem;
       color: var(--text-secondary);
     }}
+    .toast {{
+      position: fixed;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--text);
+      color: var(--surface);
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      z-index: 1000;
+      max-width: 90%;
+      text-align: center;
+    }}
+    .toast.visible {{
+      opacity: 1;
+    }}
     @media (prefers-color-scheme: dark) {{
       :root {{
         --bg: #1a1a1a;
@@ -1043,56 +1064,167 @@ def render_html(today: dt.date,
           return [];
         }}
       }}
-
       function saveIgnored(ids) {{
-        try {{
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(ids));
-        }} catch (e) {{ /* storage unavailable */ }}
+        try {{ localStorage.setItem(STORAGE_KEY, JSON.stringify(ids)); }}
+        catch (e) {{ /* storage unavailable */ }}
       }}
 
-      // On load: hide any cards the user previously ignored in this browser.
-      var ignored = loadIgnored();
-      document.querySelectorAll(".event-card[data-event-id]").forEach(function (card) {{
-        if (ignored.indexOf(card.getAttribute("data-event-id")) !== -1) {{
-          card.style.display = "none";
+      // ── Toast ─────────────────────────────────────────────
+      var toastTimer = null;
+      function showToast(msg) {{
+        var t = document.getElementById("toast");
+        if (!t) {{
+          t = document.createElement("div");
+          t.id = "toast";
+          t.className = "toast";
+          document.body.appendChild(t);
         }}
+        t.textContent = msg;
+        t.classList.add("visible");
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () {{
+          t.classList.remove("visible");
+        }}, 3000);
+      }}
+
+      // ── Card state swap helpers ───────────────────────────
+      function setIgnored(card) {{
+        card.classList.add("ignored");
+        card.style.display = "none";
+        card.setAttribute("data-ignored", "1");
+        var btn = card.querySelector(".ignore-btn");
+        if (btn) {{
+          btn.className = "unignore-btn";
+          btn.textContent = "Unignore event";
+          btn.setAttribute("aria-label", "Unignore this event");
+          btn.disabled = false;
+        }}
+      }}
+      function setActive(card) {{
+        card.classList.remove("ignored");
+        card.style.display = "";
+        card.removeAttribute("data-ignored");
+        var btn = card.querySelector(".unignore-btn");
+        if (btn) {{
+          btn.className = "ignore-btn";
+          btn.textContent = "Ignore event";
+          btn.setAttribute("aria-label", "Ignore this event");
+          btn.disabled = false;
+        }}
+      }}
+
+      // ── Show-ignored toggle counter (server-rendered) ─────
+      function bumpToggle(delta) {{
+        var btn = document.querySelector(".show-ignored-toggle");
+        if (!btn) return;
+        var showLabel = btn.getAttribute("data-show-label") || "";
+        var m = showLabel.match(/\((\d+)\)/);
+        var n = m ? parseInt(m[1], 10) + delta : 0;
+        if (n <= 0) {{
+          document.body.classList.remove("show-ignored");
+          var parent = btn.parentElement;
+          if (parent) parent.remove();
+          return;
+        }}
+        var newShow = "Show ignored (" + n + ")";
+        var newHide = "Hide ignored (" + n + ")";
+        btn.setAttribute("data-show-label", newShow);
+        btn.setAttribute("data-hide-label", newHide);
+        btn.textContent = document.body.classList.contains("show-ignored")
+          ? newHide : newShow;
+      }}
+
+      // ── localStorage hydration ────────────────────────────
+      // For each locally-stored id, hide the matching card AND swap its
+      // button to Unignore so the Show-ignored toggle + Unignore flow work
+      // before the next workflow run picks up the server-side list.
+      var localIds = loadIgnored();
+      document.querySelectorAll(".event-card[data-event-id]").forEach(function (card) {{
+        if (localIds.indexOf(card.getAttribute("data-event-id")) === -1) return;
+        if (card.getAttribute("data-ignored") === "1") return;
+        setIgnored(card);
       }});
 
-      // Click handler: fade the card, record locally, POST to the webhook.
-      document.querySelectorAll(".ignore-btn").forEach(function (btn) {{
-        btn.addEventListener("click", function () {{
-          var card = btn.closest(".event-card");
+      // ── POST helper ───────────────────────────────────────
+      function postAction(payload) {{
+        if (!WEBHOOK_URL) return Promise.resolve();  // dev/preview no-op success
+        return fetch(WEBHOOK_URL, {{
+          method: "POST",
+          headers: {{ "Content-Type": "text/plain;charset=utf-8" }},
+          body: JSON.stringify(payload)
+        }});
+      }}
+
+      // ── Delegated click router ────────────────────────────
+      document.addEventListener("click", function (e) {{
+        var t = e.target;
+
+        // Ignore event — optimistic hide, restore on failure.
+        if (t.classList.contains("ignore-btn")) {{
+          var card = t.closest(".event-card");
           if (!card) return;
           var id = card.getAttribute("data-event-id");
-          var name = btn.getAttribute("data-event-name") || "";
-          var date = btn.getAttribute("data-event-date") || "";
-          var status = card.querySelector(".ignore-status");
-          btn.disabled = true;
-          if (status) status.textContent = "";
-
+          var name = t.getAttribute("data-event-name") || "";
+          var date = t.getAttribute("data-event-date") || "";
+          t.disabled = true;
           var current = loadIgnored();
           if (current.indexOf(id) === -1) current.push(id);
           saveIgnored(current);
           card.classList.add("fading");
-          setTimeout(function () {{ card.style.display = "none"; }}, 300);
-
-          if (!WEBHOOK_URL) return;  // dev/preview: no backend, hide only
-          fetch(WEBHOOK_URL, {{
-            method: "POST",
-            headers: {{ "Content-Type": "text/plain;charset=utf-8" }},
-            body: JSON.stringify({{ id: id, name: name, date: date }})
-          }}).catch(function () {{
-            // Restore the card so the user can retry.
-            card.style.display = "";
+          setTimeout(function () {{
+            setIgnored(card);
             card.classList.remove("fading");
-            btn.disabled = false;
+          }}, 300);
+          postAction({{ action: "ignore", id: id, name: name, date: date }}).catch(function () {{
+            setActive(card);
             var remaining = loadIgnored().filter(function (x) {{ return x !== id; }});
             saveIgnored(remaining);
-            if (status) status.textContent = "Could not sync — try again.";
+            showToast("Ignore failed — try again");
           }});
-        }});
-      }});
+          return;
+        }}
 
+        // Unignore event — pessimistic, apply only after 2xx.
+        if (t.classList.contains("unignore-btn")) {{
+          var ucard = t.closest(".event-card");
+          if (!ucard) return;
+          var uid = ucard.getAttribute("data-event-id");
+          t.disabled = true;
+          postAction({{ action: "unignore", id: uid }}).then(function () {{
+            setActive(ucard);
+            var remaining = loadIgnored().filter(function (x) {{ return x !== uid; }});
+            saveIgnored(remaining);
+            bumpToggle(-1);
+          }}).catch(function () {{
+            t.disabled = false;
+            showToast("Unignore failed — try again");
+          }});
+          return;
+        }}
+
+        // Show/Hide ignored toggle — pure client class flip.
+        if (t.classList.contains("show-ignored-toggle")) {{
+          var on = document.body.classList.toggle("show-ignored");
+          t.textContent = on
+            ? (t.getAttribute("data-hide-label") || t.textContent)
+            : (t.getAttribute("data-show-label") || t.textContent);
+          return;
+        }}
+
+        // Ignore sender — toast on resolution, disable on success.
+        if (t.classList.contains("ignore-sender-btn")) {{
+          var domain = t.getAttribute("data-sender") || "";
+          if (!domain) return;
+          t.disabled = true;
+          postAction({{ action: "ignore_sender", domain: domain }}).then(function () {{
+            showToast("Ignoring " + domain + ". New events will stop appearing after the next refresh.");
+          }}).catch(function () {{
+            t.disabled = false;
+            showToast("Ignore failed — try again");
+          }});
+          return;
+        }}
+      }});
     }})();
   </script>
 </body>
