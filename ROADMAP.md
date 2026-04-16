@@ -8,13 +8,24 @@ Always load the karpathy-guidelines skill before starting anything here.
 
 Replace this block at the end of each session. Keep it to what the next agent actually needs to walk in cold: what just closed, what's open, where to pick up, and any non-obvious observations that aren't captured under a numbered item.
 
-**2026-04-16**
+**2026-04-16 (session 2 — design phase for #11)**
 
-- **Closed: #16** — Node 20 → Node 24 action upgrades (`ea081da`). Bumped `actions/checkout` v4→v5, `actions/setup-python` v5→v6, `actions/upload-pages-artifact` v3→v5, `actions/deploy-pages` v4→v5 across `weekly-schedule.yml` and `tests.yml`. Added `include-hidden-files: true` to the Upload Pages artifact step because v4 made hidden-file exclusion the default and `docs/.nojekyll` must ship with the artifact. Design note at `design/node-24-action-upgrades.md`. Also restored the truncated `FORCE_JAVAS…` fallback sentence in #16 (now documenting `ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION`). Tom verified: `tests.yml` green on Node 24 pins, Pages deployed cleanly, no deprecation warnings.
-- **Closed (earlier session): #9** — footer tempo copy (`756428c`) + archive-infrastructure rip (`2640c4b`).
-- **Closed (earlier session): #10** — Monday-only Gmail draft gating (`65c86f3`). See `design/monday-only-draft-gating.md`.
-- **Next up: #11** — card information redesign. Supersedes the original per-kid split and **blocks #13** (per-kid filter chips); don't start chip work until the card redesign lands. Design-note-first per the item body.
-- **Repo state**: 224 tests passing. All workflow actions now on Node 24 majors.
+- **In progress: #11** — card redesign. Layout A ("identity-first rail") approved by Tom after mockup iteration. Mockup committed at `design/card-redesign-mockup.html` — six variants pairing current-state old cards above proposed new cards, so a fresh agent can see the deltas without rehashing them.
+- **Locked design decisions for the implementation pass:**
+  - Meta strip reads `[child-chip] Day, Mon DD · Time` (e.g. `Thu, Apr 16 · 3:45 PM`). Weekday three-letter, event date next to it. Week section header still carries the full month context.
+  - Child chip: 22px solid circle with bold initial. Everly `#ec407a` (coral), Isla `#5c6bc0` (indigo). Non-kid `child` values (e.g. "All LAES students") render as a small "For: ..." line below the name instead of forcing an ambiguous chip.
+  - Category text badge removed. Category is signaled by the coloured left rail only.
+  - Source line removed entirely. Sender domain still surfaces via the Ignore-sender button where applicable; Gmail search covers the rest.
+  - "Time TBD" / "Location TBD" strings suppressed. Empty time renders as a small grey "All day" pill. Empty location drops the whole location line.
+  - URL-only or email-only locations suppressed at render (Python-side). Not yet implemented; design note to capture the rule.
+  - Actions (Add to calendar, Ignore event / Unignore event, Ignore sender) unchanged in shape and placement.
+- **Agent.py ripple** (flagged, not implemented here): the extractor currently produces `time: "All day (deadline)"` for due dates. Design note should specify the canonical empty-time representation so render has a single fallback path.
+- **Roadmap swap**: per-kid filter chips moved from #13 → #12 to be tackled immediately after #11. "New this week" badges demoted to #13. Cross-refs updated in the #11 body and in this summary.
+- **Teacher-roster subtask** added under new #12. Current 2025–2026: Isla → Ms. Meredith Rohde, Everly → Ms. Anita Sahai, both at Louise Archer Elementary. `class_roster.json` injected into `agent.py`'s extractor prompt. Fall-2026 update: Everly moves to Thoreau Middle — roster edit + fresh Thoreau domain(s) on `protected_senders.txt` before first summer registration emails arrive.
+- **Stale fixture flag**: `fixtures/sample_candidates.json` contains "Glasgow Middle School / Isla" which does not match reality. Not a blocker for #11; worth a one-off cleanup pass after the redesign lands so `scripts/dev_render.py` produces realistic previews.
+- **Next step (pick up here):** write `design/card-redesign.md` capturing the locked decisions above (scope, mockup pointer, render ripple through `scripts/process_events.py`, agent.py ripple for canonical empty-time, fixture/test plan, responsibility table, non-goals, #12 ripple for chip colors matching avatar colors). Then implement in `process_events.py` with fixture extension in step. ROADMAP #11 stays `[ ]` until the code commit lands and flips it to `[~]`.
+- **Earlier session closures (for context):** #16 Node 24 action upgrades (`ea081da`); #9 footer tempo copy (`756428c`) + archive-infrastructure rip (`2640c4b`); #10 Monday-only draft gating (`65c86f3`).
+- **Repo state**: 224 tests passing, last full run prior to this session. No test changes this session.
 
 ## For future agents
 
@@ -138,15 +149,17 @@ Picked option (b) from the original note: split the cron into two entries (`15 1
 
 ### 11. [ ] Card information redesign (supersedes per-kid split)
 
-The initial "group by child" split (Everly / Isla) isn't landing. Deliberately redesign what fields show on each card and how, rather than iterating on the current layout. Design-note-first at `design/card-redesign.md`: inventory the current fields end-to-end, name the redundancies (child label when already grouped, sender line when obvious, repeated date/time formatting), propose 1–2 layouts in mock HTML, pick one, then implement. Call out in the design note that this reshapes the problem space for item 13 (per-kid filter chips) — chips should be revisited only after this lands.
+The initial "group by child" split (Everly / Isla) isn't landing. Deliberately redesign what fields show on each card and how, rather than iterating on the current layout. Design-note-first at `design/card-redesign.md`: inventory the current fields end-to-end, name the redundancies (child label when already grouped, sender line when obvious, repeated date/time formatting), propose 1–2 layouts in mock HTML, pick one, then implement. Call out in the design note that this reshapes the problem space for item 12 (per-kid filter chips) — chips should be revisited only after this lands.
 
-### 12. [ ] "New this week" badges
+### 12. [ ] Per-kid filter chips — next up after #11
+
+`process_events.py` renders a chip row at the top of the page from the unique children in this run, plus an "All" reset chip. Client JS toggles card visibility via a CSS class on click. Pure-UI, self-contained. With the card redesign (item 11) promoting child to a first-class visual chip per card, the top-of-page filter chips should reuse the same colors so the two affordances reinforce each other instead of competing.
+
+**Subtask — Teacher roster for attribution accuracy.** With child as a prominent visual chip, mis-attribution by the extractor becomes visually load-bearing instead of a subtle meta-row quibble. Commit a `class_roster.json` (teacher → kid mapping, optionally including school) and inject it into `agent.py`'s extractor prompt so emails that name a teacher ("Mrs. Rohde's class", "Ms. Sahai's homeroom") without naming a kid route correctly. Current (2025–2026 academic year): Isla → Ms. Meredith Rohde, Everly → Ms. Anita Sahai, both at Louise Archer Elementary. Fall-update workflow: edit the roster file, commit. Should land before or alongside the chip row so the filters aren't operating on shaky labels.
+
+### 13. [ ] "New this week" badges
 
 Persist prior-run event IDs to a manifest file in the repo (e.g. `prior_events.json`). On each run, `process_events.py` diffs current IDs against the manifest and stamps cards whose IDs did not exist last week with a visible "NEW" badge. First run: manifest empty, no badges — degrade gracefully. The workflow commits the updated manifest alongside the other outputs.
-
-### 13. [ ] Per-kid filter chips — revisit after item 11
-
-Blocked on the card redesign in item 11: if the per-child split gets rethought at the card level, the chip affordance has to be re-scoped against whatever replaces it. Original plan, preserved for reference: `process_events.py` renders a chip row at the top of the page from the unique children in this run, plus an "All" reset chip. Client JS toggles card visibility via a CSS class on click. Pure-UI, self-contained.
 
 ### 14. [ ] Manual "refresh now" button in the UI
 
