@@ -1184,7 +1184,7 @@ def render_html(today: dt.date,
           return;
         }}
         var showLabel = btn.getAttribute("data-show-label") || "";
-        var m = showLabel.match(/\((\d+)\)/);
+        var m = showLabel.match(/\\((\\d+)\\)/);
         var n = m ? parseInt(m[1], 10) + delta : 0;
         if (n <= 0) {{
           document.body.classList.remove("show-ignored");
