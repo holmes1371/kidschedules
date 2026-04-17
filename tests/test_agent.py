@@ -232,3 +232,178 @@ def test_load_roster_prose_raises_on_missing_file(tmp_path):
     import pytest
     with pytest.raises(FileNotFoundError):
         agent._load_roster_prose(missing)
+
+
+# ─── newsletter-isolated batching (#17 subtask) ───────────────────────────
+#
+# `_sender_key` collapses the `From` header to the same lowercased-mailbox
+# form `newsletter_stats.py` stores; `_plan_batches` uses it to partition
+# emails into newsletter (size-1) and regular (BATCH_SIZE) batches.
+# Newsletter batches run FIRST — if an API call fails midway, the
+# high-yield messages are already extracted.
+
+
+def _mk_email(mid: str, sender: str) -> dict:
+    """Minimal email dict for batch-planning tests.
+
+    Only messageId and from_ matter; the rest of the fields the agent
+    normally threads through the prompt are irrelevant for the
+    partition/chunk logic covered here.
+    """
+    return {
+        "messageId": mid,
+        "from_": sender,
+        "subject": "",
+        "date_sent": "",
+        "body": "",
+    }
+
+
+def test_sender_key_bare_address():
+    assert agent._sender_key("foo@bar.com") == "foo@bar.com"
+
+
+def test_sender_key_named_form():
+    assert agent._sender_key("Foo Bar <foo@bar.com>") == "foo@bar.com"
+
+
+def test_sender_key_lowercases_mixed_case():
+    """Case folding happens at key time so the stats file can store one
+    canonical form and the batching lookup stays case-insensitive."""
+    assert agent._sender_key("FOO@BAR.COM") == "foo@bar.com"
+
+
+def test_sender_key_empty_and_missing_headers_return_empty():
+    """Empty / None headers collapse to an empty-string key. Callers
+    treat empty-key as 'not in the newsletter set' — the safe default
+    (batched at BATCH_SIZE)."""
+    assert agent._sender_key("") == ""
+    assert agent._sender_key(None) == ""  # type: ignore[arg-type]
+
+
+def test_sender_key_garbage_header_never_matches_a_real_mailbox():
+    """`email.utils.parseaddr` is tolerant: on garbage input without
+    angle brackets it may return the first bare token ('not' for
+    'not an email'). That's fine — any such token can't equal a real
+    lowercased mailbox in the newsletter set, so the email safely flows
+    into the regular partition. This test pins the safety property
+    rather than the exact parseaddr return value."""
+    key = agent._sender_key("not an email")
+    # The key may be empty or a bare token; crucially, it is never
+    # equal to a realistic mailbox, so newsletter matching is safe.
+    assert "@" not in key
+
+
+def test_plan_batches_default_matches_prior_chunking():
+    """Regression guard. None preserves the pre-#17 behavior: a single
+    partition chunked at BATCH_SIZE, in input order."""
+    emails = [_mk_email(f"m{i}", f"s{i}@x.com") for i in range(25)]
+    batches = agent._plan_batches(emails, None)
+    # 25 emails → ceil(25/10) = 3 batches of sizes 10, 10, 5
+    assert [len(b) for b in batches] == [10, 10, 5]
+    # Input order preserved across the flattened batches
+    flat = [e["messageId"] for b in batches for e in b]
+    assert flat == [f"m{i}" for i in range(25)]
+
+
+def test_plan_batches_empty_list_with_none():
+    assert agent._plan_batches([], None) == []
+
+
+def test_plan_batches_empty_list_with_set():
+    """An empty input list produces no batches regardless of whether
+    newsletter_senders is provided."""
+    assert agent._plan_batches([], {"news@x.com"}) == []
+
+
+def test_plan_batches_newsletter_only_runs_as_batches_of_one():
+    emails = [_mk_email("m1", "news@x.com"), _mk_email("m2", "news@x.com")]
+    batches = agent._plan_batches(emails, {"news@x.com"})
+    assert [len(b) for b in batches] == [1, 1]
+    assert batches[0][0]["messageId"] == "m1"
+    assert batches[1][0]["messageId"] == "m2"
+
+
+def test_plan_batches_regular_only_chunks_at_batch_size():
+    """Empty newsletter set means every email is regular; resulting
+    chunking should be identical to the `None` default."""
+    emails = [_mk_email(f"m{i}", "regular@x.com") for i in range(12)]
+    batches = agent._plan_batches(emails, set())
+    assert [len(b) for b in batches] == [10, 2]
+
+
+def test_plan_batches_newsletters_first_then_regulars():
+    """Mixed partition: newsletters (batch-of-1) ordered BEFORE regulars
+    (BATCH_SIZE chunk). Order within each partition is preserved."""
+    emails = [
+        _mk_email("r1", "regular@x.com"),
+        _mk_email("n1", "news@x.com"),
+        _mk_email("r2", "regular@x.com"),
+        _mk_email("n2", "news@x.com"),
+        _mk_email("r3", "regular@x.com"),
+    ]
+    batches = agent._plan_batches(emails, {"news@x.com"})
+    # 2 newsletter batches (size 1 each) first, then 1 regular batch (size 3)
+    assert [len(b) for b in batches] == [1, 1, 3]
+    assert batches[0][0]["messageId"] == "n1"
+    assert batches[1][0]["messageId"] == "n2"
+    assert [e["messageId"] for e in batches[2]] == ["r1", "r2", "r3"]
+
+
+def test_plan_batches_newsletter_heavy_run_plus_multiple_regular_batches():
+    """15 regulars + 3 newsletters → 3 newsletter batches first, then
+    2 regular batches (10+5). Proves both partitions chunk correctly."""
+    emails = [_mk_email(f"n{i}", "news@x.com") for i in range(3)]
+    emails += [_mk_email(f"r{i}", "regular@x.com") for i in range(15)]
+    batches = agent._plan_batches(emails, {"news@x.com"})
+    assert [len(b) for b in batches] == [1, 1, 1, 10, 5]
+    for i in range(3):
+        assert batches[i][0]["messageId"] == f"n{i}"
+
+
+def test_plan_batches_sender_match_is_case_insensitive():
+    """From-header senders often arrive in mixed case. _sender_key
+    lowercases before lookup, so the stats-file canonical form (lower)
+    still matches."""
+    emails = [_mk_email("m1", "News@X.COM")]
+    batches = agent._plan_batches(emails, {"news@x.com"})
+    assert [len(b) for b in batches] == [1]
+
+
+def test_plan_batches_uses_named_form_mailbox_for_match():
+    """Senders often come through as `"Foo Bar <foo@bar.com>"`. The key
+    is the inner mailbox, so the newsletter set lookup must hit."""
+    emails = [_mk_email("m1", "PTA Sunbeam <sunbeam@laespta.org>")]
+    batches = agent._plan_batches(emails, {"sunbeam@laespta.org"})
+    assert [len(b) for b in batches] == [1]
+
+
+def test_plan_batches_unknown_sender_is_regular():
+    """A sender not in the newsletter set rides the regular partition
+    even when `newsletter_senders` is non-empty."""
+    emails = [_mk_email("m1", "surprise@x.com")]
+    batches = agent._plan_batches(emails, {"news@x.com"})
+    # Single email → one regular batch of size 1 (not forced batch-of-1
+    # because that only applies to matched newsletters; here it is just
+    # the last-chunk residual of a BATCH_SIZE chunking)
+    assert [len(b) for b in batches] == [1]
+    assert batches[0][0]["messageId"] == "m1"
+
+
+def test_plan_batches_missing_from_header_is_regular():
+    """Email dicts without a `from_` key (defensive: should never
+    happen, but protect the partition loop from KeyError) flow into
+    the regular bucket via the empty-string key default."""
+    emails = [{"messageId": "m1", "subject": "", "date_sent": "", "body": ""}]
+    batches = agent._plan_batches(emails, {"news@x.com"})
+    assert [len(b) for b in batches] == [1]
+
+
+def test_extract_events_accepts_newsletter_senders_kwarg():
+    """Guardrail: the public signature accepts the new kwarg with a
+    default of None. Verified without an API call by inspecting the
+    signature so future refactors can't silently drop the kwarg."""
+    import inspect
+    sig = inspect.signature(agent.extract_events)
+    assert "newsletter_senders" in sig.parameters
+    assert sig.parameters["newsletter_senders"].default is None

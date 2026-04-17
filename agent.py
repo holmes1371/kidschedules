@@ -8,6 +8,7 @@ is handled by the deterministic Python scripts.
 """
 from __future__ import annotations
 
+import email.utils
 import json
 import os
 import time
@@ -277,6 +278,65 @@ bare parent domain, to avoid collateral damage.
 # detail per email, at the cost of more API calls.
 BATCH_SIZE = 10
 
+
+def _sender_key(from_header: str) -> str:
+    """Return the lowercased mailbox portion of a `From` header.
+
+    Used by `_plan_batches` to compare each email's sender against the
+    newsletter set that `main.py` builds from `sender_stats.json`. The
+    shape has to match the key `newsletter_stats.py` stores — lowercased
+    mailbox, parsed via `email.utils.parseaddr` so
+    `"Foo <foo@bar.com>"` collapses to `"foo@bar.com"`.
+
+    Returns `""` when the header is missing or unparseable; callers
+    treat empty-key as "not in the newsletter set" — the safe default
+    (batched at `BATCH_SIZE`).
+    """
+    _, addr = email.utils.parseaddr(from_header or "")
+    return addr.lower()
+
+
+def _plan_batches(
+    emails: list[dict[str, Any]],
+    newsletter_senders: set[str] | None,
+) -> list[list[dict[str, Any]]]:
+    """Partition `emails` into per-API-call batches.
+
+    Pure function — no I/O. Separated from `extract_events` so the
+    batching logic can be unit-tested without mocking the Anthropic SDK.
+
+    When `newsletter_senders` is `None` (default), behaves like the
+    prior inline split: a single partition chunked at `BATCH_SIZE`. This
+    preserves bit-for-bit behavior for callers that don't opt in.
+
+    When provided, emails whose sender key (lowercased mailbox from the
+    `From` header) is in the set go into batches of size 1; everyone
+    else goes into chunks of `BATCH_SIZE`. Newsletter batches are
+    ordered FIRST so a parse failure on a cheap regular batch does not
+    gate the expensive newsletter work — if the run aborts midway, the
+    high-yield messages are already extracted.
+    """
+    if newsletter_senders is None:
+        return [
+            emails[i : i + BATCH_SIZE]
+            for i in range(0, len(emails), BATCH_SIZE)
+        ]
+
+    newsletter_emails: list[dict[str, Any]] = []
+    regular_emails: list[dict[str, Any]] = []
+    for e in emails:
+        if _sender_key(e.get("from_", "")) in newsletter_senders:
+            newsletter_emails.append(e)
+        else:
+            regular_emails.append(e)
+
+    batches: list[list[dict[str, Any]]] = [[e] for e in newsletter_emails]
+    batches.extend(
+        regular_emails[i : i + BATCH_SIZE]
+        for i in range(0, len(regular_emails), BATCH_SIZE)
+    )
+    return batches
+
 # Retry config for transient API errors (overloaded, rate limits).
 MAX_RETRIES = 3
 RETRY_BASE_DELAY = 10  # seconds; doubles each retry
@@ -426,6 +486,7 @@ def extract_events(
     emails: list[dict[str, Any]],
     model: str = "claude-sonnet-4-6",
     max_tokens: int = 16384,
+    newsletter_senders: set[str] | None = None,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     """Send email content to Claude in batches and collect event dicts.
 
@@ -434,6 +495,12 @@ def extract_events(
                 date_sent, body (all strings).
         model: Anthropic model to use. Sonnet is cost-effective for this.
         max_tokens: max response tokens per batch.
+        newsletter_senders: optional set of lowercased sender mailboxes
+            (as produced by `_sender_key`) that should each run in a
+            batch of size 1 instead of sharing a batch with `BATCH_SIZE`
+            other emails. Newsletter batches run before regular ones.
+            `None` (default) preserves the prior behavior of batching
+            all emails at `BATCH_SIZE`.
 
     Returns:
         (events, irrelevant_senders) — events are ready for
@@ -442,11 +509,7 @@ def extract_events(
     if not emails:
         return [], []
 
-    # Split into batches
-    batches = [
-        emails[i : i + BATCH_SIZE]
-        for i in range(0, len(emails), BATCH_SIZE)
-    ]
+    batches = _plan_batches(emails, newsletter_senders)
     print(f"  Splitting {len(emails)} emails into {len(batches)} batch(es) "
           f"of up to {BATCH_SIZE}")
 
