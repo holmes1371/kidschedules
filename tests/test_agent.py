@@ -146,8 +146,9 @@ def test_no_warnings_when_nothing_is_dropped(capsys):
 
 def test_extraction_prompt_embeds_roster_prose():
     """End-to-end: the fully-formed prompt carries kid names, grades,
-    teachers, school, and the attribution rule. Guards the module-load
-    wiring — if the roster loader ever breaks silently, this fails."""
+    teachers, school, activity providers, and the attribution rules.
+    Guards the module-load wiring — if the roster loader or the
+    activity-clause branch ever breaks silently, this fails."""
     prompt = agent.EXTRACTION_SYSTEM_PROMPT
     for needle in (
         "Teacher roster",
@@ -159,6 +160,9 @@ def test_extraction_prompt_embeds_roster_prose():
         "6th",
         "3rd",
         "attribute",
+        "Born 2 Dance Studio (B2D)",
+        "Cuppett Performing Arts Center",
+        "activity provider",
     ):
         assert needle in prompt, f"missing from prompt: {needle!r}"
 
@@ -166,7 +170,8 @@ def test_extraction_prompt_embeds_roster_prose():
 def test_format_roster_prose_shape():
     """Unit test on the pure formatter. No filesystem. Fabricated mapping
     with a third kid proves the loop scales and nothing in the formatter
-    hard-codes Everly/Isla."""
+    hard-codes Everly/Isla. No `activities` key — exercises the no-clause
+    branch and asserts the kid's line stops at the teacher."""
     mapping = {
         "Alice": {"teacher": "Mr. Smith", "grade": "4th", "school": "Oakwood"},
         "Bob":   {"teacher": "Ms. Jones", "grade": "2nd", "school": "Oakwood"},
@@ -175,7 +180,49 @@ def test_format_roster_prose_shape():
     assert prose.startswith("Teacher roster (current academic year):")
     assert "- Alice is in 4th grade at Oakwood, taught by Mr. Smith." in prose
     assert "- Bob is in 2nd grade at Oakwood, taught by Ms. Jones." in prose
+    assert "activities:" not in prose  # no kid has activities in this fixture
     assert "attribute" in prose
+
+
+def test_format_roster_prose_includes_activities_clause():
+    """Activities are optional per-kid and surface as a semicolon clause
+    on the kid's line. Mixed fixture: one kid has one activity, one has
+    two, one has none. Asserts all three rendering paths are stable."""
+    mapping = {
+        "Alice": {
+            "teacher": "Mr. Smith",
+            "grade": "4th",
+            "school": "Oakwood",
+            "activities": ["Ridgeline Swim Club"],
+        },
+        "Bob": {
+            "teacher": "Ms. Jones",
+            "grade": "2nd",
+            "school": "Oakwood",
+            "activities": ["Junior Chess League", "Wren Nature Center"],
+        },
+        "Carla": {
+            "teacher": "Ms. Rivera",
+            "grade": "1st",
+            "school": "Oakwood",
+            "activities": [],  # explicitly empty — no clause, no trailing dangler
+        },
+    }
+    prose = agent._format_roster_prose(mapping)
+    assert (
+        "- Alice is in 4th grade at Oakwood, taught by Mr. Smith; "
+        "activities: Ridgeline Swim Club." in prose
+    )
+    assert (
+        "- Bob is in 2nd grade at Oakwood, taught by Ms. Jones; "
+        "activities: Junior Chess League, Wren Nature Center." in prose
+    )
+    assert "- Carla is in 1st grade at Oakwood, taught by Ms. Rivera." in prose
+    # The activity-routing sentence is appended whenever this formatter
+    # runs, even if a particular fixture has no populated activities;
+    # the rule is cheap and harmless, and keeping it unconditional means
+    # one less branch in production.
+    assert "activity provider" in prose
 
 
 def test_load_roster_prose_raises_on_missing_file(tmp_path):

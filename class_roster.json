@@ -2,11 +2,13 @@
   "Everly": {
     "teacher": "Ms. Anita Sahai",
     "grade": "6th",
-    "school": "Louise Archer Elementary"
+    "school": "Louise Archer Elementary",
+    "activities": ["Born 2 Dance Studio (B2D)"]
   },
   "Isla": {
     "teacher": "Ms. Meredith Rohde",
     "grade": "3rd",
-    "school": "Louise Archer Elementary"
+    "school": "Louise Archer Elementary",
+    "activities": ["Cuppett Performing Arts Center"]
   }
 }

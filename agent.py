@@ -27,26 +27,39 @@ def _get_client() -> anthropic.Anthropic:
 _ROSTER_PATH = Path(__file__).parent / "class_roster.json"
 
 
-def _format_roster_prose(mapping: dict[str, dict[str, str]]) -> str:
+def _format_roster_prose(mapping: dict[str, dict]) -> str:
     """Format a roster mapping into a prose block for the extractor prompt.
 
     Pure function — no I/O. The formatter is kept separate from the loader
     so it can be unit-tested against a fabricated mapping without touching
     the filesystem. Sentence shape avoids gendered pronouns so adding a
     third kid later doesn't require rewording.
+
+    Per-kid `activities` (list of strings) is optional. When present and
+    non-empty, the names are appended as a clause on that kid's line and
+    the tail attribution rule about activity providers applies. When
+    absent or empty, the kid's line stops at the teacher and no extra
+    routing pressure is added — useful for kids who have no committed
+    activities yet and for unit-test fixtures.
     """
     lines = ["Teacher roster (current academic year):"]
     for name, info in mapping.items():
-        lines.append(
+        base = (
             f"- {name} is in {info['grade']} grade at {info['school']}, "
-            f"taught by {info['teacher']}."
+            f"taught by {info['teacher']}"
         )
+        activities = info.get("activities") or []
+        if activities:
+            lines.append(f"{base}; activities: {', '.join(activities)}.")
+        else:
+            lines.append(f"{base}.")
     lines.append("")
     lines.append(
         "If an email names a teacher without naming the kid, attribute "
         "events to that teacher's student. If an email names a grade "
         "level that matches a kid's grade, prefer that kid for the "
-        "`child` field."
+        "`child` field. If an email is from or mentions a listed "
+        "activity provider for a kid, attribute those events to that kid."
     )
     return "\n".join(lines)
 
