@@ -972,6 +972,219 @@ def test_undated_card_carries_data_child():
     assert 'data-child="isla"' in card
 
 
+# ─── #19 roster-backed attribution (data-child derivation) ───────────────
+#
+# These tests exercise the end-to-end rendering path: given an event
+# whose `child` field is an audience string (or empty) but whose other
+# fields carry a roster signal (grade, teacher, activity), the card must
+# render with both the kid pill AND a `data-child` attribute the #12
+# filter chips can hide.
+
+
+def _render_single(raw: list[dict]) -> str:
+    """Render one or more candidate events into HTML for card-level asserts."""
+    display, undated, _, _, _, _ = pe.classify(
+        raw, cutoff=TODAY, horizon=HORIZON,
+    )
+    display = pe.dedupe(display)
+    weeks = pe.group_by_week(display)
+    return pe.render_html(
+        today=TODAY, weeks=weeks, undated=undated,
+        total_future=len(display), lookback_days=60, webhook_url="",
+    )
+
+
+def test_grade_in_child_field_attributes_to_everly():
+    """Tom's first reported miss: a '6th grade AAP' audience string in
+    the child field must surface as Everly's card under #19, because
+    Everly is in 6th grade per class_roster.json."""
+    html = _render_single([{
+        "name": "AAP Enrichment Activity",
+        "date": "2026-04-20",
+        "time": "10:00 AM",
+        "location": "Louise Archer Elementary",
+        "category": "School Activity",
+        "child": "6th grade AAP",
+        "source": "LAES PTA Sunbeam (Apr 10)",
+    }])
+    card = _card_slice(html, "AAP Enrichment Activity")
+    assert 'data-child="everly"' in card
+    # Pill renders as well (not just the audience line) so the kid is
+    # visually tagged in the schedule, not buried in a "For:" line.
+    assert 'class="child-chip everly"' in card
+    # The original audience context stays — E pill + "For: 6th grade AAP"
+    # is the agreed display (design note §Rendering impact).
+    assert "For: 6th grade AAP" in card
+
+
+def test_rising_grade_in_child_field_attributes_to_everly():
+    """Spring newsletters start talking about next year. 'Rising 7th
+    grader' events must attach to Everly, who advances to 7th."""
+    html = _render_single([{
+        "name": "Rising 7th Grade Info Night",
+        "date": "2026-05-05",
+        "time": "7:00 PM",
+        "location": "Kilmer Middle School",
+        "category": "School Activity",
+        "child": "rising 7th graders",
+        "source": "FCPS Middle School Transition (Apr 14)",
+    }])
+    card = _card_slice(html, "Rising 7th Grade Info Night")
+    assert 'data-child="everly"' in card
+    assert 'class="child-chip everly"' in card
+
+
+def test_rising_grade_in_child_field_attributes_to_isla():
+    """Parallel to Everly: 4th grade events route to Isla (currently 3rd)."""
+    html = _render_single([{
+        "name": "4th Grade Field Trip Planning",
+        "date": "2026-05-12",
+        "time": "6:30 PM",
+        "location": "LAES Cafeteria",
+        "category": "School Activity",
+        "child": "4th grade parents",
+        "source": "LAES PTA (Apr 12)",
+    }])
+    card = _card_slice(html, "4th Grade Field Trip Planning")
+    assert 'data-child="isla"' in card
+    assert 'class="child-chip isla"' in card
+
+
+def test_activity_in_source_attributes_to_isla():
+    """Tom's second reported miss: a Cuppett Performing Arts email with
+    an empty `child` field must route to Isla via the activity tier."""
+    html = _render_single([{
+        "name": "Spring Recital Rehearsal",
+        "date": "2026-05-09",
+        "time": "4:30 PM",
+        "location": "Cuppett Performing Arts Center",
+        "category": "Sports & Extracurriculars",
+        "child": "",
+        "source": "Cuppett Performing Arts Center (Apr 10)",
+    }])
+    card = _card_slice(html, "Spring Recital Rehearsal")
+    assert 'data-child="isla"' in card
+    assert 'class="child-chip isla"' in card
+    # No audience line on activity matches with empty child field —
+    # nothing worth surfacing beside the pill.
+    assert "For:" not in card
+
+
+def test_activity_first_word_alias_attributes_to_isla():
+    """Shortened activity mentions ("Cuppett" alone, without "Performing
+    Arts Center") still trigger attribution via the first-word alias."""
+    html = _render_single([{
+        "name": "Ballet Class",
+        "date": "2026-04-24",
+        "time": "5:00 PM",
+        "location": "Vienna Town Center",
+        "category": "Sports & Extracurriculars",
+        "child": "",
+        "source": "Cuppett reminder (Apr 10)",
+    }])
+    card = _card_slice(html, "Ballet Class")
+    assert 'data-child="isla"' in card
+
+
+def test_activity_parenthetical_alias_attributes_to_everly():
+    """B2D is the implicit acronym alias for Everly's dance studio."""
+    html = _render_single([{
+        "name": "B2D Showcase",
+        "date": "2026-05-02",
+        "time": "6:00 PM",
+        "location": "Dance Studio",
+        "category": "Sports & Extracurriculars",
+        "child": "",
+        "source": "B2D monthly update (Apr 9)",
+    }])
+    card = _card_slice(html, "B2D Showcase")
+    assert 'data-child="everly"' in card
+
+
+def test_teacher_last_name_attributes_to_everly():
+    """'Ms. Sahai' in the event text should tag the card as Everly
+    without a name or grade hint."""
+    html = _render_single([{
+        "name": "Parent Conference",
+        "date": "2026-04-22",
+        "time": "3:15 PM",
+        "location": "Room 204",
+        "category": "Appointment",
+        "child": "",
+        "source": "Ms. Sahai's classroom (Apr 8)",
+    }])
+    card = _card_slice(html, "Parent Conference")
+    assert 'data-child="everly"' in card
+
+
+def test_shared_school_does_not_attribute_kid():
+    """Regression guard: LAES is shared across both kids, so 'All LAES
+    students' must still render with data-child='' (#12 non-lossy
+    behavior — school-wide events stay visible under every filter)."""
+    html = _render_single([{
+        "name": "Yearbook Order Deadline",
+        "date": "2026-04-30",
+        "time": "All day (deadline)",
+        "location": "",
+        "category": "Academic Due Date",
+        "child": "All LAES students",
+        "source": "LAES PTA (Apr 11)",
+    }])
+    card = _card_slice(html, "Yearbook Order Deadline")
+    assert 'data-child=""' in card
+    # No kid pill either
+    assert "child-chip" not in card
+    # Audience line preserved for context
+    assert "For: All LAES students" in card
+
+
+def test_name_match_still_suppresses_audience_line():
+    """A clean `child="Isla"` extraction must keep the pre-#19 render:
+    the I pill alone, no audience line. Regression guard for the
+    rendering branch that suppresses audience on tier-1 name matches."""
+    html = _render_single([{
+        "name": "Pediatrician Check-up",
+        "date": "2026-04-23",
+        "time": "3:45 PM",
+        "location": "Tysons Pediatrics",
+        "category": "Appointment",
+        "child": "Isla",
+        "source": "MyChart reminder (Apr 2)",
+    }])
+    card = _card_slice(html, "Pediatrician Check-up")
+    assert 'data-child="isla"' in card
+    assert 'class="child-chip isla"' in card
+    assert "For: Isla" not in card
+
+
+def test_undated_card_uses_roster_derivation():
+    """The undated rendering path shares _child_markup; a 6th-grade
+    undated event should pick up Everly attribution the same way."""
+    raw = [{
+        "name": "6th Grade AAP Signup",
+        "date": "",
+        "time": "All day (deadline)",
+        "location": "",
+        "category": "Academic Due Date",
+        "child": "6th grade AAP",
+        "source": "LAES PTA (Apr 11)",
+    }]
+    _, undated, _, _, _, _ = pe.classify(
+        raw, cutoff=TODAY, horizon=HORIZON,
+    )
+    undated = pe.dedupe(undated)
+    html = pe.render_html(
+        today=TODAY, weeks=[], undated=undated,
+        total_future=0, lookback_days=60, webhook_url="",
+    )
+    idx = html.find('class="event-card undated"')
+    assert idx != -1
+    card = html[idx:idx + 1500]
+    assert 'data-child="everly"' in card
+    assert 'class="child-chip everly"' in card
+    assert "For: 6th grade AAP" in card
+
+
 # ─── subject + metadata ──────────────────────────────────────────────────
 
 

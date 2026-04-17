@@ -23,9 +23,18 @@ from typing import Any
 from zoneinfo import ZoneInfo
 
 from protected_senders import is_protected, load_protected_senders
+import roster_match
 
 
 LOCAL_TZ = ZoneInfo("America/New_York")
+
+# Roster-derived attribution table, built once at import time. See
+# design/kid-attribution-derivation.md (#19). Module-level so render_html
+# callers don't need to thread it through; tests that need a different
+# roster can monkeypatch `_DISTINCTIVE_SIGNALS` and `_SLUG_TO_NAME`.
+_ROSTER = roster_match.load_roster()
+_DISTINCTIVE_SIGNALS = roster_match.build_distinctive_signals(_ROSTER)
+_SLUG_TO_NAME = {kid.lower(): kid for kid in _ROSTER}
 
 # Tokens of fewer than 3 chars are dropped from dedupe signatures to avoid
 # matching on filler like "no", "a", "of", "to".
@@ -661,6 +670,44 @@ def render_html(today: dt.date,
     webcal_base = _webcal_base(pages_url)
     protected = protected_senders or []
 
+    def _child_markup(
+        child: str, slug: str, tier: str,
+    ) -> tuple[str, str]:
+        """Render (chip_html, audience_html) for an event card.
+
+        Rules:
+          - Slug present → render the coloured kid pill using the
+            roster's canonical name (from _SLUG_TO_NAME), so casing
+            tracks the roster even if the event's `child` field was
+            lowercased or missing.
+          - Audience line is shown alongside the pill only when the
+            derivation matched via a non-name tier (teacher / grade /
+            activity / school) AND the event has a non-empty `child`
+            field worth surfacing (e.g. "For: 6th grade AAP" next to
+            the E pill). A tier-1 "name" match suppresses the audience
+            line — the pill already tells you who.
+          - No slug → fall back to the pre-#19 behavior: audience line
+            if `child` is non-empty, nothing otherwise.
+        """
+        if slug:
+            display_name = _SLUG_TO_NAME.get(slug, slug.capitalize())
+            chip_html = (
+                f'<span class="child-chip {slug}" '
+                f'title="{display_name}">{display_name[0]}</span>'
+            )
+            if tier != "name" and child:
+                audience_html = (
+                    f'\n        <div class="event-audience">For: {child}</div>'
+                )
+            else:
+                audience_html = ""
+            return chip_html, audience_html
+        if child:
+            return "", (
+                f'\n        <div class="event-audience">For: {child}</div>'
+            )
+        return "", ""
+
     def _event_card(ev: dict[str, Any]) -> str:
         d: dt.date = ev["_date_obj"]
         cat = ev["category"]
@@ -669,25 +716,17 @@ def render_html(today: dt.date,
         # is the sole category signal now.
         fg, _ = CATEGORY_COLORS.get(cat, CATEGORY_COLORS["Uncategorized"])
         day_label = d.strftime("%a, %b %-d")
-        # Child renders one of three ways: a coloured initial chip for
-        # named kids (Everly/Isla), a small audience line for non-kid
-        # values ("All LAES students", "6th grade AAP"), or nothing at
-        # all when empty.
+        # Child rendering uses the roster-backed derivation (#19). A
+        # slug + tier is computed from the full event (child field,
+        # source, location, name) against the distinctive signals of
+        # each kid. See design/kid-attribution-derivation.md.
         child = (ev.get("child") or "").strip()
-        if child in ("Everly", "Isla"):
-            chip_html = (f'<span class="child-chip {child.lower()}" '
-                         f'title="{child}">{child[0]}</span>')
-            audience_html = ""
-        elif child:
-            chip_html = ""
-            audience_html = f'\n        <div class="event-audience">For: {child}</div>'
-        else:
-            chip_html = ""
-            audience_html = ""
-        # data-child drives the top-of-page filter chips (#12). Only named
-        # kids are taggable; audience-line and empty-child cards stay
-        # visible across every filter selection.
-        data_child_val = child.lower() if child in ("Everly", "Isla") else ""
+        slug, tier = roster_match.derive_child_slug(ev, _DISTINCTIVE_SIGNALS)
+        chip_html, audience_html = _child_markup(child, slug, tier)
+        # data-child drives the top-of-page filter chips (#12). The
+        # derivation expands beyond strict name-match, so e.g. a
+        # "6th grade AAP" card now carries data-child="everly".
+        data_child_val = slug
         if _is_all_day(ev["time"]):
             time_html = '<span class="time allday">All day</span>'
         else:
@@ -756,18 +795,10 @@ def render_html(today: dt.date,
 
     def _undated_card(ev: dict[str, Any]) -> str:
         child = (ev.get("child") or "").strip()
-        if child in ("Everly", "Isla"):
-            chip_html = (f'<span class="child-chip {child.lower()}" '
-                         f'title="{child}">{child[0]}</span>')
-            audience_html = ""
-        elif child:
-            chip_html = ""
-            audience_html = f'\n        <div class="event-audience">For: {child}</div>'
-        else:
-            chip_html = ""
-            audience_html = ""
-        # See `_event_card` for the data-child rationale (#12 filter chips).
-        data_child_val = child.lower() if child in ("Everly", "Isla") else ""
+        slug, tier = roster_match.derive_child_slug(ev, _DISTINCTIVE_SIGNALS)
+        chip_html, audience_html = _child_markup(child, slug, tier)
+        # See `_event_card` for the data-child rationale (#12 + #19).
+        data_child_val = slug
         if _is_all_day(ev["time"]):
             time_html = '<span class="time allday">All day</span>'
         else:
