@@ -1,0 +1,54 @@
+# Freemail (consumer email) domain list
+# ─────────────────────────────────────────────────────────────
+# Senders whose registrable domain matches one of these entries get the
+# Ignore-sender button at ADDRESS granularity rather than the whole
+# registrable domain. Rationale: these are shared consumer-email
+# providers where one sender-address is one real person; blocking the
+# whole domain would block every unrelated teacher / coach / parent on
+# the same provider.
+#
+# Anything not on this list falls back to today's domain-level
+# behavior — one click blocks the whole registrable domain, which is
+# the right default for institutional / org-wide distributions.
+#
+# File format:
+#   - one lowercase domain per line
+#   - `#` starts a line comment
+#   - blank lines ignored
+#   - no wildcard support (the set is closed; new providers get added
+#     by one-line commit)
+#
+# See design/sender-block-granularity.md for the full decision record.
+
+gmail.com
+yahoo.com
+yahoo.co.uk
+ymail.com
+outlook.com
+hotmail.com
+live.com
+msn.com
+icloud.com
+me.com
+mac.com
+aol.com
+comcast.net
+verizon.net
+sbcglobal.net
+att.net
+cox.net
+protonmail.com
+proton.me
+tutanota.com
+tutanota.de
+fastmail.com
+fastmail.fm
+gmx.com
+gmx.us
+gmx.de
+yandex.com
+yandex.ru
+zoho.com
+mail.com
+hushmail.com
+duck.com
