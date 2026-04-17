@@ -18,11 +18,11 @@ Strict rules for writing it:
 4. **No cross-session carry-overs.** If something is still broken session-to-session, file it as a numbered ROADMAP item instead of repeating it here.
 5. **Replace in place.** Do not append a new block and archive the old one below.
 
-**2026-04-17 (session 11)**
+**2026-04-17 (session 11 — clean handoff)**
 
-- **#21 closed.** Tom live-QA'd 9882a1c / 775f173 / 44283b6 on `main`; full prose archived in `COMPLETED.md`, one-line stub left at #21.
-- **#22 code on `main` — awaiting live QA.** Single commit threads `args.lookback_days` through `step4_process_events` → `--lookback-days` on the `process_events.py` subprocess; `--display-window-days` stays pinned at 60. 459 tests passing (+1). Do NOT flip `[~]` → `[x]` until Tom runs a `workflow_dispatch` with `lookback_days=120` and confirms the rendered header reads "120 day lookback".
-- Branch is 2 ahead of `origin/main`; Tom pushes after live-QA.
+- Both session-11 items closed and live-QA'd: #21 thread dedup (`9882a1c` / `775f173` / `44283b6`) and #22 `--lookback-days` header bug (`563827d`). Post-mortems in `COMPLETED.md`.
+- Nothing in flight. The Backlog list has no `[ ]` or `[~]` items — next pick is Tom's call.
+- 459 tests passing on the close-out commit. Branch is 3 ahead of `origin/main`; Tom pushes when ready.
 
 ## For future agents
 
@@ -85,22 +85,7 @@ Status legend:
 
 ### 21. [x] Dedupe candidate messages before agent extraction — 9882a1c / 775f173 / 44283b6 — see COMPLETED.md
 
-### 22. [~] Bug: page header "N day lookback" ignores `--lookback-days` CLI value
-
-Filed 2026-04-17 by Tom. He ran the workflow with `lookback_days=120` via the dispatch input; the Gmail searches correctly used the 120-day window and extra events surfaced, but the rendered header on `docs/index.html` still read "60 day lookback" (screenshot confirmed: "32 events / 60 day lookback" under "Updated April 17, 2026 @ 5:14PM"). So the page lies about how wide a window it was built from, and the data-vs-display-copy drift is the kind of mismatch that will eventually cause the wrong call on "is this event old enough to still trust".
-
-Root cause is a single missing argument pass-through. `main.py::step4_process_events` (around line 817 at `6d80f53`) hardcodes `"--display-window-days", "60"` when invoking `scripts/process_events.py` and never forwards `args.lookback_days` as `--lookback-days`. `process_events.py`'s argparse (line 1928) defaults `--lookback-days` to `60`, so the value that ends up rendered in the `"{lookback_days} day lookback"` template (line 1405) and in the no-events fallback paragraph (line 1001) is always `60` regardless of what the workflow was triggered with. `--display-window-days` (future horizon for the published page) is a genuinely separate knob and the `"60"` hardcode there is fine — that's always 60 days forward of today.
-
-Fix:
-
-- Add a `lookback_days: int` parameter to `main.py::step4_process_events`.
-- Thread `args.lookback_days` in at the single caller (line 1073).
-- Append `"--lookback-days", str(lookback_days)` to the `script_args` list built around line 809.
-- No changes needed in `process_events.py` — the flag is already defined and already rendered into the header template.
-
-Tests: one pytest that mocks out `run_script` in `step4_process_events`, calls it with `lookback_days=120`, and asserts `--lookback-days 120` appears in the captured script args. Existing snapshot tests cover the header template; no new render-side tests needed.
-
-Accepted risk / non-goal: weekly cron runs with no `lookback_days` dispatch input still default to 60 (the workflow's default), so the page continues to read "60 day lookback" on the common path. This is intentional — the bug is only visible when Tom overrides the window manually.
+### 22. [x] Bug: page header "N day lookback" ignores `--lookback-days` CLI value — 563827d — see COMPLETED.md
 ### 14. [-] Manual "refresh now" button in the UI — descoped 2026-04-17, see "Descoped / on hold" at bottom
 
 ### 15. [-] Conflict highlighting — descoped 2026-04-17, see "Descoped / on hold" at bottom
