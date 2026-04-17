@@ -252,6 +252,136 @@ def test_attach_sender_domain_empty_candidates_is_noop(capsys):
     assert capsys.readouterr().out == ""
 
 
+# ── _compute_block_key + sender_block_key attribution ─────────────────────
+#
+# #20: freemail senders (gmail.com, yahoo.com, etc.) block at address
+# granularity; institutional senders keep domain-level blocking. These
+# tests pin the decision surface so a future refactor can't silently
+# revert to domain-only blocking.
+
+
+def test_compute_block_key_freemail_returns_address():
+    freemail = frozenset({"gmail.com", "yahoo.com"})
+    assert (
+        main._compute_block_key("alice@gmail.com", "gmail.com", freemail)
+        == "alice@gmail.com"
+    )
+
+
+def test_compute_block_key_freemail_lowercases_address():
+    freemail = frozenset({"gmail.com"})
+    assert (
+        main._compute_block_key("Alice.Smith@Gmail.com", "gmail.com", freemail)
+        == "alice.smith@gmail.com"
+    )
+
+
+def test_compute_block_key_institutional_returns_domain():
+    freemail = frozenset({"gmail.com"})
+    assert (
+        main._compute_block_key("office@fcps.edu", "fcps.edu", freemail)
+        == "fcps.edu"
+    )
+
+
+def test_compute_block_key_empty_domain_returns_empty():
+    # Degenerate-attribution path — no domain means no button at all.
+    assert main._compute_block_key("anything", "", frozenset({"gmail.com"})) == ""
+
+
+def test_compute_block_key_freemail_domain_but_no_address_falls_back_to_domain():
+    # Defense-in-depth: if the address somehow went missing on a freemail
+    # domain, we'd rather block the whole domain than not block at all.
+    assert (
+        main._compute_block_key("", "gmail.com", frozenset({"gmail.com"}))
+        == "gmail.com"
+    )
+
+
+def test_compute_block_key_empty_freemail_set_is_always_domain_level():
+    # Graceful degrade when freemail_domains.txt is missing or empty.
+    assert (
+        main._compute_block_key("alice@gmail.com", "gmail.com", frozenset())
+        == "gmail.com"
+    )
+
+
+def test_attach_sender_block_key_freemail_address():
+    freemail = frozenset({"gmail.com"})
+    emails = [_email("m1", "Jane Doe <jane@gmail.com>")]
+    candidates = [_candidate("m1")]
+    main._attach_sender_domains(candidates, emails, freemail=freemail)
+    assert candidates[0]["sender_domain"] == "gmail.com"
+    assert candidates[0]["sender_block_key"] == "jane@gmail.com"
+
+
+def test_attach_sender_block_key_institutional_uses_domain():
+    freemail = frozenset({"gmail.com"})
+    emails = [_email("m1", "pta@school.org")]
+    candidates = [_candidate("m1")]
+    main._attach_sender_domains(candidates, emails, freemail=freemail)
+    assert candidates[0]["sender_domain"] == "school.org"
+    assert candidates[0]["sender_block_key"] == "school.org"
+
+
+def test_attach_sender_block_key_address_lowercased():
+    freemail = frozenset({"gmail.com"})
+    emails = [_email("m1", "Alice.Smith@Gmail.com")]
+    candidates = [_candidate("m1")]
+    main._attach_sender_domains(candidates, emails, freemail=freemail)
+    assert candidates[0]["sender_domain"] == "gmail.com"
+    assert candidates[0]["sender_block_key"] == "alice.smith@gmail.com"
+
+
+def test_attach_sender_block_key_empty_freemail_set_falls_back_to_domain():
+    # Mirrors what happens when freemail_domains.txt is missing/empty: every
+    # sender — even what we'd normally treat as freemail — gets today's
+    # domain-level block behavior. Acceptable graceful-degrade posture.
+    emails = [_email("m1", "jane@gmail.com")]
+    candidates = [_candidate("m1")]
+    main._attach_sender_domains(candidates, emails, freemail=frozenset())
+    assert candidates[0]["sender_domain"] == "gmail.com"
+    assert candidates[0]["sender_block_key"] == "gmail.com"
+
+
+def test_attach_sender_block_key_attribution_failure_yields_empty_both():
+    # Missing from header → both fields empty so the single render-gate
+    # condition (empty block_key → no button) holds.
+    emails = [_email("m1", "")]
+    candidates = [_candidate("m1")]
+    main._attach_sender_domains(candidates, emails, freemail=frozenset({"gmail.com"}))
+    assert candidates[0]["sender_domain"] == ""
+    assert candidates[0]["sender_block_key"] == ""
+
+
+def test_attach_sender_block_key_two_different_gmail_senders_differ():
+    # The whole point of the change: two gmail.com senders must render
+    # different block keys so clicking one doesn't nuke the other.
+    freemail = frozenset({"gmail.com"})
+    emails = [
+        _email("m1", "Alice <alice@gmail.com>"),
+        _email("m2", "Bob <bob@gmail.com>"),
+    ]
+    candidates = [_candidate("m1"), _candidate("m2")]
+    main._attach_sender_domains(candidates, emails, freemail=freemail)
+    # Same domain, different block keys.
+    assert candidates[0]["sender_domain"] == "gmail.com"
+    assert candidates[1]["sender_domain"] == "gmail.com"
+    assert candidates[0]["sender_block_key"] == "alice@gmail.com"
+    assert candidates[1]["sender_block_key"] == "bob@gmail.com"
+
+
+def test_attach_sender_block_key_default_freemail_load_uses_committed_file():
+    # When the caller omits freemail=, main._attach_sender_domains loads
+    # the committed freemail_domains.txt. Smoke-check that the real
+    # committed file recognizes gmail.com as freemail.
+    emails = [_email("m1", "someone@gmail.com")]
+    candidates = [_candidate("m1")]
+    main._attach_sender_domains(candidates, emails)  # no explicit freemail
+    assert candidates[0]["sender_domain"] == "gmail.com"
+    assert candidates[0]["sender_block_key"] == "someone@gmail.com"
+
+
 # ── _reextract_eviction (forced re-extraction) ────────────────────────────
 
 

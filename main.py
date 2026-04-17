@@ -34,8 +34,19 @@ import newsletter_stats as ns
 from gmail_client import GmailClient
 from agent import _sender_key, extract_events, review_stripped_messages
 
-
+# ── scripts/ modules shared with process_events.py / build_queries.py ──
+# freemail_domains.load_freemail_domains lives alongside protected_senders
+# in scripts/ because they're conceptually a pair (both drive per-sender
+# render/block decisions). main.py imports it in-process to stamp
+# sender_block_key on each candidate event.
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+_SCRIPTS_DIR = os.path.join(PROJECT_ROOT, "scripts")
+if _SCRIPTS_DIR not in sys.path:
+    sys.path.insert(0, _SCRIPTS_DIR)
+
+from freemail_domains import load_freemail_domains  # noqa: E402
+
+
 PAGES_OUTPUT_DIR = os.path.join(PROJECT_ROOT, "docs")
 FUTURE_EVENTS_PATH = os.path.join(PROJECT_ROOT, "future_events.json")
 EVENTS_STATE_PATH = os.path.join(PROJECT_ROOT, "events_state.json")
@@ -52,6 +63,7 @@ AUTO_BLOCKLIST_AUDIT_PATH = os.path.join(
 )
 IGNORED_SENDERS_PATH = os.path.join(PROJECT_ROOT, "ignored_senders.json")
 PROTECTED_SENDERS_PATH = os.path.join(PROJECT_ROOT, "protected_senders.txt")
+FREEMAIL_DOMAINS_PATH = os.path.join(PROJECT_ROOT, "freemail_domains.txt")
 PRIOR_EVENTS_PATH = os.path.join(PROJECT_ROOT, "prior_events.json")
 SENDER_STATS_PATH = os.path.join(PROJECT_ROOT, "sender_stats.json")
 
@@ -411,11 +423,40 @@ def step2c_load_cache_and_filter(
     return state, new_emails
 
 
+def _compute_block_key(
+    addr: str, domain: str, freemail: frozenset[str]
+) -> str:
+    """Decide what string the Ignore-sender button should submit.
+
+    Freemail (consumer email) domains block one address at a time;
+    institutional domains block the whole registrable domain. The
+    ``freemail`` membership set comes from ``freemail_domains.txt`` —
+    see design/sender-block-granularity.md for the full decision record.
+
+    Returns:
+        - ``""`` when the event has no attributable domain (the
+          downstream render gate uses this emptiness as "no button").
+        - The lowercased full address when ``domain`` is in ``freemail``
+          and a non-empty address is available.
+        - The domain itself otherwise — matches today's behavior for
+          every institutional sender and the graceful-degrade case
+          where the freemail list is empty or the address failed to
+          parse.
+    """
+    if not domain:
+        return ""
+    if not addr or domain not in freemail:
+        return domain
+    return addr.strip().lower()
+
+
 def _attach_sender_domains(
     candidates: list[dict[str, Any]],
     new_emails: list[dict[str, Any]],
+    freemail: frozenset[str] | None = None,
 ) -> None:
-    """Stamp each candidate with its sender's registrable domain.
+    """Stamp each candidate with its sender's registrable domain and
+    the block key the Ignore-sender button should submit.
 
     The agent echoes the source email's Message ID as
     `event["source_message_id"]` (enforced upstream in agent.py). Here we
@@ -423,13 +464,30 @@ def _attach_sender_domains(
     to the agent, parse the address, and run it through tldextract so
     multi-level TLDs like `greenfield.k12.ny.us` come out right.
 
+    Two fields land on every event:
+
+    - ``sender_domain`` — registrable domain, lowercased. Unchanged
+      semantic from earlier schema versions; the protected-senders
+      guard (``is_protected``) and sender grouping continue to key on
+      this field.
+    - ``sender_block_key`` — the string the Ignore-sender button submits
+      (also used for the ``data-sender`` attribute). Equals the
+      lowercased full address when ``sender_domain`` is a freemail
+      provider (gmail.com, yahoo.com, etc.); equals ``sender_domain``
+      otherwise. Empty when attribution fails.
+
     Any failure along the way — missing ID, missing From, malformed
-    address, empty registered_domain — sets `sender_domain = ""`.
+    address, empty registered_domain — sets both fields to ``""``.
     Downstream the Ignore-sender button simply won't render for that
     event. Never raises. Matches the tolerant-parse posture in agent.py.
 
-    Mutates `candidates` in place.
+    ``freemail`` defaults to the committed ``freemail_domains.txt`` so
+    most callers pass nothing; tests pass an explicit frozenset.
+
+    Mutates ``candidates`` in place.
     """
+    if freemail is None:
+        freemail = load_freemail_domains(FREEMAIL_DOMAINS_PATH)
     from_by_id = {
         em.get("messageId", ""): em.get("from_", "")
         for em in new_emails
@@ -441,11 +499,13 @@ def _attach_sender_domains(
         from_header = from_by_id.get(sid, "")
         if not from_header:
             event["sender_domain"] = ""
+            event["sender_block_key"] = ""
             missing += 1
             continue
         _, addr = email.utils.parseaddr(from_header)
         if not addr:
             event["sender_domain"] = ""
+            event["sender_block_key"] = ""
             missing += 1
             continue
         extracted = tldextract.extract(addr)
@@ -453,6 +513,7 @@ def _attach_sender_domains(
         # (5.1+); the old `registered_domain` is deprecated for removal.
         domain = (extracted.top_domain_under_public_suffix or "").lower()
         event["sender_domain"] = domain
+        event["sender_block_key"] = _compute_block_key(addr, domain, freemail)
         if not domain:
             missing += 1
     if missing:
