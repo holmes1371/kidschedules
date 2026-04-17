@@ -58,6 +58,27 @@ def test_is_protected_with_empty_pattern_list():
     assert is_protected("fcps.edu", []) is False
 
 
+# --- Address-form inputs (#20: block keys can now be full addresses) ---
+
+def test_is_protected_address_form_school():
+    assert is_protected("alice@fcps.edu", ["fcps.edu"]) is True
+    assert is_protected("Alice@FCPS.EDU", ["fcps.edu"]) is True
+
+
+def test_is_protected_address_form_wildcard():
+    assert is_protected("coach@louisearcherpta.org", ["*pta.org"]) is True
+
+
+def test_is_protected_address_form_unprotected():
+    assert is_protected("alice@gmail.com", ["fcps.edu", "*pta.org"]) is False
+
+
+def test_is_protected_edge_trailing_at():
+    # No domain after the '@' — defensive early return so a malformed
+    # sheet entry can't slip into the Gmail query.
+    assert is_protected("alice@", ["fcps.edu"]) is False
+
+
 # --- Build-queries integration: protected domains filtered out of the union ---
 
 def test_build_queries_drops_protected_from_ignored_senders(tmp_path, monkeypatch):

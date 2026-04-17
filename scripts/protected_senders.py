@@ -39,25 +39,41 @@ def load_protected_senders(path: str) -> list[str]:
     return out
 
 
-def is_protected(domain: str, patterns: list[str]) -> bool:
-    """Return True if ``domain`` matches any ``pattern`` in the list.
+def is_protected(sender: str, patterns: list[str]) -> bool:
+    """Return True if ``sender`` matches any ``pattern`` in the list.
 
+    - ``sender`` may be either a bare registrable domain (``fcps.edu``)
+      or a full email address (``alice@fcps.edu``). For addresses, the
+      match runs against the part after the last ``@``.
     - Bare patterns match the exact registrable domain.
-    - A pattern starting with ``*`` matches any domain that ends with the
-      literal part after the asterisk (e.g. ``*pta.org`` matches
+    - A pattern starting with ``*`` matches any domain that ends with
+      the literal part after the asterisk (e.g. ``*pta.org`` matches
       ``louisearcherpta.org``).
     - Matching is case-insensitive.
-    - Empty ``domain`` is never protected — callers should check for that
-      case before deciding whether to render the Ignore-sender button.
+    - Empty ``sender`` is never protected — callers should check for
+      that case before deciding whether to render the Ignore-sender
+      button.
+
+    The address-form branch (#20) is the load-bearing guarantee that
+    nothing in the Ignored-Senders sheet — whether a button click, a
+    hand edit, or a stale row — can land a protected domain in the
+    Gmail query. The two consumers (``process_events.py`` gating the
+    button and ``build_queries.py`` filtering the exclusion union)
+    share this matcher; expanding it here locks the guarantee in one
+    place.
     """
-    d = (domain or "").strip().lower()
-    if not d:
+    s = (sender or "").strip().lower()
+    if not s:
         return False
+    if "@" in s:
+        s = s.rsplit("@", 1)[1]
+        if not s:
+            return False
     for pat in patterns:
         if pat.startswith("*"):
             suffix = pat[1:]
-            if suffix and d.endswith(suffix):
+            if suffix and s.endswith(suffix):
                 return True
-        elif d == pat:
+        elif s == pat:
             return True
     return False
