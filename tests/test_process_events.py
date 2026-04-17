@@ -861,6 +861,117 @@ def test_layout_a_css_ships_new_tokens_and_selectors():
     assert ".event-audience" in html
 
 
+# ─── per-kid filter chips (#12) ──────────────────────────────────────────
+
+
+def test_filter_chip_row_is_present():
+    """The top-of-page chip row renders three buttons (All, Everly, Isla)
+    each with a stable data-filter-child attribute the JS reads."""
+    html, _ = _render_cr()
+    assert 'class="filter-chips"' in html
+    assert 'data-filter-child="all"' in html
+    assert 'data-filter-child="everly"' in html
+    assert 'data-filter-child="isla"' in html
+    assert ">All</button>" in html
+    assert ">Everly</button>" in html
+    assert ">Isla</button>" in html
+
+
+def test_filter_chip_row_is_static_not_derived_from_events():
+    """The chip row is hard-coded — it does NOT iterate over unique
+    children in the input. Render against an Isla-only fixture: all
+    three chips must still appear."""
+    isla_only = [{
+        "name": "Solo Isla Event",
+        "date": "2026-04-21",
+        "time": "5:30 PM",
+        "location": "Wakefield Park",
+        "category": "Sports & Extracurriculars",
+        "child": "Isla",
+        "source": "test",
+        "sender_domain": "teamsnap.com",
+    }]
+    display, undated, _, _, _, _ = pe.classify(
+        isla_only, cutoff=TODAY, horizon=HORIZON,
+    )
+    display = pe.dedupe(display)
+    weeks = pe.group_by_week(display)
+    html = pe.render_html(
+        today=TODAY, weeks=weeks, undated=undated,
+        total_future=len(display), lookback_days=60, webhook_url="",
+    )
+    assert 'data-filter-child="all"' in html
+    assert 'data-filter-child="everly"' in html
+    assert 'data-filter-child="isla"' in html
+
+
+def test_event_card_carries_data_child_everly():
+    html, _ = _render_cr()
+    card = _card_slice(html, "Pediatrician Check-up")
+    assert 'data-child="everly"' in card
+
+
+def test_event_card_carries_data_child_isla():
+    html, _ = _render_cr()
+    card = _card_slice(html, "Soccer Practice")
+    assert 'data-child="isla"' in card
+
+
+def test_event_card_data_child_empty_for_audience_line():
+    """Audience-line cards (e.g. `All LAES students`) render with
+    `data-child=""` so kid filters leave them visible."""
+    html, _ = _render_cr()
+    card = _card_slice(html, "Yearbook Photos Submission Deadline")
+    assert 'data-child=""' in card
+
+
+def test_event_card_data_child_empty_for_empty_child():
+    """Cards with no child at all render with `data-child=""`; no kid
+    filter should hide them."""
+    html, _ = _render_cr()
+    card = _card_slice(html, "Early Release Day")
+    assert 'data-child=""' in card
+
+
+def test_filter_hide_css_uses_important():
+    """Regression guard for the `.show-ignored` interaction: the filter
+    hide rule needs `!important` to match the specificity of
+    `.show-ignored .event-card.ignored { display: block !important; }`,
+    otherwise an ignored Isla card would stay visible when the Everly
+    filter is active and Show-ignored is on."""
+    html, _ = _render_cr()
+    assert 'body.filter-everly .event-card[data-child="isla"]' in html
+    assert 'body.filter-isla' in html
+    assert 'display: none !important' in html
+
+
+def test_undated_card_carries_data_child():
+    """Parallel change to `_undated_card`: filters apply to the Needs
+    Verification section the same way as to dated weeks."""
+    raw = [{
+        "name": "Camp Signup",
+        "date": "",
+        "time": "All day (deadline)",
+        "location": "camps.fcps.edu",
+        "category": "Academic Due Date",
+        "child": "Isla",
+        "source": "FCPS camps (Apr 3)",
+        "sender_domain": "fcps.edu",
+    }]
+    _, undated, _, _, _, _ = pe.classify(
+        raw, cutoff=TODAY, horizon=HORIZON,
+    )
+    undated = pe.dedupe(undated)
+    html = pe.render_html(
+        today=TODAY, weeks=[], undated=undated,
+        total_future=0, lookback_days=60, webhook_url="",
+    )
+    idx = html.find('class="event-card undated"')
+    assert idx != -1, "expected an undated card in this render"
+    card = html[idx:idx + 1500]
+    assert 'data-child="isla"' in card
+
+
 # ─── subject + metadata ──────────────────────────────────────────────────
 
 

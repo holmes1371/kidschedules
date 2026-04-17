@@ -684,6 +684,10 @@ def render_html(today: dt.date,
         else:
             chip_html = ""
             audience_html = ""
+        # data-child drives the top-of-page filter chips (#12). Only named
+        # kids are taggable; audience-line and empty-child cards stay
+        # visible across every filter selection.
+        data_child_val = child.lower() if child in ("Everly", "Isla") else ""
         if _is_all_day(ev["time"]):
             time_html = '<span class="time allday">All day</span>'
         else:
@@ -738,7 +742,7 @@ def render_html(today: dt.date,
                 '        </div>'
             )
         return f"""\
-      <div class="event-card{ignored_class}" data-event-id="{ev["id"]}"{ignored_attr}{sender_attr}
+      <div class="event-card{ignored_class}" data-event-id="{ev["id"]}" data-child="{data_child_val}"{ignored_attr}{sender_attr}
            style="{card_style}">
         <div class="event-actions-top">{ics_btn_html}{ignore_btn_html}</div>
         <div class="meta-strip">
@@ -762,6 +766,8 @@ def render_html(today: dt.date,
         else:
             chip_html = ""
             audience_html = ""
+        # See `_event_card` for the data-child rationale (#12 filter chips).
+        data_child_val = child.lower() if child in ("Everly", "Isla") else ""
         if _is_all_day(ev["time"]):
             time_html = '<span class="time allday">All day</span>'
         else:
@@ -781,7 +787,7 @@ def render_html(today: dt.date,
         card_style = ("display:none; border-left: 4px solid #f9ab00;" if is_ignored
                       else "border-left: 4px solid #f9ab00;")
         return f"""\
-      <div class="event-card undated{ignored_class}"{ignored_attr} style="{card_style}">
+      <div class="event-card undated{ignored_class}" data-child="{data_child_val}"{ignored_attr} style="{card_style}">
         <div class="meta-strip">
           {chip_html}<span class="day">Date TBD</span>
           <span class="sep">·</span>
@@ -1067,6 +1073,44 @@ def render_html(today: dt.date,
     }}
     .child-chip.everly {{ background: var(--everly); color: #fff; }}
     .child-chip.isla   {{ background: var(--isla);   color: #fff; }}
+    .filter-chips {{
+      display: flex;
+      justify-content: center;
+      gap: 0.4rem;
+      padding: 0.5rem 1rem;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }}
+    .filter-chip {{
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 0.2rem 0.7rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      line-height: 1.4;
+    }}
+    .filter-chip:hover {{
+      background: var(--border);
+      color: var(--text);
+    }}
+    .filter-chip.active {{
+      background: var(--text);
+      color: var(--surface);
+      border-color: var(--text);
+    }}
+    /* !important matches .show-ignored .event-card.ignored so an active
+       kid filter still hides the other kid's cards while ignored ones
+       are revealed. */
+    body.filter-everly .event-card[data-child="isla"],
+    body.filter-isla   .event-card[data-child="everly"] {{ display: none !important; }}
     .meta-strip .sep {{
       color: var(--text-tertiary);
     }}
@@ -1169,6 +1213,11 @@ def render_html(today: dt.date,
     <div><span class="stat-value">{total_future}</span> event{"s" if total_future != 1 else ""}</div>
     <div><span class="stat-value">{lookback_days}</span> day lookback</div>
   </div>{show_ignored_toggle_html}
+  <div class="filter-chips" role="group" aria-label="Filter by child">
+    <button class="filter-chip active" type="button" data-filter-child="all">All</button>
+    <button class="filter-chip" type="button" data-filter-child="everly"><span class="child-chip everly" aria-hidden="true">E</span>Everly</button>
+    <button class="filter-chip" type="button" data-filter-child="isla"><span class="child-chip isla" aria-hidden="true">I</span>Isla</button>
+  </div>
   <div class="container">
 {weeks_html}
 {undated_html}
@@ -1326,6 +1375,25 @@ def render_html(today: dt.date,
         // If already sender-ignored, upgrade to reason=event so Unignore-event
         // is the surfaced affordance.
         setIgnored(card, "event");
+      }});
+
+      // ── Per-kid filter chips (#12) ────────────────────────
+      // Ephemeral view filter — no localStorage, no persistence. Clicking
+      // a kid chip adds body.filter-<kid> which the stylesheet uses to
+      // hide cards tagged with the *other* named kid. Audience-line and
+      // empty-child cards stay visible across every selection.
+      var filterChips = document.querySelectorAll(".filter-chip");
+      filterChips.forEach(function (chip) {{
+        chip.addEventListener("click", function () {{
+          var kid = chip.getAttribute("data-filter-child");
+          document.body.classList.remove("filter-everly", "filter-isla");
+          if (kid !== "all") {{
+            document.body.classList.add("filter-" + kid);
+          }}
+          filterChips.forEach(function (c) {{
+            c.classList.toggle("active", c === chip);
+          }});
+        }});
       }});
 
       // ── POST helper ───────────────────────────────────────
