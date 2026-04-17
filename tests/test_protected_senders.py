@@ -112,6 +112,7 @@ def test_render_html_omits_ignore_sender_button_for_protected_sender():
         "child": "Kid",
         "source": "test@fcps.edu",
         "sender_domain": "fcps.edu",
+        "sender_block_key": "fcps.edu",
     }
     weeks = [(dt.date(2026, 4, 20), [event])]
     html = pe.render_html(
@@ -144,6 +145,7 @@ def test_render_html_keeps_ignore_sender_button_for_unprotected_sender():
         "child": "Kid",
         "source": "test@spammer.com",
         "sender_domain": "spammer.com",
+        "sender_block_key": "spammer.com",
     }
     weeks = [(dt.date(2026, 4, 20), [event])]
     html = pe.render_html(

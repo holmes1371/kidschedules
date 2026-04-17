@@ -7,7 +7,8 @@
     "category": "School Activity",
     "child": "Isla",
     "source": "LAES email (Apr 10)",
-    "sender_domain": "greenfield.k12.ny.us"
+    "sender_domain": "greenfield.k12.ny.us",
+    "sender_block_key": "greenfield.k12.ny.us"
   },
   {
     "name": "Ignored No Sender",
@@ -17,7 +18,8 @@
     "category": "Appointment",
     "child": "Everly",
     "source": "unknown",
-    "sender_domain": ""
+    "sender_domain": "",
+    "sender_block_key": ""
   },
   {
     "name": "Active With Sender",
@@ -27,7 +29,8 @@
     "category": "School Activity",
     "child": "Isla",
     "source": "LAES PTA (Apr 11)",
-    "sender_domain": "laes.org"
+    "sender_domain": "laes.org",
+    "sender_block_key": "laes.org"
   },
   {
     "name": "Active No Sender",
@@ -37,7 +40,8 @@
     "category": "Sports & Extracurriculars",
     "child": "Isla",
     "source": "coach email",
-    "sender_domain": ""
+    "sender_domain": "",
+    "sender_block_key": ""
   },
   {
     "name": "Undated Needs Verify",
@@ -47,7 +51,8 @@
     "category": "School Activity",
     "child": "",
     "source": "LAES newsletter",
-    "sender_domain": ""
+    "sender_domain": "",
+    "sender_block_key": ""
   },
   {
     "name": "Undated With Sender",
@@ -57,6 +62,29 @@
     "category": "School Activity",
     "child": "",
     "source": "LAES newsletter",
-    "sender_domain": "laes.org"
+    "sender_domain": "laes.org",
+    "sender_block_key": "laes.org"
+  },
+  {
+    "name": "Parent Freemail A",
+    "date": "2026-04-24",
+    "time": "5:00 PM",
+    "location": "Park",
+    "category": "Sports & Extracurriculars",
+    "child": "Isla",
+    "source": "parent email",
+    "sender_domain": "gmail.com",
+    "sender_block_key": "parenta@gmail.com"
+  },
+  {
+    "name": "Parent Freemail B",
+    "date": "2026-04-25",
+    "time": "5:00 PM",
+    "location": "Park",
+    "category": "Sports & Extracurriculars",
+    "child": "Everly",
+    "source": "parent email",
+    "sender_domain": "gmail.com",
+    "sender_block_key": "parentb@gmail.com"
   }
 ]

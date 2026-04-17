@@ -377,6 +377,7 @@ def classify(events: list[dict[str, Any]], cutoff: dt.date,
             "child": (ev.get("child") or "").strip(),
             "source": (ev.get("source") or "").strip() or "unknown source",
             "sender_domain": (ev.get("sender_domain") or "").strip(),
+            "sender_block_key": (ev.get("sender_block_key") or "").strip(),
         }
         norm["id"] = _event_id(norm["name"], norm["date"], norm["child"])
         # Render-but-hide model: ignored events still flow into their date
@@ -876,20 +877,28 @@ def render_html(today: dt.date,
                 f'                data-event-name="{ev["name"]}" data-event-date="{ev["date"]}"\n'
                 f'                type="button">Ignore event</button>'
             )
-        sender = (ev.get("sender_domain") or "").strip()
-        sender_attr = f' data-sender="{sender}"' if sender else ""
+        # `sender_domain` remains the registrable-domain identity — used
+        # by the protected-senders guard (a domain-level semantic). The
+        # `sender_block_key` is what the Ignore-sender button submits:
+        # full address for freemail (gmail.com, yahoo.com, ...), the
+        # domain otherwise. See design/sender-block-granularity.md.
+        block_key = (ev.get("sender_block_key") or "").strip()
+        domain = (ev.get("sender_domain") or "").strip()
+        sender_attr = f' data-sender="{block_key}"' if block_key else ""
         sender_btn_html = ""
         # Never render the Ignore-sender button for protected domains
         # (schools, PTAs, health providers, team-management platforms) —
         # blocking those at the Gmail-query level would drop real events.
-        # The Ignore-event button on the same card is unaffected.
-        if sender and not is_protected(sender, protected):
+        # The guard keys on sender_domain so the domain-level pattern
+        # file stays load-bearing even for address-form block keys. The
+        # Ignore-event button on the same card is unaffected.
+        if block_key and not is_protected(domain, protected):
             sender_btn_html = (
                 '\n        <div class="event-actions-bottom">\n'
                 f'          <button class="ignore-sender-btn" '
                 f'aria-label="Ignore future events from this sender"\n'
-                f'                  data-sender="{sender}" type="button">'
-                f'Ignore sender ({sender})</button>\n'
+                f'                  data-sender="{block_key}" type="button">'
+                f'Ignore sender ({block_key})</button>\n'
                 '        </div>'
             )
         new_badge_html = (

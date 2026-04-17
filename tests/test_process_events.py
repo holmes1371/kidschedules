@@ -138,6 +138,27 @@ def test_classify_passes_through_sender_domain():
     assert by_name["Empty Sender"]["sender_domain"] == ""
 
 
+def test_classify_passes_through_sender_block_key():
+    # #20: classify normalizes sender_block_key alongside sender_domain.
+    # No default derivation — an explicit "" or missing key stays "".
+    raw = [
+        {"name": "Freemail Addr", "date": "2026-04-20",
+         "sender_domain": "gmail.com", "sender_block_key": "alice@gmail.com",
+         "category": "School Activity", "child": "Isla", "source": "x"},
+        {"name": "Institutional", "date": "2026-04-20",
+         "sender_domain": "laes.org", "sender_block_key": "laes.org",
+         "category": "School Activity", "child": "Isla", "source": "x"},
+        {"name": "Missing Key", "date": "2026-04-20",
+         "sender_domain": "laes.org",
+         "category": "School Activity", "child": "Isla", "source": "x"},
+    ]
+    display, _, _, _, _, _ = pe.classify(raw, cutoff=TODAY, horizon=HORIZON)
+    by_name = {e["name"]: e for e in display}
+    assert by_name["Freemail Addr"]["sender_block_key"] == "alice@gmail.com"
+    assert by_name["Institutional"]["sender_block_key"] == "laes.org"
+    assert by_name["Missing Key"]["sender_block_key"] == ""
+
+
 def test_classify_warns_on_missing_name_and_skips():
     events = load_fixture("edge_cases")
     display, undated, past, banked, ignored, warnings = pe.classify(
@@ -466,6 +487,94 @@ def test_render_html_ignore_sender_button_only_when_sender_set():
     ns_start = html.find(f'data-event-id="{no_sender_id}"')
     ns_end = html.find("</div>\n      </div>", ns_start)
     assert 'class="ignore-sender-btn"' not in html[ns_start:ns_end]
+
+
+def test_render_sender_block_key_freemail_address():
+    """#20: freemail senders (gmail.com, yahoo.com, ...) render the
+    Ignore-sender button with the full address so two unrelated people
+    on the same freemail provider block independently."""
+    html, by_name = _render_ignored_fixture(ignored_names=())
+    a_id = by_name["Parent Freemail A"]["id"]
+    b_id = by_name["Parent Freemail B"]["id"]
+    a_start = html.find(f'data-event-id="{a_id}"')
+    a_end = html.find("</div>\n      </div>", a_start)
+    b_start = html.find(f'data-event-id="{b_id}"')
+    b_end = html.find("</div>\n      </div>", b_start)
+    assert 'data-sender="parenta@gmail.com"' in html[a_start:a_end]
+    assert 'data-sender="parentb@gmail.com"' in html[b_start:b_end]
+    assert "Ignore sender (parenta@gmail.com)" in html[a_start:a_end]
+    assert "Ignore sender (parentb@gmail.com)" in html[b_start:b_end]
+    # Guard: the bare domain must not leak into either card as a button
+    # label — that's the exact regression this feature prevents.
+    assert "Ignore sender (gmail.com)" not in html
+
+
+def test_render_sender_block_key_institutional_domain_unchanged():
+    """#20: institutional senders keep blocking at domain granularity —
+    block_key equals sender_domain for them, so button and data-sender
+    render exactly as before the freemail split."""
+    html, by_name = _render_ignored_fixture(ignored_names=())
+    ev_id = by_name["Active With Sender"]["id"]
+    start = html.find(f'data-event-id="{ev_id}"')
+    end = html.find("</div>\n      </div>", start)
+    assert 'data-sender="laes.org"' in html[start:end]
+    assert "Ignore sender (laes.org)" in html[start:end]
+
+
+def test_render_sender_block_key_missing_suppresses_button():
+    """#20: an event with empty sender_block_key emits no data-sender
+    attribute and no Ignore-sender button, matching today's behavior
+    when attribution fails upstream in main.py."""
+    html, by_name = _render_ignored_fixture(ignored_names=())
+    ev_id = by_name["Active No Sender"]["id"]
+    start = html.find(f'data-event-id="{ev_id}"')
+    end = html.find("</div>\n      </div>", start)
+    card = html[start:end]
+    assert "data-sender=" not in card
+    assert 'class="ignore-sender-btn"' not in card
+
+
+def test_render_protected_still_suppresses_even_with_block_key():
+    """#20 load-bearing guarantee: an event whose sender_domain is a
+    protected pattern (fcps.edu) does not render the Ignore-sender
+    button — even if its sender_block_key carries an address form
+    (alice@fcps.edu). The guard keys on sender_domain specifically so
+    the domain-level pattern file stays authoritative. The card still
+    carries data-sender for sweep-parity, but the button never renders,
+    so an address-form block_key cannot reach localSenders or the
+    sheet."""
+    events = [
+        {
+            "name": "Protected With Address Block Key",
+            "date": "2026-04-22",
+            "time": "9:00 AM",
+            "location": "School",
+            "category": "School Activity",
+            "child": "Isla",
+            "source": "Teacher email",
+            "sender_domain": "fcps.edu",
+            "sender_block_key": "alice@fcps.edu",
+        }
+    ]
+    display, undated, _, _, _, _ = pe.classify(
+        events, cutoff=TODAY, horizon=HORIZON,
+    )
+    weeks = pe.group_by_week(pe.dedupe(display))
+    html = pe.render_html(
+        today=TODAY, weeks=weeks, undated=undated,
+        total_future=len(display), lookback_days=60, webhook_url="",
+        protected_senders=["fcps.edu"],
+    )
+    eid = pe._event_id("Protected With Address Block Key",
+                       "2026-04-22", "Isla")
+    start = html.find(f'data-event-id="{eid}"')
+    end = html.find("</div>\n      </div>", start)
+    card = html[start:end]
+    # The button never renders for protected senders — checked at the
+    # card slice so CSS/JS mentions of "ignore-sender-btn" elsewhere in
+    # the document don't give a false pass.
+    assert '<button class="ignore-sender-btn"' not in card
+    assert "Ignore sender (" not in card
 
 
 def test_render_html_show_ignored_toggle_appears_with_count():
