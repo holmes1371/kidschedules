@@ -21,8 +21,8 @@ Strict rules for writing it:
 **2026-04-17 (session 11)**
 
 - **#21 closed.** Tom live-QA'd 9882a1c / 775f173 / 44283b6 on `main`; full prose archived in `COMPLETED.md`, one-line stub left at #21.
-- **#22 in progress** — fix sketch already locked in the ROADMAP entry; implementation to follow in this session.
-- Branch is 1 ahead of `origin/main` after the close-out commit.
+- **#22 code on `main` — awaiting live QA.** Single commit threads `args.lookback_days` through `step4_process_events` → `--lookback-days` on the `process_events.py` subprocess; `--display-window-days` stays pinned at 60. 459 tests passing (+1). Do NOT flip `[~]` → `[x]` until Tom runs a `workflow_dispatch` with `lookback_days=120` and confirms the rendered header reads "120 day lookback".
+- Branch is 2 ahead of `origin/main`; Tom pushes after live-QA.
 
 ## For future agents
 
@@ -85,7 +85,7 @@ Status legend:
 
 ### 21. [x] Dedupe candidate messages before agent extraction — 9882a1c / 775f173 / 44283b6 — see COMPLETED.md
 
-### 22. [ ] Bug: page header "N day lookback" ignores `--lookback-days` CLI value
+### 22. [~] Bug: page header "N day lookback" ignores `--lookback-days` CLI value
 
 Filed 2026-04-17 by Tom. He ran the workflow with `lookback_days=120` via the dispatch input; the Gmail searches correctly used the 120-day window and extra events surfaced, but the rendered header on `docs/index.html` still read "60 day lookback" (screenshot confirmed: "32 events / 60 day lookback" under "Updated April 17, 2026 @ 5:14PM"). So the page lies about how wide a window it was built from, and the data-vs-display-copy drift is the kind of mismatch that will eventually cause the wrong call on "is this event old enough to still trust".
 

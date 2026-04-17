@@ -836,6 +836,40 @@ def test_step4_process_events_cleans_up_alerts_tempfile(monkeypatch):
     assert not Path(seen["alerts_path"]).exists()
 
 
+# ── step4_process_events lookback-days bridge (#22) ──────────────────────
+#
+# The Gmail search window is chosen upstream in main() via
+# `args.lookback_days`; the same value has to ride through the
+# step4 bridge into process_events.py so the rendered page header
+# ("{N} day lookback") and the no-events fallback paragraph both
+# match the window the run actually used. Pre-fix, step4 dropped
+# the value on the floor and process_events.py silently defaulted
+# to 60 — so an override like --lookback-days 120 extracted the
+# right events but rendered a stale "60 day lookback" in the UI.
+
+
+def test_step4_process_events_forwards_lookback_days(monkeypatch):
+    """Explicit override: lookback_days=120 must arrive as the string
+    "120" on the --lookback-days flag in run_script's argv, so the page
+    header and no-events fallback render the actual window the run
+    used. Asserting via kv-dict pins adjacency (flag immediately
+    followed by its value) alongside presence."""
+    captured: dict = {}
+
+    def fake_run_script(script_name, script_args):
+        captured["script_args"] = list(script_args)
+        _stub_script_outputs(script_args)
+        return ""
+
+    monkeypatch.setattr(main, "run_script", fake_run_script)
+    monkeypatch.setattr(main, "_load_webhook_url", lambda: "")
+    main.step4_process_events(
+        [], pages_url="", dry_run=True, lookback_days=120
+    )
+    kv = dict(zip(captured["script_args"][::2], captured["script_args"][1::2]))
+    assert kv["--lookback-days"] == "120"
+
+
 # ── _dedupe_by_thread (#21 C2) ────────────────────────────────────────────
 #
 # Thread-level dedup sits in step2b between the existing messageId pass

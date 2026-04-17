@@ -758,6 +758,7 @@ def step4_process_events(
     pages_url: str = "",
     dry_run: bool = False,
     outlier_alerts: list[dict[str, Any]] | None = None,
+    lookback_days: int = 60,
 ) -> tuple[str, str, dict, str, str]:
     """Run process_events.py and return (html, body_text, meta,
     digest_text, digest_html).
@@ -770,6 +771,11 @@ def step4_process_events(
     forwarded as `--outlier-alerts`, which causes the weekly digest
     bodies to render an ⚠️ Possible under-extraction block. `None` or
     an empty list skips the flag so the digest degrades cleanly.
+
+    `lookback_days` is forwarded as `--lookback-days` so the rendered
+    page header ("{N} day lookback") reflects the actual Gmail-search
+    window main() used upstream. Default 60 matches the workflow's
+    default; only the `--lookback-days` dispatch-input path overrides it.
     """
     print("\n" + "=" * 60)
     print("STEP 4: Processing events (filter, dedupe, sort, render)")
@@ -815,6 +821,7 @@ def step4_process_events(
             "--digest-html-out", digest_html_path,
             "--pages-url", pages_url,
             "--display-window-days", "60",
+            "--lookback-days", str(lookback_days),
             "--webhook-url", webhook_url,
             "--ignored", IGNORED_EVENTS_PATH,
             "--protected-senders", PROTECTED_SENDERS_PATH,
@@ -1074,6 +1081,7 @@ def main() -> int:
         list(state["events"].values()), pages_url=pages_url,
         dry_run=args.dry_run,
         outlier_alerts=alerts,
+        lookback_days=args.lookback_days,
     )
 
     # Step 5: Publish
