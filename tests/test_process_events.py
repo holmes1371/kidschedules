@@ -1409,6 +1409,180 @@ def test_load_ignored_ids_tolerant(tmp_path, file_contents, expected):
     assert result == expected
 
 
+# ─── outlier alerts — loader, renderers, digest integration (#17) ────────
+
+
+_SAMPLE_ALERT = {
+    "sender": "newsletter@example.com",
+    "message_id": "18e4f2abc",
+    "prior_median": 6,
+    "current_count": 1,
+    "threshold": 3,
+}
+
+
+@pytest.mark.parametrize(
+    "file_contents,expected",
+    [
+        (None, []),                                           # file missing
+        ("not json at all", []),                              # malformed JSON
+        ('{"not": "a list"}', []),                            # wrong shape
+        ('"also not a list"', []),                            # wrong shape
+        ('[]', []),                                           # empty list
+        (
+            json.dumps([_SAMPLE_ALERT]),
+            [_SAMPLE_ALERT],
+        ),                                                    # happy path
+        (
+            json.dumps([_SAMPLE_ALERT, "garbage", 42]),
+            [_SAMPLE_ALERT],
+        ),                                                    # non-dict entries skipped
+    ],
+)
+def test_load_outlier_alerts_tolerant(tmp_path, file_contents, expected):
+    path = tmp_path / "alerts.json"
+    if file_contents is None:
+        result = pe._load_outlier_alerts(str(path))
+    else:
+        path.write_text(file_contents, encoding="utf-8")
+        result = pe._load_outlier_alerts(str(path))
+    assert result == expected
+
+
+def test_load_outlier_alerts_empty_path_returns_empty():
+    assert pe._load_outlier_alerts("") == []
+    assert pe._load_outlier_alerts(None) == []
+
+
+def test_render_outlier_block_text_empty_returns_empty_list():
+    assert pe._render_outlier_block_text([]) == []
+
+
+def test_render_outlier_block_text_renders_alerts():
+    alerts = [_SAMPLE_ALERT]
+    lines = pe._render_outlier_block_text(alerts)
+    # Block always leads with the warning header and ends with a blank line
+    # so downstream concatenation gets a visual separator from the event list.
+    assert lines[0] == "⚠️ Possible under-extraction:"
+    assert lines[-1] == ""
+    # The alert line carries sender, message ID, count, prior median, threshold.
+    alert_line = lines[1]
+    assert "newsletter@example.com" in alert_line
+    assert "18e4f2abc" in alert_line
+    assert "1 event" in alert_line  # singular
+    assert "prior median 6" in alert_line
+    assert "threshold 3" in alert_line
+    # --reextract hint is present so the operator has the re-run recipe inline.
+    assert any("--reextract" in line for line in lines)
+
+
+def test_render_outlier_block_text_event_pluralization():
+    two_events = dict(_SAMPLE_ALERT, current_count=2)
+    lines = pe._render_outlier_block_text([two_events])
+    assert any("2 events" in line for line in lines)
+
+
+def test_render_outlier_block_html_empty_returns_empty_list():
+    assert pe._render_outlier_block_html([]) == []
+
+
+def test_render_outlier_block_html_renders_alerts():
+    lines = pe._render_outlier_block_html([_SAMPLE_ALERT])
+    html = "\n".join(lines)
+    assert "⚠️ Possible under-extraction" in html
+    assert "newsletter@example.com" in html
+    assert "18e4f2abc" in html
+    assert "1 event" in html
+    assert "prior median 6" in html
+    assert "threshold 3" in html
+    # Amber warning styling is the block's visual cue.
+    assert "#f9a825" in html or "fff8e1" in html
+
+
+def test_render_outlier_block_html_escapes_untrusted_fields():
+    # Sender and message_id originate from Gmail headers → untrusted.
+    evil = {
+        "sender": "<script>alert(1)</script>@x.com",
+        "message_id": "<img src=x onerror=1>",
+        "prior_median": 5,
+        "current_count": 0,
+        "threshold": 3,
+    }
+    html = "\n".join(pe._render_outlier_block_html([evil]))
+    assert "<script>" not in html
+    assert "<img" not in html
+    assert "&lt;script&gt;" in html
+    assert "&lt;img" in html
+
+
+def test_render_digest_text_injects_alert_block_above_events():
+    weeks = _digest_weeks("digest_this_week")
+    text = pe.render_digest_text(
+        weeks, TODAY, pages_url="", alerts=[_SAMPLE_ALERT]
+    )
+    # The warning header precedes the first event line.
+    subject_idx = text.index(pe.digest_subject(TODAY))
+    alert_idx = text.index("⚠️ Possible under-extraction")
+    first_event_idx = text.index("Art & Crafts")
+    assert subject_idx < alert_idx < first_event_idx
+
+
+def test_render_digest_text_no_alerts_matches_prior_behavior():
+    weeks = _digest_weeks("digest_this_week")
+    text_none = pe.render_digest_text(weeks, TODAY, pages_url="")
+    text_empty = pe.render_digest_text(
+        weeks, TODAY, pages_url="", alerts=[]
+    )
+    assert text_none == text_empty
+    assert "Possible under-extraction" not in text_none
+
+
+def test_render_digest_html_injects_alert_block_above_events():
+    weeks = _digest_weeks("digest_this_week")
+    html = pe.render_digest_html(
+        weeks, TODAY, pages_url="", alerts=[_SAMPLE_ALERT]
+    )
+    alert_idx = html.index("Possible under-extraction")
+    event_list_idx = html.index("<ul")
+    assert alert_idx < event_list_idx
+
+
+def test_render_digest_html_no_alerts_omits_block():
+    weeks = _digest_weeks("digest_this_week")
+    html = pe.render_digest_html(weeks, TODAY, pages_url="")
+    assert "Possible under-extraction" not in html
+
+
+def test_digest_cli_forwards_outlier_alerts_flag(tmp_path):
+    """End-to-end: --outlier-alerts reaches the rendered digest bodies."""
+    candidates_path = FIXTURES_DIR / "digest_this_week.json"
+    alerts_path = tmp_path / "alerts.json"
+    alerts_path.write_text(json.dumps([_SAMPLE_ALERT]), encoding="utf-8")
+    dtext_path = tmp_path / "digest.txt"
+    dhtml_path = tmp_path / "digest.html"
+    meta_path = tmp_path / "meta.json"
+    body_path = tmp_path / "body.txt"
+    subprocess.run(
+        [sys.executable,
+         str(REPO_ROOT / "scripts" / "process_events.py"),
+         "--candidates", str(candidates_path),
+         "--today", TODAY.isoformat(),
+         "--body-out", str(body_path),
+         "--meta-out", str(meta_path),
+         "--digest-text-out", str(dtext_path),
+         "--digest-html-out", str(dhtml_path),
+         "--outlier-alerts", str(alerts_path),
+         ],
+        check=True,
+    )
+    text = dtext_path.read_text(encoding="utf-8")
+    html = dhtml_path.read_text(encoding="utf-8")
+    assert "Possible under-extraction" in text
+    assert "18e4f2abc" in text
+    assert "Possible under-extraction" in html
+    assert "18e4f2abc" in html
+
+
 # ─── .ics export ──────────────────────────────────────────────────────────
 
 

@@ -596,6 +596,7 @@ def step4_process_events(
     candidates: list[dict[str, Any]],
     pages_url: str = "",
     dry_run: bool = False,
+    outlier_alerts: list[dict[str, Any]] | None = None,
 ) -> tuple[str, str, dict, str, str]:
     """Run process_events.py and return (html, body_text, meta,
     digest_text, digest_html).
@@ -603,6 +604,11 @@ def step4_process_events(
     Far-future events (beyond the 60-day display window) now persist
     in events_state.json alongside everything else, so this step no
     longer maintains a separate bank file.
+
+    `outlier_alerts` (when non-empty) is serialised to a tempfile and
+    forwarded as `--outlier-alerts`, which causes the weekly digest
+    bodies to render an ⚠️ Possible under-extraction block. `None` or
+    an empty list skips the flag so the digest degrades cleanly.
     """
     print("\n" + "=" * 60)
     print("STEP 4: Processing events (filter, dedupe, sort, render)")
@@ -629,6 +635,14 @@ def step4_process_events(
     digest_text_path = candidates_path.replace(".json", "-digest.txt")
     digest_html_path = candidates_path.replace(".json", "-digest.html")
 
+    alerts_path: str | None = None
+    if outlier_alerts:
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix="-alerts.json", delete=False, encoding="utf-8"
+        ) as f:
+            json.dump(outlier_alerts, f, ensure_ascii=False)
+            alerts_path = f.name
+
     try:
         webhook_url = _load_webhook_url()
         script_args = [
@@ -645,6 +659,8 @@ def step4_process_events(
             "--protected-senders", PROTECTED_SENDERS_PATH,
             "--prior-events", PRIOR_EVENTS_PATH,
         ]
+        if alerts_path:
+            script_args += ["--outlier-alerts", alerts_path]
         # Per-event .ics files land in docs/ics/ for the Pages artifact to
         # pick up; skipped on dry-run to avoid churning the publish dir.
         if not dry_run:
@@ -675,8 +691,11 @@ def step4_process_events(
 
         return html, body, meta, digest_text, digest_html
     finally:
-        for p in [candidates_path, body_path, html_path, meta_path,
-                  digest_text_path, digest_html_path]:
+        cleanup_paths = [candidates_path, body_path, html_path, meta_path,
+                         digest_text_path, digest_html_path]
+        if alerts_path:
+            cleanup_paths.append(alerts_path)
+        for p in cleanup_paths:
             try:
                 os.unlink(p)
             except OSError:
@@ -886,10 +905,14 @@ def main() -> int:
 
     # Step 4: Process events — hand the merged cache as the candidate pool
     # so stable events from prior runs survive without a re-extraction.
+    # Outlier alerts (if any) flow through to the weekly digest bodies;
+    # on Wed/Sat runs the digest is suppressed upstream so the alert
+    # tempfile is rendered but never surfaces to Gmail.
     pages_url = _load_pages_url()
     html, body, meta, digest_text, digest_html = step4_process_events(
         list(state["events"].values()), pages_url=pages_url,
         dry_run=args.dry_run,
+        outlier_alerts=alerts,
     )
 
     # Step 5: Publish

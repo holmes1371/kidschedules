@@ -489,6 +489,42 @@ def _save_prior_event_ids(path: str, ids: set[str], now_iso: str) -> None:
     os.replace(tmp_path, path)
 
 
+# ─── outlier alerts (#17) ─────────────────────────────────────────────────
+
+
+def _load_outlier_alerts(path: str | None) -> list[dict[str, Any]]:
+    """Read the outlier-alerts JSON file and return a list of alert dicts.
+
+    Missing / empty path / unreadable / wrong shape → `[]`. The Monday
+    digest is the only consumer today, and an absent file on Wed/Sat
+    runs (or a first-ever run before the state branch carries one) must
+    degrade to "no warning block" rather than crash the pipeline.
+
+    Each alert dict carries keys produced by
+    `newsletter_stats.outlier_alerts`: sender, message_id, prior_median,
+    current_count, threshold. Deep validation is deferred to the
+    renderers, which use `.get()` with safe defaults.
+    """
+    if not path or not os.path.exists(path):
+        return []
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except (json.JSONDecodeError, OSError) as e:
+        print(
+            f"  WARNING: outlier_alerts file unreadable ({e}); "
+            "no under-extraction block will be rendered"
+        )
+        return []
+    if not isinstance(data, list):
+        print(
+            "  WARNING: outlier_alerts file is not a JSON list; "
+            "no under-extraction block will be rendered"
+        )
+        return []
+    return [a for a in data if isinstance(a, dict)]
+
+
 def _name_signature(name: str) -> frozenset[str]:
     """Significant-token set for fuzzy dedupe of near-duplicate event names.
 
@@ -1740,12 +1776,89 @@ def _digest_this_week(weeks: list[tuple[dt.date, list[dict[str, Any]]]],
     return []
 
 
+def _event_noun(count: int) -> str:
+    """Return "event" or "events" to match the count."""
+    return "event" if count == 1 else "events"
+
+
+def _render_outlier_block_text(alerts: list[dict[str, Any]]) -> list[str]:
+    """Plain-text lines for the weekly digest under-extraction block.
+
+    Returns an empty list when there are no alerts so the caller can
+    `lines.extend(block)` unconditionally. Each alert renders as one
+    bullet line; a trailing hint line points at `--reextract`. The
+    message ID is included verbatim so the human operator can paste it
+    into the re-extract invocation.
+    """
+    if not alerts:
+        return []
+    block: list[str] = ["⚠️ Possible under-extraction:"]
+    for a in alerts:
+        sender = a.get("sender", "")
+        message_id = a.get("message_id", "")
+        current = a.get("current_count", 0)
+        prior = a.get("prior_median", 0)
+        threshold = a.get("threshold", 0)
+        block.append(
+            f"  - {sender}: message {message_id} — "
+            f"{current} {_event_noun(current)}, "
+            f"prior median {prior}, threshold {threshold}"
+        )
+    block.append(
+        "  (to re-run an under-extracted message: "
+        "python main.py --reextract <MESSAGE_ID>)"
+    )
+    block.append("")
+    return block
+
+
+def _render_outlier_block_html(alerts: list[dict[str, Any]]) -> list[str]:
+    """HTML lines for the weekly digest under-extraction block.
+
+    Returns an empty list when there are no alerts. Amber left-border
+    box echoes the ⚠️ glyph used in the text block. All alert fields
+    are HTML-escaped because `sender` and `message_id` originate from
+    untrusted Gmail headers.
+    """
+    if not alerts:
+        return []
+    block: list[str] = []
+    block.append(
+        '<div style="background-color:#fff8e1; '
+        'border-left:4px solid #f9a825; padding:10px 12px; '
+        'margin:0 0 12px 0;">'
+    )
+    block.append(
+        '<strong>⚠️ Possible under-extraction</strong>'
+    )
+    block.append(
+        '<ul style="margin:6px 0 0 0; padding-left:1.2em;">'
+    )
+    for a in alerts:
+        sender = _html.escape(str(a.get("sender", "")))
+        message_id = _html.escape(str(a.get("message_id", "")))
+        current = a.get("current_count", 0)
+        prior = a.get("prior_median", 0)
+        threshold = a.get("threshold", 0)
+        block.append(
+            f'<li style="margin:0 0 4px 0;">'
+            f'<code>{sender}</code> · message <code>{message_id}</code> — '
+            f'{current} {_event_noun(current)}, '
+            f'prior median {prior}, threshold {threshold}</li>'
+        )
+    block.append('</ul>')
+    block.append('</div>')
+    return block
+
+
 def render_digest_text(weeks: list[tuple[dt.date, list[dict[str, Any]]]],
                        today: dt.date,
-                       pages_url: str = "") -> str:
+                       pages_url: str = "",
+                       alerts: list[dict[str, Any]] | None = None) -> str:
     """Plain-text Gmail digest body."""
     evs = _digest_this_week(weeks, today)
     lines: list[str] = [digest_subject(today), ""]
+    lines.extend(_render_outlier_block_text(alerts or []))
     if not evs:
         lines.append("No events this week.")
     else:
@@ -1761,7 +1874,8 @@ def render_digest_text(weeks: list[tuple[dt.date, list[dict[str, Any]]]],
 
 def render_digest_html(weeks: list[tuple[dt.date, list[dict[str, Any]]]],
                        today: dt.date,
-                       pages_url: str = "") -> str:
+                       pages_url: str = "",
+                       alerts: list[dict[str, Any]] | None = None) -> str:
     """HTML Gmail digest body. Event names/times are HTML-escaped."""
     evs = _digest_this_week(weeks, today)
     parts: list[str] = []
@@ -1772,6 +1886,7 @@ def render_digest_html(weeks: list[tuple[dt.date, list[dict[str, Any]]]],
     parts.append(
         f'<h2 style="margin:0 0 12px 0;">{_html.escape(digest_subject(today))}</h2>'
     )
+    parts.extend(_render_outlier_block_html(alerts or []))
     if not evs:
         parts.append('<p>No events this week.</p>')
     else:
@@ -1840,6 +1955,12 @@ def main() -> int:
                         "title; the manifest is overwritten with the current "
                         "render set after HTML is written. Missing/malformed "
                         "file → no badges (first-run graceful degradation).")
+    p.add_argument("--outlier-alerts", default="",
+                   help="Path to a JSON list of outlier-alert dicts produced "
+                        "by newsletter_stats.outlier_alerts. When non-empty, "
+                        "an ⚠️ Possible under-extraction section renders at "
+                        "the top of the weekly digest (text + HTML). "
+                        "Missing/malformed file → no block.")
     args = p.parse_args()
 
     today = (dt.date.fromisoformat(args.today) if args.today
@@ -1899,8 +2020,13 @@ def main() -> int:
         count = write_ics_files(display, args.ics_out_dir)
         print(f"Wrote {count} .ics files to {args.ics_out_dir}", file=sys.stderr)
 
-    digest_text = render_digest_text(weeks, today, pages_url=args.pages_url)
-    digest_html = render_digest_html(weeks, today, pages_url=args.pages_url)
+    outlier_alerts = _load_outlier_alerts(args.outlier_alerts)
+    digest_text = render_digest_text(
+        weeks, today, pages_url=args.pages_url, alerts=outlier_alerts
+    )
+    digest_html = render_digest_html(
+        weeks, today, pages_url=args.pages_url, alerts=outlier_alerts
+    )
     this_week_count = len(_digest_this_week(weeks, today))
 
     if args.digest_text_out:

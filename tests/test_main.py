@@ -568,3 +568,139 @@ def test_step3_extract_events_forwards_none_when_kwarg_omitted(monkeypatch):
     monkeypatch.setattr(main, "extract_events", fake_extract_events)
     main.step3_extract_events([], model="x")
     assert captured["newsletter_senders"] is None
+
+
+# ─────────────────────────────────────────────────────────────────────────
+# step4_process_events outlier-alerts bridge (#17, C6)
+# ─────────────────────────────────────────────────────────────────────────
+
+
+def test_step4_process_events_accepts_outlier_alerts_kwarg():
+    """Signature guardrail. C6 adds the kwarg so the weekly digest can
+    surface per-run outlier alerts without punching through argparse
+    from main() directly."""
+    import inspect
+    sig = inspect.signature(main.step4_process_events)
+    assert "outlier_alerts" in sig.parameters
+    assert sig.parameters["outlier_alerts"].default is None
+
+
+def _stub_script_outputs(script_args: list[str]) -> None:
+    """Write the minimal set of files step4_process_events reads back."""
+    # script_args is a flat [flag, value, flag, value, ...] list.
+    kv = dict(zip(script_args[::2], script_args[1::2]))
+    Path(kv["--body-out"]).write_text("", encoding="utf-8")
+    Path(kv["--html-out"]).write_text("", encoding="utf-8")
+    Path(kv["--digest-text-out"]).write_text("", encoding="utf-8")
+    Path(kv["--digest-html-out"]).write_text("", encoding="utf-8")
+    Path(kv["--meta-out"]).write_text(
+        json.dumps({
+            "subject": "",
+            "today_iso": "2026-04-13",
+            "counts": {
+                "candidates_in": 0,
+                "future_dated": 0,
+                "undated": 0,
+                "dropped_past": 0,
+                "banked_far_future": 0,
+                "dropped_ignored": 0,
+            },
+            "warnings": [],
+            "has_events": False,
+            "digest": {"subject": "", "this_week_count": 0},
+        }),
+        encoding="utf-8",
+    )
+
+
+def test_step4_process_events_forwards_outlier_alerts_tempfile(monkeypatch):
+    """When alerts are supplied, step4 writes them to a tempfile and adds
+    --outlier-alerts to run_script's argv pointing at it. The tempfile
+    content is the same list (round-tripped through JSON)."""
+    alerts = [
+        {
+            "sender": "newsletter@example.com",
+            "message_id": "m1",
+            "prior_median": 6,
+            "current_count": 1,
+            "threshold": 3,
+        }
+    ]
+    captured: dict = {}
+
+    def fake_run_script(script_name, script_args):
+        captured["script_name"] = script_name
+        captured["script_args"] = list(script_args)
+        # Read the alerts tempfile while it still exists.
+        kv = dict(zip(script_args[::2], script_args[1::2]))
+        alerts_path = kv["--outlier-alerts"]
+        with open(alerts_path, "r", encoding="utf-8") as f:
+            captured["alerts_on_disk"] = json.load(f)
+        _stub_script_outputs(script_args)
+        return ""
+
+    monkeypatch.setattr(main, "run_script", fake_run_script)
+    monkeypatch.setattr(main, "_load_webhook_url", lambda: "")
+    main.step4_process_events(
+        [], pages_url="", dry_run=True, outlier_alerts=alerts
+    )
+    assert "--outlier-alerts" in captured["script_args"]
+    assert captured["alerts_on_disk"] == alerts
+
+
+def test_step4_process_events_omits_flag_when_alerts_none(monkeypatch):
+    """None is the default-quiet path: no tempfile, no flag, no stale
+    `--outlier-alerts ""` that a tolerant loader would need to skip."""
+    captured: dict = {}
+
+    def fake_run_script(script_name, script_args):
+        captured["script_args"] = list(script_args)
+        _stub_script_outputs(script_args)
+        return ""
+
+    monkeypatch.setattr(main, "run_script", fake_run_script)
+    monkeypatch.setattr(main, "_load_webhook_url", lambda: "")
+    main.step4_process_events([], pages_url="", dry_run=True)
+    assert "--outlier-alerts" not in captured["script_args"]
+
+
+def test_step4_process_events_omits_flag_when_alerts_empty(monkeypatch):
+    """Empty list behaves like None — the flag is an existence-signal,
+    not a payload. `newsletter_stats.outlier_alerts` returning [] is
+    the common-case no-alerts run and must not drag a tempfile in."""
+    captured: dict = {}
+
+    def fake_run_script(script_name, script_args):
+        captured["script_args"] = list(script_args)
+        _stub_script_outputs(script_args)
+        return ""
+
+    monkeypatch.setattr(main, "run_script", fake_run_script)
+    monkeypatch.setattr(main, "_load_webhook_url", lambda: "")
+    main.step4_process_events(
+        [], pages_url="", dry_run=True, outlier_alerts=[]
+    )
+    assert "--outlier-alerts" not in captured["script_args"]
+
+
+def test_step4_process_events_cleans_up_alerts_tempfile(monkeypatch):
+    """The finally block must unlink the alerts tempfile along with the
+    other scratch files so a long-running agent session doesn't
+    accumulate one-shot JSON files in /tmp."""
+    alerts = [{"sender": "x@y.com", "message_id": "m", "prior_median": 5,
+               "current_count": 0, "threshold": 3}]
+    seen: dict = {}
+
+    def fake_run_script(script_name, script_args):
+        kv = dict(zip(script_args[::2], script_args[1::2]))
+        seen["alerts_path"] = kv["--outlier-alerts"]
+        assert Path(seen["alerts_path"]).exists()
+        _stub_script_outputs(script_args)
+        return ""
+
+    monkeypatch.setattr(main, "run_script", fake_run_script)
+    monkeypatch.setattr(main, "_load_webhook_url", lambda: "")
+    main.step4_process_events(
+        [], pages_url="", dry_run=True, outlier_alerts=alerts
+    )
+    assert not Path(seen["alerts_path"]).exists()
