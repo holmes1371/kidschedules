@@ -1,0 +1,111 @@
+# Kids Schedule — Completed Backlog
+
+Archive of closed `[x]` items from `ROADMAP.md`. Entries keep their original numbers so past session summaries and commit messages that reference `#5`, `#16`, etc. still resolve. Close-out rule: when Tom signs off a `[~]` item, the next session moves its full entry here and leaves a one-line stub at the original position in `ROADMAP.md`.
+
+### 1. [x] Failure notifications via GitHub mobile app — c3d2e5b
+
+Tom enables Actions push notifications for the repo in the GitHub mobile app. On the code side, verify `main.py` and the workflow exit non-zero on real failures (Gmail token expiry, Anthropic 5xx, unexpected exceptions) so the push actually fires. Add a small dry-run or intentional-failure path to confirm the notification arrives end-to-end.
+
+Audited existing propagation paths (most were already correct). Removed the `except Exception: continue` in `agent.py::extract_events` so post-retry API failures propagate instead of silently returning `([], [])`; parse failures and filter-audit failures remain tolerant by design (see `design/failure-notifications.md`). Added `main.py --intentional-failure` plus a matching `intentional_failure` workflow_dispatch input. Tom verified the mobile push arrives when the intentional-failure run finishes.
+
+### 2. [x] Pytest suite for `scripts/process_events.py` — 8375e9c (suite) / 8a9f4b3 (CI)
+
+Cover current behavior: past-event filtering, dedupe, sort order, week grouping, event-ID stability (12-char sha1), HTML body rendering, subject-line construction. Use fixture JSON inputs under `fixtures/`; prefer string-equality or snapshot assertions over structural asserts. Wire into a GitHub Actions check so regressions fail the workflow. Foundational — every subsequent feature extends the fixture set.
+
+26 tests in `tests/test_process_events.py`. Fixtures under `fixtures/test/`, body snapshot under `tests/snapshots/`. CI in `.github/workflows/tests.yml` runs on push + PR. Design note at `design/pytest-suite.md`. Session-discipline block updated to point at `tests/` and note that a red test check blocks merge.
+
+### 3. [x] Weekly email digest to Gmail drafts, with test-mode toggle — b5200cb … f312d90
+
+After publishing, create a Gmail draft summarizing this-week events with a link to the Pages URL. Built with a three-layer safety model (see `design/weekly-digest-draft.md`):
+
+- `main.py --create-draft` is explicit opt-in; default is no-draft. `CREATE_DRAFT=1` env var is equivalent for workflow plumbing. `--dry-run` always suppresses.
+- Workflow sets `CREATE_DRAFT=1` only when `github.event_name == 'schedule'` or the new `create_draft` workflow_dispatch input is true.
+- Preview of the rendered digest subject + body prints to stdout on every run regardless of the gate, so local/manual runs can eyeball content without touching Gmail.
+
+Render functions (`digest_subject`, `render_digest_text`, `render_digest_html`) live in `scripts/process_events.py`. Draft is HTML with plain-text alternative (`gmail_client.py::create_draft` now accepts `text_alternative`). Empty-week short-circuit: no draft when `this_week_count == 0`. Pages URL pulled from committed `pages_url.txt` (empty-safe). `should_create_draft` is unit-tested exhaustively across all gate combinations.
+
+Commit trail: c89bd19 (design) · b5200cb (render + CLI + tests) · 2ffc458 (gmail_client) · 4838af0 (pages_url.txt) · 91cd5fb (main wiring + gate tests) · f312d90 (workflow).
+
+### 4. [x] Incremental extraction — skip already-processed Gmail messages — 008051c … 7528267
+
+Every run used to send up to 60 days of email through the Anthropic agent even though almost none of those messages had changed since last week. Fixed by caching extracted events in `events_state.json` (on the `state` branch) keyed by Gmail message ID; each run only sends the agent messages whose IDs aren't already in the cache. Gmail search window stays at 60 days (cheap, self-healing). Event IDs are stable (`sha1(name|date|child)[:12]`), so dedupe across runs is trivial. Garbage-collects `processed_messages` entries older than 2× lookback (120 days) and events whose date is past. Subsumes `future_events.json`, which is retired.
+
+Live verification 2026-04-14: first run after retirement bootstrapped 168 events from `future_events.json` and filtered 0 of 66 emails (everything new); second run filtered 61 of 66 and sent only 5 to the agent — a ~92% reduction in agent load. Key decisions locked in the design note: no per-message event attribution (YAGNI); top-level `schema_version` with blow-away-and-rebuild on mismatch; atomic write via tempfile + `os.replace`; load-time GC; cache failure modes always "warn and start empty"; reschedule detection deferred (manual ignore is adequate for now — see design note "Explicit non-goals"). Full design at `design/incremental-extraction.md`.
+
+Commit trail: 008051c (design note + ROADMAP insert) · 440358f (`events_state.py` module + 33 unit tests) · bd56047 (main.py integration + workflow state-branch plumbing + zero-new-messages test) · 7528267 (retire `future_events.json`; one-time bootstrap).
+
+### 5. [x] Per-event `.ics` export button — 52ebd73 … cc7ac82
+
+RFC 5545 generator in `scripts/process_events.py` (`build_ics`) plus an "Add to calendar" anchor on every dated card. Three-step path, each pivot driven by a concrete iOS testing failure the prior version couldn't solve:
+
+1. **Blob download (superseded).** Inline `data-ics` attribute + JS Blob handler. iOS Safari/Edge/Chrome all route `.ics` downloads through Files and offer Reminders as the default handler — wrong app, two taps in the wrong place.
+2. **Hosted files + `webcal://` (superseded).** Per-event files at `docs/ics/{event_id}.ics` linked via `webcal://<pages-host>/…`. Fixed the handler routing (Calendar opens directly), but `webcal://` is iOS's *subscription* scheme — tapping a link opens the "Subscribe to calendar?" sheet and adds a remote feed, rather than importing the single event.
+3. **Hosted files + `https://` + range parsing (final).** Plain `https://` anchor to the same `.ics` files; GitHub Pages serves `Content-Type: text/calendar`, so iOS recognizes the MIME and opens Calendar's single-event preview sheet ("Add Event"), pre-populated, no subscription step. Added `_parse_time_range` for strings like "2PM - 5PM" so camp-style events emit a real `DURATION:PT3H` instead of degrading to all-day.
+
+Architecture: `write_ics_files()` wipes and repopulates `docs/ics/` on every non-dry-run; `_webcal_base(pages_url)` strips the scheme and returns the host+path used to build the anchor href (name is historical — it's now the base for the https link); render gracefully omits the button when `pages_url` is empty (dev preview). UID stays `{event_id}@kidschedules.holmes1371.github.io` (opaque — UIDs don't need to resolve); timed events get `DTSTART;TZID=America/New_York` + real duration + a single hand-coded `VTIMEZONE`; all-day events get `VALUE=DATE` with exclusive `DTEND`. No workflow change needed — `docs/` is rebuilt each run and uploaded via `actions/upload-pages-artifact`.
+
+Commit trail: 52ebd73 (design note + ROADMAP insert) · e0a8aa6 (`build_ics` + helpers + snapshots + parser tests) · 8c060b9 (UI card — Blob version, superseded) · 2082da8 (pivot to hosted files + webcal://, superseded) · 1135405 (time-range parsing) · cc7ac82 (webcal:// → https:// swap, final).
+
+Design note: `design/ics-export.md` (includes both pivot rationales).
+
+### 6. [x] Undo recently ignored + 7. "Ignore sender" (bundled)
+
+Bundled because they share all their surfaces — Apps Script routing, a second Google Sheet tab, client-side button/toggle work in the rendered HTML, and a new workflow sync step. Full design: `design/ignore-undo-and-block-sender.md` (includes locked decisions, 10-step commit plan, responsibility table, non-goals).
+
+Locked model (from the design note, not re-debated): render-but-hide (no 5-minute toast); per-card Unignore button in solid-green variant replaces Ignore on ignored cards; header **Show ignored (N)** toggle; registrable-domain blocking via `tldextract`; LLM echoes `source_message_id` → Python does all sender parsing.
+
+Progress against the 10-step commit plan:
+
+1. [x] Design note + ROADMAP insert — f7f3425 · 82979d6 (palette amendment)
+2. [x] `agent.py` schema bump (`source_message_id` field, prompt update, parser validation, 9 unit tests) — 518b4ad
+3. [x] `main.py` sender-domain attachment + `tldextract>=5.1.0` added to `requirements.txt` (10 unit tests) — eebae6f
+4. [x] `events_state.py` schema v2 (optional `sender_domain` per event; blow-away-and-rebuild on mismatch) — 96795dd
+5. [x] `process_events.py` render-but-hide model (classify/render changes, Show/Hide toggle, Ignore-sender button) — 220b083; design amended post-step-5 to standardize on "ignored senders" vocabulary end-to-end (b07bdf7)
+6. [x] `scripts/apps_script.gs` action router (`ignore` / `unignore` / `ignore_sender`; `?kind=ignored_senders` GET route; second tab "Ignored Senders") — 9935d60
+7. [x] `scripts/sync_ignored_senders.py` fetch-and-write helper + 13 unit tests — 8d51750
+8. [x] Workflow "Sync ignored senders" step — a9f070c. `ignored_senders.json` is ephemeral (option A): written to the runner's working dir only, no commit-on-main — matches the existing `ignored_events.json` sibling. Design note updated to reflect this (sections: intro, architecture-update, Workflow changes, Commit plan step 8, ripple-through).
+9. [x] Client JS in `docs/index.html` (Unignore, Show/Hide toggle, Ignore sender, toast helpers, localStorage hydration) — 646993c
+10. [x] CSS fix for action-row overlap (flex wrapper for Add-to-calendar + Ignore event buttons) — bf34506
+11. [x] Gap closure: wire `ignored_senders.json` into `build_queries.py` so UI-clicked Ignore-sender decisions actually exclude those domains from Gmail searches at fetch time — e97f1b0
+12. [x] Protected-senders guardrail: `protected_senders.txt` at repo root (seeded from `blocklist.txt`'s NEVER-add list) + shared `scripts/protected_senders.py` loader. Both `process_events.render_html` (suppresses the Ignore-sender button) and `build_queries.main` (filters protected domains out of the ignored_senders union) read the same file — defense in depth so the user can't accidentally block schools, PTAs, team-management platforms, or health providers — 2393d31
+13. [x] Ignore-sender sweeps sibling cards locally — 7cf8cb3
+
+    Click-time the handler now `querySelectorAll('.event-card[data-sender="<domain>"]')`, optimistically hides every match via `setIgnored`, persists ids to the shared `localStorage` key, and bumps `Show ignored (N)` by the number newly hidden. Cards already `data-ignored="1"` (server-ignored or event-ignored earlier in the session) are skipped so the counter stays accurate. POST failure reverts the entire sweep (`setActive` each card, drop ids, `bumpToggle(-swept.length)`, toast). Fade is deliberately skipped for the sweep — staggered fades across many cards read as jank — single-card Ignore keeps its 300ms fade. Unignore-sender remains intentionally asymmetric: no per-card affordance; domain stays on the Ignored Senders sheet until edited there. `bumpToggle` also gained a zero-to-one create path so a first local ignore on an `ignored_n == 0` page still surfaces the counter. 4 regression tests in `tests/test_process_events.py`.
+
+    The "intentionally asymmetric" framing was superseded by sub-item 14 once the janky Unignore-event surface on sender-swept cards surfaced in use; the sender-sweep's id-push to Ignored Events also got rolled back under that pass (events now stay out of the events tab when sender-ignored — Gmail-query exclusion is the persistence path).
+
+14. [x] Unignore-sender button + optimistic-Unignore parity — 4feaa2d · f24b81e
+
+    Closes the UX gap where a sender-swept card showed "Unignore event" but clicking it did nothing visible (Ignored Events had no matching id; pessimistic handler masked the POST round-trip). Schema bumped: Ignored Events rows now carry a 5th `sender` column so `action=unignore_sender` can bulk-delete by sender in addition to wiping the Ignored Senders row. Client-side: new `kids_schedule_ignored_senders` localStorage key (sender-sweep writes only the domain now, no per-event-id pushes — keeps Ignored Events a pure individual-ignore record), `data-ignored-reason` attribute dispatches the right Unignore variant, and both Unignore paths are optimistic for latency parity with Ignore. Design note at `design/unignore-sender.md`. Legacy 4-column Ignored Events rows are intentionally left out of the bulk-delete path — cleared individually or by hand in the sheet. 8 new regression tests; 2 sub-item-13 tests updated to reflect the storage-key split.
+
+    **Deploy required before this is live.** Paste `scripts/apps_script.gs` into the bound Apps Script editor (preserve the real `READ_SECRET` — the repo copy is a placeholder), then Deploy → Manage deployments → edit the existing web app deployment → New version → Deploy. Without that step `action=unignore_sender` returns `bad action` and Ignore-event rows keep writing 4 columns; client code is defensive against both, so users just see no behavior change until the redeploy lands.
+
+    **Live smoke test after deploy:** (1) Ignore event → new sheet row has 5 columns incl. sender. (2) Unignore event feels as snappy as Ignore (optimistic). (3) Ignore sender hides every sibling, adds a row to Ignored Senders only — Ignored Events is not touched. (4) Page refresh preserves sender-swept state via `kids_schedule_ignored_senders` localStorage. (5) Unignore sender reveals every card from that domain, incl. any individually-ignored ones (server-side bulk delete by column 5). (6) Protected-sender guard unchanged: cards in `protected_senders.txt` still render without an Ignore-sender button. Pre-existing 4-column rows from sub-item 13's sender-sweep won't be caught by Unignore-sender — expected; clear individually if they drift into view.
+
+### 8. [x] Bug: "Show ignored (N)" counter doesn't update mid-session — eb0236b
+
+Unignore already decremented via `bumpToggle(-1)` on success, but Ignore had the mirror-image gap. Added `bumpToggle(1)` to the `ignore-btn` branch right after the local `setIgnored` + localStorage push, and `bumpToggle(-1)` in the POST-failure catch alongside the existing `setActive` + `saveIgnored` rollback. Zero-to-one creation (counter appearing when the page built with `ignored_n == 0`) is served by the `bumpToggle` rework in 7cf8cb3. 2 regression tests in `tests/test_process_events.py`.
+
+### 9. [x] Footer refresh-tempo copy out of date — 756428c
+
+Footer string in `scripts/process_events.py` now reads `Auto-generated from Gmail · Updated Mon, Wed, and Sat`, matching the Mon/Wed/Sat cron in `.github/workflows/weekly-schedule.yml:8`. Also dropped the adjacent `<a href="archive.html">View past schedules</a>` link — `archive.html` is never generated in CI (no workflow step calls `scripts/build_archive_index.py`) and the affordance contradicts the live-view rule in session discipline. `Updated {generated}` subtitle (actual line 1058) is in the header, not the footer, and is already prominent — no restyle needed. The expected snapshot re-record turned out to be unnecessary: `tests/snapshots/basic_body.txt` is the plain-text email body, and no test asserts on the HTML footer string. All 224 tests pass.
+
+Follow-up archive-infrastructure rip handled in 2640c4b: deleted `scripts/build_archive_index.py` (170-line orphan, no callers) and the vestigial `docs/archive.html` + dated-snapshot (`docs/20[0-9][0-9]-[0-1][0-9]-[0-3][0-9].html`) patterns from `.gitignore`. Also removed the local `docs/2026-04-14.html` artifact. Zero residual `archive` references remain outside the live-view rule in this file. 224 tests still pass.
+
+### 10. [x] Gmail draft gating: Monday runs only — 65c86f3
+
+Picked option (b) from the original note: split the cron into two entries (`15 10 * * 1` and `15 10 * * 3,6`) and gate `CREATE_DRAFT` on `github.event.schedule == '15 10 * * 1'`. All logic stays declarative in the `env:` expression; no shell-date math. Manual `workflow_dispatch` opt-in via `inputs.create_draft` is preserved through the OR branch. Python `should_create_draft` unchanged — already exhaustively unit-tested. Workflow comment flags the cron-string/gate coupling so a future time edit doesn't silently drop drafts. Design note at `design/monday-only-draft-gating.md`. 224 tests still pass.
+
+### 16. [x] Node 20 → Node 24 action upgrades (before 2026-06-02) — ea081da
+
+Every workflow run was printing:
+
+> Warning: Node.js 20 actions are deprecated. The following actions are running on Node.js 20 and may not work as expected: actions/deploy-pages@v4.
+
+GitHub timeline: Node 24 becomes the default on 2026-06-02 and Node 20 is removed from runners on 2026-09-16 (see https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/). The warning named `actions/deploy-pages@v4`; audit of the other pinned actions in `.github/workflows/weekly-schedule.yml` and `.github/workflows/tests.yml` found `actions/checkout@v4`, `actions/setup-python@v5`, and `actions/upload-pages-artifact@v3` all still on the Node 20 runtime.
+
+Bumps landed in `ea081da`: `actions/checkout` v4→v5, `actions/setup-python` v5→v6, `actions/upload-pages-artifact` v3→v5 (with `include-hidden-files: true` to preserve `docs/.nojekyll` across the v4 breaking change), `actions/deploy-pages` v4→v5. Full scope, the `.nojekyll` gotcha, and the verification plan live in `design/node-24-action-upgrades.md`.
+
+Verified: `tests.yml` green on push (`checkout@v5` + `setup-python@v6`); non-dry `weekly-schedule.yml` run confirmed Pages deployed cleanly with `upload-pages-artifact@v5` + `deploy-pages@v5`, no Node 20 deprecation warnings in the Actions log.
+
+Fallback (not applied — all four actions already have Node 24 majors, documented here for a future feature that pulls in a less-maintained action): if an action has no Node 24 major by 2026-06-02, set `ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true` as an env on the step (or on the runner) to keep it on Node 20 past the default flip. This only buys time until 2026-09-16, when Node 20 is removed from runners entirely. The older `FORCE_JAVASCRIPT_ACTIONS_TO_NODE20` env var is the historical predecessor and is not the forward-looking escape hatch.
