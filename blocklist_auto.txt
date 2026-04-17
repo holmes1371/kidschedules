@@ -78,3 +78,5 @@ feedback@e.democrats.org  # auto 2026-04-17: Political fundraising email — adu
 subscription.service@subscriptions.ssa.gov  # auto 2026-04-17: Social Security Administration W-2 wage reporting newsletter — adult/employer co
 support0@info.myloancare.com  # auto 2026-04-17: Mortgage/loan payment due notice — adult financial content only
 noreply@opera.upscalebychoice.com  # auto 2026-04-17: Hotel booking confirmation for adults, no kids' events
+mdac@malaysiavisas.com  # auto 2026-04-17: Travel visa confirmation for adults, no kids' events
+notifications@united.com  # auto 2026-04-17: Adult airline travel reminder, no kids' events
