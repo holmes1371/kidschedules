@@ -925,3 +925,67 @@ def test_dedupe_by_thread_preserves_first_encounter_group_order():
     a_late = _stub("a2", "tA", "Wed, 16 Apr 2026 10:00:00 -0400")
     stubs = [a_early, b_early, c_only, b_late, a_late]
     assert main._dedupe_by_thread(stubs) == [a_late, b_late, c_only]
+
+
+# ── step2b wiring integration (#21 C3) ────────────────────────────────────
+#
+# End-to-end check that the two dedup passes fire in order and the
+# per-message body fetch only happens for survivors — verifying the
+# original dance-studio observation: one active reply thread producing
+# four [i/N] hits collapses to a single read_message call.
+
+
+def test_step2b_thread_dedup_collapses_dance_studio_pattern(capsys):
+    """Recital thread with four stubs spread across three query
+    categories (plus one duplicated messageId to prove the earlier
+    messageId pass still fires) collapses to a single read_message
+    call; two unrelated threads survive untouched. Log shows the
+    three-line funnel counts."""
+    # Four dance-studio stubs in thread Tdance, ascending dates — the
+    # latest (recital4) should win.
+    r1 = _stub("recital1", "Tdance", "Mon, 30 Mar 2026 08:00:00 -0400")
+    r2 = _stub("recital2", "Tdance", "Tue, 31 Mar 2026 09:00:00 -0400")
+    r3 = _stub("recital3", "Tdance", "Wed,  1 Apr 2026 10:00:00 -0400")
+    r4 = _stub("recital4", "Tdance", "Thu,  2 Apr 2026 11:00:00 -0400")
+    # Two unrelated threads — pass through.
+    laes = _stub("laes1", "Tlaes", "Mon, 30 Mar 2026 12:00:00 -0400")
+    swim = _stub("swim1", "Tswim", "Mon, 30 Mar 2026 13:00:00 -0400")
+
+    # r1 appears in two categories — exercises the pre-existing
+    # messageId pass so the funnel reports 7 → 6 → 3.
+    search_results: dict[str, list[dict]] = {
+        "school_activities": [r1, laes],
+        "sports_extracurriculars": [r1, swim],
+        "newsletters_calendars": [r2, r3, r4],
+        "camps_summer": [],
+        "birthdays_parties": [],
+    }
+
+    calls: list[str] = []
+
+    class _FakeGmail:
+        def read_message(self, message_id: str) -> dict:
+            calls.append(message_id)
+            return {
+                "messageId": message_id,
+                "threadId": None,
+                "headers": {
+                    "From": "studio@example.com",
+                    "Subject": f"subject-{message_id}",
+                    "Date": "Thu,  2 Apr 2026 11:00:00 -0400",
+                },
+                "snippet": "",
+                "body": "body",
+            }
+
+    full = main.step2b_read_promising(_FakeGmail(), search_results)
+
+    # One read_message call per surviving thread — the three earlier
+    # recital replies never hit the Gmail API.
+    assert calls == ["recital4", "laes1", "swim1"]
+    assert [e["messageId"] for e in full] == ["recital4", "laes1", "swim1"]
+
+    out = capsys.readouterr().out
+    assert "Collected 7 stub(s) across 5 queries" in out
+    assert "Unique messageIds: 6" in out
+    assert "After thread dedup: 3" in out

@@ -335,15 +335,28 @@ def step2b_read_promising(
     gmail: GmailClient,
     search_results: dict[str, list[dict[str, Any]]],
 ) -> list[dict[str, Any]]:
-    """Read full bodies for all unique messages across searches."""
+    """Read full bodies for all unique messages across searches.
+
+    Two dedup passes run before any full-body fetch: first by
+    ``messageId`` (collapses the common case where Gmail returns the
+    same message under multiple overlapping query templates), then by
+    ``threadId`` via :func:`_dedupe_by_thread` (collapses the less
+    common but still-expensive case where an active reply chain
+    produces several distinct messages that each match the queries).
+    Dropping the redundancy here — before the per-message
+    ``read_message`` call — saves Gmail API quota alongside the
+    downstream agent cost. See design/dedupe-candidate-messages.md.
+    """
     print("\n" + "=" * 60)
     print("STEP 2b: Reading full message bodies")
     print("=" * 60)
 
     seen_ids: set[str] = set()
     emails_to_read: list[dict[str, Any]] = []
+    total_stubs = 0
 
     for category, messages in search_results.items():
+        total_stubs += len(messages)
         for msg in messages:
             mid = msg["messageId"]
             if mid in seen_ids:
@@ -351,7 +364,15 @@ def step2b_read_promising(
             seen_ids.add(mid)
             emails_to_read.append(msg)
 
-    print(f"  Unique messages to read: {len(emails_to_read)}")
+    unique_message_ids = len(emails_to_read)
+    emails_to_read = _dedupe_by_thread(emails_to_read)
+
+    print(
+        f"  Collected {total_stubs} stub(s) across "
+        f"{len(search_results)} queries"
+    )
+    print(f"  Unique messageIds: {unique_message_ids}")
+    print(f"  After thread dedup: {len(emails_to_read)}")
 
     full_emails: list[dict[str, Any]] = []
     for i, msg in enumerate(emails_to_read, 1):
