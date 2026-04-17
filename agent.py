@@ -11,6 +11,7 @@ from __future__ import annotations
 import json
 import os
 import time
+from pathlib import Path
 from typing import Any
 
 import anthropic
@@ -23,7 +24,45 @@ def _get_client() -> anthropic.Anthropic:
     return anthropic.Anthropic(api_key=api_key)
 
 
-EXTRACTION_SYSTEM_PROMPT = """\
+_ROSTER_PATH = Path(__file__).parent / "class_roster.json"
+
+
+def _format_roster_prose(mapping: dict[str, dict[str, str]]) -> str:
+    """Format a roster mapping into a prose block for the extractor prompt.
+
+    Pure function — no I/O. The formatter is kept separate from the loader
+    so it can be unit-tested against a fabricated mapping without touching
+    the filesystem. Sentence shape avoids gendered pronouns so adding a
+    third kid later doesn't require rewording.
+    """
+    lines = ["Teacher roster (current academic year):"]
+    for name, info in mapping.items():
+        lines.append(
+            f"- {name} is in {info['grade']} grade at {info['school']}, "
+            f"taught by {info['teacher']}."
+        )
+    lines.append("")
+    lines.append(
+        "If an email names a teacher without naming the kid, attribute "
+        "events to that teacher's student. If an email names a grade "
+        "level that matches a kid's grade, prefer that kid for the "
+        "`child` field."
+    )
+    return "\n".join(lines)
+
+
+def _load_roster_prose(path: Path = _ROSTER_PATH) -> str:
+    """Read the roster JSON and return the formatted prose block.
+
+    Raises (FileNotFoundError / json.JSONDecodeError / KeyError) on any
+    problem — the roster file is committed and its absence or corruption
+    is a bug, not a condition to paper over with a silent fallback.
+    """
+    mapping = json.loads(path.read_text())
+    return _format_roster_prose(mapping)
+
+
+_EXTRACTION_BASE_PROMPT = """\
 You are an assistant that extracts kids' events from email content for a
 family with children at Louise Archer Elementary School (LAES) in Fairfax
 County (FCPS). The family also has kids in swim team (HTM Sharks / Hunter
@@ -145,6 +184,12 @@ OUTPUT FORMAT — return a single JSON object:
 If no events: "events": []. If no irrelevant senders: "irrelevant_senders": [].
 Output ONLY the JSON object, no other text.
 """
+
+
+# Final prompt with roster prose appended. Module import will fail loudly if
+# class_roster.json is missing or malformed — intentional; the file is
+# committed and silent drift would degrade extractions invisibly.
+EXTRACTION_SYSTEM_PROMPT = _EXTRACTION_BASE_PROMPT + "\n" + _load_roster_prose()
 
 
 AUDIT_SYSTEM_PROMPT = """\

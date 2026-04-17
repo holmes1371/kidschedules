@@ -139,3 +139,49 @@ def test_no_warnings_when_nothing_is_dropped(capsys):
     events = [_event("ok", "1111aaaa2222bbbb")]
     agent._filter_events_by_source_id(events, batch_ids)
     assert capsys.readouterr().out == ""
+
+
+# ─── teacher roster injection (#12 subtask) ───────────────────────────────
+
+
+def test_extraction_prompt_embeds_roster_prose():
+    """End-to-end: the fully-formed prompt carries kid names, grades,
+    teachers, school, and the attribution rule. Guards the module-load
+    wiring — if the roster loader ever breaks silently, this fails."""
+    prompt = agent.EXTRACTION_SYSTEM_PROMPT
+    for needle in (
+        "Teacher roster",
+        "Everly",
+        "Isla",
+        "Ms. Anita Sahai",
+        "Ms. Meredith Rohde",
+        "Louise Archer Elementary",
+        "6th",
+        "3rd",
+        "attribute",
+    ):
+        assert needle in prompt, f"missing from prompt: {needle!r}"
+
+
+def test_format_roster_prose_shape():
+    """Unit test on the pure formatter. No filesystem. Fabricated mapping
+    with a third kid proves the loop scales and nothing in the formatter
+    hard-codes Everly/Isla."""
+    mapping = {
+        "Alice": {"teacher": "Mr. Smith", "grade": "4th", "school": "Oakwood"},
+        "Bob":   {"teacher": "Ms. Jones", "grade": "2nd", "school": "Oakwood"},
+    }
+    prose = agent._format_roster_prose(mapping)
+    assert prose.startswith("Teacher roster (current academic year):")
+    assert "- Alice is in 4th grade at Oakwood, taught by Mr. Smith." in prose
+    assert "- Bob is in 2nd grade at Oakwood, taught by Ms. Jones." in prose
+    assert "attribute" in prose
+
+
+def test_load_roster_prose_raises_on_missing_file(tmp_path):
+    """Missing roster file must raise at load time — not paper over with a
+    silent fallback. The file is committed and its absence is a bug."""
+    missing = tmp_path / "nope.json"
+    import pytest
+    with pytest.raises(FileNotFoundError):
+        agent._load_roster_prose(missing)
