@@ -61,3 +61,6 @@ columbiapikeanimalhospital@gmail.com  # auto 2026-04-16: Veterinary records for 
 invitations@linkedin.com  # auto 2026-04-16: Adult professional networking invitation, no children's events
 no-reply@dancestudio-pro.com  # auto 2026-04-16: Marketing email from an unaffiliated dance studio (Adrenaline) advertising their
 hello@drmtlgy.com  # auto 2026-04-17: Adult skincare/sunscreen product marketing email, no kids' content
+waivers@waivers.dance.one  # auto 2026-04-17: Document delivery confirmation only (signed waiver copy); no event dates contain
+newtampa@m.mygym.com  # auto 2026-04-17: My Gym New Tampa promotional email for a Tampa-area gym unrelated to this family
+no-reply@demosphere.com  # auto 2026-04-17: Vienna Youth Inc volleyball league communications — not related to children in t
