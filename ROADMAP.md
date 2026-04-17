@@ -25,7 +25,10 @@ Replace this block at the end of each session. Keep it to what the next agent ac
   - Stats count zero-yield runs (a quiet summer newsletter issue contributes 0 to `per_message_counts`) to keep the rolling median honest.
   - Newsletter-isolated batching is batch-of-1 per newsletter email, batch-of-10 for everyone else. Newsletter batches run FIRST so a parse failure on a cheap regular batch doesn't gate the expensive newsletter work.
 - **Session discipline clarification from Tom this session:** update this ROADMAP session-notes block between each commit during a large task, not just at session end. The block should always reflect what *just* landed and what's next, so a mid-feature handoff (either mid-session or across agents) has a clean pickup point.
-- **Repo state at this commit:** `main` is clean except for #17's design note + this ROADMAP update. Tests should still be at 329 passing — this commit is prose only.
+- **Commit progress within #17:**
+  - C1 (prose only, landed): design note + ROADMAP flip [~]. Tests unchanged at 329.
+  - C2 (landed): `newsletter_stats.py` module + `tests/test_newsletter_stats.py` (31 new tests, full suite now 360). Standalone — not yet wired into the pipeline. Covers load/save/update/classify/outlier. Key invariants pinned: missing-file ≠ malformed-file, sticky promotion, zero-count messages contribute 0 to rolling window, 11th entry rolls the first out, outlier threshold uses strict `<` not `<=`, floor of 2 protects low-median senders.
+  - C3 next: `main.py --reextract` CLI + event-cache eviction + tests. Independently functional (can ship without C2 being wired).
 
 ---
 
