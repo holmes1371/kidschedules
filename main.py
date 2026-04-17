@@ -30,8 +30,9 @@ from zoneinfo import ZoneInfo
 import tldextract
 
 import events_state as es
+import newsletter_stats as ns
 from gmail_client import GmailClient
-from agent import extract_events, review_stripped_messages
+from agent import _sender_key, extract_events, review_stripped_messages
 
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -52,6 +53,7 @@ AUTO_BLOCKLIST_AUDIT_PATH = os.path.join(
 IGNORED_SENDERS_PATH = os.path.join(PROJECT_ROOT, "ignored_senders.json")
 PROTECTED_SENDERS_PATH = os.path.join(PROJECT_ROOT, "protected_senders.txt")
 PRIOR_EVENTS_PATH = os.path.join(PROJECT_ROOT, "prior_events.json")
+SENDER_STATS_PATH = os.path.join(PROJECT_ROOT, "sender_stats.json")
 
 
 def _load_webhook_url() -> str:
@@ -460,18 +462,93 @@ def _attach_sender_domains(
         )
 
 
+def _per_message_counts(
+    new_emails: list[dict[str, Any]],
+    candidates: list[dict[str, Any]],
+) -> list[tuple[str, str, int]]:
+    """Build (sender_key, message_id, count) triples for the stats update.
+
+    Pure function — no I/O. One triple per message the agent saw this
+    run, even when the agent emitted zero events for that message. The
+    zero-event case is load-bearing: a newsletter that legitimately
+    produced 0 events this week (quiet summer issue) contributes a 0
+    to the rolling median, which is exactly what the outlier check
+    needs to stay honest.
+
+    Counts are derived from `candidates[*].source_message_id`; the
+    sender key is pulled from the matching email's `from_` header via
+    `agent._sender_key` so the key shape matches what the stats file
+    stores (lowercased mailbox).
+
+    Candidates whose `source_message_id` doesn't match any email in
+    `new_emails` are ignored — they can't feed a per-sender count, and
+    the upstream filter in `agent._filter_events_by_source_id` already
+    warns on this case.
+    """
+    count_by_id: dict[str, int] = {}
+    new_message_ids = {em.get("messageId", "") for em in new_emails}
+    new_message_ids.discard("")
+    for ev in candidates:
+        mid = ev.get("source_message_id", "")
+        if mid in new_message_ids:
+            count_by_id[mid] = count_by_id.get(mid, 0) + 1
+
+    triples: list[tuple[str, str, int]] = []
+    for em in new_emails:
+        mid = em.get("messageId", "")
+        sender_key = _sender_key(em.get("from_", ""))
+        triples.append((sender_key, mid, count_by_id.get(mid, 0)))
+    return triples
+
+
+def _print_outlier_alerts(alerts: list[dict[str, Any]]) -> None:
+    """Print the STEP 3c outlier-alerts section to stdout.
+
+    The banner is unconditional so an Actions-log reader can tell
+    "stats were checked and clean" from "stats were skipped entirely".
+    Each alert line echoes the message ID verbatim so Tom can paste it
+    straight into a `--reextract` invocation.
+    """
+    print("\n" + "=" * 60)
+    print("STEP 3c: Outlier alerts (possible under-extraction)")
+    print("=" * 60)
+    if not alerts:
+        print("  No outlier alerts this run.")
+        return
+    for a in alerts:
+        print(
+            f"  ⚠️ {a['sender']} — message {a['message_id']} "
+            f"yielded {a['current_count']} event(s); "
+            f"prior median {a['prior_median']}, threshold {a['threshold']}"
+        )
+    print(
+        "  (to re-run an under-extracted message: "
+        "python main.py --reextract <MESSAGE_ID>)"
+    )
+
+
 def step3_extract_events(
     full_emails: list[dict[str, Any]],
     model: str,
+    newsletter_senders: set[str] | None = None,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    """Send emails to the Anthropic agent for event extraction."""
+    """Send emails to the Anthropic agent for event extraction.
+
+    `newsletter_senders` is the set of lowercased sender mailboxes that
+    the agent should batch one-per-API-call (see design/newsletter-
+    robustness.md). `None` falls back to the default BATCH_SIZE batching
+    for every email — used by any test that doesn't care about the
+    partition and matches the kwarg default on `agent.extract_events`.
+    """
     print("\n" + "=" * 60)
     print("STEP 3: Agent event extraction (Anthropic API)")
     print("=" * 60)
     print(f"  Model: {model}")
     print(f"  Emails to process: {len(full_emails)}")
 
-    events, irrelevant_senders = extract_events(full_emails, model=model)
+    events, irrelevant_senders = extract_events(
+        full_emails, model=model, newsletter_senders=newsletter_senders,
+    )
     print(f"  Candidate events extracted: {len(events)}")
     print(f"  Irrelevant sender suggestions: {len(irrelevant_senders)}")
     return events, irrelevant_senders
@@ -746,6 +823,12 @@ def main() -> int:
     state, new_emails = step2c_load_cache_and_filter(full_emails)
     now_iso = _now_iso()
 
+    # Load sender stats BEFORE extraction so the newsletter set can be
+    # passed to the agent (newsletter emails get batch-of-1, regulars
+    # BATCH_SIZE). Missing/corrupt file → empty stats dict; see
+    # newsletter_stats.load_stats.
+    sender_stats = ns.load_stats(SENDER_STATS_PATH)
+
     if not new_emails:
         if not full_emails:
             print("\nNo emails found. Rendering from cache only.")
@@ -754,9 +837,12 @@ def main() -> int:
         candidates: list[dict] = []
         irrelevant_senders: list[dict] = []
     else:
-        # Step 3: Agent extraction (only for new, uncached messages)
+        # Step 3: Agent extraction (only for new, uncached messages).
+        # Known newsletter senders get a batch-of-1 API call; everyone
+        # else batches at BATCH_SIZE. See design/newsletter-robustness.md.
         candidates, irrelevant_senders = step3_extract_events(
-            new_emails, model=args.model
+            new_emails, model=args.model,
+            newsletter_senders=ns.newsletter_senders(sender_stats),
         )
         # Attach sender_domain before caching so the Ignore-sender button
         # can render deterministically on future re-paints.
@@ -779,6 +865,24 @@ def main() -> int:
         step3b_update_auto_blocklist(irrelevant_senders)
     else:
         print("\n  (dry-run: skipping auto-blocklist update)")
+
+    # Step 3c: Fold this run into sender_stats, compute outlier alerts,
+    # and print the alerts banner. Alerts are computed BEFORE the stats
+    # update so prior_median reflects history only — folding in would
+    # bias the threshold toward the current run's (potentially short)
+    # counts. Zero-yield messages still contribute a 0 via
+    # `_per_message_counts` so a quiet newsletter issue doesn't skew
+    # the rolling window upward.
+    per_message_counts = _per_message_counts(new_emails, candidates)
+    alerts = ns.outlier_alerts(sender_stats, per_message_counts)
+    if per_message_counts:
+        ns.update_sender_counts(sender_stats, per_message_counts, now_iso)
+        ns.classify_senders(sender_stats)
+        if args.dry_run:
+            print("\n  (dry-run: skipping sender_stats save)")
+        else:
+            ns.save_stats(SENDER_STATS_PATH, sender_stats, now_iso)
+    _print_outlier_alerts(alerts)
 
     # Step 4: Process events — hand the merged cache as the candidate pool
     # so stable events from prior runs survive without a re-extraction.
