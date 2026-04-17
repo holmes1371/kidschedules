@@ -2,15 +2,15 @@
 
 This repo sits on a FUSE mount (virtiofs over a Windows OneDrive path) whose semantics refuse `unlink` but permit `rename`. Running `rm` on any file returns `Operation not permitted`, even under `dangerouslyDisableSandbox` — the restriction is filesystem-level, not sandbox-level. `mv` works normally. Agents that try to delete files fail; agents that rename files succeed.
 
-Under that constraint, this project uses a **soft-delete convention**: when an agent needs to discard a file, it `mv`s the file into `.to_delete/` at the repo root. Tom empties `.to_delete/` manually from Windows when convenient. `.to_delete/` exists in the tree (kept alive by `.to_delete/.gitkeep`); everything else under it is `.gitignore`d.
+Under that constraint, this project uses a **soft-delete convention**: when an agent needs to discard a file, it `mv`s the file into `.to_delete/` at the repo root. Tom empties `.to_delete/` manually from Windows when convenient. The folder is not tracked — it's `.gitignore`d wholesale (`.to_delete/`). Because it isn't kept alive by a `.gitkeep`, the folder may not exist in a fresh clone or after Tom empties it; agents `mkdir -p` it on demand before each move.
 
 ## The rule
 
-**Never `rm`. Always `mv` into `.to_delete/`.** Include a timestamp and short tag in the destination name so the folder stays browseable. Example:
+**Never `rm`. Always `mkdir -p .to_delete/` then `mv` into it.** Include a timestamp and short tag in the destination name so the folder stays browseable. Example:
 
 ```
-mv .git/index.lock .to_delete/git-index-lock-$(date +%Y%m%d-%H%M%S)
-mv stale-draft.md   .to_delete/stale-draft-$(date +%Y%m%d-%H%M%S).md
+mkdir -p .to_delete && mv .git/index.lock .to_delete/git-index-lock-$(date +%Y%m%d-%H%M%S)
+mkdir -p .to_delete && mv stale-draft.md   .to_delete/stale-draft-$(date +%Y%m%d-%H%M%S).md
 ```
 
 If an operation fails with `Operation not permitted` during an unlink, the cause is always this FUSE restriction. Do not ask for sandbox-disable — it does not help. Soft-delete is the only workaround.
@@ -31,8 +31,7 @@ after a commit that otherwise reports `[main 70c172a] ...`, the commit landed. I
 **Stale locks blocking the next op** — if the next git command fails with `fatal: Unable to create '.git/index.lock': File exists`, the persistent lock from the prior op is blocking you. Recover with:
 
 ```
-mv /sessions/vibrant-funny-ride/mnt/kids-schedule-github/.git/index.lock \
-   /sessions/vibrant-funny-ride/mnt/kids-schedule-github/.to_delete/git-index-lock-$(date +%Y%m%d-%H%M%S)
+mkdir -p .to_delete && mv .git/index.lock .to_delete/git-index-lock-$(date +%Y%m%d-%H%M%S)
 ```
 
 Then retry. Same pattern for `.git/HEAD.lock`.

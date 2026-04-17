@@ -43,7 +43,6 @@ blocklist_auto_audit.jsonl
 
 # Soft-delete holding pen — the repo sits on a FUSE mount that refuses
 # unlink, so agents `mv` files here instead of `rm`-ing them. Tom empties
-# this folder periodically. Ignore contents but keep the folder via .gitkeep.
-# See design/soft-delete-convention.md for the full convention.
-.to_delete/*
-!.to_delete/.gitkeep
+# the folder periodically. The folder is not tracked; agents `mkdir -p`
+# it on demand before each move. See design/soft-delete-convention.md.
+.to_delete/
