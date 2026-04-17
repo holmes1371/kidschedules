@@ -75,9 +75,11 @@ Status legend:
 
 ### 12. [x] Per-kid filter chips — f0976f6 (design note) / fd0c264 (roster subtask) / 399d383 (chips) — see COMPLETED.md
 
-### 13. [ ] "New this week" badges
+### 13. [~] "New this week" badges
 
 Persist prior-run event IDs to a manifest file in the repo (e.g. `prior_events.json`). On each run, `process_events.py` diffs current IDs against the manifest and stamps cards whose IDs did not exist last week with a visible "NEW" badge. First run: manifest empty, no badges — degrade gracefully. The workflow commits the updated manifest alongside the other outputs.
+
+In progress — plan approved 2026-04-17. Design note at `design/new-this-week-badges.md` (file-per-concern manifest in its own `prior_events.json`; missing file ≠ empty list for first-run semantics; badge inline with event name; dry-run gated save). Next: implementation in `scripts/process_events.py` + workflow restore/save plumbing + tests.
 
 ### 14. [ ] Manual "refresh now" button in the UI
 
