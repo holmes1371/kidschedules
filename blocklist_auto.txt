@@ -64,3 +64,17 @@ hello@drmtlgy.com  # auto 2026-04-17: Adult skincare/sunscreen product marketing
 waivers@waivers.dance.one  # auto 2026-04-17: Document delivery confirmation only (signed waiver copy); no event dates contain
 newtampa@m.mygym.com  # auto 2026-04-17: My Gym New Tampa promotional email for a Tampa-area gym unrelated to this family
 no-reply@demosphere.com  # auto 2026-04-17: Vienna Youth Inc volleyball league communications — not related to children in t
+noreply@glassdoor.com  # auto 2026-04-17: adult job search/recruiting platform, no kids' events
+noreply@everbridge.net  # auto 2026-04-17: county government facility closure alerts unrelated to children or school
+messageservice@daysmart.com  # auto 2026-04-17: adult salon and spa appointment notifications
+vspvisioncarevcm@e.vsp.com  # auto 2026-04-17: Adult vision insurance benefits marketing email addressed to Ellen, no children'
+mydoctor@unifiedhc.com  # auto 2026-04-17: Adult OB/GYN provider network notification, no children involved
+ica_notification@ica.gov.sg  # auto 2026-04-17: Singapore immigration arrival card auto-notifications, adult travel administrati
+team@email.rocketlawyer.com  # auto 2026-04-17: Adult business/legal services marketing email, no children's events
+usaabank@exmac.usaa.com  # auto 2026-04-17: Bank promotional email about credit card balance transfer offers — adult financi
+23andmedatasettlement@e.emailksa.com  # auto 2026-04-17: Legal settlement notification for adult data breach — no child relevance
+support8@info.myloancare.com  # auto 2026-04-17: Mortgage/loan payment due notice — adult financial content only
+feedback@e.democrats.org  # auto 2026-04-17: Political fundraising email — adult content only
+subscription.service@subscriptions.ssa.gov  # auto 2026-04-17: Social Security Administration W-2 wage reporting newsletter — adult/employer co
+support0@info.myloancare.com  # auto 2026-04-17: Mortgage/loan payment due notice — adult financial content only
+noreply@opera.upscalebychoice.com  # auto 2026-04-17: Hotel booking confirmation for adults, no kids' events
