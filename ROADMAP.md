@@ -10,10 +10,10 @@ Closed `[x]` items are archived in `COMPLETED.md` with their full post-mortem pr
 
 Replace this block at the end of each session. Keep it to what the next agent actually needs to walk in cold: what just closed, what's open, where to pick up, and any non-obvious observations that aren't captured under a numbered item.
 
-**2026-04-17 (session 6 — #19 deterministic kid attribution closed)**
+**2026-04-17 (session 6 — #19 deterministic kid attribution closed, plus #12 chip carry-over closed)**
 
-- **Just closed: #19 deterministic kid attribution.** Stub left at item 19 in the backlog; full prose moved to `COMPLETED.md`. Four commits landed on `main`: `eb65f8a` (design note + ROADMAP `[ ]` → `[~]`), `2ee6a17` (`scripts/roster_match.py` module + 46 unit tests), `ad145ba` (wire into `process_events.py` + 10 render tests), `a854946` (ROADMAP SHAs + implementation summary). Tom confirmed visual QA on the live Pages build: "6th grade AAP" → Everly, "Cuppett Performing Arts" → Isla, "All LAES students" renders with no pill under every chip, direct name matches stay pill-only. This session's close-out flip + move-to-COMPLETED was landed in commit `<next SHA, see git log>`.
-- **Next step (pick up here):** #12 per-kid filter chips is still marked `[~]` in the backlog even though the #19 work was layered on top of a working chip row. Tom has not explicitly re-signed-off #12 — next session should confirm with him, then flip #12 to `[x]` and move its prose into `COMPLETED.md` using the same stub pattern. After that, next backlog item is `#13` — "New this week" badges. `#17` (multi-event newsletter robustness) and `#18` (undated-card ignore affordance) remain open at Tom's priority.
+- **Just closed: #19 deterministic kid attribution + #12 per-kid filter chips.** Both stubs left at their original numbers in the backlog; full prose moved to `COMPLETED.md`. Four #19 implementation commits on `main`: `eb65f8a` (design note + ROADMAP `[ ]` → `[~]`), `2ee6a17` (`scripts/roster_match.py` module + 46 unit tests), `ad145ba` (wire into `process_events.py` + 10 render tests), `a854946` (ROADMAP SHAs + implementation summary). Tom confirmed visual QA on the live Pages build: "6th grade AAP" → Everly, "Cuppett Performing Arts" → Isla, "All LAES students" renders with no pill under every chip, direct name matches stay pill-only. `84aef8a` closed #19 (flip + move-to-COMPLETED). Then Tom also signed off #12's carry-over from session 5 — chips had been working live the whole time and the #19 attribution fix made them useful on messier audience-string cases. This session's close-out commit for #12 followed — see git log tail.
+- **Next step (pick up here):** next backlog item is `#13` — "New this week" badges. `#17` (multi-event newsletter robustness) and `#18` (undated-card ignore affordance) remain open at Tom's priority — no work started on either.
 - **Key design decisions locked in `design/kid-attribution-derivation.md`**, worth skimming before any change that touches attribution, filter chips, or the roster:
   - **Five signal tiers, priority `name → teacher → grade → activity → school`.** Earlier tiers win on tie. `derive_child_slug` iterates tiers outermost so a teacher match trumps an activity match even if both fire for different kids.
   - **Distinctiveness filter is tier-agnostic.** Any signal string appearing in two or more kids' signal lists is dropped from everyone — not just from one tier. This is why both kids sharing LAES silences the school tier entirely and "All LAES students" events attribute to nobody (correctly, per the non-lossy filter contract from #12).
@@ -75,9 +75,7 @@ Status legend:
 
 ### 11. [x] Card information redesign (supersedes per-kid split) — fe6e272 — see COMPLETED.md
 
-### 12. [~] Per-kid filter chips — 399d383 (chips) / fd0c264 (roster subtask) / f0976f6 (design note)
-
-Implemented as three commits: design note → teacher roster (class_roster.json + agent.py prose injection) → chip row + filter JS. Final shape matches `design/per-kid-filter-chips.md`: three hard-coded chips (All / Everly / Isla), non-lossy hide semantics (audience-line and empty-child cards stay visible across every selection), ephemeral filter state. Pending Tom's visual QA on the next live GitHub Pages build before flipping to `[x]`.
+### 12. [x] Per-kid filter chips — f0976f6 (design note) / fd0c264 (roster subtask) / 399d383 (chips) — see COMPLETED.md
 
 ### 13. [ ] "New this week" badges
 
