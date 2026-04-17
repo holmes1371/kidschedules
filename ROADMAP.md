@@ -133,6 +133,22 @@ Discovery in session 11 corrected the original framing: `step2b_read_promising` 
 
 Scope in progress: `_dedupe_by_thread` helper in `main.py` (pure function), wired into `step2b_read_promising`; three new log lines replace `Unique messages to read: {N}` to show the full funnel (stubs / unique messageIds / after thread dedup). Tests cover the helper's edge cases (empty, no collisions, clear Date ordering, tiebreaker, missing threadId, malformed Date) plus one integration test that simulates the dance-studio four-hit pattern against the step2b flow. See `design/dedupe-candidate-messages.md` for the full decision record.
 
+### 22. [ ] Bug: page header "N day lookback" ignores `--lookback-days` CLI value
+
+Filed 2026-04-17 by Tom. He ran the workflow with `lookback_days=120` via the dispatch input; the Gmail searches correctly used the 120-day window and extra events surfaced, but the rendered header on `docs/index.html` still read "60 day lookback" (screenshot confirmed: "32 events / 60 day lookback" under "Updated April 17, 2026 @ 5:14PM"). So the page lies about how wide a window it was built from, and the data-vs-display-copy drift is the kind of mismatch that will eventually cause the wrong call on "is this event old enough to still trust".
+
+Root cause is a single missing argument pass-through. `main.py::step4_process_events` (around line 817 at `6d80f53`) hardcodes `"--display-window-days", "60"` when invoking `scripts/process_events.py` and never forwards `args.lookback_days` as `--lookback-days`. `process_events.py`'s argparse (line 1928) defaults `--lookback-days` to `60`, so the value that ends up rendered in the `"{lookback_days} day lookback"` template (line 1405) and in the no-events fallback paragraph (line 1001) is always `60` regardless of what the workflow was triggered with. `--display-window-days` (future horizon for the published page) is a genuinely separate knob and the `"60"` hardcode there is fine — that's always 60 days forward of today.
+
+Fix:
+
+- Add a `lookback_days: int` parameter to `main.py::step4_process_events`.
+- Thread `args.lookback_days` in at the single caller (line 1073).
+- Append `"--lookback-days", str(lookback_days)` to the `script_args` list built around line 809.
+- No changes needed in `process_events.py` — the flag is already defined and already rendered into the header template.
+
+Tests: one pytest that mocks out `run_script` in `step4_process_events`, calls it with `lookback_days=120`, and asserts `--lookback-days 120` appears in the captured script args. Existing snapshot tests cover the header template; no new render-side tests needed.
+
+Accepted risk / non-goal: weekly cron runs with no `lookback_days` dispatch input still default to 60 (the workflow's default), so the page continues to read "60 day lookback" on the common path. This is intentional — the bug is only visible when Tom overrides the window manually.
 ### 14. [-] Manual "refresh now" button in the UI — descoped 2026-04-17, see "Descoped / on hold" at bottom
 
 ### 15. [-] Conflict highlighting — descoped 2026-04-17, see "Descoped / on hold" at bottom
