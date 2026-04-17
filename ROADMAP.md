@@ -10,19 +10,21 @@ Closed `[x]` items are archived in `COMPLETED.md` with their full post-mortem pr
 
 Replace this block at the end of each session. Keep it to what the next agent actually needs to walk in cold: what just closed, what's open, where to pick up, and any non-obvious observations that aren't captured under a numbered item.
 
-**2026-04-17 (session 7 — #18 undated-card ignore affordance closed)**
+**2026-04-17 (session 8 — #13 "New this week" badges closed)**
 
-- **Just closed: #18 Ignore affordance for undated "Needs Verification" cards.** Three commits on `main`: `41505aa` (fixture + `_undated_card` markup + 4 render tests + id-collision test + ROADMAP flip `[ ]` → `[~]`), `aade8aa` (extend server-side `ignored_n` count to span display + undated + 2 toggle-count tests), `9848080` (ROADMAP SHAs + implementation summary, pending QA). Tom ran live QA the same day and confirmed the full click path — Ignore hides, Show-ignored surfaces the hidden card with Unignore, Unignore restores, reload persists state, Apps Script sheet picks up a row with `date=""`. Close-out commit moves the full prose to `COMPLETED.md` and flips the stub to `[x]`.
-- **Next step (pick up here):** next backlog item is `#13` — "New this week" badges. `#17` (multi-event newsletter robustness) still open at Tom's priority — design-note-first per the ROADMAP entry.
-- **Key design decisions worth remembering for #18**, captured more fully in the COMPLETED entry:
-  - **Id-collision contract is load-bearing.** `_event_id(name, "", child)` vs `_event_id(name, "YYYY-MM-DD", child)` are disjoint by construction (sha1 input differs on the middle segment). Pinned by `test_event_id_undated_vs_dated_no_collision`. Any future change to the event-id scheme must preserve this.
-  - **Ignore-sender stays out of scope on undated cards.** `_undated_card` deliberately does NOT emit `data-sender` even when the source event has one — tested against a fixture entry with `sender_domain="laes.org"`. Undated senders are unreliable by the time events reach "Needs Verification".
-  - **JS handler was not touched.** The click router and hydration IIFE already selected on `.event-card[data-event-id]` generically; once undated cards carry the attribute they slot in. `setIgnored`/`setActive` don't touch the yellow left-rail color.
-  - **`ignored_n` sums display + undated.** Deliberate deviation from "straight port" — without it, an undated card ignored on a prior run reloads hidden with no toggle to reveal it.
-  - **Apps Script audit row for empty date.** `_handleIgnore` writes `date || ''` with no validation; `_load_ignored_ids` only extracts `id`. End-to-end tolerant, no Apps Script change.
-- **Shape of the `_undated_card` change.** `scripts/process_events.py::_undated_card` now mirrors `_event_card`'s top-action-row pattern: `data-event-id` on the outer div, `data-ignored="1" data-ignored-reason="event"` when `is_ignored`, and an `event-actions-top` div wrapping the Ignore/Unignore button. The `.ignore-status` placeholder was intentionally NOT added — it's `:empty` → `display:none` on dated cards anyway, and omitting it keeps the undated markup minimal.
-- **Repo state at session end:** 312 tests passing (was 306 at session 6 close; +1 id-collision + 3 undated render + 2 toggle count = +6). Worktree clean. `.to_delete/` picked up another batch of stale `.git/*.lock` files from this session's git churn — safe to leave until Tom sweeps.
-- **Open thread (carry-over) — Cowork permission re-prompts:** still re-prompts every `mv`/`git commit`. Broader allowlist entries like `Bash(git:*)` and `Bash(mv:*)` in `.claude/settings.local.json` would kill the noise if Tom asks to address it.
+- **Just closed: #13 "New this week" badges.** Three commits on `main`: `5ab4a01` (design note at `design/new-this-week-badges.md` + ROADMAP flip `[ ]` → `[~]`), `ac4ae3b` (helpers + render wiring + CSS + 17 new tests + `main.py` `--prior-events` wiring + `.gitignore` entry), `4cbfc68` (workflow restore/save plumbing). Tom signed off same session. Close-out commit moves full prose to `COMPLETED.md` and flips the stub to `[x]` — this is that commit.
+- **Next step (pick up here):** next backlog item is `#14` — "Manual 'refresh now' button in the UI". `#15` (conflict highlighting) and `#17` (multi-event newsletter robustness) also open. `#17` is design-note-first per the ROADMAP entry; `#14` has its full threat model + defense-in-depth rationale baked into the ROADMAP entry already, so design-note-first is lighter lift there.
+- **Key design decisions worth remembering for #13**, captured more fully in the COMPLETED entry:
+  - **Missing file ≠ empty list.** `_load_prior_event_ids` returns `None` when the file is missing / unreadable / malformed / wrong-shape; returns `set()` when present and well-formed. Caller writes `new_ids = (current - prior) if prior is not None else set()` — so first-run (no manifest) suppresses every badge, but a legitimate empty-prior state still badges everything. The distinction is load-bearing and pinned by four loader edge-case tests.
+  - **`prior_events.json` is its own file, not a new key in `events_state.json`.** Different concerns, different GC rules, different parity contracts. File-per-concern matches the existing state-branch pattern. Cache eviction does not touch the render manifest, and a cache-clear still diffs correctly because event IDs are deterministic from `(name, date, child)`.
+  - **Badge renders on ignored-but-new cards.** No special-case. The `<span class="new-badge">` ships in the HTML; `display:none` from `.ignored` hides the whole card until Show ignored is clicked, at which point the NEW correctly signals a newly-extracted auto-ignored card.
+  - **CSS rule always ships; span is conditional.** The `.new-badge` selector lives in the inline `<style>` block regardless of whether any card renders the span. Suppression tests assert on `<span class="new-badge">` (the rendered element), not the selector string — easy mistake to make, caught during iteration.
+  - **Dry-run gating piggybacks on the existing save-step `if:`.** No new flag threaded into `process_events.py`. Dry-run renders badges against the last real prior-run state but doesn't advance the manifest — next real run's diff stays correct.
+  - **"New" is binary per run — no aging.** Mon's run overwrites the manifest with Mon's union; by Wed a Mon-new event loses its badge. Simplest possible semantic.
+- **One deviation from the design note.** The design note's "Files touched" list said "No changes to `main.py`". Implementation added `PRIOR_EVENTS_PATH` + `--prior-events` wiring through `step4_process_events` — symmetric with the existing state-branch-file pattern. Rationale in the COMPLETED entry; worth noting because the design note is otherwise still load-bearing for explaining why things are shaped the way they are.
+- **Repo state at session end:** 329 tests passing (was 312 at session 7 close; +17 #13 tests = 329). Worktree clean. `.to_delete/` picked up another batch of stale `.git/*.lock` + `.git/objects/*/tmp_obj_*` files from this session's git churn — safe to leave until Tom sweeps.
+- **Carry-over from sessions 6–7 — Cowork permission re-prompts.** Still re-prompts every `mv`/`git commit`. Broader allowlist entries like `Bash(git:*)` and `Bash(mv:*)` in `.claude/settings.local.json` would kill the noise if Tom asks to address it.
+- **FUSE stale-lock reminder.** Today's session hit stale `.git/index.lock` and `.git/HEAD.lock` from an earlier crashed git process on this mount. Pre-commit ritual: `if [ -f .git/index.lock ]; then mv .git/index.lock .to_delete/...; fi; if [ -f .git/HEAD.lock ]; then mv .git/HEAD.lock .to_delete/...; fi` before every `git commit`. The "unable to unlink" warnings that follow a successful commit are cosmetic — commit already landed via rename. Full recovery ritual at `design/soft-delete-convention.md`.
 
 ## For future agents
 
@@ -75,11 +77,7 @@ Status legend:
 
 ### 12. [x] Per-kid filter chips — f0976f6 (design note) / fd0c264 (roster subtask) / 399d383 (chips) — see COMPLETED.md
 
-### 13. [~] "New this week" badges
-
-Persist prior-run event IDs to a manifest file in the repo (e.g. `prior_events.json`). On each run, `process_events.py` diffs current IDs against the manifest and stamps cards whose IDs did not exist last week with a visible "NEW" badge. First run: manifest empty, no badges — degrade gracefully. The workflow commits the updated manifest alongside the other outputs.
-
-In progress — plan approved 2026-04-17. Design note at `design/new-this-week-badges.md` (file-per-concern manifest in its own `prior_events.json`; missing file ≠ empty list for first-run semantics; badge inline with event name; dry-run gated save). Next: implementation in `scripts/process_events.py` + workflow restore/save plumbing + tests.
+### 13. [x] "New this week" badges — 5ab4a01 / ac4ae3b / 4cbfc68 — see COMPLETED.md
 
 ### 14. [ ] Manual "refresh now" button in the UI
 
