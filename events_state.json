@@ -13,6 +13,19 @@
       "source_message_id": "19d1873576a3c28d",
       "time": "9:00 AM - 2:00 PM"
     },
+    "0886ce6b7c29": {
+      "category": "Sports & Extracurriculars",
+      "child": "",
+      "date": "2026-05-08",
+      "first_seen_iso": "2026-04-17T09:55:04-04:00",
+      "id": "0886ce6b7c29",
+      "location": "",
+      "name": "ID Dance Competition",
+      "sender_domain": "teamsnap.com",
+      "source": "TeamSnap Team Coordinator (Apr 16)",
+      "source_message_id": "19d97400ede1ed0d",
+      "time": ""
+    },
     "09ba480f8257": {
       "category": "School Activity",
       "child": "Rising 7th & 8th graders",
@@ -275,6 +288,19 @@
       "source": "Kids' Schedule — April 6, 2026 (Apr 6)",
       "time": "Time TBD"
     },
+    "48be24a6e550": {
+      "category": "School Activity",
+      "child": "All LAES students",
+      "date": "2026-05-06",
+      "first_seen_iso": "2026-04-17T09:55:04-04:00",
+      "id": "48be24a6e550",
+      "location": "Louise Archer Elementary School (LAES)",
+      "name": "Teacher Appreciation Week — PTA Provides Bagels for Staff",
+      "sender_domain": "gmail.com",
+      "source": "Susan Anspach / LAES PTA (Apr 16)",
+      "source_message_id": "19d97dc3ddcf82b5",
+      "time": "School hours"
+    },
     "50907ef899b6": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -320,6 +346,19 @@
       "name": "Chess Camp at LAES (Session 1 End)",
       "source": "LAES PTA Sunbeam (Mar 15)",
       "time": "9:00 AM - 4:00 PM"
+    },
+    "59b229168805": {
+      "category": "Academic Due Date",
+      "child": "All LAES students",
+      "date": "2026-06-12",
+      "first_seen_iso": "2026-04-17T09:55:04-04:00",
+      "id": "59b229168805",
+      "location": "www.shopttkits.com (school ID 93768)",
+      "name": "School Supply Kits Order Deadline (2026-2027)",
+      "sender_domain": "gmail.com",
+      "source": "Susan Anspach / LAES PTA (Apr 16)",
+      "source_message_id": "19d97dc3ddcf82b5",
+      "time": "All day (deadline)"
     },
     "5cf198cfcd2b": {
       "category": "Academic Due Date",
@@ -615,6 +654,32 @@
       "source": "HTM Sharks / Carly Reiley via SportsEngine Motion (Mar 4)",
       "time": "9:00 AM – 12:00 PM"
     },
+    "935734d51833": {
+      "category": "School Activity",
+      "child": "All LAES students",
+      "date": "2026-05-05",
+      "first_seen_iso": "2026-04-17T09:55:04-04:00",
+      "id": "935734d51833",
+      "location": "Louise Archer Elementary School (LAES)",
+      "name": "Teacher Appreciation Week — PTA Provides Lunch for Staff",
+      "sender_domain": "gmail.com",
+      "source": "Susan Anspach / LAES PTA (Apr 16)",
+      "source_message_id": "19d97dc3ddcf82b5",
+      "time": "School hours"
+    },
+    "9672725e93df": {
+      "category": "School Activity",
+      "child": "All LAES students",
+      "date": "2026-05-08",
+      "first_seen_iso": "2026-04-17T09:55:04-04:00",
+      "id": "9672725e93df",
+      "location": "Louise Archer Elementary School (LAES)",
+      "name": "Teacher Appreciation Week — Gift Card Bingo for Staff",
+      "sender_domain": "gmail.com",
+      "source": "Susan Anspach / LAES PTA (Apr 16)",
+      "source_message_id": "19d97dc3ddcf82b5",
+      "time": "School hours"
+    },
     "9c1090e16021": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -628,6 +693,19 @@
       "source_message_id": "19d1873576a3c28d",
       "time": "Afternoon (after school)"
     },
+    "9d9780ee435f": {
+      "category": "Sports & Extracurriculars",
+      "child": "",
+      "date": "2026-05-11",
+      "first_seen_iso": "2026-04-17T09:55:04-04:00",
+      "id": "9d9780ee435f",
+      "location": "",
+      "name": "ID Dance Competition (end date)",
+      "sender_domain": "teamsnap.com",
+      "source": "TeamSnap Team Coordinator (Apr 16)",
+      "source_message_id": "19d97400ede1ed0d",
+      "time": ""
+    },
     "9e1fb6cc5395": {
       "category": "Sports & Extracurriculars",
       "child": "",
@@ -640,6 +718,19 @@
       "source": "Adrenaline Dance Studio (Apr 13)",
       "source_message_id": "19d872ccd914c41d",
       "time": ""
+    },
+    "a0199878586e": {
+      "category": "School Activity",
+      "child": "All LAES students",
+      "date": "2026-05-04",
+      "first_seen_iso": "2026-04-17T09:55:04-04:00",
+      "id": "a0199878586e",
+      "location": "Louise Archer Elementary School (LAES)",
+      "name": "Teacher Appreciation Week — Fruitful Hearts and Minds (bring fresh fruit)",
+      "sender_domain": "gmail.com",
+      "source": "Susan Anspach / LAES PTA (Apr 16)",
+      "source_message_id": "19d97dc3ddcf82b5",
+      "time": "School hours"
     },
     "a0a1c3808522": {
       "category": "Sports & Extracurriculars",
@@ -664,6 +755,19 @@
       "name": "Sports Camp at LAES — Session 2",
       "source": "LAES PTA Sunbeam (Mar 22)",
       "time": "9:00 AM – 2:00 PM"
+    },
+    "a2320a1fa8f7": {
+      "category": "Academic Due Date",
+      "child": "All LAES students",
+      "date": "2026-04-24",
+      "first_seen_iso": "2026-04-17T09:55:04-04:00",
+      "id": "a2320a1fa8f7",
+      "location": "www.ybpay.com (school ID 15370226)",
+      "name": "Yearbook Order Deadline",
+      "sender_domain": "gmail.com",
+      "source": "Susan Anspach / LAES PTA (Apr 16)",
+      "source_message_id": "19d97dc3ddcf82b5",
+      "time": "All day (deadline)"
     },
     "a903e23c8d23": {
       "category": "Sports & Extracurriculars",
@@ -777,6 +881,19 @@
       "source": "HTM Sharks via SportsEngine Motion (Apr 12)",
       "source_message_id": "19d840f6654b6048",
       "time": ""
+    },
+    "b5eafd54b2a9": {
+      "category": "Sports & Extracurriculars",
+      "child": "",
+      "date": "2026-05-17",
+      "first_seen_iso": "2026-04-17T09:55:04-04:00",
+      "id": "b5eafd54b2a9",
+      "location": "Cuppett Performing Arts Center",
+      "name": "Mini Cuppett Dance Company Interest Meeting",
+      "sender_domain": "jackrabbittech.com",
+      "source": "Cuppett Performing Arts Center (Apr 16)",
+      "source_message_id": "19d980d04944af0d",
+      "time": "4:00 PM"
     },
     "b75932926050": {
       "category": "Sports & Extracurriculars",
@@ -1059,6 +1176,19 @@
       "source": "Children's Dentistry of Oakton (Apr 6)",
       "time": "8:30 AM"
     },
+    "f5e565a344ea": {
+      "category": "School Activity",
+      "child": "All LAES students",
+      "date": "2026-05-07",
+      "first_seen_iso": "2026-04-17T09:55:04-04:00",
+      "id": "f5e565a344ea",
+      "location": "Louise Archer Elementary School (LAES)",
+      "name": "Teacher Appreciation Week — Words from the Heart & Flowers from the Garden",
+      "sender_domain": "gmail.com",
+      "source": "Susan Anspach / LAES PTA (Apr 16)",
+      "source_message_id": "19d97dc3ddcf82b5",
+      "time": "School hours"
+    },
     "f67e3d91085b": {
       "category": "Sports & Extracurriculars",
       "child": "Everly",
@@ -1149,7 +1279,7 @@
       "time": "9:00 AM - 2:00 PM"
     }
   },
-  "last_updated_iso": "2026-04-16T18:59:18-04:00",
+  "last_updated_iso": "2026-04-17T09:55:04-04:00",
   "processed_messages": {
     "19c887239c6630a3": "2026-04-15T20:23:18-04:00",
     "19c889d02a70ec60": "2026-04-15T20:23:18-04:00",
@@ -1219,7 +1349,13 @@
     "19d91cee7b11347a": "2026-04-15T20:23:18-04:00",
     "19d926296f346c39": "2026-04-15T20:23:18-04:00",
     "19d930955442bfc3": "2026-04-15T20:23:18-04:00",
-    "19d933c3c526f4c5": "2026-04-15T20:23:18-04:00"
+    "19d933c3c526f4c5": "2026-04-15T20:23:18-04:00",
+    "19d969b0da419acd": "2026-04-17T09:55:04-04:00",
+    "19d972f301856aea": "2026-04-17T09:55:04-04:00",
+    "19d973ff86fd7945": "2026-04-17T09:55:04-04:00",
+    "19d97400ede1ed0d": "2026-04-17T09:55:04-04:00",
+    "19d97dc3ddcf82b5": "2026-04-17T09:55:04-04:00",
+    "19d980d04944af0d": "2026-04-17T09:55:04-04:00"
   },
   "schema_version": 2
 }
