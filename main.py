@@ -51,6 +51,7 @@ AUTO_BLOCKLIST_AUDIT_PATH = os.path.join(
 )
 IGNORED_SENDERS_PATH = os.path.join(PROJECT_ROOT, "ignored_senders.json")
 PROTECTED_SENDERS_PATH = os.path.join(PROJECT_ROOT, "protected_senders.txt")
+PRIOR_EVENTS_PATH = os.path.join(PROJECT_ROOT, "prior_events.json")
 
 
 def _load_webhook_url() -> str:
@@ -511,6 +512,7 @@ def step4_process_events(
             "--webhook-url", webhook_url,
             "--ignored", IGNORED_EVENTS_PATH,
             "--protected-senders", PROTECTED_SENDERS_PATH,
+            "--prior-events", PRIOR_EVENTS_PATH,
         ]
         # Per-event .ics files land in docs/ics/ for the Pages artifact to
         # pick up; skipped on dry-run to avoid churning the publish dir.

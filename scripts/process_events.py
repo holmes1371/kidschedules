@@ -421,6 +421,74 @@ def _load_ignored_ids(path: str | None) -> frozenset[str]:
     )
 
 
+# ─── prior-run event manifest (#13) ───────────────────────────────────────
+
+
+def _load_prior_event_ids(path: str | None) -> set[str] | None:
+    """Read prior_events.json and return its set of event IDs.
+
+    Semantics distinguish missing from empty:
+
+    - Missing file / empty path / unreadable / wrong shape → return
+      None. The caller reads None as "no prior state" and suppresses
+      all NEW badges for this run. This is the first-run graceful
+      degradation path — flashing NEW on every card when there's
+      nothing to diff against would be visually useless.
+    - File present, event_ids is a list (possibly empty) → return a
+      set of the string IDs. An empty list is a legitimate "last run
+      rendered zero events" state; callers SHOULD badge the current
+      render in that case.
+
+    The missing-vs-empty distinction is load-bearing — see
+    design/new-this-week-badges.md.
+    """
+    if not path or not os.path.exists(path):
+        return None
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except (json.JSONDecodeError, OSError) as e:
+        print(
+            f"  WARNING: prior_events.json unreadable ({e}); "
+            "suppressing NEW badges for this run"
+        )
+        return None
+    if not isinstance(data, dict):
+        print(
+            "  WARNING: prior_events.json not a JSON object; "
+            "suppressing NEW badges for this run"
+        )
+        return None
+    ids = data.get("event_ids")
+    if not isinstance(ids, list):
+        print(
+            "  WARNING: prior_events.json missing event_ids list; "
+            "suppressing NEW badges for this run"
+        )
+        return None
+    return {s for s in ids if isinstance(s, str)}
+
+
+def _save_prior_event_ids(path: str, ids: set[str], now_iso: str) -> None:
+    """Atomically overwrite prior_events.json with the current render's IDs.
+
+    Writes event_ids sorted so week-over-week diffs on the state
+    branch are readable. generated_at_iso is informational for
+    operators looking at the committed file; nothing downstream
+    parses it. The tempfile + os.replace pattern mirrors
+    events_state.save_state — an interrupted write cannot leave a
+    truncated manifest.
+    """
+    payload = {
+        "generated_at_iso": now_iso,
+        "event_ids": sorted(ids),
+    }
+    tmp_path = f"{path}.tmp"
+    with open(tmp_path, "w", encoding="utf-8") as f:
+        json.dump(payload, f, indent=2, ensure_ascii=False)
+    os.replace(tmp_path, path)
+
+
 def _name_signature(name: str) -> frozenset[str]:
     """Significant-token set for fuzzy dedupe of near-duplicate event names.
 
@@ -651,7 +719,8 @@ def render_html(today: dt.date,
                 lookback_days: int,
                 webhook_url: str = "",
                 pages_url: str = "",
-                protected_senders: list[str] | None = None) -> str:
+                protected_senders: list[str] | None = None,
+                new_ids: set[str] | None = None) -> str:
     """Render a complete, self-contained HTML page for GitHub Pages.
 
     webhook_url: if non-empty, the rendered page will POST ignore decisions
@@ -665,10 +734,17 @@ def render_html(today: dt.date,
     triggers a calendar-subscription flow (the wrong behavior for a
     single event). Empty pages_url hides the button (e.g. dev preview
     without a deploy URL).
+
+    new_ids: event IDs whose cards should render a "NEW" badge inline
+    with the event name. Pass `None` on first-run (no prior manifest
+    to diff against) to suppress all badges; pass `set()` to render
+    with zero events flagged new. See design/new-this-week-badges.md
+    (#13) for the diff semantics.
     """
 
     webcal_base = _webcal_base(pages_url)
     protected = protected_senders or []
+    _new_ids = new_ids if new_ids is not None else set()
 
     def _child_markup(
         child: str, slug: str, tier: str,
@@ -780,6 +856,9 @@ def render_html(today: dt.date,
                 f'Ignore sender ({sender})</button>\n'
                 '        </div>'
             )
+        new_badge_html = (
+            '<span class="new-badge">NEW</span>' if ev["id"] in _new_ids else ""
+        )
         return f"""\
       <div class="event-card{ignored_class}" data-event-id="{ev["id"]}" data-child="{data_child_val}"{ignored_attr}{sender_attr}
            style="{card_style}">
@@ -789,7 +868,7 @@ def render_html(today: dt.date,
           <span class="sep">·</span>
           {time_html}
         </div>
-        <div class="event-name">{ev["name"]}</div>{audience_html}{location_html}
+        <div class="event-name">{ev["name"]}{new_badge_html}</div>{audience_html}{location_html}
         <div class="ignore-status" aria-live="polite"></div>{sender_btn_html}
       </div>"""
 
@@ -833,6 +912,9 @@ def render_html(today: dt.date,
                 f'                data-event-name="{ev["name"]}" data-event-date="{ev["date"]}"\n'
                 f'                type="button">Ignore event</button>'
             )
+        new_badge_html = (
+            '<span class="new-badge">NEW</span>' if ev["id"] in _new_ids else ""
+        )
         return f"""\
       <div class="event-card undated{ignored_class}" data-event-id="{ev["id"]}" data-child="{data_child_val}"{ignored_attr} style="{card_style}">
         <div class="event-actions-top">{ignore_btn_html}</div>
@@ -841,7 +923,7 @@ def render_html(today: dt.date,
           <span class="sep">·</span>
           {time_html}
         </div>
-        <div class="event-name">{ev["name"]}</div>{audience_html}{location_html}
+        <div class="event-name">{ev["name"]}{new_badge_html}</div>{audience_html}{location_html}
       </div>"""
 
     # Build week sections
@@ -1184,6 +1266,19 @@ def render_html(today: dt.date,
       font-weight: 600;
       line-height: 1.3;
       margin: 0.1rem 0 0.2rem;
+    }}
+    .new-badge {{
+      display: inline-block;
+      background: var(--accent);
+      color: white;
+      padding: 0.05rem 0.45rem;
+      border-radius: 10px;
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      margin-left: 0.4rem;
+      vertical-align: middle;
     }}
     .event-location {{
       font-size: 0.82rem;
@@ -1738,6 +1833,13 @@ def main() -> int:
                    help="Path to protected_senders.txt. Events whose sender "
                         "domain matches one of these patterns render without "
                         "the Ignore-sender button. Missing file → empty list.")
+    p.add_argument("--prior-events", default="",
+                   help="Path to prior_events.json (persisted across runs). "
+                        "When set, events whose IDs are absent from the prior "
+                        "manifest render with a NEW badge inline with the "
+                        "title; the manifest is overwritten with the current "
+                        "render set after HTML is written. Missing/malformed "
+                        "file → no badges (first-run graceful degradation).")
     args = p.parse_args()
 
     today = (dt.date.fromisoformat(args.today) if args.today
@@ -1760,6 +1862,18 @@ def main() -> int:
     else:
         sys.stdout.write(body)
 
+    # #13 NEW-badge diff: compute current render IDs, load the prior
+    # manifest, and pass the delta into render_html. Missing manifest
+    # (`prior is None`) suppresses all badges — the first-run graceful
+    # degradation path.
+    current_ids: set[str] = (
+        {ev["id"] for ev in display} | {ev["id"] for ev in undated}
+    )
+    new_ids: set[str] | None = None
+    if args.prior_events:
+        prior = _load_prior_event_ids(args.prior_events)
+        new_ids = (current_ids - prior) if prior is not None else set()
+
     if args.html_out:
         protected = (
             load_protected_senders(args.protected_senders)
@@ -1768,9 +1882,18 @@ def main() -> int:
         html = render_html(today, weeks, undated, len(display),
                            args.lookback_days, webhook_url=args.webhook_url,
                            pages_url=args.pages_url,
-                           protected_senders=protected)
+                           protected_senders=protected,
+                           new_ids=new_ids)
         with open(args.html_out, "w", encoding="utf-8") as f:
             f.write(html)
+        # Only overwrite prior_events.json after a successful HTML write.
+        # Dev-only runs (no --html-out) must not advance the baseline, and
+        # a render failure above shouldn't poison next week's diff.
+        if args.prior_events:
+            now_iso = dt.datetime.now(dt.timezone.utc).strftime(
+                "%Y-%m-%dT%H:%M:%SZ"
+            )
+            _save_prior_event_ids(args.prior_events, current_ids, now_iso)
 
     if args.ics_out_dir:
         count = write_ics_files(display, args.ics_out_dir)

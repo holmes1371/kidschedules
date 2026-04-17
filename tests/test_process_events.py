@@ -1603,3 +1603,222 @@ def test_write_ics_files_skips_undated_events(tmp_path):
     assert count == 1
     assert (out_dir / "f00dcafe0000.ics").exists()
     assert not (out_dir / "abc123def456.ics").exists()
+
+
+# ─── prior-events manifest + NEW badges (#13) ────────────────────────────
+
+
+def test_load_prior_event_ids_missing_file(tmp_path):
+    """First-run graceful-degradation: no file → None (suppress badges).
+
+    `None` is distinct from `set()` — the caller reads `None` as "no
+    prior state, don't badge anything this run". See
+    design/new-this-week-badges.md for the missing-vs-empty contract."""
+    result = pe._load_prior_event_ids(str(tmp_path / "missing.json"))
+    assert result is None
+
+
+def test_load_prior_event_ids_empty_path():
+    """Empty/None path = feature disabled → returns None, no exception."""
+    assert pe._load_prior_event_ids("") is None
+    assert pe._load_prior_event_ids(None) is None
+
+
+def test_load_prior_event_ids_empty_list(tmp_path):
+    """File present, event_ids is empty → returns empty set (NOT None).
+
+    This is the "prior render had zero events" case — a legitimate
+    state, distinct from the first-run missing-file case. Caller
+    should badge every current event under this loader result."""
+    path = tmp_path / "prior.json"
+    path.write_text(
+        '{"generated_at_iso": "2026-04-10T00:00:00Z", "event_ids": []}',
+        encoding="utf-8",
+    )
+    result = pe._load_prior_event_ids(str(path))
+    assert result == set()
+    assert result is not None
+
+
+def test_load_prior_event_ids_happy_path(tmp_path):
+    path = tmp_path / "prior.json"
+    path.write_text(
+        '{"generated_at_iso": "2026-04-10T00:00:00Z", '
+        '"event_ids": ["abc123abc123", "def456def456", "789xyz789xyz"]}',
+        encoding="utf-8",
+    )
+    result = pe._load_prior_event_ids(str(path))
+    assert result == {"abc123abc123", "def456def456", "789xyz789xyz"}
+
+
+def test_load_prior_event_ids_malformed_json(tmp_path, capsys):
+    """Unparseable JSON degrades to None + a stdout warning so the
+    workflow log surfaces the problem. Suppressing badges on a corrupt
+    prior is safer than silently flagging every event as new."""
+    path = tmp_path / "prior.json"
+    path.write_text("{not valid json", encoding="utf-8")
+    result = pe._load_prior_event_ids(str(path))
+    assert result is None
+    assert "WARNING" in capsys.readouterr().out
+
+
+def test_load_prior_event_ids_wrong_shape_list(tmp_path, capsys):
+    """A bare JSON list (e.g. a hand-hacked file) fails shape check →
+    returns None with warning. The loader only accepts an object with
+    an `event_ids` list."""
+    path = tmp_path / "prior.json"
+    path.write_text('["abc", "def"]', encoding="utf-8")
+    result = pe._load_prior_event_ids(str(path))
+    assert result is None
+    assert "WARNING" in capsys.readouterr().out
+
+
+def test_load_prior_event_ids_missing_event_ids_key(tmp_path, capsys):
+    """Object present but `event_ids` absent → None + warning."""
+    path = tmp_path / "prior.json"
+    path.write_text(
+        '{"generated_at_iso": "2026-04-10T00:00:00Z"}',
+        encoding="utf-8",
+    )
+    result = pe._load_prior_event_ids(str(path))
+    assert result is None
+    assert "WARNING" in capsys.readouterr().out
+
+
+def test_save_prior_event_ids_roundtrip(tmp_path):
+    path = str(tmp_path / "prior.json")
+    ids = {"abc", "def", "ghi"}
+    pe._save_prior_event_ids(path, ids, "2026-04-17T10:15:32Z")
+    assert pe._load_prior_event_ids(path) == ids
+
+
+def test_save_prior_event_ids_writes_sorted_and_stamped(tmp_path):
+    """Committed manifest is sorted so week-over-week diffs on the state
+    branch are readable. generated_at_iso is stamped verbatim."""
+    path = str(tmp_path / "prior.json")
+    pe._save_prior_event_ids(
+        path, {"zzz", "aaa", "mmm"}, "2026-04-17T10:15:32Z",
+    )
+    with open(path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    assert data["event_ids"] == ["aaa", "mmm", "zzz"]
+    assert data["generated_at_iso"] == "2026-04-17T10:15:32Z"
+
+
+def test_save_prior_event_ids_atomic(tmp_path):
+    """Writer goes via `<path>.tmp` + os.replace so an interrupted write
+    cannot leave a truncated manifest. After a successful save, the
+    `.tmp` file must not linger."""
+    path = str(tmp_path / "prior.json")
+    pe._save_prior_event_ids(path, {"abc"}, "2026-04-17T10:15:32Z")
+    assert not (tmp_path / "prior.json.tmp").exists()
+    assert (tmp_path / "prior.json").exists()
+
+
+def _render_basic_mixed(new_ids):
+    """Render the basic_mixed fixture with a given new_ids set and return
+    the HTML. Factors out the classify→dedupe→render boilerplate shared
+    by the #13 render tests below."""
+    events = load_fixture("basic_mixed")
+    display, undated, _, _, _, _ = pe.classify(
+        events, cutoff=TODAY, horizon=HORIZON,
+    )
+    display = pe.dedupe(display)
+    undated = pe.dedupe(undated)
+    weeks = pe.group_by_week(display)
+    return pe.render_html(
+        today=TODAY, weeks=weeks, undated=undated,
+        total_future=len(display), lookback_days=60, webhook_url="",
+        new_ids=new_ids,
+    )
+
+
+def test_render_html_new_badge_when_id_absent_from_prior():
+    """An event whose ID appears in new_ids renders with a NEW span inside
+    its event-name div. Badge sits immediately after the name text — the
+    inline-with-title placement is a committed design decision."""
+    spring_id = pe._event_id("Spring Concert", "2026-04-23", "Isla")
+    html = _render_basic_mixed(new_ids={spring_id})
+    assert (
+        '<div class="event-name">Spring Concert'
+        '<span class="new-badge">NEW</span></div>'
+    ) in html
+
+
+def test_render_html_no_new_badge_when_id_absent_from_new_ids():
+    """Cards whose IDs aren't in new_ids render without the badge even
+    when OTHER cards are new — verifies the per-card branch."""
+    spring_id = pe._event_id("Spring Concert", "2026-04-23", "Isla")
+    html = _render_basic_mixed(new_ids={spring_id})
+    # Pediatrician Check-up's ID isn't in new_ids → no badge on that card.
+    ped_card = _card_slice(html, "Pediatrician Check-up")
+    assert "new-badge" not in ped_card
+
+
+def test_render_html_new_badge_on_undated_card():
+    """Per Q1 of the approved plan: undated "Needs Verification" cards
+    also carry the NEW badge. Their IDs are disjoint from dated IDs (the
+    #18 id-collision contract), so the same badging rule applies."""
+    undated_id = pe._event_id("Summer Camp Registration", "", "")
+    html = _render_basic_mixed(new_ids={undated_id})
+    assert (
+        '<div class="event-name">Summer Camp Registration'
+        '<span class="new-badge">NEW</span></div>'
+    ) in html
+
+
+def test_render_html_no_badges_when_new_ids_none_first_run():
+    """new_ids=None is the first-run signal (no prior manifest to diff
+    against). No card should render the badge."""
+    html = _render_basic_mixed(new_ids=None)
+    # CSS rule always ships; assert the <span> isn't emitted on any card.
+    assert '<span class="new-badge">' not in html
+
+
+def test_render_html_no_badges_when_new_ids_empty_set():
+    """Post-first-run but with no new events (everything was in prior) →
+    new_ids=set(). No badges render."""
+    html = _render_basic_mixed(new_ids=set())
+    assert '<span class="new-badge">' not in html
+
+
+def test_render_html_new_badge_css_rule_always_present():
+    """The .new-badge CSS rule ships in the inline <style> block
+    unconditionally — same file is served whether or not any card is
+    currently badged, and the rule costs nothing when unused."""
+    html = _render_basic_mixed(new_ids=None)
+    assert ".new-badge" in html
+    # Tied to the accent colour token so the badge tracks the site palette.
+    assert "background: var(--accent)" in html
+
+
+def test_render_html_new_badge_survives_on_ignored_card():
+    """Per Q3 of the approved plan: ignored-but-new events still carry
+    the NEW span in rendered HTML. The card's .ignored CSS rule hides
+    the whole card by default; the badge only appears when the user
+    clicks "Show ignored" — no special-case suppression needed."""
+    ignored_id = pe._event_id("Ignored With Sender", "2026-04-20", "Isla")
+    events = load_fixture("ignored_and_sender")
+    display, undated, _, _, _, _ = pe.classify(
+        events, cutoff=TODAY, horizon=HORIZON,
+        ignored_ids=frozenset([ignored_id]),
+    )
+    display = pe.dedupe(display)
+    undated = pe.dedupe(undated)
+    weeks = pe.group_by_week(display)
+    html = pe.render_html(
+        today=TODAY, weeks=weeks, undated=undated,
+        total_future=len(display), lookback_days=60, webhook_url="",
+        new_ids={ignored_id},
+    )
+    # Precondition: the card is rendered as server-side-ignored, so the
+    # badge-on-ignored assertion below isn't vacuous.
+    start = html.find(f'data-event-id="{ignored_id}"')
+    assert start != -1
+    card_open = html.rfind("<div", 0, start)
+    assert 'class="event-card ignored"' in html[card_open:start + 200]
+    # Ignored AND new → badge renders. CSS hides the whole card until
+    # "Show ignored" is clicked; at that point the user sees the badge.
+    assert (
+        'Ignored With Sender<span class="new-badge">NEW</span></div>'
+    ) in html
