@@ -38,5 +38,25 @@
     "child": "Isla",
     "source": "coach email",
     "sender_domain": ""
+  },
+  {
+    "name": "Undated Needs Verify",
+    "date": "",
+    "time": "",
+    "location": "",
+    "category": "School Activity",
+    "child": "",
+    "source": "LAES newsletter",
+    "sender_domain": ""
+  },
+  {
+    "name": "Undated With Sender",
+    "date": "",
+    "time": "",
+    "location": "",
+    "category": "School Activity",
+    "child": "",
+    "source": "LAES newsletter",
+    "sender_domain": "laes.org"
   }
 ]

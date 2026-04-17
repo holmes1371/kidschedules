@@ -808,17 +808,34 @@ def render_html(today: dt.date,
             location_html = f'\n        <div class="event-location">{loc_raw}</div>'
         else:
             location_html = ""
-        # Undated cards don't carry Ignore/Unignore affordances (pre-existing
-        # behavior — there's no UI path to ignore an undated event). If one
-        # arrives with is_ignored=True via a stale ignored_events.json entry
-        # we still honor it as a hide so the event doesn't leak through.
+        # #18: undated cards carry the same per-event Ignore/Unignore
+        # affordance as dated cards. The stable id is sha1(name|""|child);
+        # it is disjoint from any dated hash because the middle segment
+        # differs (see test_event_id_undated_vs_dated_no_collision). The
+        # Ignore-sender variant stays out of scope — undated cards that
+        # reach this section are typically the ones the extractor could
+        # not fully ground, so their sender domain is unreliable.
         is_ignored = bool(ev.get("is_ignored"))
         ignored_class = " ignored" if is_ignored else ""
-        ignored_attr = ' data-ignored="1"' if is_ignored else ""
+        ignored_attr = (' data-ignored="1" data-ignored-reason="event"'
+                        if is_ignored else "")
         card_style = ("display:none; border-left: 4px solid #f9ab00;" if is_ignored
                       else "border-left: 4px solid #f9ab00;")
+        if is_ignored:
+            ignore_btn_html = (
+                f'<button class="unignore-btn" aria-label="Unignore this event"\n'
+                f'                data-event-name="{ev["name"]}" data-event-date="{ev["date"]}"\n'
+                f'                type="button">Unignore event</button>'
+            )
+        else:
+            ignore_btn_html = (
+                f'<button class="ignore-btn" aria-label="Ignore this event"\n'
+                f'                data-event-name="{ev["name"]}" data-event-date="{ev["date"]}"\n'
+                f'                type="button">Ignore event</button>'
+            )
         return f"""\
-      <div class="event-card undated{ignored_class}" data-child="{data_child_val}"{ignored_attr} style="{card_style}">
+      <div class="event-card undated{ignored_class}" data-event-id="{ev["id"]}" data-child="{data_child_val}"{ignored_attr} style="{card_style}">
+        <div class="event-actions-top">{ignore_btn_html}</div>
         <div class="meta-strip">
           {chip_html}<span class="day">Date TBD</span>
           <span class="sep">·</span>

@@ -53,6 +53,15 @@ def test_event_id_changes_with_date():
     assert a != b
 
 
+def test_event_id_undated_vs_dated_no_collision():
+    """#18 relies on undated (date="") and dated event IDs being disjoint
+    so the same name+child under a TBD-date card can't collide with a
+    future dated build of the same event. Pin the contract."""
+    dated = pe._event_id("Summer Camp Registration", "2026-06-01", "")
+    undated = pe._event_id("Summer Camp Registration", "", "")
+    assert dated != undated
+
+
 # ─── classify() paths ─────────────────────────────────────────────────────
 
 
@@ -348,7 +357,9 @@ def test_render_html_ics_button_is_https_link():
     # No inline .ics body on any card — we host the files now.
     assert "data-ics=" not in html
 
-    # Undated cards have no button.
+    # Undated cards never carry an Add-to-calendar button (no date → no
+    # .ics target). They DO carry an Ignore button as of #18; that
+    # affordance is pinned by the dedicated undated tests below.
     undated_card_start = html.find('class="event-card undated"')
     assert undated_card_start != -1, "expected an undated card in this fixture"
     undated_slice = html[undated_card_start:undated_card_start + 1500]
@@ -474,6 +485,68 @@ def test_render_html_show_ignored_toggle_omitted_when_none_ignored():
     # robust to the label literal appearing elsewhere in the script.
     assert 'class="show-ignored-toggle"' not in html
     assert 'data-show-label="Show ignored (' not in html
+
+
+# ─── #18 undated-card ignore affordance ──────────────────────────────────
+
+
+def _undated_card_slice(html: str, eid: str) -> str:
+    """Return the full markup span for an undated card by event id.
+
+    Rewinds to the `<div` that opens the card (so class="..." is captured)
+    and stops at the card's closing `</div>`, pinned by the 6-space indent
+    that wraps every card. No nested event-actions-bottom on undated
+    cards, so the end boundary is unambiguous."""
+    attr_pos = html.find(f'data-event-id="{eid}"')
+    assert attr_pos != -1, f"undated card {eid} not rendered"
+    start = html.rfind("<div", 0, attr_pos)
+    assert start != -1, "could not locate undated card open"
+    end_marker = "</div>\n      </div>"
+    end = html.find(end_marker, attr_pos)
+    assert end != -1, "could not locate undated card close"
+    return html[start:end + len(end_marker)]
+
+
+def test_render_html_undated_card_has_event_id_and_ignore_button():
+    html, _ = _render_ignored_fixture(ignored_names=())
+    eid = pe._event_id("Undated Needs Verify", "", "")
+    card = _undated_card_slice(html, eid)
+    # Parity with dated cards: the card opens with the event-card class
+    # and carries the stable id. The Ignore-event button follows.
+    assert 'class="event-card undated"' in card
+    assert 'class="ignore-btn"' in card
+    assert 'data-event-name="Undated Needs Verify"' in card
+    assert 'data-event-date=""' in card
+    assert 'class="unignore-btn"' not in card
+    assert "Ignore event" in card
+
+
+def test_render_html_undated_ignored_renders_unignore_button():
+    html, _ = _render_ignored_fixture(("Undated Needs Verify",))
+    eid = pe._event_id("Undated Needs Verify", "", "")
+    card = _undated_card_slice(html, eid)
+    # Server-side is_ignored=True flips the button + hides the card, same
+    # as dated cards. data-ignored-reason="event" lets the click router
+    # dispatch Unignore-event correctly on click.
+    assert 'class="event-card undated ignored"' in card
+    assert 'data-ignored="1"' in card
+    assert 'data-ignored-reason="event"' in card
+    assert "display:none" in card
+    assert 'class="unignore-btn"' in card
+    assert "Unignore event" in card
+    assert 'class="ignore-btn"' not in card
+
+
+def test_render_html_undated_card_has_no_ignore_sender_button():
+    """Per-event ignore only on undated cards — #18 explicitly excludes
+    the Ignore-sender affordance because undated senders are unreliable.
+    Even a fixture undated event with a populated sender_domain must not
+    render data-sender or the sender button."""
+    html, _ = _render_ignored_fixture(ignored_names=())
+    eid = pe._event_id("Undated With Sender", "", "")
+    card = _undated_card_slice(html, eid)
+    assert 'class="ignore-sender-btn"' not in card
+    assert "data-sender=" not in card
 
 
 # ─── render_html client JS wiring (step 9) ───────────────────────────────

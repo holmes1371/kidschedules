@@ -101,7 +101,7 @@ Scope: (a) log the event count per `source_message_id` on each run and flag outl
 
 Non-goal: diffing newsletter issues across time to detect added/removed dates — YAGNI until a concrete miss justifies the infrastructure.
 
-### 18. [ ] Ignore affordance for undated "Needs Verification" cards
+### 18. [~] Ignore affordance for undated "Needs Verification" cards
 
 The "Needs Verification" section at the bottom of the page renders cards for events the extractor surfaced without a date. Those cards go through `_undated_card` in `scripts/process_events.py` and currently carry no Ignore button — dated cards have one, undated cards don't. That's the whole asymmetry to close.
 
