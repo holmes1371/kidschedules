@@ -29,11 +29,14 @@ fixtures/last_run_candidates.json
 # .filter_audit.json is a local-only audit stamp.
 # prior_events.json (the NEW-badge diff manifest, #13) lives on the `state`
 # branch alongside events_state.json; restored/saved by the workflow.
+# sender_stats.json (the learned newsletter classifier, #17) lives on the
+# `state` branch alongside events_state.json; restored/saved by the workflow.
 docs/index.html
 future_events.json
 events_state.json
 ignored_events.json
 prior_events.json
+sender_stats.json
 .filter_audit.json
 blocklist_auto.txt
 blocklist_auto_audit.jsonl

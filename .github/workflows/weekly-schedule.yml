@@ -94,6 +94,17 @@ jobs:
           else
             echo "No prior prior_events.json — NEW badges suppressed this run."
           fi
+          # sender_stats.json carries the learned per-sender event-count
+          # history (#17). If absent, newsletter_stats.load_stats returns an
+          # empty stats object and no senders are classified as newsletters
+          # on this run; promotion restarts from a clean slate.
+          if [ -f .state/sender_stats.json ]; then
+            cp .state/sender_stats.json sender_stats.json
+            COUNT=$(python3 -c "import json; print(len(json.load(open('sender_stats.json')).get('senders', {})))")
+            echo "Restored sender_stats.json ($COUNT sender(s) tracked)."
+          else
+            echo "No prior sender_stats.json — newsletter classifier starts empty."
+          fi
           if [ -f .state/.filter_audit.json ]; then
             cp .state/.filter_audit.json .filter_audit.json
             echo "Restored .filter_audit.json."
@@ -200,7 +211,8 @@ jobs:
              && [ ! -f blocklist_auto.txt ] \
              && [ ! -f blocklist_auto_audit.jsonl ] \
              && [ ! -f events_state.json ] \
-             && [ ! -f prior_events.json ]; then
+             && [ ! -f prior_events.json ] \
+             && [ ! -f sender_stats.json ]; then
             echo "No persistent state produced — nothing to save."
             exit 0
           fi
@@ -226,6 +238,9 @@ jobs:
           if [ -f ../prior_events.json ]; then
             cp ../prior_events.json prior_events.json
           fi
+          if [ -f ../sender_stats.json ]; then
+            cp ../sender_stats.json sender_stats.json
+          fi
           # Only 'git add' files that actually exist — any one of these may be
           # absent on a given run (e.g. first run before filter audit stamps).
           # future_events.json is intentionally NOT in this list — it was
@@ -236,6 +251,7 @@ jobs:
           [ -f blocklist_auto_audit.jsonl ] && FILES="$FILES blocklist_auto_audit.jsonl"
           [ -f events_state.json ] && FILES="$FILES events_state.json"
           [ -f prior_events.json ] && FILES="$FILES prior_events.json"
+          [ -f sender_stats.json ] && FILES="$FILES sender_stats.json"
           git -c user.name="github-actions[bot]" \
               -c user.email="github-actions[bot]@users.noreply.github.com" \
               add $FILES
