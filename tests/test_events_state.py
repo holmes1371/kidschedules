@@ -388,7 +388,35 @@ def test_load_state_v1_on_disk_is_blown_away(tmp_path, capsys):
         encoding="utf-8",
     )
     state = es.load_state(str(path))
-    assert state["schema_version"] == 2
+    assert state["schema_version"] == es.CURRENT_SCHEMA_VERSION
+    assert state["processed_messages"] == {}
+    assert state["events"] == {}
+    assert "WARNING" in capsys.readouterr().out
+
+
+def test_load_state_v2_on_disk_is_blown_away(tmp_path, capsys):
+    """v2 cards predate sender_block_key; blow-away prevents mixed
+    granularity (domain-only cached cards next to address-level fresh
+    cards) during the 120-day GC decay."""
+    path = tmp_path / "state.json"
+    path.write_text(
+        json.dumps(
+            {
+                "schema_version": 2,
+                "processed_messages": {"m1": NOW_ISO},
+                "events": {
+                    "abc123": {
+                        "name": "Concert",
+                        "date": "2026-05-01",
+                        "sender_domain": "gmail.com",
+                    }
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    state = es.load_state(str(path))
+    assert state["schema_version"] == es.CURRENT_SCHEMA_VERSION
     assert state["processed_messages"] == {}
     assert state["events"] == {}
     assert "WARNING" in capsys.readouterr().out
