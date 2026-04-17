@@ -549,6 +549,24 @@ def test_render_html_undated_card_has_no_ignore_sender_button():
     assert "data-sender=" not in card
 
 
+def test_render_html_show_ignored_toggle_counts_undated_only():
+    """Ignoring only an undated event must still surface the Show-ignored
+    toggle — otherwise a card ignored on a prior run reloads hidden with
+    no way back. #18 extended the server-side count across both buckets."""
+    html, _ = _render_ignored_fixture(("Undated Needs Verify",))
+    assert 'class="show-ignored-toggle"' in html
+    assert "Show ignored (1)" in html
+
+
+def test_render_html_show_ignored_toggle_counts_dated_plus_undated():
+    """Dated and undated ignored events both contribute to the counter."""
+    html, _ = _render_ignored_fixture((
+        "Ignored With Sender", "Undated Needs Verify",
+    ))
+    assert "Show ignored (2)" in html
+    assert 'data-hide-label="Hide ignored (2)"' in html
+
+
 # ─── render_html client JS wiring (step 9) ───────────────────────────────
 
 # These tests lock in that the delegated click router in the rendered page

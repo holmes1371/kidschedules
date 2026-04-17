@@ -879,12 +879,15 @@ def render_html(today: dt.date,
     now_local = dt.datetime.now(LOCAL_TZ)
     generated = now_local.strftime("%B %-d, %Y @ %-I:%M%p")
 
-    # Show-ignored toggle: rendered server-side only when there's at least one
-    # ignored event in the display buckets, so the header stays clean when
-    # nothing is hidden. Count follows the design note — display only, not
-    # undated.
+    # Show-ignored toggle: rendered server-side only when at least one
+    # card is hidden on the page. #18 extended per-event ignore to
+    # undated cards, so the count spans display + undated buckets —
+    # otherwise an undated card ignored on a prior run would reload
+    # hidden with no toggle available to reveal it.
     ignored_n = sum(
         1 for wk in weeks for ev in wk[1] if ev.get("is_ignored")
+    ) + sum(
+        1 for ev in undated if ev.get("is_ignored")
     )
     show_ignored_toggle_html = ""
     if ignored_n > 0:
