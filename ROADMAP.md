@@ -10,6 +10,25 @@ Closed `[x]` items are archived in `COMPLETED.md` with their full post-mortem pr
 
 Replace this block at the end of each session. Keep it to what the next agent actually needs to walk in cold: what just closed, what's open, where to pick up, and any non-obvious observations that aren't captured under a numbered item.
 
+**2026-04-17 (session 9 — #17 newsletter robustness planning + design note)**
+
+- **In flight: #17 "Robust handling of multi-event newsletter emails".** Plan approved by Tom. Design note at `design/newsletter-robustness.md` captures the four sub-features (learned newsletter detection via `sender_stats.json`, outlier flag on under-extraction, `main.py --reextract <message-id>` CLI, newsletter-isolated batching in `agent.py`) plus responsibility table and out-of-scope list.
+- **Ship plan:** seven commits. (1) design note + ROADMAP flip [~] [THIS COMMIT]. (2) new `newsletter_stats.py` module + `tests/test_newsletter_stats.py` unit tests — standalone, no integration. (3) `main.py --reextract` arg + cache eviction + tests — independently functional, Tom can use it right away. (4) `agent.py` newsletter-isolated batching (new `newsletter_senders` kwarg, default `None` preserves current behavior). (5) `main.py` stats load + pass to extractor + post-extraction update + outlier alert computation. (6) `scripts/process_events.py --outlier-alerts` flag + "Possible under-extraction" block in digest text/HTML. (7) workflow yml restore/save for `sender_stats.json` + `.gitignore`. Each commit leaves the repo green; ROADMAP session notes update between each.
+- **Key design decisions to remember (full context in `design/newsletter-robustness.md`):**
+  - Sender key is lowercased From-address, not domain. Domain-level aggregation would dilute the signal across high-yield and low-yield senders on the same domain.
+  - Promotion fires on `messages_seen >= 3 AND median(per_message_counts) >= 5`. Sticky once promoted. Demotion not implemented; manual file edit is the escape hatch.
+  - Outlier threshold: `current < max(2, round(prior_median * 0.5))`. Floor of 2 avoids false positives at low prior medians.
+  - `per_message_counts` capped at the most recent 10 values (FIFO). Bounds file growth and keeps the rolling median insensitive to year-old data.
+  - Outlier alerts surface in the Monday digest AND the Actions log (both run every cadence; draft is Monday-only). Not on the published site — schedule page is a live view, not a status dashboard.
+  - Dry-run reads but does not write `sender_stats.json`. Mirrors #13's `prior_events.json` handling.
+  - `--reextract` evicts BOTH the message ID from `processed_messages` AND every event whose `source_message_id` matches. Purging events is destructive by design: the re-extraction's own events will be merged back in; any original events the re-extraction doesn't reproduce stay gone.
+  - Stats count zero-yield runs (a quiet summer newsletter issue contributes 0 to `per_message_counts`) to keep the rolling median honest.
+  - Newsletter-isolated batching is batch-of-1 per newsletter email, batch-of-10 for everyone else. Newsletter batches run FIRST so a parse failure on a cheap regular batch doesn't gate the expensive newsletter work.
+- **Session discipline clarification from Tom this session:** update this ROADMAP session-notes block between each commit during a large task, not just at session end. The block should always reflect what *just* landed and what's next, so a mid-feature handoff (either mid-session or across agents) has a clean pickup point.
+- **Repo state at this commit:** `main` is clean except for #17's design note + this ROADMAP update. Tests should still be at 329 passing — this commit is prose only.
+
+---
+
 **2026-04-17 (session 8 — #13 "New this week" badges closed)**
 
 - **Just closed: #13 "New this week" badges.** Three commits on `main`: `5ab4a01` (design note at `design/new-this-week-badges.md` + ROADMAP flip `[ ]` → `[~]`), `ac4ae3b` (helpers + render wiring + CSS + 17 new tests + `main.py` `--prior-events` wiring + `.gitignore` entry), `4cbfc68` (workflow restore/save plumbing). Tom signed off same session. Close-out commit moves full prose to `COMPLETED.md` and flips the stub to `[x]` — this is that commit.
@@ -79,9 +98,11 @@ Status legend:
 
 ### 13. [x] "New this week" badges — 5ab4a01 / ac4ae3b / 4cbfc68 — see COMPLETED.md
 
-### 17. [ ] Robust handling of multi-event newsletter emails
+### 17. [~] Robust handling of multi-event newsletter emails
 
 Reordered to next-up at Tom's direction 2026-04-17 (was sitting between #16 and #18). Numbering stays stable per the close-out convention; only the priority slot moved.
+
+**Status 2026-04-17 (session 9):** plan approved, design note landed at `design/newsletter-robustness.md`. Seven-commit breakdown: (1) design + flip [this commit]; (2) `newsletter_stats.py` + unit tests; (3) `main.py --reextract`; (4) `agent.py` newsletter-isolated batching; (5) `main.py` stats integration + outlier alerts; (6) digest under-extraction block in `process_events.py`; (7) workflow yml restore/save + `.gitignore`. Each commit self-contained and testable; ROADMAP session notes updated between each so a mid-feature handoff is clean.
 
 Newsletters routinely carry 5–15+ dates each. The extractor is already prompted to pull every calendar item (see `agent.py` rule 8, "Newsletter calendar items"), and per-batch parsing treats N events from one `source_message_id` as the normal case. But there's no signal when the extractor under-extracts, and no affordance to re-process a message once it lands in `events_state.json` — the message ID is cached and the next run skips it.
 
