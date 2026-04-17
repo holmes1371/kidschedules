@@ -69,11 +69,7 @@ Status legend:
 
 ### 10. [x] Gmail draft gating: Monday runs only — 65c86f3 — see COMPLETED.md
 
-### 11. [~] Card information redesign (supersedes per-kid split)
-
-The initial "group by child" split (Everly / Isla) isn't landing. Deliberately redesign what fields show on each card and how, rather than iterating on the current layout. Design-note-first at `design/card-redesign.md`: inventory the current fields end-to-end, name the redundancies (child label when already grouped, sender line when obvious, repeated date/time formatting), propose 1–2 layouts in mock HTML, pick one, then implement. Call out in the design note that this reshapes the problem space for item 12 (per-kid filter chips) — chips should be revisited only after this lands.
-
-Design note at `design/card-redesign.md` (`70c172a`) captures the Layout A locked decisions, render/ingest ripple through `scripts/process_events.py`, the `_is_all_day` / `_is_suppressible_location` helpers, the fixture/test plan, the responsibility table, and the #12 chip-colour ripple. Mockup at `design/card-redesign-mockup.html` (`787abd0`). Implementation shipped in `fe6e272` — identity-first meta-strip (child chip + day + time) above the event name, retired the category badge / event-date / event-meta rows, ingest flip from `Time TBD` / `Location TBD` sentinels to empty strings, URL-and-email location suppression, and a 14-case test block under `# ─── card redesign (Layout A) ───`. Left open deliberately (`[~]` not `[x]`) until Tom eyeballs the live GitHub Pages build against the mockup; final close-out will bump to `[x]` once he confirms. Follow-up items not in scope for this ticket: retiring the now-stale `fixtures/sample_candidates.json` ("Glasgow Middle School / Isla" artifact) so `scripts/dev_render.py` shows realistic Layout-A previews.
+### 11. [x] Card information redesign (supersedes per-kid split) — fe6e272 — see COMPLETED.md
 
 ### 12. [ ] Per-kid filter chips — next up after #11
 
