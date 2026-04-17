@@ -112,3 +112,11 @@ Scope: extend the existing ignore mechanics to undated cards. Reuse the stable-i
 Out of scope: the "Ignore sender" variant. Undated cards often lack a usable sender domain (the ones that leak through to this section are typically the ones the extractor couldn't ground fully), and sender-ignore without a reliable domain is worse than useless. Per-event ignore only.
 
 No design note needed — straight port of the existing pattern. The risk is subtle id-collision across dated/undated sections; the implementation session should confirm the stable-id hash inputs don't overlap before shipping.
+
+### 19. [~] Deterministic kid attribution from grade / teacher / activity
+
+Tom reported that the 2026-04-16 live run missed attribution for a "6th grade AAP" card (should go to Everly) and a "Cuppett Performing Arts" card (should go to Isla). The extractor prompt already tells the model to use grade / teacher / activity to pick a kid, but the model follows that inconsistently. Per the standing order, roster-based attribution is deterministic and belongs in Python rather than in the prompt.
+
+Scope: a pure `_derive_child_slug(ev, roster)` helper in a new `scripts/roster_match.py`, wired into `_event_card` and `_undated_card`. Five signal tiers (name / teacher / grade / activity / school), with grade matching on both current and rising year (so 7th or "rising 7th grader" → Everly, 4th → Isla), activity matching on parenthetical-extracted aliases (so "B2D" → Everly), and a distinctiveness filter that drops signals shared across kids (so "LAES" stays a no-op until the roster has kids at different schools). The `child` field is not mutated — the event-ID hash depends on it, and the audience-line display stays as context next to the kid pill.
+
+Design note at `design/kid-attribution-derivation.md`. Full signal priority, alias extraction, distinctiveness, rendering impact, and the required test cases are captured there.
