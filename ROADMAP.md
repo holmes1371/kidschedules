@@ -28,7 +28,8 @@ Replace this block at the end of each session. Keep it to what the next agent ac
 - **Commit progress within #17:**
   - C1 (prose only, landed): design note + ROADMAP flip [~]. Tests unchanged at 329.
   - C2 (landed): `newsletter_stats.py` module + `tests/test_newsletter_stats.py` (31 new tests, full suite now 360). Standalone — not yet wired into the pipeline. Covers load/save/update/classify/outlier. Key invariants pinned: missing-file ≠ malformed-file, sticky promotion, zero-count messages contribute 0 to rolling window, 11th entry rolls the first out, outlier threshold uses strict `<` not `<=`, floor of 2 protects low-median senders.
-  - C3 next: `main.py --reextract` CLI + event-cache eviction + tests. Independently functional (can ship without C2 being wired).
+  - C3 (landed): `main.py --reextract <MESSAGE_ID>` CLI + `_reextract_eviction` helper + 5 new tests (suite 365). Independently useful; Tom can use it right away from a manual workflow dispatch. Eviction purges BOTH `processed_messages[mid]` AND every event whose `source_message_id == mid`. Persisted to disk via `es.save_state` so the subsequent step2c load sees the evicted state. Unknown message ID warns but does not fail (user fat-finger safety). Runs before `step1_build_queries` so the pipeline is a normal run thereafter.
+  - C4 next: `agent.py` newsletter-isolated batching via new `newsletter_senders` kwarg, default `None` preserves current behavior.
 
 ---
 

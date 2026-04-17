@@ -287,6 +287,60 @@ def _now_iso() -> str:
     )
 
 
+def _reextract_eviction(
+    message_id: str,
+    state_path: str = EVENTS_STATE_PATH,
+    now_iso: str | None = None,
+) -> None:
+    """Evict a Gmail message ID from events_state.json.
+
+    Removes the message from processed_messages and purges every cached
+    event whose source_message_id matches. Persists the result so the
+    next step2c load sees the evicted state. The re-extraction itself
+    happens naturally: with the message dropped from processed_messages,
+    filter_unprocessed treats it as new and feeds it back to the agent.
+
+    An unknown message_id is a warning, not a failure — fat-fingering a
+    hex string should not fail the pipeline.
+    """
+    print("=" * 60)
+    print(f"REEXTRACT: evicting message {message_id} from cache")
+    print("=" * 60)
+
+    if not os.path.exists(state_path):
+        print(f"  No events_state.json at {state_path} — nothing to evict.")
+        return
+
+    state = es.load_state(state_path)
+
+    msg_evicted = 0
+    if message_id in state["processed_messages"]:
+        del state["processed_messages"][message_id]
+        msg_evicted = 1
+
+    events_evicted = 0
+    kept_events: dict[str, Any] = {}
+    for eid, ev in state["events"].items():
+        if ev.get("source_message_id") == message_id:
+            events_evicted += 1
+        else:
+            kept_events[eid] = ev
+    state["events"] = kept_events
+
+    if msg_evicted == 0 and events_evicted == 0:
+        print(
+            f"  WARNING: no match in cache for {message_id} — no-op. "
+            f"(Check the message ID; the digest alert lines print it verbatim.)"
+        )
+        return
+
+    print(
+        f"  Evicted {msg_evicted} processed_message entry and "
+        f"{events_evicted} cached event(s)."
+    )
+    es.save_state(state_path, state, now_iso or _now_iso())
+
+
 def _bootstrap_from_future_events(
     state: dict[str, Any], now_iso: str
 ) -> int:
@@ -650,6 +704,14 @@ def main() -> int:
              "and local runs do not spam Ellen's drafts folder. The "
              "scheduled workflow run passes CREATE_DRAFT=1 to flip this on."
     )
+    parser.add_argument(
+        "--reextract", type=str, default=None, metavar="MESSAGE_ID",
+        help="Evict a Gmail message ID from events_state.json before the "
+             "Gmail fetch so the next run re-extracts it. Use when the "
+             "weekly digest flags a newsletter as under-extracted — paste "
+             "the message ID verbatim from the alert line. Single ID per "
+             "invocation; bulk form is out of scope."
+    )
     args = parser.parse_args()
 
     if args.intentional_failure:
@@ -657,6 +719,11 @@ def main() -> int:
             "Intentional failure triggered via --intentional-failure. "
             "This is a test of the GitHub Actions notification path."
         )
+
+    # Pre-fetch eviction (if requested). Runs before any other work so the
+    # on-disk state that step2c loads already reflects the eviction.
+    if args.reextract:
+        _reextract_eviction(args.reextract)
 
     # Step 1: Build queries
     config = step1_build_queries(args.lookback_days)

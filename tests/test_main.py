@@ -250,3 +250,123 @@ def test_attach_sender_domain_mixed_batch_emits_one_summary_warning(capsys):
 def test_attach_sender_domain_empty_candidates_is_noop(capsys):
     main._attach_sender_domains([], [_email("m1", "pta@school.org")])
     assert capsys.readouterr().out == ""
+
+
+# ── _reextract_eviction (forced re-extraction) ────────────────────────────
+
+
+def _write_state_with_events(
+    path: Path,
+    processed_ids: list[str],
+    events: list[tuple[str, str]],  # list of (event_id, source_message_id)
+) -> None:
+    """Write a state file with both processed_messages and events seeded."""
+    state = es._empty_state()
+    for mid in processed_ids:
+        state["processed_messages"][mid] = NOW_ISO
+    for eid, source_mid in events:
+        state["events"][eid] = {
+            "id": eid,
+            "name": f"Event {eid}",
+            "date": "2026-05-01",
+            "child": "Isla",
+            "source_message_id": source_mid,
+        }
+    path.write_text(json.dumps(state), encoding="utf-8")
+
+
+def test_reextract_purges_message_and_all_matching_events(tmp_path, capsys):
+    """Target: m-target is in processed_messages AND has 3 matching events.
+    After eviction, both sides are clean; unrelated entries survive."""
+    state_path = tmp_path / "events_state.json"
+    _write_state_with_events(
+        state_path,
+        processed_ids=["m-target", "m-other"],
+        events=[
+            ("eid-a", "m-target"),
+            ("eid-b", "m-target"),
+            ("eid-c", "m-target"),
+            ("eid-d", "m-other"),  # unrelated
+        ],
+    )
+    main._reextract_eviction(
+        "m-target", state_path=str(state_path), now_iso=NOW_ISO
+    )
+
+    reloaded = es.load_state(str(state_path))
+    assert "m-target" not in reloaded["processed_messages"]
+    assert "m-other" in reloaded["processed_messages"]
+    assert "eid-a" not in reloaded["events"]
+    assert "eid-b" not in reloaded["events"]
+    assert "eid-c" not in reloaded["events"]
+    assert "eid-d" in reloaded["events"]
+
+    out = capsys.readouterr().out
+    assert "Evicted 1 processed_message entry and 3 cached event(s)" in out
+
+
+def test_reextract_unknown_message_id_is_warning_not_failure(tmp_path, capsys):
+    """Fat-fingered message ID → log a warning, do not mutate state."""
+    state_path = tmp_path / "events_state.json"
+    _write_state_with_events(
+        state_path,
+        processed_ids=["m-real"],
+        events=[("eid-a", "m-real")],
+    )
+    main._reextract_eviction(
+        "m-nonexistent", state_path=str(state_path), now_iso=NOW_ISO
+    )
+
+    reloaded = es.load_state(str(state_path))
+    assert reloaded["processed_messages"] == {"m-real": NOW_ISO}
+    assert "eid-a" in reloaded["events"]
+
+    out = capsys.readouterr().out
+    assert "no match in cache" in out.lower()
+
+
+def test_reextract_missing_state_file_is_noop(tmp_path, capsys):
+    """Fresh-install case or deleted cache file — log and return."""
+    state_path = tmp_path / "nonexistent.json"
+    main._reextract_eviction(
+        "m-target", state_path=str(state_path), now_iso=NOW_ISO
+    )
+    assert not state_path.exists()  # not created by the helper
+    out = capsys.readouterr().out
+    assert "nothing to evict" in out.lower()
+
+
+def test_reextract_purges_events_even_when_message_not_in_processed(tmp_path):
+    """Edge case: events_state has orphan events whose source message was
+    already GC'd from processed_messages. Eviction still purges the
+    orphan events and prints 0 message + N events evicted."""
+    state_path = tmp_path / "events_state.json"
+    _write_state_with_events(
+        state_path,
+        processed_ids=[],  # no processed_messages entry
+        events=[("eid-a", "m-target"), ("eid-b", "m-other")],
+    )
+    main._reextract_eviction(
+        "m-target", state_path=str(state_path), now_iso=NOW_ISO
+    )
+    reloaded = es.load_state(str(state_path))
+    assert "eid-a" not in reloaded["events"]
+    assert "eid-b" in reloaded["events"]
+
+
+def test_reextract_persists_to_disk(tmp_path):
+    """The state has to land on disk (not just in-memory) so step2c's
+    subsequent load_state call sees the eviction."""
+    state_path = tmp_path / "events_state.json"
+    _write_state_with_events(
+        state_path,
+        processed_ids=["m-target"],
+        events=[("eid-a", "m-target")],
+    )
+    main._reextract_eviction(
+        "m-target", state_path=str(state_path), now_iso=NOW_ISO
+    )
+    # Raw file read — no in-memory shortcut.
+    on_disk = json.loads(state_path.read_text(encoding="utf-8"))
+    assert "m-target" not in on_disk["processed_messages"]
+    assert "eid-a" not in on_disk["events"]
