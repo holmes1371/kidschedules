@@ -88,6 +88,7 @@ Status legend:
 - `[ ]` not started
 - `[~]` in progress — include a note with what is done and what remains
 - `[x]` done — include the commit SHA
+- `[-]` descoped / on hold — full prose preserved in "Descoped / on hold" at the bottom for possible future revival
 
 ## Backlog (priority order)
 
@@ -127,18 +128,38 @@ Schema bump `events_state.py` v2 → v3 (blow-away on mismatch, matching v1→v2
 
 Commit plan (C1–C8 + close-out): design note + ROADMAP flip → freemail list + loader + tests → `main.py` derivation → `events_state.py` v3 → `process_events.py` render wiring → `is_protected` address-aware → `build_queries.py` docstring/test pass → `apps_script.gs` `SENDER_RE` → close-out after Tom signs off.
 
-### 14. [ ] Manual "refresh now" button in the UI
+### 21. [ ] Dedupe candidate messages before agent extraction
 
-Button in `docs/index.html` that triggers the weekly workflow on demand, so a fresh build can be forced after a late schedule email without waiting for the next scheduled run or opening GitHub. GitHub's `workflow_dispatch` API requires an authenticated call, so the existing Apps Script webhook grows a new `action=refresh` endpoint that holds a fine-grained PAT (scope: `workflow`, single-repo) as a Script Property and POSTs to the dispatches endpoint. Client fires `fetch(APPS_SCRIPT_URL, {method:'POST', body: JSON.stringify({secret, action:'refresh'})})` and shows a "Rebuilding… reload in ~2 min" toast; no live polling.
+Filed 2026-04-17 (session 10) after Tom spotted the symptom in live logs: a single dance-studio "Re: First dibs on Recital TICKETS…" thread produced four hits (`[31/66]`, `[32/66]`, `[35/66]`, `[36/66]`) in the extractor input, and the "Reverb Dance Comp" reminder produced two (separate timestamps — those may be legitimately distinct). The 5 Gmail search templates in `scripts/build_queries.py` overlap by design (a dance-studio email plausibly matches `school_activities`, `sports_extracurriculars`, and `newsletters_calendars` at once), and Gmail returns each message independently per query — so the union of candidates before extraction is noisier than it needs to be. Agent cost scales roughly linearly with candidate count, so this is real waste on every run.
 
-Threat model accepted: the shared secret is effectively public (embedded in page source on a page with near-zero organic traffic), worst case is a handful of wasted workflow runs. Defense in depth: Apps Script rate-limits to one dispatch per 5 minutes via `PropertiesService`. The workflow's existing `concurrency: {group: pages, cancel-in-progress: false}` already prevents pileups from rapid clicks. PAT rotation: 1-year expiry with a calendar reminder.
+Cheapest fix: insert a dedup pass in `main.py` between "collect candidates from all 5 Gmail queries" and "hand to the extractor", keyed on Gmail `messageId`. That alone compresses the 4× recital-thread duplication down to 1 per distinct message. Slightly more ambitious: dedupe by `threadId` and keep only the latest message per thread on the theory that the most recent message usually carries the operative date/decision — this would also collapse the genuine-but-redundant 2× reminder case when the earlier reminder is subsumed by the later one. Start with `messageId`-level; promote to `threadId`-level if post-landing stats show remaining noise.
 
-### 15. [ ] Conflict highlighting
+Test plan: extend the existing agent-batching fixtures with a synthetic multi-query-hit input and assert the dedup pass produces exactly one entry per `messageId`. Instrument the logs so the `[N/M]` banner reports `M` post-dedup with a separate "collected X across 5 queries, deduped to M" line — makes future regressions visible in the Actions log.
 
-In `process_events.py`, detect overlapping timed events on the same day via interval intersection; flag both cards with a visible conflict marker. Prioritize different-kid overlaps as the high-signal case. Same-day all-day + timed events should NOT be flagged as conflicts — they coexist by design.
+### 14. [-] Manual "refresh now" button in the UI — descoped 2026-04-17, see "Descoped / on hold" at bottom
+
+### 15. [-] Conflict highlighting — descoped 2026-04-17, see "Descoped / on hold" at bottom
 
 ### 16. [x] Node 20 → Node 24 action upgrades (before 2026-06-02) — ea081da — see COMPLETED.md
 
 ### 18. [x] Ignore affordance for undated "Needs Verification" cards — 41505aa / aade8aa — see COMPLETED.md
 
 ### 19. [x] Deterministic kid attribution from grade / teacher / activity — eb65f8a (design note) / 2ee6a17 (module + unit tests) / ad145ba (wiring + render tests) — see COMPLETED.md
+
+## Descoped / on hold
+
+Items parked here aren't dead — they're off the active queue but preserved in case priorities shift. Revive by moving the full prose back under "Backlog" at the original number and flipping `[-]` → `[ ]`.
+
+### 14. [-] Manual "refresh now" button in the UI
+
+Descoped 2026-04-17 (session 10). The weekly cron cadence has been sufficient in practice — Tom has not hit a real case of needing a mid-week rebuild since the feature was originally filed, and the threat-model / PAT-rotation overhead no longer looks worth the payoff. Preserving the full scope below in case that changes.
+
+Button in `docs/index.html` that triggers the weekly workflow on demand, so a fresh build can be forced after a late schedule email without waiting for the next scheduled run or opening GitHub. GitHub's `workflow_dispatch` API requires an authenticated call, so the existing Apps Script webhook grows a new `action=refresh` endpoint that holds a fine-grained PAT (scope: `workflow`, single-repo) as a Script Property and POSTs to the dispatches endpoint. Client fires `fetch(APPS_SCRIPT_URL, {method:'POST', body: JSON.stringify({secret, action:'refresh'})})` and shows a "Rebuilding… reload in ~2 min" toast; no live polling.
+
+Threat model accepted: the shared secret is effectively public (embedded in page source on a page with near-zero organic traffic), worst case is a handful of wasted workflow runs. Defense in depth: Apps Script rate-limits to one dispatch per 5 minutes via `PropertiesService`. The workflow's existing `concurrency: {group: pages, cancel-in-progress: false}` already prevents pileups from rapid clicks. PAT rotation: 1-year expiry with a calendar reminder.
+
+### 15. [-] Conflict highlighting
+
+Descoped 2026-04-17 (session 10). Same-day multi-kid overlaps are visually obvious on the current card layout — the week grouping already co-locates them — and Tom has not seen a missed-conflict incident that would justify the render complexity. Preserving the scope below in case a kid adds a second activity that creates regular overlaps.
+
+In `process_events.py`, detect overlapping timed events on the same day via interval intersection; flag both cards with a visible conflict marker. Prioritize different-kid overlaps as the high-signal case. Same-day all-day + timed events should NOT be flagged as conflicts — they coexist by design.
