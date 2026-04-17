@@ -197,6 +197,20 @@
       "source_message_id": "19d97dc3ddcf82b5",
       "time": "5:00 PM - 6:00 PM"
     },
+    "3364e50cbcdb": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2025-10-28",
+      "first_seen_iso": "2026-04-17T18:51:22-04:00",
+      "id": "3364e50cbcdb",
+      "location": "National Portrait Gallery",
+      "name": "National Portrait Gallery Field Trip Cancelled (due to government shutdown)",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Pinkman, Brandi L. (Oct 24)",
+      "source_message_id": "19a1784ff2f26474",
+      "time": "All day"
+    },
     "37be43b5f3a7": {
       "category": "Sports & Extracurriculars",
       "child": "All LAES students",
@@ -623,6 +637,20 @@
       "source_message_id": "19d1d0ab1d4dfc49",
       "time": "All day (deadline)"
     },
+    "818419f1e4b1": {
+      "category": "Sports & Extracurriculars",
+      "child": "Isla",
+      "date": "2025-12-02",
+      "first_seen_iso": "2026-04-17T18:51:22-04:00",
+      "id": "818419f1e4b1",
+      "location": "Cuppett Performing Arts Center",
+      "name": "Cuppett Performing Arts — December Merch, Calendars & Nutcracker Fun",
+      "sender_block_key": "jackrabbittech.com",
+      "sender_domain": "jackrabbittech.com",
+      "source": "Cuppett Performing Arts Center via jackrabbittech (Dec 2)",
+      "source_message_id": "19adffc30097c93b",
+      "time": ""
+    },
     "82436e40406c": {
       "category": "Academic Due Date",
       "child": "Everly",
@@ -725,6 +753,20 @@
       "source": "Sahai, Anita — March Newsletter 6 AAP (Feb 27)",
       "source_message_id": "19ca071bdbf4dbb6",
       "time": "All day (deadline)"
+    },
+    "9a3e98357636": {
+      "category": "School Activity",
+      "child": "All LAES students",
+      "date": "2025-10-25",
+      "first_seen_iso": "2026-04-17T18:51:22-04:00",
+      "id": "9a3e98357636",
+      "location": "",
+      "name": "Food For Neighbors Red Bag Food Drive Pick-Up",
+      "sender_block_key": "foodforneighbors.org",
+      "sender_domain": "foodforneighbors.org",
+      "source": "Food For Neighbors (Oct 22)",
+      "source_message_id": "19a0da1d7445f787",
+      "time": "8:30 AM"
     },
     "a0a1c3808522": {
       "category": "Sports & Extracurriculars",
@@ -955,6 +997,20 @@
       "source_message_id": "19d6387e9e9ca21d",
       "time": "8:30 AM"
     },
+    "be03f0b3ceee": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2025-10-30",
+      "first_seen_iso": "2026-04-17T18:51:22-04:00",
+      "id": "be03f0b3ceee",
+      "location": "Louise Archer Elementary School",
+      "name": "Camp Highroad Field Trip Postponed — Original Date (Thursday, October 30th, regular school day instead)",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Pinkman, Brandi L. (Oct 29)",
+      "source_message_id": "19a302466ad094f2",
+      "time": "All day"
+    },
     "c0d42d60dcf4": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -968,6 +1024,20 @@
       "source": "Susan Anspach / PTA updates (Apr 16)",
       "source_message_id": "19d97dc3ddcf82b5",
       "time": "School hours"
+    },
+    "c2485e0cdaf6": {
+      "category": "Appointment",
+      "child": "Everly",
+      "date": "2025-12-17",
+      "first_seen_iso": "2026-04-17T18:51:22-04:00",
+      "id": "c2485e0cdaf6",
+      "location": "",
+      "name": "Everly Orthodontist Appointment (late arrival to school)",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Stille, Rebecca / Ellen Holmes (Dec 17)",
+      "source_message_id": "19b2d2c5e899007e",
+      "time": "Morning (late arrival after lunch)"
     },
     "caf200bf6782": {
       "category": "School Activity",
@@ -1029,20 +1099,6 @@
       "name": "HTM Sharks NVSL A Meet — AWAY: Hunter Mill @ Fairfax Station Swim & Tennis (FS)",
       "source": "HTM Sharks / Carly Reiley via SportsEngine Motion (Mar 4)",
       "time": "9:00 AM – 12:00 PM"
-    },
-    "d21e9ab83cff": {
-      "category": "Appointment",
-      "child": "Isla",
-      "date": "2026-03-17",
-      "first_seen_iso": "2026-04-17T18:36:12-04:00",
-      "id": "d21e9ab83cff",
-      "location": "Children's Medical Associates, 10615 Braddock Rd, Fairfax, VA 22032",
-      "name": "Isla Birthday Checkup",
-      "sender_block_key": "thomas.holmes1371@gmail.com",
-      "sender_domain": "gmail.com",
-      "source": "Tom Holmes (Dec 29)",
-      "source_message_id": "19b6aeff299e2994",
-      "time": "8:45 AM"
     },
     "d30f10742e5d": {
       "category": "School Activity",
@@ -1214,6 +1270,20 @@
       "source": "FCPS News You Choose — VIP Camp (Apr 10)",
       "time": "9:00 AM – 4:00 PM"
     },
+    "e998fd668176": {
+      "category": "Academic Due Date",
+      "child": "All LAES students",
+      "date": "2025-10-23",
+      "first_seen_iso": "2026-04-17T18:51:22-04:00",
+      "id": "e998fd668176",
+      "location": "",
+      "name": "Food For Neighbors Red Bag RSVP Deadline",
+      "sender_block_key": "foodforneighbors.org",
+      "sender_domain": "foodforneighbors.org",
+      "source": "Food For Neighbors (Oct 22)",
+      "source_message_id": "19a0da1d7445f787",
+      "time": "12:00 PM (noon)"
+    },
     "ef88087609ca": {
       "category": "Sports & Extracurriculars",
       "child": "Rising 7th & 8th graders",
@@ -1343,8 +1413,22 @@
       "time": "6:00 PM - 7:30 PM"
     }
   },
-  "last_updated_iso": "2026-04-17T18:36:12-04:00",
+  "last_updated_iso": "2026-04-17T18:51:22-04:00",
   "processed_messages": {
+    "19a0da1d7445f787": "2026-04-17T18:51:22-04:00",
+    "19a1784ff2f26474": "2026-04-17T18:51:22-04:00",
+    "19a302466ad094f2": "2026-04-17T18:51:22-04:00",
+    "19a36b3753e9000d": "2026-04-17T18:51:22-04:00",
+    "19a3b18fd06cf91d": "2026-04-17T18:51:22-04:00",
+    "19a6fa7d3a9c3472": "2026-04-17T18:51:22-04:00",
+    "19ab709461ded8c0": "2026-04-17T18:51:22-04:00",
+    "19adffc30097c93b": "2026-04-17T18:51:22-04:00",
+    "19b0a59186c34166": "2026-04-17T18:51:22-04:00",
+    "19b0fde2212b6808": "2026-04-17T18:51:22-04:00",
+    "19b2435512d937fa": "2026-04-17T18:51:22-04:00",
+    "19b28c6e58e75401": "2026-04-17T18:51:22-04:00",
+    "19b2d2c5e899007e": "2026-04-17T18:51:22-04:00",
+    "19b2e3032a8c6d6d": "2026-04-17T18:51:22-04:00",
     "19b37606156d2153": "2026-04-17T18:36:12-04:00",
     "19b529aece764494": "2026-04-17T17:12:56-04:00",
     "19b671db3273b6a4": "2026-04-17T17:12:56-04:00",

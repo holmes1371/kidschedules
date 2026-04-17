@@ -1,5 +1,5 @@
 {
-  "last_updated_iso": "2026-04-17T18:36:12-04:00",
+  "last_updated_iso": "2026-04-17T18:51:22-04:00",
   "schema_version": 1,
   "senders": {
     "23andmedatasettlement@e.emailksa.com": {
@@ -16,6 +16,16 @@
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
       "last_seen_iso": "2026-04-17T17:04:04-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
+    "alle@info.alle.com": {
+      "first_seen_iso": "2026-04-17T18:51:22-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-04-17T18:51:22-04:00",
       "messages_seen": 1,
       "per_message_counts": [
         0
@@ -47,16 +57,19 @@
     "blpinkman@fcps.edu": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-04-17T18:36:12-04:00",
-      "messages_seen": 5,
+      "last_seen_iso": "2026-04-17T18:51:22-04:00",
+      "messages_seen": 8,
       "per_message_counts": [
         1,
         2,
         1,
         2,
-        0
+        0,
+        0,
+        1,
+        1
       ],
-      "total_events": 6
+      "total_events": 8
     },
     "childrensdentistryofoakton@mail.modento.io": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
@@ -82,6 +95,16 @@
       ],
       "total_events": 0
     },
+    "dccc@ak.dccc.org": {
+      "first_seen_iso": "2026-04-17T18:51:22-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-04-17T18:51:22-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
     "dgagym-notifications@ses.iclasspro.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
@@ -91,6 +114,16 @@
         1
       ],
       "total_events": 1
+    },
+    "donate@email.obama.org": {
+      "first_seen_iso": "2026-04-17T18:51:22-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-04-17T18:51:22-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
     },
     "donotreply@email.teamsnap.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
@@ -146,6 +179,26 @@
       ],
       "total_events": 0
     },
+    "getinvolved@foodforneighbors.org": {
+      "first_seen_iso": "2026-04-17T18:51:22-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-04-17T18:51:22-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        2
+      ],
+      "total_events": 2
+    },
+    "hey@shortstorybox.com": {
+      "first_seen_iso": "2026-04-17T18:51:22-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-04-17T18:51:22-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
     "ica_notification@ica.gov.sg": {
       "first_seen_iso": "2026-04-17T17:12:56-04:00",
       "is_newsletter": false,
@@ -153,6 +206,16 @@
       "messages_seen": 2,
       "per_message_counts": [
         0,
+        0
+      ],
+      "total_events": 0
+    },
+    "info@adamebbin.com": {
+      "first_seen_iso": "2026-04-17T18:51:22-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-04-17T18:51:22-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
         0
       ],
       "total_events": 0
@@ -220,6 +283,16 @@
       ],
       "total_events": 0
     },
+    "mika@joytothefood.com": {
+      "first_seen_iso": "2026-04-17T18:51:22-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-04-17T18:51:22-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
     "mlrohde@fcps.edu": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
@@ -271,6 +344,16 @@
       ],
       "total_events": 3
     },
+    "no-reply@edsemail.com": {
+      "first_seen_iso": "2026-04-17T18:51:22-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-04-17T18:51:22-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
     "no-reply@ottosportmail.ai": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
@@ -315,16 +398,17 @@
     "noreply@jackrabbittech.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-04-17T17:04:04-04:00",
-      "messages_seen": 5,
+      "last_seen_iso": "2026-04-17T18:51:22-04:00",
+      "messages_seen": 6,
       "per_message_counts": [
         1,
         1,
         0,
         0,
-        0
+        0,
+        1
       ],
-      "total_events": 2
+      "total_events": 3
     },
     "noreply@opera.upscalebychoice.com": {
       "first_seen_iso": "2026-04-17T17:12:56-04:00",
@@ -368,6 +452,16 @@
         3
       ],
       "total_events": 6
+    },
+    "rstille@fcps.edu": {
+      "first_seen_iso": "2026-04-17T18:51:22-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-04-17T18:51:22-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        1
+      ],
+      "total_events": 1
     },
     "smberg@erols.com": {
       "first_seen_iso": "2026-04-17T17:12:56-04:00",
@@ -416,6 +510,16 @@
       "first_seen_iso": "2026-04-17T17:12:56-04:00",
       "is_newsletter": false,
       "last_seen_iso": "2026-04-17T17:12:56-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
+    "support@ogee.com": {
+      "first_seen_iso": "2026-04-17T18:51:22-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-04-17T18:51:22-04:00",
       "messages_seen": 1,
       "per_message_counts": [
         0

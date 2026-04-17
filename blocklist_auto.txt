@@ -80,3 +80,11 @@ support0@info.myloancare.com  # auto 2026-04-17: Mortgage/loan payment due notic
 noreply@opera.upscalebychoice.com  # auto 2026-04-17: Hotel booking confirmation for adults, no kids' events
 mdac@malaysiavisas.com  # auto 2026-04-17: Travel visa confirmation for adults, no kids' events
 notifications@united.com  # auto 2026-04-17: Adult airline travel reminder, no kids' events
+info@adamebbin.com  # auto 2026-04-17: Political newsletter from state senator — adult civic/legislative content only,
+hey@shortstorybox.com  # auto 2026-04-17: Adult retail/subscription box promotional email, no kids' events
+alle@info.alle.com  # auto 2026-04-17: Adult cosmetic/aesthetic loyalty program policy update, no kids' events
+mika@joytothefood.com  # auto 2026-04-17: Adult lifestyle/food newsletter, no kids' events
+support@ogee.com  # auto 2026-04-17: Adult clean beauty retail promotional email, no kids' events
+no-reply@edsemail.com  # auto 2026-04-17: Utility/billing notification (Evergreen bill), adult household account, no kids'
+donate@email.obama.org  # auto 2026-04-17: Adult political fundraising/advocacy email from Obama Foundation, no kids' conte
+dccc@ak.dccc.org  # auto 2026-04-17: Adult political fundraising email from DCCC, no kids' content
