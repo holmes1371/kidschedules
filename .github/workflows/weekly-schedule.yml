@@ -84,6 +84,16 @@ jobs:
           else
             echo "No prior events_state.json — cache starts empty."
           fi
+          # prior_events.json drives the NEW-badge diff (#13). If absent
+          # (first run, or state-branch rollback), process_events.py returns
+          # new_ids=None and no badges render — graceful first-run degrade.
+          if [ -f .state/prior_events.json ]; then
+            cp .state/prior_events.json prior_events.json
+            COUNT=$(python3 -c "import json; print(len(json.load(open('prior_events.json')).get('event_ids', [])))")
+            echo "Restored prior_events.json ($COUNT event ID(s) from prior run)."
+          else
+            echo "No prior prior_events.json — NEW badges suppressed this run."
+          fi
           if [ -f .state/.filter_audit.json ]; then
             cp .state/.filter_audit.json .filter_audit.json
             echo "Restored .filter_audit.json."
@@ -189,7 +199,8 @@ jobs:
           if [ ! -f .filter_audit.json ] \
              && [ ! -f blocklist_auto.txt ] \
              && [ ! -f blocklist_auto_audit.jsonl ] \
-             && [ ! -f events_state.json ]; then
+             && [ ! -f events_state.json ] \
+             && [ ! -f prior_events.json ]; then
             echo "No persistent state produced — nothing to save."
             exit 0
           fi
@@ -212,6 +223,9 @@ jobs:
           if [ -f ../events_state.json ]; then
             cp ../events_state.json events_state.json
           fi
+          if [ -f ../prior_events.json ]; then
+            cp ../prior_events.json prior_events.json
+          fi
           # Only 'git add' files that actually exist — any one of these may be
           # absent on a given run (e.g. first run before filter audit stamps).
           # future_events.json is intentionally NOT in this list — it was
@@ -221,6 +235,7 @@ jobs:
           [ -f blocklist_auto.txt ] && FILES="$FILES blocklist_auto.txt"
           [ -f blocklist_auto_audit.jsonl ] && FILES="$FILES blocklist_auto_audit.jsonl"
           [ -f events_state.json ] && FILES="$FILES events_state.json"
+          [ -f prior_events.json ] && FILES="$FILES prior_events.json"
           git -c user.name="github-actions[bot]" \
               -c user.email="github-actions[bot]@users.noreply.github.com" \
               add $FILES
