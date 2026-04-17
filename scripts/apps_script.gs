@@ -15,28 +15,40 @@
 //                       user dismissed. `sender` was added in the unignore-
 //                       sender pass; pre-existing rows carry only the first
 //                       four columns. Legacy rows are left as-is — they can
-//                       only be cleared by individual unignore-event.
+//                       only be cleared by individual unignore-event. Since
+//                       ROADMAP #20 the sender column stores a block
+//                       identifier — either a bare registrable domain
+//                       (institutional) or a full lowercased email address
+//                       (freemail). The payload key remains "sender".
 //   "Ignored Senders" — one row per (timestamp, domain, source) — either
 //                       the UI Ignore-sender button (source="auto-button")
 //                       or a hand-seeded row (source="manual" by convention).
 //                       The script treats every row as authoritative; the
-//                       source column is informational.
+//                       source column is informational. The "domain" column
+//                       name is historical — since ROADMAP #20 it carries
+//                       block identifiers (domain or full address).
 //
 // POST /exec        — action router. Body JSON: {"action": "...", ...}.
 //   action="ignore" (also the default when action is absent — backward
 //                   compat for the first-wave client):
 //     {"id": "<12-hex>", "name": "...", "date": "...", "sender": "..."}
 //     →  append to Ignored Events. `sender` is optional and stored only
-//     when it validates as a domain; invalid or missing values write as "".
+//     when it validates as a block identifier (bare domain or full
+//     address); invalid or missing values write as "".
 //   action="unignore":
 //     {"id": "<12-hex>"}  →  delete every Ignored Events row matching id.
 //     Idempotent: returns 'ok' even if no row matched.
 //   action="ignore_sender":
 //     {"domain": "..."}  →  validate, lowercase, append to Ignored Senders
-//     with source="auto-button".
+//     with source="auto-button". Wire-protocol key is "domain" for
+//     backward compat; the value may be a bare domain or a full address.
 //   action="unignore_sender":
-//     {"domain": "..."}  →  delete every Ignored Senders row matching
-//     domain AND every Ignored Events row where the sender column matches.
+//     {"domain": "..."}  →  delete every Ignored Senders row whose block
+//     identifier matches AND every Ignored Events row where the sender
+//     column matches. Match is lowercased exact equality on the whole
+//     string, so an alice@gmail.com unignore does NOT match a gmail.com
+//     row and vice versa (this is correct: address-level and domain-level
+//     ignores unignore at the same level).
 //     Idempotent: returns 'ok' even if no rows matched.
 //
 // GET  /exec?secret=... — read route. Gated by READ_SECRET.
@@ -47,7 +59,11 @@ const IGNORED_EVENTS_SHEET_NAME  = 'Ignored Events';
 const IGNORED_SENDERS_SHEET_NAME = 'Ignored Senders';
 const READ_SECRET = 'REPLACE_ME_WITH_RANDOM_STRING';
 
-const DOMAIN_RE = /^[a-z0-9][a-z0-9.-]*\.[a-z]{2,}$/;
+// Accepts either a bare registrable domain ("fcps.edu") or a full
+// address ("alice@fcps.edu"). Strictly broader than the pre-#20
+// DOMAIN_RE so first-wave clients that still send domain-only
+// payloads continue to validate.
+const SENDER_RE = /^(?:[^\s@]+@)?[a-z0-9][a-z0-9.-]*\.[a-z]{2,}$/;
 
 function doPost(e) {
   try {
@@ -81,7 +97,7 @@ function _handleIgnore(payload) {
   const name = String(payload.name || '').slice(0, 200);
   const date = String(payload.date || '').slice(0, 20);
   const senderRaw = String(payload.sender || '').trim().toLowerCase();
-  const sender = DOMAIN_RE.test(senderRaw) ? senderRaw : '';
+  const sender = SENDER_RE.test(senderRaw) ? senderRaw : '';
   _getIgnoredEventsSheet().appendRow(
     [new Date().toISOString(), id, name, date, sender]
   );
@@ -104,8 +120,10 @@ function _handleUnignore(payload) {
 }
 
 function _handleIgnoreSender(payload) {
+  // Payload key stays "domain" (wire-protocol compat); the value is a
+  // block identifier — bare registrable domain or full address.
   const domain = String(payload.domain || '').trim().toLowerCase();
-  if (!DOMAIN_RE.test(domain)) return _text('bad domain');
+  if (!SENDER_RE.test(domain)) return _text('bad domain');
   _getIgnoredSendersSheet().appendRow(
     [new Date().toISOString(), domain, 'auto-button']
   );
@@ -114,7 +132,7 @@ function _handleIgnoreSender(payload) {
 
 function _handleUnignoreSender(payload) {
   const domain = String(payload.domain || '').trim().toLowerCase();
-  if (!DOMAIN_RE.test(domain)) return _text('bad domain');
+  if (!SENDER_RE.test(domain)) return _text('bad domain');
   // Delete the domain row(s) from Ignored Senders.
   const sendersSheet = _getIgnoredSendersSheet();
   const sendersData = sendersSheet.getDataRange().getValues();
@@ -161,7 +179,7 @@ function _listIgnoredSenders() {
   const seen = {};
   for (let i = 0; i < data.length; i++) {
     const domain = String(data[i][1] || '').trim().toLowerCase();
-    if (!DOMAIN_RE.test(domain)) continue;
+    if (!SENDER_RE.test(domain)) continue;
     if (!seen[domain]) {
       seen[domain] = {
         timestamp: String(data[i][0] || ''),
