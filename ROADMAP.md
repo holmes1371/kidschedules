@@ -18,11 +18,11 @@ Strict rules for writing it:
 4. **No cross-session carry-overs.** If something is still broken session-to-session, file it as a numbered ROADMAP item instead of repeating it here.
 5. **Replace in place.** Do not append a new block and archive the old one below.
 
-**2026-04-17 (session 10)**
+**2026-04-17 (session 11)**
 
-- **#21 "Dedupe candidate messages before agent extraction" — awaiting live QA.** C1–C3 on `main` at `9882a1c` / `775f173` / `44283b6`; 458 tests passing. Tom has NOT run the first live cron yet. Do NOT flip `[~]` → `[x]` or touch `COMPLETED.md` until he confirms the three-line funnel in the Actions log + eyeballs the page for missing items. Escape hatch for thin collapsed-thread survivors: `python main.py --reextract <messageId>`. Full record: `design/dedupe-candidate-messages.md`.
-- **#22 filed: page header "N day lookback" ignores `--lookback-days` CLI value.** Bug entry has the fix sketch + test note; not yet started.
-- Branch is 6 ahead of `origin/main`; Tom pushes after live-QA, not before.
+- **#21 closed.** Tom live-QA'd 9882a1c / 775f173 / 44283b6 on `main`; full prose archived in `COMPLETED.md`, one-line stub left at #21.
+- **#22 in progress** — fix sketch already locked in the ROADMAP entry; implementation to follow in this session.
+- Branch is 1 ahead of `origin/main` after the close-out commit.
 
 ## For future agents
 
@@ -83,13 +83,7 @@ Status legend:
 
 ### 20. [x] Freemail-aware sender-block granularity — f855dee / 745957a / d5820c2 / 563354c / bf9fe35 / 8170081 / 03b44c5 / e448a8a — see COMPLETED.md
 
-### 21. [~] Dedupe candidate messages before agent extraction
-
-Filed 2026-04-17 (session 10) after Tom spotted the symptom in live logs: a single dance-studio "Re: First dibs on Recital TICKETS…" thread produced four hits (`[31/66]`, `[32/66]`, `[35/66]`, `[36/66]`) in the extractor input, and the "Reverb Dance Comp" reminder produced two (separate timestamps — those may be legitimately distinct). The 5 Gmail search templates in `scripts/build_queries.py` overlap by design (a dance-studio email plausibly matches `school_activities`, `sports_extracurriculars`, and `newsletters_calendars` at once), and Gmail returns each message independently per query — so the union of candidates before extraction is noisier than it needs to be. Agent cost scales roughly linearly with candidate count, so this is real waste on every run.
-
-Discovery in session 11 corrected the original framing: `step2b_read_promising` already dedupes by `messageId` via its `seen_ids` set, so the four hits are four *distinct* messages in the same Gmail thread rather than four copies of one message. The cheap fix is therefore `threadId`-level dedup (the "slightly more ambitious" option originally named below), not another `messageId` pass. Policy decided same session: keep only the latest message per thread — the most recent reply usually restates the operative date/decision. Drop happens in `step2b_read_promising` after the existing messageId pass and before the `read_message` body fetch, so the Gmail API call is saved alongside the agent cost.
-
-Scope in progress: `_dedupe_by_thread` helper in `main.py` (pure function), wired into `step2b_read_promising`; three new log lines replace `Unique messages to read: {N}` to show the full funnel (stubs / unique messageIds / after thread dedup). Tests cover the helper's edge cases (empty, no collisions, clear Date ordering, tiebreaker, missing threadId, malformed Date) plus one integration test that simulates the dance-studio four-hit pattern against the step2b flow. See `design/dedupe-candidate-messages.md` for the full decision record.
+### 21. [x] Dedupe candidate messages before agent extraction — 9882a1c / 775f173 / 44283b6 — see COMPLETED.md
 
 ### 22. [ ] Bug: page header "N day lookback" ignores `--lookback-days` CLI value
 
