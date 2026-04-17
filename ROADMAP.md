@@ -22,7 +22,7 @@ Strict rules for writing it:
 
 - Both session-11 items closed and live-QA'd: #21 thread dedup (`9882a1c` / `775f173` / `44283b6`) and #22 `--lookback-days` header bug (`563827d`). Post-mortems in `COMPLETED.md`.
 - Nothing in flight. The Backlog list has no `[ ]` or `[~]` items — next pick is Tom's call.
-- 459 tests passing on the close-out commit. Branch is 3 ahead of `origin/main`; Tom pushes when ready.
+- 459 tests passing. Tom pushed mid-session (after the #22 fix, to trigger the live `workflow_dispatch` QA run), so `origin/main` is at `563827d`; HEAD is 1 ahead (the close-out commit). Tom pushes when ready.
 
 ## For future agents
 
