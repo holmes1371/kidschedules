@@ -87,13 +87,19 @@ def load_blocklist(path: str) -> list[str]:
 
 
 def load_ignored_senders(path: str) -> list[str]:
-    """Return the domain strings from the ephemeral ignored_senders.json cache.
+    """Return the block-identifier strings from the ephemeral
+    ignored_senders.json cache.
 
     The file is produced by scripts/sync_ignored_senders.py and is a JSON
     list of ``{"domain": ..., "source": ..., "timestamp": ...}`` dicts.
-    This loader pulls the domain values out in list order so they can be
-    unioned into the Gmail exclusion clause alongside the hand-curated and
-    auto blocklists.
+    Historically the ``domain`` field always held a bare registrable
+    domain; since ROADMAP #20 it may also hold a lowercased email
+    address (``alice@gmail.com``) for freemail senders. The payload key
+    stays ``domain`` for wire-protocol backward compatibility — treat
+    the returned strings as opaque block identifiers.
+
+    Gmail's ``from:`` operator accepts both shapes, so the exclusion
+    clause works unchanged regardless of which shape the row carries.
 
     Missing file, malformed JSON, or a non-list payload all degrade
     silently to ``[]`` — matches the posture of the sync helper, which
@@ -168,12 +174,16 @@ def main() -> int:
                    help="Path to the bot-owned blocklist_auto.txt. Pass '' to disable.")
     p.add_argument("--ignored-senders", type=str, default=DEFAULT_IGNORED_SENDERS,
                    help="Path to ignored_senders.json (runner-ephemeral cache "
-                        "of UI-clicked Ignore-sender domains). Pass '' to disable.")
+                        "of UI-clicked Ignore-sender block keys — bare "
+                        "domains for institutional senders, full addresses "
+                        "for freemail). Pass '' to disable.")
     p.add_argument("--protected-senders", type=str,
                    default=DEFAULT_PROTECTED_SENDERS,
                    help="Path to protected_senders.txt. Protected domains are "
                         "filtered OUT of the ignored_senders union as a "
-                        "defense-in-depth guardrail. Pass '' to disable.")
+                        "defense-in-depth guardrail; the filter matches on "
+                        "both bare-domain and address-form block keys. Pass "
+                        "'' to disable.")
     p.add_argument("--no-category-filter", action="store_true",
                    help="Do not append -category:promotions to queries.")
     p.add_argument("--audit-state", type=str, default=DEFAULT_AUDIT_STATE,

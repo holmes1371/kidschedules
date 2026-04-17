@@ -117,6 +117,51 @@ def test_build_queries_drops_protected_from_ignored_senders(tmp_path, monkeypatc
     assert "-from:louisearcherpta.org" not in sample
 
 
+def test_build_queries_drops_address_form_protected_from_ignored_senders(
+    tmp_path, monkeypatch,
+):
+    # #20 load-bearing guarantee: an address-form block key whose
+    # domain part matches a protected pattern must still drop from the
+    # Gmail exclusion union. This is the end-to-end check that the
+    # address-aware is_protected reaches build_queries's filter.
+    ignored = tmp_path / "ignored_senders.json"
+    ignored.write_text(json.dumps([
+        {"domain": "alice@fcps.edu"},       # protected via fcps.edu
+        {"domain": "coach@louisearcherpta.org"},  # protected via *pta.org
+        {"domain": "alice@gmail.com"},      # not protected (freemail)
+        {"domain": "jane@outlook.com"},     # not protected (freemail)
+    ]))
+    protected = tmp_path / "protected.txt"
+    protected.write_text("fcps.edu\n*pta.org\n")
+
+    import io
+    import sys
+
+    buf = io.StringIO()
+    monkeypatch.setattr(sys, "stdout", buf)
+    monkeypatch.setattr(sys, "argv", [
+        "build_queries.py",
+        "--blocklist", "",
+        "--auto-blocklist", "",
+        "--ignored-senders", str(ignored),
+        "--protected-senders", str(protected),
+        "--today", "2026-04-15",
+    ])
+    assert bq.main() == 0
+    out = json.loads(buf.getvalue())
+    excl = out["exclusions"]
+    assert excl["ignored_senders_dropped_protected"] == 2
+    assert excl["blocklist_size_ignored_senders"] == 2
+    sample = out["queries"]["school_activities"]
+    # Address-form freemail rows land in the Gmail clause unchanged —
+    # Gmail's from: operator accepts either shape.
+    assert "-from:alice@gmail.com" in sample
+    assert "-from:jane@outlook.com" in sample
+    # Address-form protected rows drop.
+    assert "-from:alice@fcps.edu" not in sample
+    assert "-from:coach@louisearcherpta.org" not in sample
+
+
 # --- Render integration: Ignore-sender button suppressed for protected senders ---
 
 def test_render_html_omits_ignore_sender_button_for_protected_sender():
