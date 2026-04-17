@@ -1,0 +1,9 @@
+# Normalize all text files to LF in the repo and on checkout on every
+# platform. Prevents CRLF drift when Windows editors (or Git-for-Windows
+# with core.autocrlf=true) write working-tree files as CRLF, which then
+# show up as phantom "modified" entries to Linux-side tooling (including
+# the FUSE-mounted sandbox this repo is edited from).
+#
+# text=auto lets git auto-detect binary files and leave them untouched.
+# eol=lf forces LF in the working tree for every file classified as text.
+* text=auto eol=lf
