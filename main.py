@@ -252,6 +252,85 @@ def step2_search_gmail(
     return all_results
 
 
+def _dedupe_by_thread(
+    stubs: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Return at most one stub per distinct Gmail threadId, keeping the
+    latest-by-Date message per thread.
+
+    When a Gmail thread produces multiple search hits across the 5
+    overlapping query templates (e.g. a dance-studio email that matches
+    ``school_activities``, ``sports_extracurriculars``, and
+    ``newsletters_calendars`` simultaneously), we only want the agent to
+    see one representative — the latest reply, since that is typically
+    the message carrying the operative date/decision. Pure function; no
+    I/O. See design/dedupe-candidate-messages.md for the decision
+    record and accepted-risk discussion.
+
+    Sort key is the stub's ``headers["Date"]`` parsed by
+    ``email.utils.parsedate_to_datetime``. Tie policy:
+
+    - Parseable dates outrank unparseable ones — a reply with a good
+      Date header beats a sibling with a malformed one even if the
+      latter was encountered first.
+    - Within the parseable set, the latest datetime wins.
+    - Within the unparseable set (every stub in the thread had a bad
+      Date header), the first-seen stub wins.
+
+    Stubs with empty or missing ``threadId`` bypass grouping and are
+    preserved as-is — Gmail always returns a threadId in practice, but
+    the helper stays tolerant so a malformed stub never silently
+    collapses a legitimate message.
+
+    Output preserves first-encounter order of each group's slot: a
+    thread whose first stub appeared at input index 0 precedes a
+    thread whose first stub appeared at input index 3, regardless of
+    which stub ultimately won each group.
+    """
+    def _parse(stub: dict[str, Any]) -> dt.datetime | None:
+        raw = stub.get("headers", {}).get("Date", "")
+        if not raw:
+            return None
+        try:
+            return email.utils.parsedate_to_datetime(raw)
+        except (TypeError, ValueError):
+            return None
+
+    # slots: first-encounter idx per distinct group (or per passthrough
+    # stub), in order. state[slot] is the (stub, parsed_dt) pair for
+    # that slot's current winner; parsed_dt is None for passthrough or
+    # for an incumbent whose Date header is unparseable.
+    slots: list[int] = []
+    state: dict[int, tuple[dict[str, Any], dt.datetime | None]] = {}
+    slot_by_tid: dict[str, int] = {}
+
+    for idx, stub in enumerate(stubs):
+        tid = stub.get("threadId") or ""
+        if not tid:
+            slots.append(idx)
+            state[idx] = (stub, None)
+            continue
+        parsed = _parse(stub)
+        if tid not in slot_by_tid:
+            slot_by_tid[tid] = idx
+            slots.append(idx)
+            state[idx] = (stub, parsed)
+            continue
+        slot = slot_by_tid[tid]
+        _incumbent, incumbent_dt = state[slot]
+        # Replace only when the incoming stub has a better Date claim:
+        # either it's parseable and the incumbent's isn't, or both are
+        # parseable and the incoming one is strictly later. Equal
+        # datetimes preserve first-seen; both-unparseable preserves
+        # first-seen.
+        if parsed is not None and (
+            incumbent_dt is None or parsed > incumbent_dt
+        ):
+            state[slot] = (stub, parsed)
+
+    return [state[s][0] for s in slots]
+
+
 def step2b_read_promising(
     gmail: GmailClient,
     search_results: dict[str, list[dict[str, Any]]],

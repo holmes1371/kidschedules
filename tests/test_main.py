@@ -834,3 +834,94 @@ def test_step4_process_events_cleans_up_alerts_tempfile(monkeypatch):
         [], pages_url="", dry_run=True, outlier_alerts=alerts
     )
     assert not Path(seen["alerts_path"]).exists()
+
+
+# ── _dedupe_by_thread (#21 C2) ────────────────────────────────────────────
+#
+# Thread-level dedup sits in step2b between the existing messageId pass
+# and the read_message body fetch. Helper is pure so these tests assert
+# the contract directly — latest-by-Date within a thread, parseable
+# outranks unparseable, first-seen breaks ties, missing threadId is a
+# passthrough. See design/dedupe-candidate-messages.md.
+
+
+def _stub(mid: str, tid: str, date: str = "") -> dict:
+    """Minimal Gmail search stub shape from gmail_client.search_messages."""
+    return {
+        "messageId": mid,
+        "threadId": tid,
+        "snippet": "",
+        "headers": {"From": "x@y.z", "Subject": mid, "Date": date},
+    }
+
+
+def test_dedupe_by_thread_empty_input():
+    assert main._dedupe_by_thread([]) == []
+
+
+def test_dedupe_by_thread_no_collisions_preserves_input():
+    """Three stubs, three distinct threads — output equals input."""
+    stubs = [
+        _stub("m1", "t1", "Mon, 14 Apr 2026 08:00:00 -0400"),
+        _stub("m2", "t2", "Mon, 14 Apr 2026 09:00:00 -0400"),
+        _stub("m3", "t3", "Mon, 14 Apr 2026 10:00:00 -0400"),
+    ]
+    assert main._dedupe_by_thread(stubs) == stubs
+
+
+def test_dedupe_by_thread_latest_date_survives_within_thread():
+    """Two stubs same thread, clear Date ordering; later stub survives
+    regardless of input order."""
+    earlier = _stub("m1", "t1", "Mon, 14 Apr 2026 08:00:00 -0400")
+    later = _stub("m2", "t1", "Tue, 15 Apr 2026 08:00:00 -0400")
+    assert main._dedupe_by_thread([earlier, later]) == [later]
+    assert main._dedupe_by_thread([later, earlier]) == [later]
+
+
+def test_dedupe_by_thread_equal_dates_first_seen_wins():
+    """Identical parsed Date on two same-thread stubs; first-seen wins
+    by the `strictly later` replace rule."""
+    a = _stub("m1", "t1", "Mon, 14 Apr 2026 08:00:00 -0400")
+    b = _stub("m2", "t1", "Mon, 14 Apr 2026 08:00:00 -0400")
+    assert main._dedupe_by_thread([a, b]) == [a]
+    assert main._dedupe_by_thread([b, a]) == [b]
+
+
+def test_dedupe_by_thread_missing_threadid_is_passthrough():
+    """Stubs without threadId bypass grouping — never collapsed, never
+    dropped, even when they share a messageId shape that would
+    otherwise collide (messageId dedup is upstream)."""
+    a = _stub("m1", "", "Mon, 14 Apr 2026 08:00:00 -0400")
+    b = _stub("m2", "", "Tue, 15 Apr 2026 08:00:00 -0400")
+    assert main._dedupe_by_thread([a, b]) == [a, b]
+
+
+def test_dedupe_by_thread_parseable_beats_unparseable_within_thread():
+    """A parseable Date outranks an unparseable one regardless of
+    encounter order — the useful timestamp wins over the missing one."""
+    parseable = _stub("m1", "t1", "Mon, 14 Apr 2026 08:00:00 -0400")
+    malformed = _stub("m2", "t1", "not a date")
+    assert main._dedupe_by_thread([parseable, malformed]) == [parseable]
+    assert main._dedupe_by_thread([malformed, parseable]) == [parseable]
+
+
+def test_dedupe_by_thread_all_unparseable_first_seen_wins():
+    """Every stub in a thread has a bad/missing Date — fall back to
+    first-seen so the function is total and deterministic."""
+    a = _stub("m1", "t1", "not a date")
+    b = _stub("m2", "t1", "")  # missing Date header
+    assert main._dedupe_by_thread([a, b]) == [a]
+    assert main._dedupe_by_thread([b, a]) == [b]
+
+
+def test_dedupe_by_thread_preserves_first_encounter_group_order():
+    """Three groups encountered in order A, B, C with collisions in A
+    and B; output still lists representatives in A, B, C order even
+    though A's winner is the last-encountered stub of group A."""
+    a_early = _stub("a1", "tA", "Mon, 14 Apr 2026 08:00:00 -0400")
+    b_early = _stub("b1", "tB", "Mon, 14 Apr 2026 08:05:00 -0400")
+    c_only = _stub("c1", "tC", "Mon, 14 Apr 2026 08:10:00 -0400")
+    b_late = _stub("b2", "tB", "Tue, 15 Apr 2026 09:00:00 -0400")
+    a_late = _stub("a2", "tA", "Wed, 16 Apr 2026 10:00:00 -0400")
+    stubs = [a_early, b_early, c_only, b_late, a_late]
+    assert main._dedupe_by_thread(stubs) == [a_late, b_late, c_only]
