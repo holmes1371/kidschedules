@@ -13,7 +13,7 @@ Replace this block at the end of each session. Keep it to what the next agent ac
 **2026-04-17 (session 8 — #13 "New this week" badges closed)**
 
 - **Just closed: #13 "New this week" badges.** Three commits on `main`: `5ab4a01` (design note at `design/new-this-week-badges.md` + ROADMAP flip `[ ]` → `[~]`), `ac4ae3b` (helpers + render wiring + CSS + 17 new tests + `main.py` `--prior-events` wiring + `.gitignore` entry), `4cbfc68` (workflow restore/save plumbing). Tom signed off same session. Close-out commit moves full prose to `COMPLETED.md` and flips the stub to `[x]` — this is that commit.
-- **Next step (pick up here):** next backlog item is `#14` — "Manual 'refresh now' button in the UI". `#15` (conflict highlighting) and `#17` (multi-event newsletter robustness) also open. `#17` is design-note-first per the ROADMAP entry; `#14` has its full threat model + defense-in-depth rationale baked into the ROADMAP entry already, so design-note-first is lighter lift there.
+- **Next step (pick up here):** next backlog item is `#17` — "Robust handling of multi-event newsletter emails". Tom re-prioritized it to the top of the open queue on 2026-04-17; the entry has been physically moved in the ROADMAP so it sits just after #13 in file order. Numbering is unchanged. #17 is design-note-first per its ROADMAP body. `#14` (manual refresh button) and `#15` (conflict highlighting) follow, in that order.
 - **Key design decisions worth remembering for #13**, captured more fully in the COMPLETED entry:
   - **Missing file ≠ empty list.** `_load_prior_event_ids` returns `None` when the file is missing / unreadable / malformed / wrong-shape; returns `set()` when present and well-formed. Caller writes `new_ids = (current - prior) if prior is not None else set()` — so first-run (no manifest) suppresses every badge, but a legitimate empty-prior state still badges everything. The distinction is load-bearing and pinned by four loader edge-case tests.
   - **`prior_events.json` is its own file, not a new key in `events_state.json`.** Different concerns, different GC rules, different parity contracts. File-per-concern matches the existing state-branch pattern. Cache eviction does not touch the render manifest, and a cache-clear still diffs correctly because event IDs are deterministic from `(name, date, child)`.
@@ -79,6 +79,16 @@ Status legend:
 
 ### 13. [x] "New this week" badges — 5ab4a01 / ac4ae3b / 4cbfc68 — see COMPLETED.md
 
+### 17. [ ] Robust handling of multi-event newsletter emails
+
+Reordered to next-up at Tom's direction 2026-04-17 (was sitting between #16 and #18). Numbering stays stable per the close-out convention; only the priority slot moved.
+
+Newsletters routinely carry 5–15+ dates each. The extractor is already prompted to pull every calendar item (see `agent.py` rule 8, "Newsletter calendar items"), and per-batch parsing treats N events from one `source_message_id` as the normal case. But there's no signal when the extractor under-extracts, and no affordance to re-process a message once it lands in `events_state.json` — the message ID is cached and the next run skips it.
+
+Scope: (a) log the event count per `source_message_id` on each run and flag outliers when a known-newsletter sender produces markedly fewer events than its prior issues; (b) add a `main.py --reextract <message-id>` flag that evicts the ID from `events_state.json` before the Gmail fetch so the next run rebuilds its events; (c) consider routing newsletter-shaped senders (LAES PTA Sunbeam, FCPS updates, etc.) to a smaller agent batch size for higher per-email attention. Design-note-first.
+
+Non-goal: diffing newsletter issues across time to detect added/removed dates — YAGNI until a concrete miss justifies the infrastructure.
+
 ### 14. [ ] Manual "refresh now" button in the UI
 
 Button in `docs/index.html` that triggers the weekly workflow on demand, so a fresh build can be forced after a late schedule email without waiting for the next scheduled run or opening GitHub. GitHub's `workflow_dispatch` API requires an authenticated call, so the existing Apps Script webhook grows a new `action=refresh` endpoint that holds a fine-grained PAT (scope: `workflow`, single-repo) as a Script Property and POSTs to the dispatches endpoint. Client fires `fetch(APPS_SCRIPT_URL, {method:'POST', body: JSON.stringify({secret, action:'refresh'})})` and shows a "Rebuilding… reload in ~2 min" toast; no live polling.
@@ -90,14 +100,6 @@ Threat model accepted: the shared secret is effectively public (embedded in page
 In `process_events.py`, detect overlapping timed events on the same day via interval intersection; flag both cards with a visible conflict marker. Prioritize different-kid overlaps as the high-signal case. Same-day all-day + timed events should NOT be flagged as conflicts — they coexist by design.
 
 ### 16. [x] Node 20 → Node 24 action upgrades (before 2026-06-02) — ea081da — see COMPLETED.md
-
-### 17. [ ] Robust handling of multi-event newsletter emails
-
-Newsletters routinely carry 5–15+ dates each. The extractor is already prompted to pull every calendar item (see `agent.py` rule 8, "Newsletter calendar items"), and per-batch parsing treats N events from one `source_message_id` as the normal case. But there's no signal when the extractor under-extracts, and no affordance to re-process a message once it lands in `events_state.json` — the message ID is cached and the next run skips it.
-
-Scope: (a) log the event count per `source_message_id` on each run and flag outliers when a known-newsletter sender produces markedly fewer events than its prior issues; (b) add a `main.py --reextract <message-id>` flag that evicts the ID from `events_state.json` before the Gmail fetch so the next run rebuilds its events; (c) consider routing newsletter-shaped senders (LAES PTA Sunbeam, FCPS updates, etc.) to a smaller agent batch size for higher per-email attention. Design-note-first.
-
-Non-goal: diffing newsletter issues across time to detect added/removed dates — YAGNI until a concrete miss justifies the infrastructure.
 
 ### 18. [x] Ignore affordance for undated "Needs Verification" cards — 41505aa / aade8aa — see COMPLETED.md
 
