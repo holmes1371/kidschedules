@@ -88,3 +88,4 @@ support@ogee.com  # auto 2026-04-17: Adult clean beauty retail promotional email
 no-reply@edsemail.com  # auto 2026-04-17: Utility/billing notification (Evergreen bill), adult household account, no kids'
 donate@email.obama.org  # auto 2026-04-17: Adult political fundraising/advocacy email from Obama Foundation, no kids' conte
 dccc@ak.dccc.org  # auto 2026-04-17: Adult political fundraising email from DCCC, no kids' content
+scheduler@goodtime.io  # auto 2026-04-18: Adult job interview scheduling for Ellen at Salesforce — entirely work-related,
