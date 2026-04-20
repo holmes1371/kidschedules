@@ -1,5 +1,5 @@
 {
-  "last_updated_iso": "2026-04-18T07:00:01-04:00",
+  "last_updated_iso": "2026-04-20T07:41:20-04:00",
   "schema_version": 1,
   "senders": {
     "23andmedatasettlement@e.emailksa.com": {
@@ -243,15 +243,16 @@
     "lifetouch@m.lifetouch.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-04-17T17:04:04-04:00",
-      "messages_seen": 4,
+      "last_seen_iso": "2026-04-20T07:41:20-04:00",
+      "messages_seen": 5,
       "per_message_counts": [
         1,
         0,
         0,
-        0
+        0,
+        1
       ],
-      "total_events": 1
+      "total_events": 2
     },
     "mashafer@gmail.com": {
       "first_seen_iso": "2026-04-17T18:36:12-04:00",
