@@ -7,7 +7,7 @@ token. Paste the printed value into the `GMAIL_REFRESH_TOKEN` repo
 secret (Settings -> Secrets and variables -> Actions).
 
 Usage:
-    python scripts/generate_gmail_token.py
+    py scripts/generate_gmail_token.py
 
 Preconditions:
     - `client_secret.json` at the repo root (Desktop-type OAuth client).

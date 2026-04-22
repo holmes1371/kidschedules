@@ -18,11 +18,11 @@ Strict rules for writing it:
 4. **No cross-session carry-overs.** If something is still broken session-to-session, file it as a numbered ROADMAP item instead of repeating it here.
 5. **Replace in place.** Do not append a new block and archive the old one below.
 
-**2026-04-17 (session 11 — clean handoff)**
+**2026-04-18 (session 12)**
 
-- Both session-11 items closed and live-QA'd: #21 thread dedup (`9882a1c` / `775f173` / `44283b6`) and #22 `--lookback-days` header bug (`563827d`). Post-mortems in `COMPLETED.md`.
-- Nothing in flight. The Backlog list has no `[ ]` or `[~]` items — next pick is Tom's call.
-- 459 tests passing. Tom pushed mid-session (after the #22 fix, to trigger the live `workflow_dispatch` QA run), so `origin/main` already carries through `563827d`; the session-11 close-out commits sit unpushed on `main` locally. Tom pushes when ready — `git status` is the live source of truth on the ahead-count.
+- ROADMAP formatting pass: completed/descoped items un-bolded (stripped `###`, used `N\.` to keep the original numbers rendering), backlog re-sorted to strict numerical order. Only upcoming `[ ]`/`[~]` items render as bold headers now.
+- Filed #23 — separate test landing page for manual `workflow_dispatch` QA runs. `[ ]` not started; design note still pending. Open questions in the item body cover whether the toggle should also gate production-state side effects (items 3, 4, 13).
+- Nothing else in flight.
 
 ## For future agents
 
@@ -55,52 +55,65 @@ Status legend:
 
 ## Backlog (priority order)
 
-### 1. [x] Failure notifications via GitHub mobile app — c3d2e5b — see COMPLETED.md
+1\. [x] Failure notifications via GitHub mobile app — c3d2e5b — see COMPLETED.md
 
-### 2. [x] Pytest suite for `scripts/process_events.py` — 8375e9c (suite) / 8a9f4b3 (CI) — see COMPLETED.md
+2\. [x] Pytest suite for `scripts/process_events.py` — 8375e9c (suite) / 8a9f4b3 (CI) — see COMPLETED.md
 
-### 3. [x] Weekly email digest to Gmail drafts, with test-mode toggle — b5200cb … f312d90 — see COMPLETED.md
+3\. [x] Weekly email digest to Gmail drafts, with test-mode toggle — b5200cb … f312d90 — see COMPLETED.md
 
-### 4. [x] Incremental extraction — skip already-processed Gmail messages — 008051c … 7528267 — see COMPLETED.md
+4\. [x] Incremental extraction — skip already-processed Gmail messages — 008051c … 7528267 — see COMPLETED.md
 
-### 5. [x] Per-event `.ics` export button — 52ebd73 … cc7ac82 — see COMPLETED.md
+5\. [x] Per-event `.ics` export button — 52ebd73 … cc7ac82 — see COMPLETED.md
 
-### 6. [x] Undo recently ignored + 7. "Ignore sender" (bundled) — see COMPLETED.md
+6\. [x] Undo recently ignored + 7. "Ignore sender" (bundled) — see COMPLETED.md
 
-### 8. [x] Bug: "Show ignored (N)" counter doesn't update mid-session — eb0236b — see COMPLETED.md
+8\. [x] Bug: "Show ignored (N)" counter doesn't update mid-session — eb0236b — see COMPLETED.md
 
-### 9. [x] Footer refresh-tempo copy out of date — 756428c / 2640c4b — see COMPLETED.md
+9\. [x] Footer refresh-tempo copy out of date — 756428c / 2640c4b — see COMPLETED.md
 
-### 10. [x] Gmail draft gating: Monday runs only — 65c86f3 — see COMPLETED.md
+10\. [x] Gmail draft gating: Monday runs only — 65c86f3 — see COMPLETED.md
 
-### 11. [x] Card information redesign (supersedes per-kid split) — fe6e272 — see COMPLETED.md
+11\. [x] Card information redesign (supersedes per-kid split) — fe6e272 — see COMPLETED.md
 
-### 12. [x] Per-kid filter chips — f0976f6 (design note) / fd0c264 (roster subtask) / 399d383 (chips) — see COMPLETED.md
+12\. [x] Per-kid filter chips — f0976f6 (design note) / fd0c264 (roster subtask) / 399d383 (chips) — see COMPLETED.md
 
-### 13. [x] "New this week" badges — 5ab4a01 / ac4ae3b / 4cbfc68 — see COMPLETED.md
+13\. [x] "New this week" badges — 5ab4a01 / ac4ae3b / 4cbfc68 — see COMPLETED.md
 
-### 17. [x] Robust handling of multi-event newsletter emails — 2f68501 / 85ae9fa / 89fe4be / bcee931 / 191edaf / 00d0a19 / 3d4bcaa — see COMPLETED.md
+14\. [-] Manual "refresh now" button in the UI — descoped 2026-04-17, see "Descoped / on hold" at bottom
 
-### 20. [x] Freemail-aware sender-block granularity — f855dee / 745957a / d5820c2 / 563354c / bf9fe35 / 8170081 / 03b44c5 / e448a8a — see COMPLETED.md
+15\. [-] Conflict highlighting — descoped 2026-04-17, see "Descoped / on hold" at bottom
 
-### 21. [x] Dedupe candidate messages before agent extraction — 9882a1c / 775f173 / 44283b6 — see COMPLETED.md
+16\. [x] Node 20 → Node 24 action upgrades (before 2026-06-02) — ea081da — see COMPLETED.md
 
-### 22. [x] Bug: page header "N day lookback" ignores `--lookback-days` CLI value — 563827d — see COMPLETED.md
-### 14. [-] Manual "refresh now" button in the UI — descoped 2026-04-17, see "Descoped / on hold" at bottom
+17\. [x] Robust handling of multi-event newsletter emails — 2f68501 / 85ae9fa / 89fe4be / bcee931 / 191edaf / 00d0a19 / 3d4bcaa — see COMPLETED.md
 
-### 15. [-] Conflict highlighting — descoped 2026-04-17, see "Descoped / on hold" at bottom
+18\. [x] Ignore affordance for undated "Needs Verification" cards — 41505aa / aade8aa — see COMPLETED.md
 
-### 16. [x] Node 20 → Node 24 action upgrades (before 2026-06-02) — ea081da — see COMPLETED.md
+19\. [x] Deterministic kid attribution from grade / teacher / activity — eb65f8a (design note) / 2ee6a17 (module + unit tests) / ad145ba (wiring + render tests) — see COMPLETED.md
 
-### 18. [x] Ignore affordance for undated "Needs Verification" cards — 41505aa / aade8aa — see COMPLETED.md
+20\. [x] Freemail-aware sender-block granularity — f855dee / 745957a / d5820c2 / 563354c / bf9fe35 / 8170081 / 03b44c5 / e448a8a — see COMPLETED.md
 
-### 19. [x] Deterministic kid attribution from grade / teacher / activity — eb65f8a (design note) / 2ee6a17 (module + unit tests) / ad145ba (wiring + render tests) — see COMPLETED.md
+21\. [x] Dedupe candidate messages before agent extraction — 9882a1c / 775f173 / 44283b6 — see COMPLETED.md
+
+22\. [x] Bug: page header "N day lookback" ignores `--lookback-days` CLI value — 563827d — see COMPLETED.md
+
+### 23. [ ] Separate test landing page for manual `workflow_dispatch` QA runs
+
+Every workflow run — scheduled cron and manual `workflow_dispatch` alike — currently overwrites `docs/index.html`, the page Ellen uses. Manual runs that exist purely to verify a fix (like the recent #22 live-QA dispatch) put experimental output in front of her until the next cron tick replaces it. The pipeline needs a way to route test builds to a separate path so the production page stays untouched.
+
+Sketch: add a boolean `workflow_dispatch` input — `test_output`, default false — that the workflow forwards to `scripts/process_events.py` (e.g. `--output-target test`). When set, the script writes `docs/test/index.html` instead of `docs/index.html` and the workflow commits only the test path. Production `index.html` is left alone, and the test build is visitable at `/test/` on the same Pages domain. The test page should render a visible banner so a stale tab or bookmark cannot be mistaken for live data.
+
+Design-note questions to resolve before coding:
+
+- Whether `test_output` should also gate adjacent side effects that touch production state — skip Gmail draft creation (item 3), skip incremental-processed-state writes (item 4), skip "new this week" snapshot updates (item 13). A test run that silently marks Gmail messages as "already processed" or stamps "seen" on events would corrupt the next production run, so the working assumption is to fold all of these under one flag, but confirm scope with Tom.
+- Whether to unify this with or supersede the existing digest test-mode flag from item 3, or keep them independent toggles.
+- Whether test-output commits should use a distinct commit-message prefix so the history is easy to skim past during regular review.
 
 ## Descoped / on hold
 
 Items parked here aren't dead — they're off the active queue but preserved in case priorities shift. Revive by moving the full prose back under "Backlog" at the original number and flipping `[-]` → `[ ]`.
 
-### 14. [-] Manual "refresh now" button in the UI
+14\. [-] Manual "refresh now" button in the UI
 
 Descoped 2026-04-17 (session 10). The weekly cron cadence has been sufficient in practice — Tom has not hit a real case of needing a mid-week rebuild since the feature was originally filed, and the threat-model / PAT-rotation overhead no longer looks worth the payoff. Preserving the full scope below in case that changes.
 
@@ -108,7 +121,7 @@ Button in `docs/index.html` that triggers the weekly workflow on demand, so a fr
 
 Threat model accepted: the shared secret is effectively public (embedded in page source on a page with near-zero organic traffic), worst case is a handful of wasted workflow runs. Defense in depth: Apps Script rate-limits to one dispatch per 5 minutes via `PropertiesService`. The workflow's existing `concurrency: {group: pages, cancel-in-progress: false}` already prevents pileups from rapid clicks. PAT rotation: 1-year expiry with a calendar reminder.
 
-### 15. [-] Conflict highlighting
+15\. [-] Conflict highlighting
 
 Descoped 2026-04-17 (session 10). Same-day multi-kid overlaps are visually obvious on the current card layout — the week grouping already co-locates them — and Tom has not seen a missed-conflict incident that would justify the render complexity. Preserving the scope below in case a kid adds a second activity that creates regular overlaps.
 
