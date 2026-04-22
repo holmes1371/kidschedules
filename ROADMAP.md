@@ -21,8 +21,8 @@ Strict rules for writing it:
 **2026-04-22**
 
 - Item 24 (`agent.py` duplicate `AUDIT_SYSTEM_PROMPT`) fixed in 0ba31c9; item left at `[~]` pending Tom's manual verification of the live audit flow.
-- Working through the Test coverage gaps section in risk-tier order. **High-risk tier cleared** — four items done: `gmail_client.py` (d4a7100), `build_queries.load_audit_state` (c7fccad), `weekly-schedule.yml` CREATE_DRAFT cron gate (0eb033b), and `.filter_audit.json` schema parity via `tests/test_filter_audit_parity.py` (6 round-trip tests).
-- Moving on to medium-risk tier.
+- Working through the Test coverage gaps section in risk-tier order. High-risk cleared; medium-risk in progress. `main.py` orchestration covered by new `tests/test_main_orchestration.py` (26 tests); `step1b_filter_audit` + `main()` intentionally deferred to the live cron as integration tests — the underlying helpers are now individually covered.
+- Still open in medium risk: `sync_ignored_senders` _fetch/main, `update_auto_blocklist.main()`, .ics URL/filename parity, state-branch save/restore parity.
 
 ## For future agents
 
@@ -128,7 +128,7 @@ Inventory of where the pytest suite is silent. Not prioritized against the featu
 
 **Medium risk — orchestration and integration coverage**
 
-- `main.py` orchestration functions with no direct test: `_load_webhook_url`, `_load_pages_url`, `run_script`, `step1_build_queries`, `step1b_filter_audit`, `step2_search_gmail`, `_bootstrap_from_future_events`, `step3b_update_auto_blocklist`, `step5_publish`, `step6_create_draft`, `main()`. The existing `test_main.py` covers the wiring smoke for `step2b_read_promising` and the kwarg/bridge plumbing into `step3`/`step4`, but the actual orchestration is exercised end-to-end only by the live weekly cron.
+- [x] `main.py` orchestration functions with no direct test: `_load_webhook_url`, `_load_pages_url`, `run_script`, `step1_build_queries`, `step1b_filter_audit`, `step2_search_gmail`, `_bootstrap_from_future_events`, `step3b_update_auto_blocklist`, `step5_publish`, `step6_create_draft`, `main()`. — covered by `tests/test_main_orchestration.py` (26 tests). `step1b_filter_audit` and `main()` intentionally left to the live weekly-cron integration — both are thin orchestration over helpers that are now individually covered, and the stub surface needed to unit-test them does not pin anything a drift in the real helpers wouldn't already break.
 - `scripts/sync_ignored_senders.py`: `_fetch` (urlopen wrapper) and `main()` CLI are untested; only `normalize_rows` and `write_if_changed` have coverage.
 - `scripts/update_auto_blocklist.main()`: intentionally out of scope per the test docstring, with the live workflow as the integration test. Worth re-evaluating whether that posture still pays — a botched auto-block run mutates a tracked file.
 - `.ics` filename routing on Pages: `build_ics` and `write_ics_files` are unit-tested, but nothing pins the URL shape the rendered HTML expects against what the writer produces. A divergence breaks the per-event `.ics` button silently.
