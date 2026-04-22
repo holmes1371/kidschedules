@@ -22,7 +22,7 @@ Strict rules for writing it:
 
 - Item 24 (`agent.py` duplicate `AUDIT_SYSTEM_PROMPT`) fixed in 0ba31c9; item left at `[~]` pending Tom's manual verification of the live audit flow.
 - Working through the Test coverage gaps section in risk-tier order. High-risk cleared; medium-risk in progress. `main.py` orchestration covered by new `tests/test_main_orchestration.py` (26 tests); `step1b_filter_audit` + `main()` intentionally deferred to the live cron as integration tests — the underlying helpers are now individually covered.
-- Still open in medium risk: `update_auto_blocklist.main()`, .ics URL/filename parity, state-branch save/restore parity.
+- Still open in medium risk: .ics URL/filename parity, state-branch save/restore parity.
 
 ## For future agents
 
@@ -130,7 +130,7 @@ Inventory of where the pytest suite is silent. Not prioritized against the featu
 
 - [x] `main.py` orchestration functions with no direct test: `_load_webhook_url`, `_load_pages_url`, `run_script`, `step1_build_queries`, `step1b_filter_audit`, `step2_search_gmail`, `_bootstrap_from_future_events`, `step3b_update_auto_blocklist`, `step5_publish`, `step6_create_draft`, `main()`. — covered by `tests/test_main_orchestration.py` (26 tests). `step1b_filter_audit` and `main()` intentionally left to the live weekly-cron integration — both are thin orchestration over helpers that are now individually covered, and the stub surface needed to unit-test them does not pin anything a drift in the real helpers wouldn't already break.
 - [x] `scripts/sync_ignored_senders.py`: `_fetch` (urlopen wrapper) and `main()` CLI are untested; only `normalize_rows` and `write_if_changed` have coverage. — covered by `tests/test_sync_ignored_senders.py` (9 new tests: `_fetch` happy path, query-string append for URLs with existing `?`, network error / non-list / non-JSON all return None with stderr breadcrumbs; `main` happy path, fetch-failure graceful degrade preserves cache bytes, no-changes short-circuit, `--timeout` propagation).
-- `scripts/update_auto_blocklist.main()`: intentionally out of scope per the test docstring, with the live workflow as the integration test. Worth re-evaluating whether that posture still pays — a botched auto-block run mutates a tracked file.
+- [x] `scripts/update_auto_blocklist.main()`: intentionally out of scope per the test docstring, with the live workflow as the integration test. Worth re-evaluating whether that posture still pays — a botched auto-block run mutates a tracked file. — re-evaluated and reversed: covered by `tests/test_update_auto_blocklist.py` (13 new `main()` tests, each guardrail branch pinned: missing/malformed/non-list suggestions exit 1; happy-path header+trailer; confidence/address/protected/dedup rejections; non-dict suggestion defense; reason truncation + `#` stripping; stderr summary; optional audit-log). Docstring updated.
 - `.ics` filename routing on Pages: `build_ics` and `write_ics_files` are unit-tested, but nothing pins the URL shape the rendered HTML expects against what the writer produces. A divergence breaks the per-event `.ics` button silently.
 - State-branch save/restore in `weekly-schedule.yml`: persists `events_state.json`, `prior_events.json`, `sender_stats.json`, `.filter_audit.json`, `blocklist_auto.txt`, `blocklist_auto_audit.jsonl`. No test asserts the workflow's checkout/commit blocks reference the same set the scripts read/write.
 
