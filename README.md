@@ -42,6 +42,18 @@ tests/                   — pytest suite covering process_events.py
 design/                  — per-feature design notes
 ```
 
+## Regenerating the Gmail refresh token
+
+The weekly workflow authenticates via a long-lived refresh token stored as the `GMAIL_REFRESH_TOKEN` repo secret. If the token is revoked or the OAuth app is ever reverted from "In production" back to "Testing" in Google Cloud Console, runs will fail with `invalid_grant: Token has been expired or revoked.`
+
+To mint a fresh token:
+
+1. Confirm the OAuth app (Google Cloud Console → APIs & Services → OAuth consent screen) is in **In production** status. Testing-mode apps expire refresh tokens after 7 days.
+2. Place `client_secret.json` at the repo root (download from Google Cloud Console → Credentials → your Desktop OAuth client). Gitignored.
+3. `python scripts/generate_gmail_token.py` — opens a browser, click through consent (including the "unverified app → Advanced → Go to [app name]" warning for the `gmail.modify` scope), copy the refresh token it prints.
+4. GitHub repo → Settings → Secrets and variables → Actions → update `GMAIL_REFRESH_TOKEN`. Paste and save.
+5. Trigger the workflow manually from the Actions tab to confirm.
+
 ## Cost
 
 - **Gmail API**: free
