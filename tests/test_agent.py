@@ -407,3 +407,229 @@ def test_extract_events_accepts_newsletter_senders_kwarg():
     sig = inspect.signature(agent.extract_events)
     assert "newsletter_senders" in sig.parameters
     assert sig.parameters["newsletter_senders"].default is None
+
+
+# ─── _parse_json_response ─────────────────────────────────────────────────
+#
+# The model's JSON output is the boundary between LLM judgment and
+# deterministic Python; this parser is the safety net that turns
+# almost-right text into a usable dict (or None). Each test below pins
+# one tolerated deviation — markdown fences, legacy bare-list shape,
+# trailing commentary, malformed value types — so a future refactor
+# can't silently drop the recovery paths.
+
+def test_parse_json_response_dict_with_events_and_senders():
+    text = '{"events": [{"name": "x"}], "irrelevant_senders": ["spam@ex.com"]}'
+    result = agent._parse_json_response(text)
+    assert result == {
+        "events": [{"name": "x"}],
+        "irrelevant_senders": ["spam@ex.com"],
+    }
+
+
+def test_parse_json_response_strips_markdown_code_fences_with_lang():
+    text = '```json\n{"events": [], "irrelevant_senders": []}\n```'
+    assert agent._parse_json_response(text) == {
+        "events": [],
+        "irrelevant_senders": [],
+    }
+
+
+def test_parse_json_response_strips_bare_code_fences():
+    text = '```\n{"events": [{"name": "x"}], "irrelevant_senders": []}\n```'
+    assert agent._parse_json_response(text) == {
+        "events": [{"name": "x"}],
+        "irrelevant_senders": [],
+    }
+
+
+def test_parse_json_response_legacy_bare_list_treated_as_events_only():
+    text = '[{"name": "x"}, {"name": "y"}]'
+    assert agent._parse_json_response(text) == {
+        "events": [{"name": "x"}, {"name": "y"}],
+        "irrelevant_senders": [],
+    }
+
+
+def test_parse_json_response_recovers_via_raw_decode_with_trailing_garbage(capsys):
+    """raw_decode parses the first valid JSON value and ignores the
+    rest — covers the failure mode where the model emits a valid
+    response followed by chatty commentary."""
+    text = '{"events": [], "irrelevant_senders": []} and then some commentary'
+    result = agent._parse_json_response(text)
+    assert result == {"events": [], "irrelevant_senders": []}
+    out = capsys.readouterr().out
+    assert "raw_decode" in out
+    assert "trailing" in out
+
+
+def test_parse_json_response_unrecoverable_garbage_returns_none(capsys):
+    result = agent._parse_json_response("not json at all { broken")
+    assert result is None
+    assert "PARSE ERROR" in capsys.readouterr().out
+
+
+def test_parse_json_response_events_non_list_coerced_to_empty(capsys):
+    text = '{"events": "not a list", "irrelevant_senders": []}'
+    result = agent._parse_json_response(text)
+    assert result == {"events": [], "irrelevant_senders": []}
+    assert "'events' is not a list" in capsys.readouterr().out
+
+
+def test_parse_json_response_senders_non_list_coerced_to_empty(capsys):
+    text = '{"events": [], "irrelevant_senders": "nope"}'
+    result = agent._parse_json_response(text)
+    assert result == {"events": [], "irrelevant_senders": []}
+    assert "'irrelevant_senders' is not a list" in capsys.readouterr().out
+
+
+def test_parse_json_response_missing_keys_default_to_empty():
+    assert agent._parse_json_response("{}") == {
+        "events": [],
+        "irrelevant_senders": [],
+    }
+
+
+def test_parse_json_response_non_dict_non_list_returns_none(capsys):
+    result = agent._parse_json_response("42")
+    assert result is None
+    assert "not a dict or list" in capsys.readouterr().out
+
+
+# ─── _call_with_retry ─────────────────────────────────────────────────────
+#
+# Wraps client.messages.create with exponential backoff on transient API
+# failures. Tests use a fake client (no network) and patch time.sleep so
+# the suite stays fast. Anthropic's exception classes override __new__
+# with HTTP-fixture requirements we don't have, so we bypass __init__
+# via cls.__new__(cls) + Exception.__init__.
+
+import anthropic  # noqa: E402
+import pytest  # noqa: E402
+
+
+def _make_anthropic_error(cls: type, *, status_code: int | None = None) -> Exception:
+    err = cls.__new__(cls)
+    Exception.__init__(err, f"fake {cls.__name__}")
+    if status_code is not None:
+        err.status_code = status_code
+    return err
+
+
+class _FakeMessages:
+    """Replays a queue of side effects for client.messages.create.
+
+    Each entry is either a return value (yielded as-is) or an Exception
+    instance (raised). Records every call's kwargs for assertions.
+    """
+    def __init__(self, side_effects: list):
+        self.calls: list[dict] = []
+        self._effects = list(side_effects)
+
+    def create(self, **kwargs):
+        self.calls.append(kwargs)
+        effect = self._effects.pop(0)
+        if isinstance(effect, BaseException):
+            raise effect
+        return effect
+
+
+class _FakeClient:
+    def __init__(self, side_effects: list):
+        self.messages = _FakeMessages(side_effects)
+
+
+@pytest.fixture
+def no_sleep(monkeypatch):
+    """Backoff sleeps would make the retry tests take ~30s; stub them out."""
+    monkeypatch.setattr(agent.time, "sleep", lambda _seconds: None)
+
+
+def test_call_with_retry_returns_response_on_first_try(no_sleep):
+    sentinel = object()
+    client = _FakeClient([sentinel])
+    result = agent._call_with_retry(
+        client, model="m", max_tokens=100, user_message="u", batch_label="b",
+    )
+    assert result is sentinel
+    assert len(client.messages.calls) == 1
+
+
+def test_call_with_retry_retries_on_rate_limit_then_succeeds(no_sleep, capsys):
+    sentinel = object()
+    err = _make_anthropic_error(anthropic.RateLimitError)
+    client = _FakeClient([err, sentinel])
+    result = agent._call_with_retry(
+        client, model="m", max_tokens=100, user_message="u", batch_label="batch1",
+    )
+    assert result is sentinel
+    assert len(client.messages.calls) == 2
+    out = capsys.readouterr().out
+    assert "batch1 attempt 1 failed" in out
+    assert "RateLimitError" in out
+
+
+@pytest.mark.parametrize("exc_cls", [
+    anthropic.InternalServerError,
+    anthropic.APIConnectionError,
+    anthropic.APITimeoutError,
+])
+def test_call_with_retry_retries_on_other_transient_errors(no_sleep, exc_cls):
+    sentinel = object()
+    client = _FakeClient([_make_anthropic_error(exc_cls), sentinel])
+    result = agent._call_with_retry(
+        client, model="m", max_tokens=100, user_message="u", batch_label="b",
+    )
+    assert result is sentinel
+    assert len(client.messages.calls) == 2
+
+
+def test_call_with_retry_retries_on_api_status_529_overloaded(no_sleep, capsys):
+    sentinel = object()
+    err = _make_anthropic_error(anthropic.APIStatusError, status_code=529)
+    client = _FakeClient([err, sentinel])
+    result = agent._call_with_retry(
+        client, model="m", max_tokens=100, user_message="u", batch_label="b",
+    )
+    assert result is sentinel
+    assert "overloaded 529" in capsys.readouterr().out
+
+
+def test_call_with_retry_does_not_retry_on_api_status_400(no_sleep):
+    """400 is a client error; retrying would be wrong."""
+    err = _make_anthropic_error(anthropic.APIStatusError, status_code=400)
+    client = _FakeClient([err])
+    with pytest.raises(anthropic.APIStatusError):
+        agent._call_with_retry(
+            client, model="m", max_tokens=100, user_message="u", batch_label="b",
+        )
+    assert len(client.messages.calls) == 1
+
+
+def test_call_with_retry_reraises_after_exhausting_max_retries(no_sleep, capsys):
+    errs = [_make_anthropic_error(anthropic.RateLimitError)
+            for _ in range(agent.MAX_RETRIES)]
+    client = _FakeClient(errs)
+    with pytest.raises(anthropic.RateLimitError):
+        agent._call_with_retry(
+            client, model="m", max_tokens=100, user_message="u", batch_label="b",
+        )
+    assert len(client.messages.calls) == agent.MAX_RETRIES
+    assert "FAILED after" in capsys.readouterr().out
+
+
+def test_call_with_retry_uses_default_extraction_system_prompt(no_sleep):
+    client = _FakeClient([object()])
+    agent._call_with_retry(
+        client, model="m", max_tokens=100, user_message="u", batch_label="b",
+    )
+    assert client.messages.calls[0]["system"] == agent.EXTRACTION_SYSTEM_PROMPT
+
+
+def test_call_with_retry_uses_provided_system_prompt(no_sleep):
+    client = _FakeClient([object()])
+    agent._call_with_retry(
+        client, model="m", max_tokens=100, user_message="u", batch_label="b",
+        system_prompt="custom-prompt",
+    )
+    assert client.messages.calls[0]["system"] == "custom-prompt"
