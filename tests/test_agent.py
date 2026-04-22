@@ -633,3 +633,181 @@ def test_call_with_retry_uses_provided_system_prompt(no_sleep):
         system_prompt="custom-prompt",
     )
     assert client.messages.calls[0]["system"] == "custom-prompt"
+
+
+# ─── extract_events ───────────────────────────────────────────────────────
+#
+# End-to-end tests for the orchestrator that wires _plan_batches →
+# _call_with_retry → _parse_json_response → _filter_events_by_source_id.
+# Each helper has its own unit tests above; these focus on the wiring:
+# what the function returns, when it fires the repair retry, when it
+# skips a batch, how it aggregates across batches.
+#
+# Both the API client (_get_client) and the API call (_call_with_retry)
+# are stubbed via monkeypatch — no network, no API key required. Fake
+# responses use SimpleNamespace to mimic the .content[0].text and
+# .usage.{input,output}_tokens shape that extract_events reads.
+
+from types import SimpleNamespace  # noqa: E402
+
+
+def _make_response(text: str,
+                   input_tokens: int = 100,
+                   output_tokens: int = 50) -> SimpleNamespace:
+    return SimpleNamespace(
+        content=[SimpleNamespace(text=text)],
+        usage=SimpleNamespace(
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
+        ),
+    )
+
+
+def _email(message_id: str,
+           from_: str = "sender@example.com",
+           subject: str = "Subject",
+           body: str = "Body") -> dict:
+    return {
+        "messageId": message_id,
+        "from_": from_,
+        "date_sent": "Mon, 14 Apr 2026 08:00:00 -0400",
+        "subject": subject,
+        "body": body,
+    }
+
+
+@pytest.fixture
+def stub_client(monkeypatch):
+    """Replace _get_client so tests don't need a real ANTHROPIC_API_KEY."""
+    monkeypatch.setattr(agent, "_get_client", lambda: object())
+
+
+def test_extract_events_empty_input_returns_empty_no_api_call(monkeypatch):
+    """Short-circuit before any client setup or API call."""
+    called = []
+    monkeypatch.setattr(agent, "_get_client",
+                        lambda: called.append("client") or object())
+    monkeypatch.setattr(agent, "_call_with_retry",
+                        lambda *a, **k: called.append("call") or None)
+    events, irrelevant = agent.extract_events([])
+    assert events == []
+    assert irrelevant == []
+    assert called == []  # neither was invoked
+
+
+def test_extract_events_happy_path_single_batch(monkeypatch, stub_client):
+    response_text = (
+        '{"events": [{"name": "Concert", "date": "2026-05-01", '
+        '"source_message_id": "m1"}], '
+        '"irrelevant_senders": [{"from": "spam@x.com", "reason": "newsletter"}]}'
+    )
+    monkeypatch.setattr(agent, "_call_with_retry",
+                        lambda *a, **k: _make_response(response_text))
+    events, irrelevant = agent.extract_events([_email("m1")])
+    assert events == [{"name": "Concert", "date": "2026-05-01",
+                       "source_message_id": "m1"}]
+    assert irrelevant == [{"from": "spam@x.com", "reason": "newsletter"}]
+
+
+def test_extract_events_drops_event_with_unknown_source_id(
+    monkeypatch, stub_client, capsys,
+):
+    """End-to-end check that _filter_events_by_source_id is wired in:
+    an event whose source_message_id isn't in the batch is dropped."""
+    response_text = (
+        '{"events": ['
+        '{"name": "Bad", "source_message_id": "ghost"}, '
+        '{"name": "Good", "source_message_id": "m1"}'
+        '], "irrelevant_senders": []}'
+    )
+    monkeypatch.setattr(agent, "_call_with_retry",
+                        lambda *a, **k: _make_response(response_text))
+    events, _ = agent.extract_events([_email("m1")])
+    assert [e["name"] for e in events] == ["Good"]
+
+
+def test_extract_events_repair_succeeds_after_initial_parse_failure(
+    monkeypatch, stub_client, capsys,
+):
+    responses = [
+        _make_response("not json garbage"),
+        _make_response(
+            '{"events": [{"name": "Recovered", "source_message_id": "m1"}], '
+            '"irrelevant_senders": []}'
+        ),
+    ]
+    call_count = [0]
+
+    def fake_call(*args, **kwargs):
+        idx = call_count[0]
+        call_count[0] += 1
+        return responses[idx]
+
+    monkeypatch.setattr(agent, "_call_with_retry", fake_call)
+    events, _ = agent.extract_events([_email("m1")])
+    assert [e["name"] for e in events] == ["Recovered"]
+    assert call_count[0] == 2  # initial + repair
+    assert "Repair succeeded" in capsys.readouterr().out
+
+
+def test_extract_events_repair_also_fails_skips_batch(
+    monkeypatch, stub_client, capsys,
+):
+    """Both calls return unparseable text — skip the batch rather than
+    crashing the run, so other batches can still produce events."""
+    monkeypatch.setattr(agent, "_call_with_retry",
+                        lambda *a, **k: _make_response("still not json"))
+    events, irrelevant = agent.extract_events([_email("m1")])
+    assert events == []
+    assert irrelevant == []
+    assert "SKIPPING" in capsys.readouterr().out
+
+
+def test_extract_events_repair_call_raises_skips_batch(
+    monkeypatch, stub_client, capsys,
+):
+    """If the repair _call_with_retry raises (e.g. exhausts its own
+    retries on a transient error), the surrounding try/except prints
+    and the batch is skipped rather than crashing."""
+    call_count = [0]
+
+    def fake_call(*args, **kwargs):
+        call_count[0] += 1
+        if call_count[0] == 1:
+            return _make_response("not json")
+        raise RuntimeError("repair blew up")
+
+    monkeypatch.setattr(agent, "_call_with_retry", fake_call)
+    events, _ = agent.extract_events([_email("m1")])
+    assert events == []
+    out = capsys.readouterr().out
+    assert "Repair also failed" in out
+    assert "SKIPPING" in out
+
+
+def test_extract_events_aggregates_across_multiple_batches(monkeypatch, stub_client):
+    """BATCH_SIZE+1 emails → 2 batches; results from each must end up
+    in the aggregated output."""
+    responses = [
+        _make_response(
+            '{"events": [{"name": "A", "source_message_id": "m1"}], '
+            '"irrelevant_senders": [{"from": "x@x.com", "reason": "ad"}]}'
+        ),
+        _make_response(
+            f'{{"events": [{{"name": "B", "source_message_id": '
+            f'"m{agent.BATCH_SIZE + 1}"}}], "irrelevant_senders": []}}'
+        ),
+    ]
+    call_count = [0]
+
+    def fake_call(*args, **kwargs):
+        idx = call_count[0]
+        call_count[0] += 1
+        return responses[idx]
+
+    monkeypatch.setattr(agent, "_call_with_retry", fake_call)
+    emails = [_email(f"m{i}") for i in range(1, agent.BATCH_SIZE + 2)]
+    events, irrelevant = agent.extract_events(emails)
+    assert sorted(e["name"] for e in events) == ["A", "B"]
+    assert irrelevant == [{"from": "x@x.com", "reason": "ad"}]
+    assert call_count[0] == 2
