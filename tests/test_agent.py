@@ -811,3 +811,156 @@ def test_extract_events_aggregates_across_multiple_batches(monkeypatch, stub_cli
     assert sorted(e["name"] for e in events) == ["A", "B"]
     assert irrelevant == [{"from": "x@x.com", "reason": "ad"}]
     assert call_count[0] == 2
+
+
+# ─── review_stripped_messages ─────────────────────────────────────────────
+#
+# Audits messages that the blocklist filter removed, asking the model
+# whether any look like real kid-related mail that was over-filtered.
+# Tolerant return contract: any failure mode (empty input, exception,
+# parse error, non-dict response) returns
+# {"decisions": [], "senders_to_unblock": []} so the surrounding
+# pipeline can treat the result uniformly.
+
+def _diff_report(stripped_by_cat: dict[str, list[dict]]) -> dict:
+    """Build the diff_report shape that review_stripped_messages reads."""
+    return {
+        "categories": {
+            cat: {"stripped_messages": msgs}
+            for cat, msgs in stripped_by_cat.items()
+        }
+    }
+
+
+def _stripped(from_: str = "spam@x.com", subject: str = "S") -> dict:
+    return {"from": from_, "subject": subject, "date": "2026-04-14",
+            "snippet": "snippet"}
+
+
+def test_review_stripped_messages_empty_categories_returns_empty_no_api_call(
+    monkeypatch, capsys,
+):
+    called = []
+    monkeypatch.setattr(agent, "_get_client",
+                        lambda: called.append("client") or object())
+    monkeypatch.setattr(agent, "_call_with_retry",
+                        lambda *a, **k: called.append("call") or None)
+    result = agent.review_stripped_messages({"categories": {}})
+    assert result == {"decisions": [], "senders_to_unblock": []}
+    assert called == []
+    assert "No stripped messages" in capsys.readouterr().out
+
+
+def test_review_stripped_messages_empty_stripped_lists_returns_empty(monkeypatch):
+    """Categories present but all empty → still no work to do."""
+    called = []
+    monkeypatch.setattr(agent, "_get_client",
+                        lambda: called.append("client") or object())
+    monkeypatch.setattr(agent, "_call_with_retry",
+                        lambda *a, **k: called.append("call") or None)
+    report = _diff_report({"school": [], "sports": []})
+    assert agent.review_stripped_messages(report) == {
+        "decisions": [], "senders_to_unblock": [],
+    }
+    assert called == []
+
+
+def test_review_stripped_messages_happy_path_returns_parsed_dict(
+    monkeypatch, stub_client,
+):
+    response_text = (
+        '{"decisions": [{"from": "spam@x.com", "verdict": "leave"}], '
+        '"senders_to_unblock": ["maybe@y.com"]}'
+    )
+    monkeypatch.setattr(agent, "_call_with_retry",
+                        lambda *a, **k: _make_response(response_text))
+    report = _diff_report({"school": [_stripped()]})
+    result = agent.review_stripped_messages(report)
+    assert result["decisions"] == [{"from": "spam@x.com", "verdict": "leave"}]
+    assert result["senders_to_unblock"] == ["maybe@y.com"]
+
+
+def test_review_stripped_messages_strips_markdown_code_fences(
+    monkeypatch, stub_client,
+):
+    response_text = (
+        '```json\n{"decisions": [], "senders_to_unblock": ["x@y.com"]}\n```'
+    )
+    monkeypatch.setattr(agent, "_call_with_retry",
+                        lambda *a, **k: _make_response(response_text))
+    report = _diff_report({"school": [_stripped()]})
+    assert agent.review_stripped_messages(report) == {
+        "decisions": [], "senders_to_unblock": ["x@y.com"],
+    }
+
+
+def test_review_stripped_messages_uses_audit_system_prompt(
+    monkeypatch, stub_client,
+):
+    """The audit pass uses a different system prompt than extraction.
+    Captured kwargs prove the audit prompt is what gets sent."""
+    captured = {}
+
+    def fake_call(*args, **kwargs):
+        captured.update(kwargs)
+        return _make_response('{"decisions": [], "senders_to_unblock": []}')
+
+    monkeypatch.setattr(agent, "_call_with_retry", fake_call)
+    report = _diff_report({"school": [_stripped()]})
+    agent.review_stripped_messages(report)
+    assert captured.get("system_prompt") == agent.AUDIT_SYSTEM_PROMPT
+
+
+def test_review_stripped_messages_parse_error_returns_empty(
+    monkeypatch, stub_client, capsys,
+):
+    monkeypatch.setattr(agent, "_call_with_retry",
+                        lambda *a, **k: _make_response("not valid json"))
+    report = _diff_report({"school": [_stripped()]})
+    assert agent.review_stripped_messages(report) == {
+        "decisions": [], "senders_to_unblock": [],
+    }
+    assert "Audit parse error" in capsys.readouterr().out
+
+
+def test_review_stripped_messages_call_exception_returns_empty(
+    monkeypatch, stub_client, capsys,
+):
+    """If _call_with_retry exhausts its retries and raises, the audit
+    must degrade gracefully — the weekly run should not fail just
+    because the audit step couldn't reach the API."""
+    def boom(*args, **kwargs):
+        raise RuntimeError("API down")
+
+    monkeypatch.setattr(agent, "_call_with_retry", boom)
+    report = _diff_report({"school": [_stripped()]})
+    assert agent.review_stripped_messages(report) == {
+        "decisions": [], "senders_to_unblock": [],
+    }
+    assert "Audit review failed" in capsys.readouterr().out
+
+
+def test_review_stripped_messages_non_dict_response_returns_empty(
+    monkeypatch, stub_client, capsys,
+):
+    """Model returns a JSON list instead of an object — degrade to
+    empty rather than hand a wrong-shaped result downstream."""
+    monkeypatch.setattr(agent, "_call_with_retry",
+                        lambda *a, **k: _make_response('["a", "b"]'))
+    report = _diff_report({"school": [_stripped()]})
+    assert agent.review_stripped_messages(report) == {
+        "decisions": [], "senders_to_unblock": [],
+    }
+    assert "unexpected shape" in capsys.readouterr().out
+
+
+def test_review_stripped_messages_missing_keys_default_to_empty(
+    monkeypatch, stub_client,
+):
+    """A dict response missing one or both keys gets them defaulted to []."""
+    monkeypatch.setattr(agent, "_call_with_retry",
+                        lambda *a, **k: _make_response('{}'))
+    report = _diff_report({"school": [_stripped()]})
+    assert agent.review_stripped_messages(report) == {
+        "decisions": [], "senders_to_unblock": [],
+    }
