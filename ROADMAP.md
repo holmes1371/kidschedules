@@ -20,9 +20,9 @@ Strict rules for writing it:
 
 **2026-04-22**
 
-- Item 24 (`agent.py` duplicate `AUDIT_SYSTEM_PROMPT`) fixed in 0ba31c9: deleted the dead first block (old lines 209–239, `keep_filtered` variant). The live second block (`keep_blocked` variant, already the last-assignment winner) is unchanged, so no behavior change; `test_agent.py` still 66/66 including the existing `test_review_stripped_messages_uses_audit_system_prompt` identity pin — no new unit test needed.
-- Item 24 left at `[~]` pending Tom's manual verification of the live audit flow.
-- Test coverage gaps section (filed earlier today): pull opportunistically; no slot in the priority queue.
+- Item 24 (`agent.py` duplicate `AUDIT_SYSTEM_PROMPT`) fixed in 0ba31c9; item left at `[~]` pending Tom's manual verification of the live audit flow.
+- Working through the Test coverage gaps section in risk-tier order. High-risk first item cleared: `gmail_client.py` now has full coverage of `_get_credentials` (three branches) and the four API wrappers — see `tests/test_gmail_client.py` (21 tests passing). Section bullet flipped to `[x]`.
+- Still open in high risk: `build_queries.load_audit_state`, the `weekly-schedule.yml` CREATE_DRAFT cron-string parity, and `.filter_audit.json` schema parity.
 
 ## For future agents
 
@@ -121,7 +121,7 @@ Inventory of where the pytest suite is silent. Not prioritized against the featu
 
 **High risk — silent failure would corrupt production state or block the weekly run**
 
-- `gmail_client.py`: only `_extract_body` is tested; `_get_credentials`, `search_messages`, `read_message`, `create_draft` (incl. the `text_alternative` multipart branch) and `get_profile` have zero coverage. A regression here breaks the entire pipeline at the fetch boundary with no unit-test signal.
+- [x] `gmail_client.py`: only `_extract_body` is tested; `_get_credentials`, `search_messages`, `read_message`, `create_draft` (incl. the `text_alternative` multipart branch) and `get_profile` have zero coverage. A regression here breaks the entire pipeline at the fetch boundary with no unit-test signal. — covered by `tests/test_gmail_client.py` (_get_credentials three-branch coverage via monkeypatched `Credentials`/`Request`; API wrappers via a chainable stub service).
 - `scripts/build_queries.load_audit_state`: untested. Date math, threshold defaulting, and tolerance for malformed `.filter_audit.json` all gate whether step1b runs — a bug here either triggers spurious audits or silently skips them.
 - `.github/workflows/weekly-schedule.yml` CREATE_DRAFT gate: the `github.event.schedule == '15 10 * * 1'` string match is paired with the cron line `15 10 * * 1` in the same file; a typo on either side silently disables the Monday digest with no test catching it. Pin via a workflow-parsing test that asserts the cron string the workflow runs on matches the cron string the gate checks.
 - `.filter_audit.json` schema parity: `scripts/mark_filter_audit.py` writes the file and `scripts/build_queries.load_audit_state` reads it, with no shared schema and no parity test. A divergence (renamed key, type drift) breaks the audit cadence silently.
