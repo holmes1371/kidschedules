@@ -1,5 +1,5 @@
 {
-  "last_updated_iso": "2026-04-20T07:41:20-04:00",
+  "last_updated_iso": "2026-04-22T08:44:22-04:00",
   "schema_version": 1,
   "senders": {
     "23andmedatasettlement@e.emailksa.com": {
@@ -15,12 +15,13 @@
     "advanced_pediatrics.sr@remindmemd.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-04-17T17:04:04-04:00",
-      "messages_seen": 1,
+      "last_seen_iso": "2026-04-22T08:44:22-04:00",
+      "messages_seen": 2,
       "per_message_counts": [
-        0
+        0,
+        1
       ],
-      "total_events": 0
+      "total_events": 1
     },
     "alle@info.alle.com": {
       "first_seen_iso": "2026-04-17T18:51:22-04:00",
@@ -43,6 +44,16 @@
         0
       ],
       "total_events": 12
+    },
+    "bca22181@gmail.com": {
+      "first_seen_iso": "2026-04-22T08:44:22-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-04-22T08:44:22-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
     },
     "bdakpinar@fcps.edu": {
       "first_seen_iso": "2026-04-17T17:12:56-04:00",
@@ -240,6 +251,16 @@
       ],
       "total_events": 0
     },
+    "jobalerts@yourmembership.com": {
+      "first_seen_iso": "2026-04-22T08:44:22-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-04-22T08:44:22-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
     "lifetouch@m.lifetouch.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
@@ -399,8 +420,8 @@
     "noreply@jackrabbittech.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-04-18T07:00:01-04:00",
-      "messages_seen": 7,
+      "last_seen_iso": "2026-04-22T08:44:22-04:00",
+      "messages_seen": 8,
       "per_message_counts": [
         1,
         1,
@@ -408,9 +429,10 @@
         0,
         0,
         1,
-        0
+        0,
+        2
       ],
-      "total_events": 3
+      "total_events": 5
     },
     "noreply@opera.upscalebychoice.com": {
       "first_seen_iso": "2026-04-17T17:12:56-04:00",
@@ -498,15 +520,16 @@
     "sunbeam@louisearcherpta.org": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": true,
-      "last_seen_iso": "2026-04-17T17:12:56-04:00",
-      "messages_seen": 4,
+      "last_seen_iso": "2026-04-22T08:44:22-04:00",
+      "messages_seen": 5,
       "per_message_counts": [
         13,
         19,
         11,
-        11
+        11,
+        22
       ],
-      "total_events": 54
+      "total_events": 76
     },
     "support0@info.myloancare.com": {
       "first_seen_iso": "2026-04-17T17:12:56-04:00",
@@ -549,6 +572,16 @@
         5
       ],
       "total_events": 24
+    },
+    "swimteam@hmsrc.org": {
+      "first_seen_iso": "2026-04-22T08:44:22-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-04-22T08:44:22-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        1
+      ],
+      "total_events": 1
     },
     "team@email.rocketlawyer.com": {
       "first_seen_iso": "2026-04-17T17:12:56-04:00",

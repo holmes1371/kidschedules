@@ -89,3 +89,5 @@ no-reply@edsemail.com  # auto 2026-04-17: Utility/billing notification (Evergree
 donate@email.obama.org  # auto 2026-04-17: Adult political fundraising/advocacy email from Obama Foundation, no kids' conte
 dccc@ak.dccc.org  # auto 2026-04-17: Adult political fundraising email from DCCC, no kids' content
 scheduler@goodtime.io  # auto 2026-04-18: Adult job interview scheduling for Ellen at Salesforce — entirely work-related,
+jobalerts@yourmembership.com  # auto 2026-04-22: legal career/job alert newsletter — entirely adult professional content, no kids
+bca22181@gmail.com  # auto 2026-04-22: neighborhood adult social happy hour event — no children's activities or school
