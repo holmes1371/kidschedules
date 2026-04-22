@@ -18,10 +18,10 @@ Strict rules for writing it:
 4. **No cross-session carry-overs.** If something is still broken session-to-session, file it as a numbered ROADMAP item instead of repeating it here.
 5. **Replace in place.** Do not append a new block and archive the old one below.
 
-**2026-04-18 (session 12)**
+**2026-04-22**
 
-- ROADMAP formatting pass: completed/descoped items un-bolded (stripped `###`, used `N\.` to keep the original numbers rendering), backlog re-sorted to strict numerical order. Only upcoming `[ ]`/`[~]` items render as bold headers now.
-- Filed #23 — separate test landing page for manual `workflow_dispatch` QA runs. `[ ]` not started; design note still pending. Open questions in the item body cover whether the toggle should also gate production-state side effects (items 3, 4, 13).
+- Test-case review of the existing pytest suite. Filed #24 (agent.py duplicate `AUDIT_SYSTEM_PROMPT` — confirmed bug, dead first definition shadowed by a substantively different second one) and a new "Test coverage gaps" section between Backlog and Descoped, organized by risk tier.
+- High-risk gaps: `gmail_client.py` (5 of 6 functions untested), `build_queries.load_audit_state`, the `weekly-schedule.yml` CREATE_DRAFT cron-string gate, `.filter_audit.json` schema parity. Pull from the section opportunistically — not slotted into the priority queue.
 - Nothing else in flight.
 
 ## For future agents
@@ -108,6 +108,38 @@ Design-note questions to resolve before coding:
 - Whether `test_output` should also gate adjacent side effects that touch production state — skip Gmail draft creation (item 3), skip incremental-processed-state writes (item 4), skip "new this week" snapshot updates (item 13). A test run that silently marks Gmail messages as "already processed" or stamps "seen" on events would corrupt the next production run, so the working assumption is to fold all of these under one flag, but confirm scope with Tom.
 - Whether to unify this with or supersede the existing digest test-mode flag from item 3, or keep them independent toggles.
 - Whether test-output commits should use a distinct commit-message prefix so the history is easy to skim past during regular review.
+
+### 24. [ ] Bug: `agent.py` defines `AUDIT_SYSTEM_PROMPT` twice
+
+`scripts/agent.py` declares `AUDIT_SYSTEM_PROMPT` at lines 209–239 and again at lines 242–275 with substantively different content — different verdict labels (`keep_filtered` vs `keep_blocked`), different system instructions. Python's last-assignment-wins rule means the second definition is the live one and the first is dead, but both are reachable to a reader and a well-meaning future edit to "the prompt" could land on the wrong copy. Fix: delete the dead first block; verify the live audit flow's behavior is unchanged via the existing `step1b_filter_audit` integration (or pin it with a unit test if one doesn't exist).
+
+## Test coverage gaps
+
+Inventory of where the pytest suite is silent. Not prioritized against the feature backlog above — pull from this when there is slack between feature work, or when a regression in one of these areas would be costly enough to pre-empt. Risk tiers reflect blast radius if the untested code silently breaks, not implementation difficulty. Filed 2026-04-22 from a full source/test survey; revisit and prune as items get covered.
+
+**High risk — silent failure would corrupt production state or block the weekly run**
+
+- `gmail_client.py`: only `_extract_body` is tested; `_get_credentials`, `search_messages`, `read_message`, `create_draft` (incl. the `text_alternative` multipart branch) and `get_profile` have zero coverage. A regression here breaks the entire pipeline at the fetch boundary with no unit-test signal.
+- `scripts/build_queries.load_audit_state`: untested. Date math, threshold defaulting, and tolerance for malformed `.filter_audit.json` all gate whether step1b runs — a bug here either triggers spurious audits or silently skips them.
+- `.github/workflows/weekly-schedule.yml` CREATE_DRAFT gate: the `github.event.schedule == '15 10 * * 1'` string match is paired with the cron line `15 10 * * 1` in the same file; a typo on either side silently disables the Monday digest with no test catching it. Pin via a workflow-parsing test that asserts the cron string the workflow runs on matches the cron string the gate checks.
+- `.filter_audit.json` schema parity: `scripts/mark_filter_audit.py` writes the file and `scripts/build_queries.load_audit_state` reads it, with no shared schema and no parity test. A divergence (renamed key, type drift) breaks the audit cadence silently.
+
+**Medium risk — orchestration and integration coverage**
+
+- `main.py` orchestration functions with no direct test: `_load_webhook_url`, `_load_pages_url`, `run_script`, `step1_build_queries`, `step1b_filter_audit`, `step2_search_gmail`, `_bootstrap_from_future_events`, `step3b_update_auto_blocklist`, `step5_publish`, `step6_create_draft`, `main()`. The existing `test_main.py` covers the wiring smoke for `step2b_read_promising` and the kwarg/bridge plumbing into `step3`/`step4`, but the actual orchestration is exercised end-to-end only by the live weekly cron.
+- `scripts/sync_ignored_senders.py`: `_fetch` (urlopen wrapper) and `main()` CLI are untested; only `normalize_rows` and `write_if_changed` have coverage.
+- `scripts/update_auto_blocklist.main()`: intentionally out of scope per the test docstring, with the live workflow as the integration test. Worth re-evaluating whether that posture still pays — a botched auto-block run mutates a tracked file.
+- `.ics` filename routing on Pages: `build_ics` and `write_ics_files` are unit-tested, but nothing pins the URL shape the rendered HTML expects against what the writer produces. A divergence breaks the per-event `.ics` button silently.
+- State-branch save/restore in `weekly-schedule.yml`: persists `events_state.json`, `prior_events.json`, `sender_stats.json`, `.filter_audit.json`, `blocklist_auto.txt`, `blocklist_auto_audit.jsonl`. No test asserts the workflow's checkout/commit blocks reference the same set the scripts read/write.
+
+**Low risk — thin scripts or intentional skips**
+
+- `scripts/diff_search_results.py`: pure CLI diff utility for filter audit. Tolerance of the `_messages` shape and totals math could regress quietly.
+- `scripts/dev_render.py`: thin subprocess wrapper around `process_events.py`; low payoff.
+- `scripts/generate_gmail_token.py`: interactive OAuth flow; intentional skip.
+- `scripts/apps_script.gs`: Google Apps Script, cannot be unit-tested in pytest; intentional.
+
+How to use this list: when picking a target, prefer the high-risk items (each is a credible regression source on a path that runs unattended every week), followed by the schema-parity and workflow-gate items in medium. The orchestration coverage in `main.py` is the largest in raw line count but lower in marginal value — most of the underlying work is already tested through `process_events.py` and the helpers; the orchestration is mostly glue.
 
 ## Descoped / on hold
 
