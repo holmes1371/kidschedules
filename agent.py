@@ -207,39 +207,6 @@ EXTRACTION_SYSTEM_PROMPT = _EXTRACTION_BASE_PROMPT + "\n" + _load_roster_prose()
 
 
 AUDIT_SYSTEM_PROMPT = """\
-You are reviewing emails that a blocklist filter removed from a kids'
-schedule search. Your job is to decide whether any of these stripped
-messages contain legitimate kids' events that the filter incorrectly hid.
-
-You will receive a list of stripped messages with their sender, subject,
-date, and snippet. For each one, classify it as either:
-- "keep_filtered": correctly blocked (marketing, news, adult content, etc.)
-- "unblock": this looks like it could contain a real kids' event and
-  the sender should be removed from the blocklist
-
-Output a JSON object:
-{
-  "decisions": [
-    {"messageId": "...", "subject": "...", "from": "...", "verdict": "keep_filtered" or "unblock", "reason": "brief explanation"}
-  ],
-  "senders_to_unblock": ["domain1.com", "addr@domain2.com"]
-}
-
-The "senders_to_unblock" list should contain the sender domains or
-addresses that should be REMOVED from the blocklist because they send
-legitimate kids' content. Only include senders where you are reasonably
-confident the filter is hiding real events.
-
-NEVER recommend unblocking these (they are known kids-event senders
-already in the safe list): fcps.edu, any *pta.org, jackrabbittech.com,
-teamsnap.com, signupgenius.com, myschoolbucks.com, lifetouch.com,
-or real medical provider domains.
-
-Output ONLY the JSON object, no other text.
-"""
-
-
-AUDIT_SYSTEM_PROMPT = """\
 You are auditing a blocklist used to filter email senders out of a kids'
 schedule pipeline. The family has children at Louise Archer Elementary
 (LAES / FCPS), HTM Sharks swim, Cuppett Performing Arts dance, and other

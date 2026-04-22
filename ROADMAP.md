@@ -20,9 +20,9 @@ Strict rules for writing it:
 
 **2026-04-22**
 
-- Test-case review of the existing pytest suite. Filed #24 (agent.py duplicate `AUDIT_SYSTEM_PROMPT` — confirmed bug, dead first definition shadowed by a substantively different second one) and a new "Test coverage gaps" section between Backlog and Descoped, organized by risk tier.
-- High-risk gaps: `gmail_client.py` (5 of 6 functions untested), `build_queries.load_audit_state`, the `weekly-schedule.yml` CREATE_DRAFT cron-string gate, `.filter_audit.json` schema parity. Pull from the section opportunistically — not slotted into the priority queue.
-- Nothing else in flight.
+- Item 24 (`agent.py` duplicate `AUDIT_SYSTEM_PROMPT`) fixed: deleted the dead first block (old lines 209–239, `keep_filtered` variant). The live second block (`keep_blocked` variant, already the last-assignment winner) is unchanged, so no behavior change; `test_agent.py` still 66/66 including the existing `test_review_stripped_messages_uses_audit_system_prompt` identity pin — no new unit test needed.
+- Item 24 left at `[~]` pending Tom's manual verification of the live audit flow. SHA to be recorded on the flip-to-`[x]` pass.
+- Test coverage gaps section (filed earlier today): pull opportunistically; no slot in the priority queue.
 
 ## For future agents
 
@@ -109,9 +109,11 @@ Design-note questions to resolve before coding:
 - Whether to unify this with or supersede the existing digest test-mode flag from item 3, or keep them independent toggles.
 - Whether test-output commits should use a distinct commit-message prefix so the history is easy to skim past during regular review.
 
-### 24. [ ] Bug: `agent.py` defines `AUDIT_SYSTEM_PROMPT` twice
+### 24. [~] Bug: `agent.py` defines `AUDIT_SYSTEM_PROMPT` twice
 
 `scripts/agent.py` declares `AUDIT_SYSTEM_PROMPT` at lines 209–239 and again at lines 242–275 with substantively different content — different verdict labels (`keep_filtered` vs `keep_blocked`), different system instructions. Python's last-assignment-wins rule means the second definition is the live one and the first is dead, but both are reachable to a reader and a well-meaning future edit to "the prompt" could land on the wrong copy. Fix: delete the dead first block; verify the live audit flow's behavior is unchanged via the existing `step1b_filter_audit` integration (or pin it with a unit test if one doesn't exist).
+
+In progress: dead first block deleted from `agent.py`; the live `keep_blocked` prompt is now the only definition. No behavior change (Python was already using the second block). `tests/test_agent.py` 66/66, including the existing `test_review_stripped_messages_uses_audit_system_prompt` identity pin that locks the prompt to the import — treating that as sufficient coverage rather than adding a redundant unit test. Pending Tom's manual verification of the live audit flow before flip to `[x]`; SHA to be recorded then.
 
 ## Test coverage gaps
 
