@@ -21,8 +21,8 @@ Strict rules for writing it:
 **2026-04-22**
 
 - Item 24 (`agent.py` duplicate `AUDIT_SYSTEM_PROMPT`) fixed in 0ba31c9; item left at `[~]` pending Tom's manual verification of the live audit flow.
-- Working through the Test coverage gaps section in risk-tier order. Two high-risk items cleared so far: `gmail_client.py` (d4a7100 — 21 tests) and `build_queries.load_audit_state` (17 tests in test_build_queries.py, 9 new).
-- Still open in high risk: `weekly-schedule.yml` CREATE_DRAFT cron-string parity, `.filter_audit.json` schema parity.
+- Working through the Test coverage gaps section in risk-tier order. Three high-risk items cleared: `gmail_client.py` (d4a7100), `build_queries.load_audit_state` (c7fccad), and `weekly-schedule.yml` CREATE_DRAFT cron-string parity (new `tests/test_workflow_cron_gate.py`, 5 tests; text-regex parser, no PyYAML dep added).
+- Still open in high risk: `.filter_audit.json` schema parity between `mark_filter_audit.py` writer and `build_queries.load_audit_state` reader.
 
 ## For future agents
 
@@ -123,7 +123,7 @@ Inventory of where the pytest suite is silent. Not prioritized against the featu
 
 - [x] `gmail_client.py`: only `_extract_body` is tested; `_get_credentials`, `search_messages`, `read_message`, `create_draft` (incl. the `text_alternative` multipart branch) and `get_profile` have zero coverage. A regression here breaks the entire pipeline at the fetch boundary with no unit-test signal. — covered by `tests/test_gmail_client.py` (_get_credentials three-branch coverage via monkeypatched `Credentials`/`Request`; API wrappers via a chainable stub service).
 - [x] `scripts/build_queries.load_audit_state`: untested. Date math, threshold defaulting, and tolerance for malformed `.filter_audit.json` all gate whether step1b runs — a bug here either triggers spurious audits or silently skips them. — covered by `tests/test_build_queries.py` (9 new tests: missing-file, malformed-JSON, missing-field, invalid-ISO, fresh/at-threshold/past-threshold, custom threshold, default threshold).
-- `.github/workflows/weekly-schedule.yml` CREATE_DRAFT gate: the `github.event.schedule == '15 10 * * 1'` string match is paired with the cron line `15 10 * * 1` in the same file; a typo on either side silently disables the Monday digest with no test catching it. Pin via a workflow-parsing test that asserts the cron string the workflow runs on matches the cron string the gate checks.
+- [x] `.github/workflows/weekly-schedule.yml` CREATE_DRAFT gate: the `github.event.schedule == '15 10 * * 1'` string match is paired with the cron line `15 10 * * 1` in the same file; a typo on either side silently disables the Monday digest with no test catching it. Pin via a workflow-parsing test that asserts the cron string the workflow runs on matches the cron string the gate checks. — covered by `tests/test_workflow_cron_gate.py` (parses the YAML as text with regex to avoid a PyYAML dep; pins Monday-cron ⇆ gate literal, gate uniqueness, and the gate ≠ Wed/Sat cron).
 - `.filter_audit.json` schema parity: `scripts/mark_filter_audit.py` writes the file and `scripts/build_queries.load_audit_state` reads it, with no shared schema and no parity test. A divergence (renamed key, type drift) breaks the audit cadence silently.
 
 **Medium risk — orchestration and integration coverage**
