@@ -176,7 +176,7 @@ class _FrozenDate(dt.date):
 
 def _run_main(monkeypatch, tmp_path, suggestions, *, main_block=None,
               auto_block_existing=None, audit_log=True,
-              protected_patterns=None):
+              protected_patterns=None, sender_stats=None):
     sug_path = tmp_path / "suggestions.json"
     sug_path.write_text(json.dumps(suggestions), encoding="utf-8")
 
@@ -195,6 +195,21 @@ def _run_main(monkeypatch, tmp_path, suggestions, *, main_block=None,
         "\n".join(protected_patterns or []) + ("\n" if protected_patterns else "")
     )
 
+    # Sender-stats sidecar (#27 v1). None = empty stats (gate falls
+    # through for every suggestion); a dict overrides — typically with a
+    # `senders: {addr: {messages_seen, total_events, ...}}` shape that
+    # newsletter_stats.load_stats accepts. Always written to a tmp file
+    # and routed through --sender-stats so existing tests are
+    # deterministic against the project's real sender_stats.json (which
+    # only exists on the state branch in production).
+    stats_path = tmp_path / "sender_stats.json"
+    stats_payload = sender_stats if sender_stats is not None else {
+        "schema_version": 1,
+        "last_updated_iso": "",
+        "senders": {},
+    }
+    stats_path.write_text(json.dumps(stats_payload), encoding="utf-8")
+
     audit_path = tmp_path / "audit.jsonl" if audit_log else None
 
     monkeypatch.setattr(uab.dt, "date", _FrozenDate)
@@ -205,6 +220,7 @@ def _run_main(monkeypatch, tmp_path, suggestions, *, main_block=None,
         "--auto-blocklist", str(auto_path),
         "--main-blocklist", str(main_path),
         "--protected-senders", str(protected_path),
+        "--sender-stats", str(stats_path),
     ]
     if audit_path is not None:
         argv += ["--audit-log", str(audit_path)]
@@ -508,3 +524,123 @@ def test_main_audit_log_optional(monkeypatch, tmp_path):
     assert rc == 0
     assert auto_path.exists()
     assert audit_path is None
+
+
+# ─── #27 v1 — sender-stats reject gate ────────────────────────────────────
+#
+# A high-confidence flag for a sender that has historically produced
+# kid events must be rejected even when every other gate would pass it.
+# The gate keys on the lowercased mailbox (matches `agent._sender_key`
+# and the `newsletter_stats.update_sender_counts` write key). Empty
+# stats / unknown sender / below-threshold all fall through.
+
+
+def test_main_rejects_when_sender_stats_show_useful_sender(monkeypatch, tmp_path):
+    """`messages_seen >= 3 AND total_events >= 1` → reject.
+
+    The Ellen-incident shape (#26) was a one-shot agent misjudgment on
+    a sender that legitimately produces kid events. With sender-stats
+    integrated, any sender at-or-above the usefulness threshold is
+    refused regardless of how confident the agent is on a single
+    email. Audit log carries `useful sender (...)` as the reason."""
+    rc, _stdout, _err, auto_path, audit_path = _run_main(
+        monkeypatch, tmp_path,
+        [{"from": "newsletter@school.edu", "reason": "no kid events this issue",
+          "confidence": "high"}],
+        sender_stats={
+            "schema_version": 1,
+            "last_updated_iso": "2026-04-25T00:00:00",
+            "senders": {
+                "newsletter@school.edu": {
+                    "messages_seen": 5,
+                    "total_events": 8,
+                    "per_message_counts": [1, 2, 1, 3, 1],
+                    "first_seen_iso": "2026-01-01",
+                    "last_seen_iso": "2026-04-20",
+                    "is_newsletter": True,
+                },
+            },
+        },
+    )
+    assert rc == 0
+    assert not auto_path.exists()
+    entry = json.loads(audit_path.read_text().strip())
+    assert entry["added"] == []
+    assert len(entry["rejected"]) == 1
+    why = entry["rejected"][0]["why"]
+    assert why.startswith("useful sender")
+    # Counts surface in the rejection so the audit log is grep-friendly.
+    assert "8" in why and "5" in why
+
+
+def test_main_does_not_reject_when_sender_stats_below_message_threshold(
+    monkeypatch, tmp_path,
+):
+    """Below `messages_seen >= 3` → fall through; suggestion is added.
+
+    A sender with one or two observed messages doesn't yet have a
+    track record long enough to override the agent's call. N-strikes
+    (a later commit) is the corroboration mechanism for this case;
+    sender-stats is for senders with established history."""
+    rc, _stdout, _err, auto_path, audit_path = _run_main(
+        monkeypatch, tmp_path,
+        [{"from": "newsletter@school.edu", "reason": "no kid events",
+          "confidence": "high"}],
+        sender_stats={
+            "schema_version": 1,
+            "last_updated_iso": "2026-04-25T00:00:00",
+            "senders": {
+                "newsletter@school.edu": {
+                    "messages_seen": 2,
+                    "total_events": 5,
+                    "per_message_counts": [3, 2],
+                    "first_seen_iso": "2026-04-10",
+                    "last_seen_iso": "2026-04-20",
+                    "is_newsletter": False,
+                },
+            },
+        },
+    )
+    assert rc == 0
+    assert auto_path.exists()
+    assert "newsletter@school.edu" in auto_path.read_text()
+    entry = json.loads(audit_path.read_text().strip())
+    assert len(entry["added"]) == 1
+    assert entry["rejected"] == []
+
+
+def test_main_does_not_reject_when_sender_stats_total_events_zero(
+    monkeypatch, tmp_path,
+):
+    """`total_events == 0` → fall through; suggestion is added.
+
+    A sender with three observed messages but zero extracted kid events
+    looks exactly like the noisy sender we want to block. Don't let a
+    high `messages_seen` count alone shield it — require nonzero
+    historical event yield. This is the precision-vs-recall pivot of
+    the gate: useful_sender requires both volume AND yield."""
+    rc, _stdout, _err, auto_path, audit_path = _run_main(
+        monkeypatch, tmp_path,
+        [{"from": "marketing@deals.com", "reason": "weekly promotions",
+          "confidence": "high"}],
+        sender_stats={
+            "schema_version": 1,
+            "last_updated_iso": "2026-04-25T00:00:00",
+            "senders": {
+                "marketing@deals.com": {
+                    "messages_seen": 6,
+                    "total_events": 0,
+                    "per_message_counts": [0, 0, 0, 0, 0, 0],
+                    "first_seen_iso": "2026-02-01",
+                    "last_seen_iso": "2026-04-22",
+                    "is_newsletter": False,
+                },
+            },
+        },
+    )
+    assert rc == 0
+    assert auto_path.exists()
+    assert "marketing@deals.com" in auto_path.read_text()
+    entry = json.loads(audit_path.read_text().strip())
+    assert len(entry["added"]) == 1
+    assert entry["rejected"] == []

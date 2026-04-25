@@ -751,6 +751,7 @@ def step3b_update_auto_blocklist(
                 "--main-blocklist", BLOCKLIST_PATH,
                 "--audit-log", AUTO_BLOCKLIST_AUDIT_PATH,
                 "--protected-senders", PROTECTED_SENDERS_PATH,
+                "--sender-stats", SENDER_STATS_PATH,
             ],
         )
     finally:
