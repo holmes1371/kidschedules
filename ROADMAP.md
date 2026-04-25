@@ -20,11 +20,11 @@ Strict rules for writing it:
 
 **2026-04-25**
 
-- Item 27 in flight `[~]`; 5 of 6 planned commits landed: 6bea35a (design + flip), e5772cc (sender-stats reject), 6b8c62a (state module), 87d18f5 (main() integration + workflow plumbing), and this commit (TTL decay).
-- TTL: 90d active (refresh-on-flag keeps real spammers blocked indefinitely) and 30d pending (suspicions age out without corroboration). `--active-ttl-days` and `--pending-ttl-days` CLI flags expose the windows for tests. Expired addresses removed from `blocklist_auto.txt` by full rewrite (header preserved); aged-out entries are pending-only with no txt presence.
-- Audit log gained `expired` and `aged_out` event buckets; stderr summary gained matching counts. All three #27 levers now wired end-to-end.
-- Test delta vs main: +43 passing (3 sender-stats + 27 state module + 6 integration + 7 TTL), 0 new failures. 92 pre-existing process_events/protected_senders failures unchanged.
-- Next pickup: commit 6 — close-out summary; item stays `[~]` pending Tom's live verification across at least two cron weeks (pending → promote cycle observable end-to-end).
+- Item 27 v1 code complete `[~]`: all 6 planned commits landed (5 code + this close-out). SHAs in the item-27 entry above. Item stays `[~]` pending Tom's live verification — a pending → promote cycle is observable across two cron runs (≥7 days apart).
+- All three #27 levers wired: sender-stats reject (cheapest gate, no new state) + N-strikes pending ledger (N=2, structural prevention via `blocklist_auto_state.json`) + TTL decay (90d active / 30d pending, recovery). Auto-rescue via filter audit was scoped out as a follow-up.
+- Mid-feature scope expansion (Tom-approved 2026-04-25): the agent's `irrelevant_senders` schema now requires `source_message_id` to participate in N-strikes corroboration. Flags missing the field are rejected at the gate.
+- Test delta vs main: +43 passing, 0 new failures. The 92 pre-existing failures (test_process_events.py, test_protected_senders.py — all subprocess-driven against `scripts/process_events.py` exiting non-zero on Windows + Python 3.14) are unrelated to #27 and worth a separate investigation when there's slack.
+- Nothing else in flight. Next session moves the full item-27 prose to `COMPLETED.md` and flips `[~]` → `[x]` once Tom signs off.
 
 ## For future agents
 
@@ -138,6 +138,10 @@ Open design questions (resolve before implementing):
 - Whether the operator's hand-curated `blocklist.txt` participates in any of this (probably not; `blocklist_auto.txt` is the only file the bot writes).
 
 Held pending item 26 close-out to avoid scope creep — landing both at once would muddy the diagnosis if the next missed-email surfaces.
+
+**Code complete (2026-04-25, v1)** — 6bea35a (design note + flip) / e5772cc (sender-stats reject) / 6b8c62a (auto_blocklist_state module + 27 unit tests) / 87d18f5 (main() integration + workflow plumbing + agent prompt) / ee90951 (TTL decay + audit log) / *this commit* (close-out). All three approved levers wired end-to-end; auto-rescue via filter audit was scoped out as a follow-up. Full design at `design/auto-blocklist-hardening.md`.
+
+Item stays `[~]` pending Tom's live verification: the cron needs to run at least twice (≥7 days apart) so a pending → promote cycle is observable end-to-end. The first post-deploy run will also seed `last_flagged_iso = today` for any pre-existing `blocklist_auto.txt` rows via `seed_active_from_legacy`. After Tom signs off, the next session moves the full prose to `COMPLETED.md` and flips to `[x]`.
 
 ## Descoped / on hold
 
