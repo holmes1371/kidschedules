@@ -233,11 +233,17 @@ def step1b_filter_audit(
 def step2_search_gmail(
     gmail: GmailClient, config: dict[str, Any]
 ) -> dict[str, list[dict[str, Any]]]:
-    """Run all 5 Gmail searches and return results keyed by category."""
-    print("\n" + "=" * 60)
-    print("STEP 2: Searching Gmail (5 queries)")
-    print("=" * 60)
+    """Run the configured Gmail searches and return results keyed by category.
+
+    Query count is derived from ``config["queries"]`` so the log line
+    stays accurate as templates are added or suppressed (e.g. the
+    roster-driven ``kid_names`` template lands only when the roster has
+    keys and ``--no-kid-names`` is off).
+    """
     queries = config["queries"]
+    print("\n" + "=" * 60)
+    print(f"STEP 2: Searching Gmail ({len(queries)} queries)")
+    print("=" * 60)
     max_results = config["max_results_per_query"]
     all_results: dict[str, list[dict[str, Any]]] = {}
 
