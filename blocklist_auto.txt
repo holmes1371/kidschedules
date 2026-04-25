@@ -6,7 +6,6 @@ amber.graves@salesforce.com  # auto 2026-04-14: adult legal recruiting call conf
 no-reply@mail.goodreads.com  # auto 2026-04-14: adult social reading/book update newsletter, no child events
 hello@edikted.com  # auto 2026-04-14: adult retail/fashion promotional email, no child events
 security@facebookmail.com  # auto 2026-04-14: Facebook security code notification, no child events
-ellen.n.holmes@gmail.com  # auto 2026-04-14: adult personal email about tax return, no child events
 email@theatlantic.com  # auto 2026-04-14: Adult magazine newsletter with no kids' content
 noreply@meevomail.com  # auto 2026-04-14: Adult hair salon appointment confirmations with no mention of children
 orders@oe.target.com  # auto 2026-04-14: Adult retail order confirmation (hair products, slow cooker) with no kids' conte
