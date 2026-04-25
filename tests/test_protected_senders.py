@@ -79,6 +79,82 @@ def test_is_protected_edge_trailing_at():
     assert is_protected("alice@", ["fcps.edu"]) is False
 
 
+# --- Address-form patterns (#26: protect specific addresses, not just domains) ---
+#
+# The Ellen failure mode (item 26 design note) was: the agent flagged
+# ellen.n.holmes@gmail.com as adult-only from one tax email, the
+# auto-blocklist accepted it, and from then on every Gmail query carried
+# -from:ellen.n.holmes@gmail.com. We can't protect "gmail.com" wholesale
+# (every personal Gmail block lives there), so per-address patterns are
+# the load-bearing fix. These tests pin that semantic.
+
+
+def test_is_protected_address_form_pattern_matches_address():
+    """A pattern containing '@' matches the full address (case-insensitive)."""
+    patterns = ["ellen.n.holmes@gmail.com"]
+    assert is_protected("ellen.n.holmes@gmail.com", patterns) is True
+    assert is_protected("Ellen.N.Holmes@GMAIL.COM", patterns) is True
+
+
+def test_is_protected_address_form_pattern_rejects_other_address_same_domain():
+    """Pattern protects ONE address, not the whole domain.
+
+    Load-bearing — the protected list contains
+    `ellen.n.holmes@gmail.com` and `thomas.holmes1371@gmail.com`, and
+    we must NOT accidentally protect every gmail.com sender (which
+    would break the entire freemail-block mechanism from #20).
+    """
+    patterns = ["ellen.n.holmes@gmail.com"]
+    assert is_protected("someone.else@gmail.com", patterns) is False
+    assert is_protected("thomas.holmes1371@gmail.com", patterns) is False
+
+
+def test_is_protected_address_form_pattern_rejects_bare_domain_sender():
+    """A bare-domain sender (no `@`) does NOT match an address-form pattern.
+
+    A pattern like `alice@example.com` only protects the specific
+    mailbox, not every mailbox at example.com. Bare-domain senders
+    must continue to need a bare-domain pattern to be protected.
+    """
+    patterns = ["ellen.n.holmes@gmail.com"]
+    assert is_protected("gmail.com", patterns) is False
+
+
+def test_is_protected_bare_domain_still_protects_address_sender():
+    """Regression pin for #20 behavior: a bare-domain pattern still
+    protects every address under that domain.
+
+    The address-form addition must not regress the bare-domain →
+    address-sender path that the existing `fcps.edu`, `*pta.org`,
+    `teamsnap.com`, etc. patterns rely on.
+    """
+    patterns = ["fcps.edu"]
+    assert is_protected("alice@fcps.edu", patterns) is True
+    assert is_protected("teacher@fcps.edu", patterns) is True
+
+
+def test_is_protected_mixed_pattern_list_honors_each_shape():
+    """All three pattern shapes coexist in production — pin that the
+    matcher routes each sender to the right rule."""
+    patterns = [
+        "fcps.edu",                         # bare domain
+        "*pta.org",                         # domain-suffix
+        "ellen.n.holmes@gmail.com",         # address-form
+        "thomas.holmes1371@gmail.com",      # address-form
+    ]
+    # Bare-domain pattern protects an fcps.edu address.
+    assert is_protected("ms.sahai@fcps.edu", patterns) is True
+    # Suffix pattern protects a louisearcherpta.org address.
+    assert is_protected("president@louisearcherpta.org", patterns) is True
+    # Address-form pattern protects each parent's exact address.
+    assert is_protected("ellen.n.holmes@gmail.com", patterns) is True
+    assert is_protected("thomas.holmes1371@gmail.com", patterns) is True
+    # Other gmail.com addresses unprotected.
+    assert is_protected("random@gmail.com", patterns) is False
+    # Address with no matching pattern unprotected.
+    assert is_protected("somebody@example.com", patterns) is False
+
+
 # --- Build-queries integration: protected domains filtered out of the union ---
 
 def test_build_queries_drops_protected_from_ignored_senders(tmp_path, monkeypatch):
