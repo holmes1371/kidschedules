@@ -20,10 +20,10 @@ Strict rules for writing it:
 
 **2026-04-25**
 
-- Item 27 flipped `[ ]` → `[~]`; design note at `design/auto-blocklist-hardening.md` locks in the three-lever scope: sender-stats reject + N-strikes pending ledger (N=2) + TTL decay (90d active / 30d pending). Auto-rescue deferred.
-- New combined state file `blocklist_auto_state.json` carries pending + active metadata in two top-level sections; `blocklist_auto.txt` format unchanged.
-- 6-commit cadence in the design note; commit 1 is this one (design + flip).
-- Next pickup: commit 2 — sender-stats reject in `update_auto_blocklist.main()` + 3 tests. Smallest contained gate; lands standalone before the pending module.
+- Item 27 in flight `[~]`; 3 of 6 planned commits landed: 6bea35a (design note + flip), e5772cc (sender-stats reject — lever 1 of 3), and this commit (`scripts/auto_blocklist_state.py` module + 27 unit tests).
+- Module covers all 5 `add_or_promote` outcomes, both TTL branches, and `seed_active_from_legacy`; pure helpers, no integration with `update_auto_blocklist.main()` yet.
+- Next pickup: commit 4 — wire the state module into `update_auto_blocklist.main()`, add `blocklist_auto_state.json` to the workflow state-branch save/restore, update `tests/test_workflow_state_branch_parity.py`, extend the integration tests in `tests/test_update_auto_blocklist.py`. Behavior switch from "first flag → active" to "first flag → pending" lands here.
+- Test delta vs main: +30 passing, 0 new failures. The 92 pre-existing failures (test_process_events.py, test_protected_senders.py, all subprocess-driven) are unrelated to #27 and flagged for separate investigation.
 - Nothing else in flight.
 
 ## For future agents
