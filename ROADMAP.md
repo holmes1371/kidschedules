@@ -20,10 +20,9 @@ Strict rules for writing it:
 
 **2026-04-24**
 
-- Item 25 design + flip 0f4a1d2; kid_names query ad8f1e1 (+9 tests); sports keyword extension bef3db1 (+1 pin); session-summary 7d6549b; STEP-2 dynamic count 656310a. Item 25 stays `[~]` — kid_names query is correct, but Tom's manual run revealed Ellen's email never reaches the agent because `blocklist_auto.txt` carries `ellen.n.holmes@gmail.com` from a 2026-04-14 agent flag of an unrelated tax email. So item 25 doesn't deliver its observable goal until item 26 ships and the auto-block row is evicted.
-- Item 26 code complete: design + flip in c829e2a, `is_protected` address-form extension + 6 tests in 437fa6b, `update_auto_blocklist` unified with the shared matcher (legacy `_is_protected` and `PROTECTED_SUFFIXES` deleted; 7 legacy tests removed; +2 integration tests) in 9a3940c, parent addresses + agent NEVER-flag in cb64dd6. State-branch cleanup of the existing `ellen.n.holmes@gmail.com` row in `blocklist_auto.txt` done manually by Tom 2026-04-24 via the web UI. Item stays `[~]` pending live-cron verification that an Ellen self-note now reaches the page.
-- Item 27 filed and `[ ]` — Tom: "one errant email shouldn't get people blocked forever." The current auto-blocklist gates on a single high-confidence agent flag; needs a multi-flag / TTL / re-audit mechanism so a one-shot misjudgment self-corrects. Not yet designed; waiting on item 26 close-out to avoid scope creep.
-- Item 24 still `[~]` pending Tom's manual audit-flow verification (unchanged).
+- Items 24, 25, 26 closed `[x]` after Tom's live verification that the kid_names query pulled in Ellen's "Everly volleyball" self-note and the agent extracted the event onto the page. Full prose moved to `COMPLETED.md`; one-line stubs preserved in the backlog.
+- Item 27 (`[ ]`) is the next pickup — auto-blocklist hardening so one errant agent flag can't permanently block a sender (N-strikes / TTL / auto-rescue / sender-stats integration). Sketch in the backlog entry; design note still to be written. Tom continues 2026-04-25.
+- Nothing else in flight.
 
 ## For future agents
 
@@ -110,31 +109,11 @@ Design-note questions to resolve before coding:
 - Whether to unify this with or supersede the existing digest test-mode flag from item 3, or keep them independent toggles.
 - Whether test-output commits should use a distinct commit-message prefix so the history is easy to skim past during regular review.
 
-### 24. [~] Bug: `agent.py` defines `AUDIT_SYSTEM_PROMPT` twice
+24\. [x] Bug: `agent.py` defines `AUDIT_SYSTEM_PROMPT` twice — 0ba31c9 — see COMPLETED.md
 
-`scripts/agent.py` declares `AUDIT_SYSTEM_PROMPT` at lines 209–239 and again at lines 242–275 with substantively different content — different verdict labels (`keep_filtered` vs `keep_blocked`), different system instructions. Python's last-assignment-wins rule means the second definition is the live one and the first is dead, but both are reachable to a reader and a well-meaning future edit to "the prompt" could land on the wrong copy. Fix: delete the dead first block; verify the live audit flow's behavior is unchanged via the existing `step1b_filter_audit` integration (or pin it with a unit test if one doesn't exist).
+25\. [x] Catch self-notes / direct kid-name emails (e.g. "Everly volleyball") — 0f4a1d2 / ad8f1e1 / bef3db1 / 656310a / 7d6549b — see COMPLETED.md
 
-In progress: dead first block deleted from `agent.py` in 0ba31c9; the live `keep_blocked` prompt is now the only definition. No behavior change (Python was already using the second block). `tests/test_agent.py` 66/66, including the existing `test_review_stripped_messages_uses_audit_system_prompt` identity pin that locks the prompt to the import — treating that as sufficient coverage rather than adding a redundant unit test. Pending Tom's manual verification of the live audit flow before flip to `[x]`.
-
-### 25. [~] Catch self-notes / direct kid-name emails (e.g. "Everly volleyball")
-
-Filed 2026-04-24 after Ellen's self-note from `ellen.n.holmes@gmail.com` to herself — Subject: `Everly volleyball`, body: `8-9am May 4-8. Sent from my iPhone` — landed in the inbox inside the 60-day lookback window but matched **none** of the 5 query templates: no school-activity vocabulary, no appointment vocabulary, the sports template has no `volleyball` (or `soccer / basketball / baseball / softball / lacrosse / tennis / track / football / hockey / wrestling` for that matter), no due/deadline language, and the sender isn't `school/district/pta/ptsa` nor is the subject a `calendar/newsletter/reminder/upcoming/schedule` form. Three structural gaps converge: incomplete sports list, no handling for terse self-notes, and the highest-precision signal we have — the kids' first names — is unused.
-
-Decision: add a 6th query template `kid_names`, sourced at runtime from `class_roster.json` keys via `roster_match.load_roster`, OR-joined and framed with the same `after/before/exclusion` clause as the other five. Existing two-pass dedup (messageId → threadId in `step2b_read_promising`) collapses overlap with the other templates, so the only *additional* messages reaching the agent are the ones the keyword templates missed — exactly the failure mode here. `--no-kid-names` flag for diagnostics; `--roster ''` opt-out for parity with the other path flags. Empty roster suppresses the query (avoids `()` being sent to Gmail); single-kid roster yields `(Name)`; multi-word names get double-quoted defensively. Full design note at `design/kid-names-query.md`.
-
-Item 25b (same design note): independent commit extending `SEARCH_TEMPLATES["sports_extracurriculars"]` with the missing common school sports — `volleyball / soccer / basketball / baseball / softball / lacrosse / tennis / track / football / hockey / wrestling`. Hygiene only; does not fix the missed-email path (kid_names already covers it), but closes the underlying vocabulary gap.
-
-In progress: design note + ROADMAP flip in 0f4a1d2; kid_names query implementation + 9 tests in ad8f1e1; sports keyword extension + 1 pin test in bef3db1. STEP-2 dynamic count fix in 656310a. 536/536 non-`%-d` tests pass.
-
-**Tom's manual run revealed a blocking second-order bug**: the kid_names query is correct but Ellen's emails never reach Gmail's result set because `-from:ellen.n.holmes@gmail.com` is in every query's exclusion clause (sourced from `blocklist_auto.txt`, agent-flagged 2026-04-14 from an unrelated tax email). Item 25 cannot deliver the observable goal — Ellen's self-notes on the page — until item 26 (parent-address protection) ships and the existing `blocklist_auto.txt` row is evicted.
-
-### 26. [~] Auto-blocklist must never block parents' personal addresses
-
-Filed 2026-04-24, blocking item 25's effective close. Two structural problems converged: (a) `protected_senders.is_protected` reduces every sender to its registrable domain before matching, so a per-address protection like `ellen.n.holmes@gmail.com` can't be expressed; (b) `update_auto_blocklist._is_protected` is a hardcoded `PROTECTED_SUFFIXES` constant — domain-only, NOT synchronized with `protected_senders.txt`, so even if address-form patterns existed, the auto-blocklist gating wouldn't honor them.
-
-Decision: extend `is_protected` to treat any pattern containing `@` as an address-form match (full-address equality, case-insensitive); unify `update_auto_blocklist` to read `protected_senders.txt` via the shared loader (drop `PROTECTED_SUFFIXES`); add Ellen (`ellen.n.holmes@gmail.com`) and Tom (`thomas.holmes1371@gmail.com`) to `protected_senders.txt` under a new "Family senders" comment block; update `agent.py::_EXTRACTION_BASE_PROMPT` NEVER-flag list to mention family/parent personal addresses (belt-and-suspenders). Full design + decisions + test plan at `design/protect-parent-addresses.md`.
-
-State-branch cleanup of the existing Ellen row was done manually by Tom 2026-04-24 via the GitHub web UI. The gating fix (cb64dd6) prevents future re-adds; the manual edit evicts the historical row. Together: the next cron run's Gmail queries will no longer carry `-from:ellen.n.holmes@gmail.com`, so item 25's kid_names query has its first chance to actually match Ellen's self-notes.
+26\. [x] Auto-blocklist must never block parents' personal addresses — c829e2a / 437fa6b / 9a3940c / cb64dd6 / 39c48b6 — see COMPLETED.md
 
 ### 27. [ ] Auto-blocklist hardening: one errant agent flag shouldn't permanently block a sender
 
