@@ -61,6 +61,7 @@ AUTO_BLOCKLIST_PATH = os.path.join(PROJECT_ROOT, "blocklist_auto.txt")
 AUTO_BLOCKLIST_AUDIT_PATH = os.path.join(
     PROJECT_ROOT, "blocklist_auto_audit.jsonl"
 )
+AUTO_BLOCKLIST_STATE_PATH = os.path.join(PROJECT_ROOT, "blocklist_auto_state.json")
 IGNORED_SENDERS_PATH = os.path.join(PROJECT_ROOT, "ignored_senders.json")
 PROTECTED_SENDERS_PATH = os.path.join(PROJECT_ROOT, "protected_senders.txt")
 FREEMAIL_DOMAINS_PATH = os.path.join(PROJECT_ROOT, "freemail_domains.txt")
@@ -752,6 +753,7 @@ def step3b_update_auto_blocklist(
                 "--audit-log", AUTO_BLOCKLIST_AUDIT_PATH,
                 "--protected-senders", PROTECTED_SENDERS_PATH,
                 "--sender-stats", SENDER_STATS_PATH,
+                "--state-file", AUTO_BLOCKLIST_STATE_PATH,
             ],
         )
     finally:
