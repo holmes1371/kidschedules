@@ -28,6 +28,34 @@
       "source_message_id": "19cf4b7054b58927",
       "time": "9:00 AM – 2:00 PM"
     },
+    "032a7f7caa0a": {
+      "category": "School Activity",
+      "child": "Everly, Isla",
+      "date": "2026-04-06",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "032a7f7caa0a",
+      "location": "Louise Archer Elementary School",
+      "name": "Teacher Workday — No School",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 23, 2026 (Mar 23)",
+      "source_message_id": "19d1ac06f155fe9f",
+      "time": "All day"
+    },
+    "0650dbdac680": {
+      "category": "Academic Due Date",
+      "child": "All LAES families",
+      "date": "2026-04-14",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "0650dbdac680",
+      "location": "Email to internationalnight@louisearcherpta.org",
+      "name": "International Night Booth Sign-Up Deadline",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — April 13, 2026 (Apr 16)",
+      "source_message_id": "19d95ef9b0561898",
+      "time": "All day (deadline)"
+    },
     "09ba480f8257": {
       "category": "School Activity",
       "child": "Rising 7th & 8th graders",
@@ -38,6 +66,20 @@
       "name": "NO VIP Camp — July 3rd",
       "source": "FCPS News You Choose (Apr 10)",
       "time": "All day"
+    },
+    "0c0b54997a22": {
+      "category": "Sports & Extracurriculars",
+      "child": "Everly",
+      "date": "2026-04-11",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "0c0b54997a22",
+      "location": "",
+      "name": "REVERB Dance Competition (B2D Dance Team)",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — April 6, 2026 (Apr 6)",
+      "source_message_id": "19d6306ccd82d58a",
+      "time": ""
     },
     "0c99125bb1f4": {
       "category": "School Activity",
@@ -64,6 +106,48 @@
       "source_message_id": "19d97400ede1ed0d",
       "time": "All day"
     },
+    "0f372c657628": {
+      "category": "Appointment",
+      "child": "Everly",
+      "date": "2026-04-06",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "0f372c657628",
+      "location": "Children's Dentistry of Oakton, 2960 Chain Bridge Rd #300, Oakton, VA 22124",
+      "name": "Everly's Dental Appointment",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — April 6, 2026 (Apr 6)",
+      "source_message_id": "19d6306ccd82d58a",
+      "time": "11:00 AM"
+    },
+    "0fc490f4a40b": {
+      "category": "School Activity",
+      "child": "All LAES kids",
+      "date": "2026-05-01",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "0fc490f4a40b",
+      "location": "Louise Archer Elementary School",
+      "name": "International Night (Louise Archer)",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — April 6, 2026 (Apr 6)",
+      "source_message_id": "19d6306ccd82d58a",
+      "time": ""
+    },
+    "12c42bf18219": {
+      "category": "Academic Due Date",
+      "child": "All LAES students",
+      "date": "2026-04-23",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "12c42bf18219",
+      "location": "yearbook@louisearcherpta.org",
+      "name": "Yearbook Photos Submission Deadline (STEAM Fair photos)",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Ellen Holmes / LAES PTA Rohde Class (Apr 8)",
+      "source_message_id": "19d6d20d0c67bc74",
+      "time": "All day (deadline)"
+    },
     "13dce15d2106": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -77,6 +161,20 @@
       "source": "LAES PTA Sunbeam (Mar 22)",
       "source_message_id": "19d1873576a3c28d",
       "time": "9:00 AM - 4:00 PM"
+    },
+    "13f84136f196": {
+      "category": "Sports & Extracurriculars",
+      "child": "Everly",
+      "date": "2026-03-22",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "13f84136f196",
+      "location": "Born 2 Dance Studio, 262 Cedar Ln SE, Vienna, VA 22180",
+      "name": "B2D ECHO Team Weekly Rehearsal",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 22, 2026 (Mar 22)",
+      "source_message_id": "19d18278dce583f8",
+      "time": "2:45 PM – 4:45 PM"
     },
     "1556f5d731b9": {
       "category": "Sports & Extracurriculars",
@@ -102,6 +200,34 @@
       "name": "VIP Summer Camp — Ends",
       "source": "FCPS News You Choose (Apr 10)",
       "time": "4:00 PM"
+    },
+    "1a63266537d9": {
+      "category": "School Activity",
+      "child": "All LAES/FCPS students",
+      "date": "2026-03-28",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "1a63266537d9",
+      "location": "N/A",
+      "name": "Spring Break — No School",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 23, 2026 (Apr 6 email)",
+      "source_message_id": "19d3705287c74f3f",
+      "time": "All day"
+    },
+    "1af8fba60479": {
+      "category": "Sports & Extracurriculars",
+      "child": "Girls on the Run participant at Louise Archer",
+      "date": "2026-05-16",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "1af8fba60479",
+      "location": "",
+      "name": "Girls on the Run 5K (Celebratory Run)",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 23, 2026 (Mar 23)",
+      "source_message_id": "19d1ac06f155fe9f",
+      "time": ""
     },
     "1b00300bea25": {
       "category": "School Activity",
@@ -135,6 +261,48 @@
       "name": "Sports Camp at LAES — Session 1 Last Day",
       "source": "LAES PTA Sunbeam (Mar 22)",
       "time": "9:00 AM – 2:00 PM"
+    },
+    "1eac17481642": {
+      "category": "Sports & Extracurriculars",
+      "child": "Everly",
+      "date": "2026-05-05",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "1eac17481642",
+      "location": "",
+      "name": "Everly Volleyball",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Ellen Holmes self-note (Apr 24)",
+      "source_message_id": "19dc12b4401d6066",
+      "time": "8:00 AM - 9:00 AM"
+    },
+    "1f4d4b779d33": {
+      "category": "Academic Due Date",
+      "child": "All LAES students",
+      "date": "2026-03-26",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "1f4d4b779d33",
+      "location": "store.originalworks.com",
+      "name": "Original Works Art Fundraiser — Online Orders Due",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 23, 2026 (Apr 6 email)",
+      "source_message_id": "19d3705287c74f3f",
+      "time": "All day (deadline)"
+    },
+    "216106a3ded7": {
+      "category": "School Activity",
+      "child": "All LAES students",
+      "date": "2026-03-25",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "216106a3ded7",
+      "location": "Cuco's Peruvian Restaurant",
+      "name": "Dining 4 Dollars at Cuco's Peruvian (LAES Fundraiser)",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 23, 2026 (Apr 6 email)",
+      "source_message_id": "19d3705287c74f3f",
+      "time": "5:00 PM – 8:00 PM"
     },
     "21b494b4a788": {
       "category": "School Activity",
@@ -172,6 +340,20 @@
       "source_message_id": "19d97dc3ddcf82b5",
       "time": "School hours"
     },
+    "2594f02eaf0d": {
+      "category": "School Activity",
+      "child": "All LAES families",
+      "date": "2026-04-09",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "2594f02eaf0d",
+      "location": "Louise Archer Elementary School Front Office",
+      "name": "Stock the Fridge Drop-Off at LAES Front Office",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 23, 2026 (Apr 6 email)",
+      "source_message_id": "19d3705287c74f3f",
+      "time": "8:00 AM – 4:30 PM"
+    },
     "2806e3232844": {
       "category": "Appointment",
       "child": "",
@@ -184,6 +366,48 @@
       "sender_domain": "remindmemd.com",
       "source": "Advanced Pediatrics (Apr 20)",
       "source_message_id": "19dab4de3a36a8ed",
+      "time": ""
+    },
+    "28d8398ecf70": {
+      "category": "School Activity",
+      "child": "All LAES students",
+      "date": "2026-04-09",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "28d8398ecf70",
+      "location": "LAES Front Office",
+      "name": "Spring Stock the Fridge — Teacher Lounge Snack Drop-Off",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Ellen Holmes / LAES PTA Rohde Class (Apr 8)",
+      "source_message_id": "19d6d20d0c67bc74",
+      "time": "8:00 AM - 4:30 PM"
+    },
+    "290852330220": {
+      "category": "Sports & Extracurriculars",
+      "child": "Girls on the Run participant (LAES, 3rd–6th grade)",
+      "date": "2026-05-16",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "290852330220",
+      "location": "",
+      "name": "Girls on the Run Celebratory 5K",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — April 6, 2026 (Apr 6)",
+      "source_message_id": "19d6306ccd82d58a",
+      "time": ""
+    },
+    "292a80b27002": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-04-24",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "292a80b27002",
+      "location": "National Portrait Gallery",
+      "name": "National Portrait Gallery Field Trip",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — Week of April 20 (Apr 20)",
+      "source_message_id": "19daab1f86c383e7",
       "time": ""
     },
     "2b08ae08159a": {
@@ -211,6 +435,20 @@
       "source_message_id": "19da909fe35cca68",
       "time": "9:00 AM - 2:00 PM"
     },
+    "2e6dfb30b11f": {
+      "category": "School Activity",
+      "child": "All LAES students",
+      "date": "2026-04-10",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "2e6dfb30b11f",
+      "location": "Louise Archer Elementary School",
+      "name": "NO SCHOOL — Teacher Workday",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Ellen Holmes / LAES PTA Rohde Class (Apr 8)",
+      "source_message_id": "19d6d20d0c67bc74",
+      "time": "All day"
+    },
     "309307aab69f": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -224,6 +462,34 @@
       "source": "Susan Anspach / PTA updates (Apr 16)",
       "source_message_id": "19d97dc3ddcf82b5",
       "time": "5:00 PM - 6:00 PM"
+    },
+    "3094438939e8": {
+      "category": "School Activity",
+      "child": "All LAES/FCPS students",
+      "date": "2026-04-06",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "3094438939e8",
+      "location": "Louise Archer Elementary School",
+      "name": "Teacher Workday — No School for Students",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 23, 2026 (Apr 6 email)",
+      "source_message_id": "19d3705287c74f3f",
+      "time": "All day"
+    },
+    "34554a49fe19": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-04-13",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "34554a49fe19",
+      "location": "Camp Highroad (off-site field trip)",
+      "name": "Camp Highroad Field Trip (6th AAP)",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — April 13, 2026 (Apr 16)",
+      "source_message_id": "19d95ef9b0561898",
+      "time": "All day"
     },
     "3569f0d19b56": {
       "category": "Academic Due Date",
@@ -264,6 +530,20 @@
       "source": "LAES PTA Sunbeam (Mar 22)",
       "time": "9:00 AM – 2:00 PM"
     },
+    "37c528cecb3c": {
+      "category": "Sports & Extracurriculars",
+      "child": "Girls grades 3–6 at Louise Archer",
+      "date": "2026-05-16",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "37c528cecb3c",
+      "location": "",
+      "name": "Girls on the Run 5K",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 22, 2026 (Mar 22)",
+      "source_message_id": "19d18278dce583f8",
+      "time": ""
+    },
     "3860bd1ba19a": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -277,6 +557,20 @@
       "source": "LAES PTA Sunbeam (Mar 15)",
       "source_message_id": "19cf4b7054b58927",
       "time": "9:00 AM – 2:00 PM"
+    },
+    "3c167999b2ec": {
+      "category": "Sports & Extracurriculars",
+      "child": "Everly",
+      "date": "2026-03-27",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "3c167999b2ec",
+      "location": "Born 2 Dance Studio, 262 Cedar Lane SE, 2nd Floor, Vienna, VA 22180",
+      "name": "B2D IGNITE Team Weekly Rehearsal",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 23, 2026 (Apr 6 email)",
+      "source_message_id": "19d3705287c74f3f",
+      "time": "4:45 PM – 6:45 PM"
     },
     "3c48282c9ff1": {
       "category": "Sports & Extracurriculars",
@@ -342,6 +636,20 @@
       "source": "Kids' Schedule — April 6, 2026 (Apr 6)",
       "time": "Time TBD"
     },
+    "469df84c4488": {
+      "category": "Sports & Extracurriculars",
+      "child": "",
+      "date": "2026-03-22",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "469df84c4488",
+      "location": "Thoreau Middle School Gym 2",
+      "name": "VYI Volleyball Scrimmage",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 22, 2026 (Mar 22)",
+      "source_message_id": "19d18278dce583f8",
+      "time": "3:00 PM"
+    },
     "491cf0216e27": {
       "category": "School Activity",
       "child": "Everly",
@@ -369,6 +677,20 @@
       "source": "Sahai, Anita - 6 AAP May Newsletter (Apr 24)",
       "source_message_id": "19dc0becff6647d8",
       "time": "10:00 AM"
+    },
+    "4c0c6306b7bc": {
+      "category": "School Activity",
+      "child": "All LAES/FCPS students",
+      "date": "2026-04-10",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "4c0c6306b7bc",
+      "location": "Louise Archer Elementary School",
+      "name": "Teacher Workday — No School for Students",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 23, 2026 (Apr 6 email)",
+      "source_message_id": "19d3705287c74f3f",
+      "time": "All day"
     },
     "4c7a2349bc7d": {
       "category": "School Activity",
@@ -406,6 +728,48 @@
       "source": "Children's Dentistry of Oakton (Apr 6)",
       "time": "8:30 AM"
     },
+    "523ec5e56421": {
+      "category": "Sports & Extracurriculars",
+      "child": "Everly",
+      "date": "2026-04-12",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "523ec5e56421",
+      "location": "Born 2 Dance Studio, 262 Cedar Ln SE, Vienna, VA 22180",
+      "name": "B2D ECHO Team Weekly Rehearsal",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 23, 2026 (Apr 6 email)",
+      "source_message_id": "19d3705287c74f3f",
+      "time": "2:45 PM – 4:45 PM"
+    },
+    "524a8e65537c": {
+      "category": "Academic Due Date",
+      "child": "All ages",
+      "date": "2026-03-27",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "524a8e65537c",
+      "location": "runsignup.com/Race/VA/Vienna/LouiseArcherSunRun",
+      "name": "5K Race Shirt Registration Deadline",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 23, 2026 (Mar 23)",
+      "source_message_id": "19d1ac06f155fe9f",
+      "time": "All day (deadline)"
+    },
+    "524cf3184535": {
+      "category": "Academic Due Date",
+      "child": "All LAES students",
+      "date": "2026-04-24",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "524cf3184535",
+      "location": "www.ybpay.com (school ID 15370266)",
+      "name": "Yearbook Sales Close / Order Deadline",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Ellen Holmes / LAES PTA Rohde Class (Apr 8)",
+      "source_message_id": "19d6d20d0c67bc74",
+      "time": "All day (deadline)"
+    },
     "52b184cf2d10": {
       "category": "Sports & Extracurriculars",
       "child": "Everly",
@@ -434,6 +798,34 @@
       "source_message_id": "19d926296f346c39",
       "time": "All day (deadline)"
     },
+    "538d6b0700b7": {
+      "category": "School Activity",
+      "child": "All LAES kids",
+      "date": "2026-04-22",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "538d6b0700b7",
+      "location": "Louise Archer Elementary School, Cafeteria",
+      "name": "STEAM Extravaganza (Louise Archer)",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — April 6, 2026 (Apr 6)",
+      "source_message_id": "19d6306ccd82d58a",
+      "time": "6:00 PM – 7:30 PM"
+    },
+    "54200d8c6dbe": {
+      "category": "Academic Due Date",
+      "child": "All LAES students",
+      "date": "2026-04-17",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "54200d8c6dbe",
+      "location": "https://drive.google.com/drive/folders/1D-X2Jh5aPCXkMH23JLYLMqfOpzPHJ79S?usp=sharing or yearbook@louisearcherpta.org",
+      "name": "Yearbook Photos Submission Deadline (General)",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Ellen Holmes / LAES PTA Rohde Class (Apr 8)",
+      "source_message_id": "19d6d20d0c67bc74",
+      "time": "All day (deadline)"
+    },
     "54dfd94aafe8": {
       "category": "Sports & Extracurriculars",
       "child": "",
@@ -446,6 +838,20 @@
       "sender_domain": "gomotionapp.com",
       "source": "HTM Sharks via SportsEngine Motion (Apr 12)",
       "source_message_id": "19d840f6654b6048",
+      "time": "All day"
+    },
+    "55dfa5e7b204": {
+      "category": "School Activity",
+      "child": "Everly, Isla",
+      "date": "2026-04-10",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "55dfa5e7b204",
+      "location": "Louise Archer Elementary School",
+      "name": "Teacher Workday — No School",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 23, 2026 (Mar 23)",
+      "source_message_id": "19d1ac06f155fe9f",
       "time": "All day"
     },
     "5845d30a4ed3": {
@@ -585,6 +991,20 @@
       "source_message_id": "19c1c6bbc45a6758",
       "time": "All day"
     },
+    "617ae38d5c51": {
+      "category": "Sports & Extracurriculars",
+      "child": "Isla",
+      "date": "2026-04-19",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "617ae38d5c51",
+      "location": "ViennArt Academy, Vienna, VA",
+      "name": "ViennArt Academy Spring Session 2 Begins",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — April 6, 2026 (Apr 6)",
+      "source_message_id": "19d6306ccd82d58a",
+      "time": ""
+    },
     "621e8009c68b": {
       "category": "Sports & Extracurriculars",
       "child": "All LAES students",
@@ -635,6 +1055,20 @@
       "source_message_id": "19d97dc3ddcf82b5",
       "time": "All day (deadline)"
     },
+    "68b008a30168": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-04-24",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "68b008a30168",
+      "location": "Art Museum (TBD)",
+      "name": "Art Museum Field Trip (6th AAP)",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 30, 2026 (Mar 30)",
+      "source_message_id": "19d3f0d72e52bba6",
+      "time": "All day"
+    },
     "69d9f97b454a": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -645,6 +1079,20 @@
       "name": "Summer Sports Camp — Session 2 (ends)",
       "source": "LAES PTA Sunbeam (Mar 22)",
       "time": "9:00 AM - 2:00 PM"
+    },
+    "6b7fff527f99": {
+      "category": "Sports & Extracurriculars",
+      "child": "Hunter Mill Sharks swimmers",
+      "date": "2026-05-03",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "6b7fff527f99",
+      "location": "Hunter Mill, 10339 Brittenford Dr, Vienna, VA 22182",
+      "name": "HTM Sharks Kick-Off Meeting (Suit Try-On Available)",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — April 13, 2026 (Apr 16)",
+      "source_message_id": "19d95ef9b0561898",
+      "time": ""
     },
     "6ca7c401d35a": {
       "category": "School Activity",
@@ -671,6 +1119,62 @@
       "source": "LAES PTA Sunbeam (Mar 15)",
       "time": "9:00 AM - 2:00 PM"
     },
+    "6ef21f8e1014": {
+      "category": "Academic Due Date",
+      "child": "All LAES students",
+      "date": "2026-04-24",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "6ef21f8e1014",
+      "location": "www.ybpay.com, School ID: 15370226",
+      "name": "Yearbook Sales Deadline",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — April 13, 2026 (Apr 16)",
+      "source_message_id": "19d95ef9b0561898",
+      "time": "All day (deadline)"
+    },
+    "7080e0b37934": {
+      "category": "Sports & Extracurriculars",
+      "child": "Everly",
+      "date": "2026-05-08",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "7080e0b37934",
+      "location": "",
+      "name": "Everly Volleyball",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Ellen Holmes self-note (Apr 24)",
+      "source_message_id": "19dc12b4401d6066",
+      "time": "8:00 AM - 9:00 AM"
+    },
+    "7118a1c82a08": {
+      "category": "School Activity",
+      "child": "Everly, Isla",
+      "date": "2026-05-01",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "7118a1c82a08",
+      "location": "Louise Archer Elementary School",
+      "name": "International Night",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 23, 2026 (Mar 23)",
+      "source_message_id": "19d1ac06f155fe9f",
+      "time": ""
+    },
+    "723aef5d1cfd": {
+      "category": "School Activity",
+      "child": "All LAES students",
+      "date": "2026-04-17",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "723aef5d1cfd",
+      "location": "Louise Archer Elementary, Room 106",
+      "name": "ASL Club — First Session",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — April 6, 2026 (Apr 6)",
+      "source_message_id": "19d6306ccd82d58a",
+      "time": "Friday afternoons"
+    },
     "7265d5b7f106": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -695,6 +1199,20 @@
       "source": "HTM Sharks via SportsEngine Motion (Apr 12)",
       "source_message_id": "19d840f6654b6048",
       "time": "All day (deadline)"
+    },
+    "73b400590843": {
+      "category": "School Activity",
+      "child": "All FCPS students",
+      "date": "2026-04-21",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "73b400590843",
+      "location": "N/A",
+      "name": "NO SCHOOL — Virginia Statewide Election Day",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — April 13, 2026 (Apr 16)",
+      "source_message_id": "19d95ef9b0561898",
+      "time": "All day"
     },
     "7448fc18d729": {
       "category": "Academic Due Date",
@@ -724,6 +1242,20 @@
       "source_message_id": "19d88762e96ed4d4",
       "time": "All day (deadline)"
     },
+    "772f967f9b9b": {
+      "category": "Sports & Extracurriculars",
+      "child": "Everly",
+      "date": "2026-04-24",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "772f967f9b9b",
+      "location": "Born 2 Dance Studio, 262 Cedar Lane SE, 2nd Floor, Vienna, VA 22180",
+      "name": "B2D IGNITE Team Weekly Rehearsal",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 23, 2026 (Apr 6 email)",
+      "source_message_id": "19d3705287c74f3f",
+      "time": "4:45 PM – 6:45 PM"
+    },
     "77b405519694": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -737,6 +1269,20 @@
       "source": "LAES PTA Sunbeam (Apr 19)",
       "source_message_id": "19da909fe35cca68",
       "time": "School hours"
+    },
+    "77be0d13d934": {
+      "category": "Academic Due Date",
+      "child": "Louise Archer students",
+      "date": "2026-04-17",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "77be0d13d934",
+      "location": "Upload to grade Google Drive folder or email yearbook@louisearcherpta.org",
+      "name": "Yearbook Photos Submission Deadline",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — April 13, 2026 (Apr 16)",
+      "source_message_id": "19d95ef9b0561898",
+      "time": "All day (deadline)"
     },
     "77fe174b17de": {
       "category": "School Activity",
@@ -763,6 +1309,34 @@
       "source_message_id": "19da909fe35cca68",
       "time": "9:00 AM - 2:00 PM"
     },
+    "79ea0571b650": {
+      "category": "Sports & Extracurriculars",
+      "child": "Isla",
+      "date": "2026-06-20",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "79ea0571b650",
+      "location": "Cuppett Performing Arts Center, 135 Park Street SE, Vienna, VA 22180",
+      "name": "Cuppett June Recitals",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 30, 2026 (Mar 30)",
+      "source_message_id": "19d3f0d72e52bba6",
+      "time": ""
+    },
+    "7a80f752debe": {
+      "category": "School Activity",
+      "child": "All LAES/FCPS students",
+      "date": "2026-03-27",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "7a80f752debe",
+      "location": "Louise Archer Elementary School",
+      "name": "2-Hour Early Release (End of Quarter 3)",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 23, 2026 (Apr 6 email)",
+      "source_message_id": "19d3705287c74f3f",
+      "time": "2-hour early release"
+    },
     "7bf6ebee1a61": {
       "category": "Sports & Extracurriculars",
       "child": "",
@@ -776,6 +1350,20 @@
       "source": "HTM Sharks / SportsEngine Motion (Mar 4)",
       "source_message_id": "19cbba1549285194",
       "time": "9:00 AM – 12:00 PM"
+    },
+    "7c1133b8f0c1": {
+      "category": "School Activity",
+      "child": "All LAES students",
+      "date": "2026-04-09",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "7c1133b8f0c1",
+      "location": "Chick-fil-A",
+      "name": "Dining for Dollars at Chick-fil-A (LAES PTA Fundraiser)",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Ellen Holmes / LAES PTA Rohde Class (Apr 8)",
+      "source_message_id": "19d6d20d0c67bc74",
+      "time": "5:00 PM - 8:00 PM"
     },
     "7d31b8cccb11": {
       "category": "School Activity",
@@ -804,6 +1392,20 @@
       "source": "LAES PTA Vice President (Mar 23)",
       "source_message_id": "19d1d0ab1d4dfc49",
       "time": "All day (deadline)"
+    },
+    "8103f7ed0683": {
+      "category": "School Activity",
+      "child": "All LAES families",
+      "date": "2026-04-12",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "8103f7ed0683",
+      "location": "James Madison High School, 2500 James Madison Dr, Vienna, VA 22181",
+      "name": "Louise Archer 5K & Sun Run",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 23, 2026 (Apr 6 email)",
+      "source_message_id": "19d3705287c74f3f",
+      "time": "Sun Run (1K) starts 8:00 AM; 5K Run/Walk starts 8:30 AM"
     },
     "82436e40406c": {
       "category": "Academic Due Date",
@@ -844,6 +1446,62 @@
       "source": "HTM Sharks / Carly Reiley via SportsEngine Motion (Mar 4)",
       "time": "9:00 AM – 12:00 PM"
     },
+    "83d89bdf3fa8": {
+      "category": "School Activity",
+      "child": "All ages",
+      "date": "2026-04-12",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "83d89bdf3fa8",
+      "location": "James Madison High School, 2500 James Madison Dr, Vienna, VA 22181",
+      "name": "Louise Archer 5K & Sun Run",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 23, 2026 (Mar 23)",
+      "source_message_id": "19d1ac06f155fe9f",
+      "time": "Sun Run (1K Fun Run) starts 8:00 AM; 5K Run/Walk starts 8:30 AM"
+    },
+    "85432207bb13": {
+      "category": "Sports & Extracurriculars",
+      "child": "Isla",
+      "date": "2026-05-08",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "85432207bb13",
+      "location": "Cuppett Performing Arts Center, 135 Park Street SE, Vienna, VA 22180",
+      "name": "Cuppett 'Peter Pan' Spring Ballet Performance",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 30, 2026 (Mar 30)",
+      "source_message_id": "19d3f0d72e52bba6",
+      "time": ""
+    },
+    "86778b48b25b": {
+      "category": "Sports & Extracurriculars",
+      "child": "LAES Girls on the Run participants",
+      "date": "2026-05-16",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "86778b48b25b",
+      "location": "",
+      "name": "Girls on the Run 5K (Celebratory Race)",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 23, 2026 (Apr 6 email)",
+      "source_message_id": "19d3705287c74f3f",
+      "time": ""
+    },
+    "8844c8aded75": {
+      "category": "Sports & Extracurriculars",
+      "child": "Hunter Mill Sharks swimmers",
+      "date": "2026-05-13",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "8844c8aded75",
+      "location": "https://huntermill2026.itemorder.com/",
+      "name": "HTM Sharks Team Store All-Items Deadline",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — April 13, 2026 (Apr 16)",
+      "source_message_id": "19d95ef9b0561898",
+      "time": "All day (deadline)"
+    },
     "889afc24d162": {
       "category": "School Activity",
       "child": "Rising 7th & 8th graders",
@@ -854,6 +1512,20 @@
       "name": "VIP Summer Camp — Rising 7th & 8th Graders",
       "source": "FCPS News You Choose (Apr 10)",
       "time": "9:00 AM – 4:00 PM"
+    },
+    "89e917ac3b90": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-04-24",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "89e917ac3b90",
+      "location": "Art museum (off-site)",
+      "name": "6th AAP Art Museum Field Trip",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — April 13, 2026 (Apr 16)",
+      "source_message_id": "19d95ef9b0561898",
+      "time": "School hours"
     },
     "8a2f17c7b54e": {
       "category": "Sports & Extracurriculars",
@@ -868,6 +1540,34 @@
       "source": "HTM Sharks / SportsEngine Motion (Mar 4)",
       "source_message_id": "19cbba1549285194",
       "time": "9:00 AM – 12:00 PM"
+    },
+    "8a351412df38": {
+      "category": "Sports & Extracurriculars",
+      "child": "Isla",
+      "date": "2026-05-09",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "8a351412df38",
+      "location": "Cuppett Performing Arts Center, 135 Park Street SE, Vienna, VA 22180",
+      "name": "Cuppett 'Peter Pan' Spring Ballet Performance",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 30, 2026 (Mar 30)",
+      "source_message_id": "19d3f0d72e52bba6",
+      "time": ""
+    },
+    "8c2d7533952c": {
+      "category": "Sports & Extracurriculars",
+      "child": "Isla",
+      "date": "2026-06-17",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "8c2d7533952c",
+      "location": "Cuppett Performing Arts Center, 135 Park Street SE, Vienna, VA 22180",
+      "name": "Cuppett Recital Dress Rehearsal (Mandatory)",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 30, 2026 (Mar 30)",
+      "source_message_id": "19d3f0d72e52bba6",
+      "time": ""
     },
     "8fabe4c5690c": {
       "category": "Academic Due Date",
@@ -922,6 +1622,76 @@
       "source": "HTM Sharks / Carly Reiley via SportsEngine Motion (Mar 4)",
       "time": "9:00 AM – 12:00 PM"
     },
+    "922c29eabf6c": {
+      "category": "Sports & Extracurriculars",
+      "child": "Open to elementary & middle school",
+      "date": "2026-03-24",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "922c29eabf6c",
+      "location": "Madison High School",
+      "name": "Free Intro to Wrestling Practice (VYI Firebirds)",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 22, 2026 (Mar 22)",
+      "source_message_id": "19d18278dce583f8",
+      "time": "6:30 PM – 8:00 PM"
+    },
+    "936b559592d8": {
+      "category": "Academic Due Date",
+      "child": "Everly",
+      "date": "2026-04-24",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "936b559592d8",
+      "location": "MySchoolBucks",
+      "name": "Art Museum Field Trip — Payment Due via MySchoolBucks ($5)",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — Week of April 20 (Apr 20)",
+      "source_message_id": "19daab1f86c383e7",
+      "time": "All day (deadline)"
+    },
+    "951165eb1a3c": {
+      "category": "School Activity",
+      "child": "Isla",
+      "date": "2026-05-04",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "951165eb1a3c",
+      "location": "Louise Archer Elementary School",
+      "name": "Spring Picture Day (3rd Grade — Rescheduled)",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 30, 2026 (Mar 30)",
+      "source_message_id": "19d3f0d72e52bba6",
+      "time": ""
+    },
+    "95a0c42f2ff9": {
+      "category": "Sports & Extracurriculars",
+      "child": "Everly",
+      "date": "2026-04-12",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "95a0c42f2ff9",
+      "location": "",
+      "name": "REVERB Dance Competition (B2D Dance Team)",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — April 6, 2026 (Apr 6)",
+      "source_message_id": "19d6306ccd82d58a",
+      "time": ""
+    },
+    "9acc0ba52ff6": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-04-13",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "9acc0ba52ff6",
+      "location": "Camp Highroad",
+      "name": "Camp Highroad Field Trip (6th Grade AAP)",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 23, 2026 (Mar 23)",
+      "source_message_id": "19d1ac06f155fe9f",
+      "time": "7:00 AM – 10:30 PM"
+    },
     "9aef9f7e7781": {
       "category": "School Activity",
       "child": "Everly",
@@ -936,6 +1706,76 @@
       "source_message_id": "19dc0becff6647d8",
       "time": "All day"
     },
+    "9cd9dcc5b4e0": {
+      "category": "School Activity",
+      "child": "All kids",
+      "date": "2026-04-06",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "9cd9dcc5b4e0",
+      "location": "Louise Archer Elementary School",
+      "name": "Teacher Workday — No School for Students",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 30, 2026 (Mar 30)",
+      "source_message_id": "19d3f0d72e52bba6",
+      "time": "All day"
+    },
+    "9e1a31ecdd9e": {
+      "category": "Academic Due Date",
+      "child": "Everly",
+      "date": "",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "9e1a31ecdd9e",
+      "location": "Online (PandaDoc link)",
+      "name": "DanceOne Participant Waiver Form Due (2025–2026)",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 23, 2026 (Mar 23)",
+      "source_message_id": "19d1ac06f155fe9f",
+      "time": "All day (deadline)"
+    },
+    "9f12df4df2ae": {
+      "category": "Academic Due Date",
+      "child": "All LAES students",
+      "date": "2026-04-14",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "9f12df4df2ae",
+      "location": "internationalnight@louisearcherpta.org",
+      "name": "International Night Booth Sign-Up Deadline",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Ellen Holmes / LAES PTA Rohde Class (Apr 8)",
+      "source_message_id": "19d6d20d0c67bc74",
+      "time": "All day (deadline)"
+    },
+    "9f7b26bfabe9": {
+      "category": "Academic Due Date",
+      "child": "All LAES students",
+      "date": "2026-03-26",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "9f7b26bfabe9",
+      "location": "store.originalworks.com",
+      "name": "Original Works Art Orders Deadline",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 22, 2026 (Mar 22)",
+      "source_message_id": "19d18278dce583f8",
+      "time": "All day (deadline)"
+    },
+    "a0a1c3808522": {
+      "category": "Sports & Extracurriculars",
+      "child": "Everly",
+      "date": "2026-04-17",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "a0a1c3808522",
+      "location": "Born 2 Dance Studio, 262 Cedar Lane SE, 2nd Floor, Vienna, VA 22180",
+      "name": "B2D IGNITE Team Weekly Rehearsal",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 23, 2026 (Apr 6 email)",
+      "source_message_id": "19d3705287c74f3f",
+      "time": "4:45 PM – 6:45 PM"
+    },
     "a15530b711f7": {
       "category": "Sports & Extracurriculars",
       "child": "All LAES students",
@@ -946,6 +1786,20 @@
       "name": "Sports Camp at LAES — Session 2",
       "source": "LAES PTA Sunbeam (Mar 22)",
       "time": "9:00 AM – 2:00 PM"
+    },
+    "a2320a1fa8f7": {
+      "category": "Academic Due Date",
+      "child": "All LAES students",
+      "date": "2026-04-24",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "a2320a1fa8f7",
+      "location": "",
+      "name": "Yearbook Order Deadline",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — Week of April 20 (Apr 20)",
+      "source_message_id": "19daab1f86c383e7",
+      "time": "All day (deadline)"
     },
     "a6a25e12ba88": {
       "category": "School Activity",
@@ -961,6 +1815,20 @@
       "source_message_id": "19dc0becff6647d8",
       "time": "School hours"
     },
+    "a6eb96414c70": {
+      "category": "Sports & Extracurriculars",
+      "child": "Everly",
+      "date": "2026-04-10",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "a6eb96414c70",
+      "location": "Born 2 Dance Studio, 262 Cedar Lane SE, 2nd Floor, Vienna, VA 22180",
+      "name": "B2D IGNITE Team Weekly Rehearsal",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 23, 2026 (Apr 6 email)",
+      "source_message_id": "19d3705287c74f3f",
+      "time": "4:45 PM – 6:45 PM"
+    },
     "a93959d65e86": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -974,6 +1842,20 @@
       "source": "Susan Anspach / PTA updates (Apr 16)",
       "source_message_id": "19d97dc3ddcf82b5",
       "time": "School hours"
+    },
+    "a973182c3fea": {
+      "category": "School Activity",
+      "child": "All LAES students",
+      "date": "2026-03-25",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "a973182c3fea",
+      "location": "Cuco's Peruvian Restaurant",
+      "name": "Dining 4 Dollars — Cuco's Peruvian (LAES Fundraiser)",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 22, 2026 (Mar 22)",
+      "source_message_id": "19d18278dce583f8",
+      "time": "5:00 PM – 8:00 PM"
     },
     "a9b6a4af91ea": {
       "category": "School Activity",
@@ -1028,6 +1910,20 @@
       "source_message_id": "19d97400ede1ed0d",
       "time": "All day"
     },
+    "af96e5ffaffd": {
+      "category": "Sports & Extracurriculars",
+      "child": "",
+      "date": "2026-04-21",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "af96e5ffaffd",
+      "location": "Dulles Gymnastics",
+      "name": "Dulles Gymnastics Kids Day Camp",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — Week of April 20 (Apr 20)",
+      "source_message_id": "19daab1f86c383e7",
+      "time": "All day"
+    },
     "b0acc99912d7": {
       "category": "Sports & Extracurriculars",
       "child": "TBD",
@@ -1067,6 +1963,20 @@
       "source_message_id": "19d1873576a3c28d",
       "time": "9:00 AM - 2:00 PM"
     },
+    "b2360e9dbf7d": {
+      "category": "Sports & Extracurriculars",
+      "child": "Everly",
+      "date": "2026-05-07",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "b2360e9dbf7d",
+      "location": "",
+      "name": "Everly Volleyball",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Ellen Holmes self-note (Apr 24)",
+      "source_message_id": "19dc12b4401d6066",
+      "time": "8:00 AM - 9:00 AM"
+    },
     "b25d1223f145": {
       "category": "Sports & Extracurriculars",
       "child": "Everly",
@@ -1080,6 +1990,20 @@
       "source": "B2D TeamSnap - Rami Shalan (Apr 8)",
       "source_message_id": "19d6e2fcbf50fdf5",
       "time": ""
+    },
+    "b2c1902fb272": {
+      "category": "Academic Due Date",
+      "child": "Louise Archer students",
+      "date": "2026-04-23",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "b2c1902fb272",
+      "location": "",
+      "name": "STEAM Fair Yearbook Photo Submissions Deadline",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — Week of April 20 (Apr 20)",
+      "source_message_id": "19daab1f86c383e7",
+      "time": "All day (deadline)"
     },
     "b37a1b050726": {
       "category": "Academic Due Date",
@@ -1123,6 +2047,20 @@
       "source_message_id": "19c889d02a70ec60",
       "time": "All day"
     },
+    "b7b61e412c61": {
+      "category": "Sports & Extracurriculars",
+      "child": "Hunter Mill Sharks swimmers",
+      "date": "2026-05-06",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "b7b61e412c61",
+      "location": "https://huntermill2026.itemorder.com/",
+      "name": "HTM Sharks Personalized Silicone Caps Order Deadline",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — April 13, 2026 (Apr 16)",
+      "source_message_id": "19d95ef9b0561898",
+      "time": "All day (deadline)"
+    },
     "b9f8b3d00f5d": {
       "category": "School Activity",
       "child": "Everly",
@@ -1165,6 +2103,34 @@
       "source_message_id": "19d6387e9e9ca21d",
       "time": "8:30 AM"
     },
+    "bc8a1e41342d": {
+      "category": "School Activity",
+      "child": "Everly, Isla",
+      "date": "2026-03-28",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "bc8a1e41342d",
+      "location": "N/A",
+      "name": "Spring Break — No School",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 23, 2026 (Mar 23)",
+      "source_message_id": "19d1ac06f155fe9f",
+      "time": "All day"
+    },
+    "bdf4c067a6dd": {
+      "category": "School Activity",
+      "child": "All LAES students (registered)",
+      "date": "2026-04-17",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "bdf4c067a6dd",
+      "location": "Room 106, Louise Archer Elementary School",
+      "name": "ASL Club First Session at LAES",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 23, 2026 (Apr 6 email)",
+      "source_message_id": "19d3705287c74f3f",
+      "time": "Friday afternoon (after school)"
+    },
     "bf043f46febf": {
       "category": "Sports & Extracurriculars",
       "child": "All LAES students",
@@ -1178,6 +2144,34 @@
       "source": "LAES PTA Sunbeam (Apr 19)",
       "source_message_id": "19da909fe35cca68",
       "time": "8:30 AM - 12:30 PM"
+    },
+    "bf5b910d994c": {
+      "category": "School Activity",
+      "child": "All LAES students",
+      "date": "2026-04-12",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "bf5b910d994c",
+      "location": "James Madison High School, 2500 James Madison Dr, Vienna, VA 22181",
+      "name": "Louise Archer 5K & Sun Run — Sun Run (1K Fun Run)",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Ellen Holmes / LAES PTA Rohde Class (Apr 8)",
+      "source_message_id": "19d6d20d0c67bc74",
+      "time": "8:00 AM"
+    },
+    "c0356bd3a139": {
+      "category": "Sports & Extracurriculars",
+      "child": "Elementary & middle school",
+      "date": "2026-04-06",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "c0356bd3a139",
+      "location": "Madison High School",
+      "name": "VYI Wrestling Spring Season Begins",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 22, 2026 (Mar 22)",
+      "source_message_id": "19d18278dce583f8",
+      "time": ""
     },
     "c088af3ea544": {
       "category": "Academic Due Date",
@@ -1249,6 +2243,20 @@
       "source_message_id": "19db6b8fe9cd6f14",
       "time": "5:34 PM (Arrival: 3:35 PM)"
     },
+    "c5e2b23fa7d6": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-04-24",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "c5e2b23fa7d6",
+      "location": "Art Museum (TBD)",
+      "name": "Art Museum Field Trip (6 AAP)",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 22, 2026 (Mar 22)",
+      "source_message_id": "19d18278dce583f8",
+      "time": ""
+    },
     "c849eb93b585": {
       "category": "Sports & Extracurriculars",
       "child": "Everly",
@@ -1263,6 +2271,34 @@
       "source_message_id": "19dc12e25bd94676",
       "time": "2:45 PM – 4:45 PM"
     },
+    "c98d6ec6e576": {
+      "category": "School Activity",
+      "child": "All LAES kids",
+      "date": "2026-04-12",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "c98d6ec6e576",
+      "location": "James Madison High School, 2500 James Madison Dr, Vienna, VA 22181",
+      "name": "Louise Archer 5K & Sun Run",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — April 6, 2026 (Apr 6)",
+      "source_message_id": "19d6306ccd82d58a",
+      "time": "Sun Run (1K Fun Run): 8:00 AM | 5K Run/Walk: 8:30 AM"
+    },
+    "ca7d2dbb98b0": {
+      "category": "School Activity",
+      "child": "All LAES students",
+      "date": "2026-04-15",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "ca7d2dbb98b0",
+      "location": "Louise Archer Elementary School",
+      "name": "Purple Up! Day (Military Child Spirit Day)",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — April 13, 2026 (Apr 16)",
+      "source_message_id": "19d95ef9b0561898",
+      "time": "School day"
+    },
     "caf200bf6782": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -1273,6 +2309,62 @@
       "name": "Summer Chess Camp (Session 1)",
       "source": "LAES PTA Sunbeam (Mar 22)",
       "time": "9:00 AM - 4:00 PM"
+    },
+    "cba83d530a58": {
+      "category": "Academic Due Date",
+      "child": "All LAES families",
+      "date": "2026-03-27",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "cba83d530a58",
+      "location": "runsignup.com/Race/VA/Vienna/LouiseArcherSunRun",
+      "name": "Louise Archer 5K Race Shirt Registration Deadline",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 23, 2026 (Apr 6 email)",
+      "source_message_id": "19d3705287c74f3f",
+      "time": "All day (deadline)"
+    },
+    "cbb1f38dcac1": {
+      "category": "School Activity",
+      "child": "All kids",
+      "date": "2026-04-10",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "cbb1f38dcac1",
+      "location": "Louise Archer Elementary School",
+      "name": "Teacher Workday — No School",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — April 6, 2026 (Apr 6)",
+      "source_message_id": "19d6306ccd82d58a",
+      "time": "All day"
+    },
+    "ccab969d16be": {
+      "category": "Academic Due Date",
+      "child": "Louise Archer students",
+      "date": "2026-04-23",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "ccab969d16be",
+      "location": "Upload to grade Google Drive folder or email yearbook@louisearcherpta.org",
+      "name": "STEAM Fair Photos Deadline (Yearbook)",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — April 13, 2026 (Apr 16)",
+      "source_message_id": "19d95ef9b0561898",
+      "time": "All day (deadline)"
+    },
+    "ccc89d401769": {
+      "category": "School Activity",
+      "child": "All LAES students/families",
+      "date": "2026-05-01",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "ccc89d401769",
+      "location": "Louise Archer Elementary School",
+      "name": "International Night",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — April 13, 2026 (Apr 16)",
+      "source_message_id": "19d95ef9b0561898",
+      "time": "6:00 PM – 8:00 PM"
     },
     "cd10ecd3d61b": {
       "category": "School Activity",
@@ -1316,6 +2408,20 @@
       "source_message_id": "19d1873576a3c28d",
       "time": "9:00 AM - 4:00 PM"
     },
+    "ce57a3b47bcd": {
+      "category": "School Activity",
+      "child": "Everly, Isla",
+      "date": "2026-03-27",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "ce57a3b47bcd",
+      "location": "Louise Archer Elementary School",
+      "name": "2-Hour Early Release (End of Quarter 3)",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 23, 2026 (Mar 23)",
+      "source_message_id": "19d1ac06f155fe9f",
+      "time": "Early release (2 hrs early)"
+    },
     "cf2b003ea771": {
       "category": "Sports & Extracurriculars",
       "child": "TBD",
@@ -1337,6 +2443,20 @@
       "name": "HTM Sharks NVSL A Meet — AWAY: Hunter Mill @ Fairfax Station Swim & Tennis (FS)",
       "source": "HTM Sharks / Carly Reiley via SportsEngine Motion (Mar 4)",
       "time": "9:00 AM – 12:00 PM"
+    },
+    "d2105b0d9b6f": {
+      "category": "Sports & Extracurriculars",
+      "child": "Isla",
+      "date": "2026-06-18",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "d2105b0d9b6f",
+      "location": "Cuppett Performing Arts Center, 135 Park Street SE, Vienna, VA 22180",
+      "name": "Cuppett Recital Dress Rehearsal (Mandatory)",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 30, 2026 (Mar 30)",
+      "source_message_id": "19d3f0d72e52bba6",
+      "time": ""
     },
     "d30f10742e5d": {
       "category": "School Activity",
@@ -1388,6 +2508,34 @@
       "source_message_id": "19d97400ede1ed0d",
       "time": "All day"
     },
+    "d5faf81a6bf4": {
+      "category": "Sports & Extracurriculars",
+      "child": "3rd–6th Grade girl at Louise Archer",
+      "date": "2026-05-16",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "d5faf81a6bf4",
+      "location": "",
+      "name": "Girls on the Run 5K",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 30, 2026 (Mar 30)",
+      "source_message_id": "19d3f0d72e52bba6",
+      "time": ""
+    },
+    "d6cb5bf71655": {
+      "category": "School Activity",
+      "child": "All Louise Archer students",
+      "date": "2026-04-22",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "d6cb5bf71655",
+      "location": "Louise Archer Elementary School",
+      "name": "LAES STEAM Extravaganza",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — April 13, 2026 (Apr 16)",
+      "source_message_id": "19d95ef9b0561898",
+      "time": "6:00 PM – 7:30 PM"
+    },
     "d7485ecc5f38": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -1416,6 +2564,20 @@
       "source_message_id": "19dc10927e23637a",
       "time": "All day (deadline)"
     },
+    "d7bd256f3db0": {
+      "category": "School Activity",
+      "child": "All LAES students",
+      "date": "2026-04-12",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "d7bd256f3db0",
+      "location": "James Madison High School, 2500 James Madison Dr, Vienna, VA 22181",
+      "name": "Louise Archer 5K & Sun Run — 5K Run/Walk",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Ellen Holmes / LAES PTA Rohde Class (Apr 8)",
+      "source_message_id": "19d6d20d0c67bc74",
+      "time": "8:30 AM"
+    },
     "db41997a7e17": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -1429,6 +2591,20 @@
       "source": "Lifetouch School Photography (Apr 19)",
       "source_message_id": "19da585c1a38aca6",
       "time": "School hours"
+    },
+    "dc3f2061e3b2": {
+      "category": "School Activity",
+      "child": "Isla",
+      "date": "2026-04-12",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "dc3f2061e3b2",
+      "location": "McLean Park Playground",
+      "name": "Isla's 9th Birthday Party",
+      "sender_block_key": "guptamonikausa23@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Evite update via Ellen Holmes (Apr 11)",
+      "source_message_id": "19d7e3800947c40e",
+      "time": ""
     },
     "dc5226f7c4b3": {
       "category": "Sports & Extracurriculars",
@@ -1457,6 +2633,20 @@
       "source": "LAES PTA Sunbeam (Apr 19)",
       "source_message_id": "19da909fe35cca68",
       "time": "8:30 AM - 12:30 PM"
+    },
+    "dce9ef50f47d": {
+      "category": "School Activity",
+      "child": "All kids",
+      "date": "2026-04-10",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "dce9ef50f47d",
+      "location": "Louise Archer Elementary School",
+      "name": "Teacher Workday — No School for Students",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 30, 2026 (Mar 30)",
+      "source_message_id": "19d3f0d72e52bba6",
+      "time": "All day"
     },
     "dd16e609dc6f": {
       "category": "School Activity",
@@ -1553,6 +2743,20 @@
       "source_message_id": "19d86af203b31fdc",
       "time": ""
     },
+    "e31957d4e5c0": {
+      "category": "Academic Due Date",
+      "child": "Louise Archer students",
+      "date": "2026-03-26",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "e31957d4e5c0",
+      "location": "store.originalworks.com",
+      "name": "Original Works Art Orders Due",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 23, 2026 (Mar 23)",
+      "source_message_id": "19d1ac06f155fe9f",
+      "time": "All day (deadline)"
+    },
     "e377fbbd0893": {
       "category": "Sports & Extracurriculars",
       "child": "Everly",
@@ -1566,6 +2770,48 @@
       "source": "B2D Team Coordinator via TeamSnap (Apr 22)",
       "source_message_id": "19db627fb28c14ad",
       "time": "All day"
+    },
+    "e4498d0a199e": {
+      "category": "Sports & Extracurriculars",
+      "child": "Hunter Mill Sharks swimmers",
+      "date": "2026-04-30",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "e4498d0a199e",
+      "location": "Submit to swimteam@hmsrc.org",
+      "name": "HTM Sharks T-Shirt Design Contest Deadline",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — April 13, 2026 (Apr 16)",
+      "source_message_id": "19d95ef9b0561898",
+      "time": "11:59 PM"
+    },
+    "e5ba00afbb5a": {
+      "category": "Academic Due Date",
+      "child": "Everly",
+      "date": "2026-04-17",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "e5ba00afbb5a",
+      "location": "",
+      "name": "Everly — G7 Algebra 1 Honors Automatic Placement Notification",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "FCPS Mathematics (Apr 17)",
+      "source_message_id": "19d9d3ff2d036295",
+      "time": ""
+    },
+    "e602d6bbc9d5": {
+      "category": "Sports & Extracurriculars",
+      "child": "Everly",
+      "date": "2026-05-06",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "e602d6bbc9d5",
+      "location": "",
+      "name": "Everly Volleyball",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Ellen Holmes self-note (Apr 24)",
+      "source_message_id": "19dc12b4401d6066",
+      "time": "8:00 AM - 9:00 AM"
     },
     "e756aa65a220": {
       "category": "Sports & Extracurriculars",
@@ -1592,6 +2838,20 @@
       "source": "FCPS News You Choose — VIP Camp (Apr 10)",
       "time": "9:00 AM – 4:00 PM"
     },
+    "eb1b214fd79c": {
+      "category": "Sports & Extracurriculars",
+      "child": "Everly",
+      "date": "2026-05-04",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "eb1b214fd79c",
+      "location": "",
+      "name": "Everly Volleyball",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Ellen Holmes self-note (Apr 24)",
+      "source_message_id": "19dc12b4401d6066",
+      "time": "8:00 AM - 9:00 AM"
+    },
     "ef88087609ca": {
       "category": "Sports & Extracurriculars",
       "child": "Rising 7th & 8th graders",
@@ -1617,19 +2877,19 @@
       "source_message_id": "19d840f6654b6048",
       "time": "All day"
     },
-    "f049dc284494": {
+    "f01a828c72f8": {
       "category": "School Activity",
-      "child": "Everly",
-      "date": "2026-04-22",
-      "first_seen_iso": "2026-04-24T20:42:56-04:00",
-      "id": "f049dc284494",
-      "location": "Louise Archer Elementary School Store",
-      "name": "6th Grade Class T-Shirts Order Confirmed",
-      "sender_block_key": "myschoolbucks.com",
-      "sender_domain": "myschoolbucks.com",
-      "source": "MySchoolBucks Order Confirmation (Apr 22)",
-      "source_message_id": "19db66f153856497",
-      "time": "All day (deadline)"
+      "child": "All kids",
+      "date": "2026-04-03",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "f01a828c72f8",
+      "location": "Assateague Island National Seashore Campground, Berlin, MD",
+      "name": "Assateague Island Camping Trip (begins)",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 30, 2026 (Mar 30)",
+      "source_message_id": "19d3f0d72e52bba6",
+      "time": "All day"
     },
     "f13e463b9f27": {
       "category": "Appointment",
@@ -1655,6 +2915,20 @@
       "source": "HTM Sharks / SportsEngine Motion (Mar 4)",
       "source_message_id": "19cbba1549285194",
       "time": "9:00 AM – 12:00 PM"
+    },
+    "f5deea369de6": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-04-24",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "f5deea369de6",
+      "location": "Art museum (TBD)",
+      "name": "Art Museum Field Trip (6th Grade AAP)",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — April 6, 2026 (Apr 6)",
+      "source_message_id": "19d6306ccd82d58a",
+      "time": ""
     },
     "f5e565a344ea": {
       "category": "School Activity",
@@ -1695,6 +2969,20 @@
       "source": "InstantSeats.com order confirmation (Apr 8)",
       "time": "3:30 PM"
     },
+    "f7cd95bd0ccb": {
+      "category": "Academic Due Date",
+      "child": "All LAES families",
+      "date": "2026-03-27",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "f7cd95bd0ccb",
+      "location": "runsignup.com/Race/VA/Vienna/LouiseArcherSunRun",
+      "name": "5K Race Shirt Guarantee Deadline",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 22, 2026 (Mar 22)",
+      "source_message_id": "19d18278dce583f8",
+      "time": "All day (deadline)"
+    },
     "f991394d30ee": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -1719,9 +3007,37 @@
       "source": "InstantSeats.com (Apr 8)",
       "source_message_id": "19d6e3bb1942e7e1",
       "time": "3:30 PM"
+    },
+    "fccc94572634": {
+      "category": "School Activity",
+      "child": "All LAES students",
+      "date": "2026-04-22",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "fccc94572634",
+      "location": "Louise Archer Elementary School",
+      "name": "LAES STEAM Extravaganza",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — Week of April 20 (Apr 20)",
+      "source_message_id": "19daab1f86c383e7",
+      "time": "6:00 PM - 7:30 PM"
+    },
+    "fce6a96a192a": {
+      "category": "Appointment",
+      "child": "Isla",
+      "date": "",
+      "first_seen_iso": "2026-04-24T21:16:59-04:00",
+      "id": "fce6a96a192a",
+      "location": "Children's Dentistry of Oakton",
+      "name": "Isla — Dental Checkup (needs scheduling)",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Kids' Schedule — March 23, 2026 (Mar 23)",
+      "source_message_id": "19d1ac06f155fe9f",
+      "time": ""
     }
   },
-  "last_updated_iso": "2026-04-24T20:42:56-04:00",
+  "last_updated_iso": "2026-04-24T21:16:59-04:00",
   "processed_messages": {
     "19a0da1d7445f787": "2026-04-17T18:51:22-04:00",
     "19a1784ff2f26474": "2026-04-17T18:51:22-04:00",
@@ -1776,6 +3092,7 @@
     "19c887239c6630a3": "2026-04-17T17:04:04-04:00",
     "19c889d02a70ec60": "2026-04-17T17:04:04-04:00",
     "19ca071bdbf4dbb6": "2026-04-17T17:04:04-04:00",
+    "19caf03c38dd72a9": "2026-04-24T21:16:59-04:00",
     "19cbba1549285194": "2026-04-17T17:04:04-04:00",
     "19cbe3784773ef87": "2026-04-17T17:04:04-04:00",
     "19cbf894b3d19af7": "2026-04-17T17:04:04-04:00",
@@ -1787,19 +3104,26 @@
     "19d0ce6e37ca3a31": "2026-04-17T17:04:04-04:00",
     "19d15c8e3ef38809": "2026-04-17T17:04:04-04:00",
     "19d1697310b86808": "2026-04-17T17:04:04-04:00",
+    "19d18278dce583f8": "2026-04-24T21:16:59-04:00",
     "19d1873576a3c28d": "2026-04-17T17:04:04-04:00",
+    "19d1ac06f155fe9f": "2026-04-24T21:16:59-04:00",
     "19d1d0ab1d4dfc49": "2026-04-17T17:04:04-04:00",
     "19d1ff79b456f539": "2026-04-17T17:04:04-04:00",
     "19d200fa13bf5d20": "2026-04-17T17:04:04-04:00",
     "19d20c7f4a430076": "2026-04-17T17:04:04-04:00",
     "19d20d5cf27b1a5b": "2026-04-17T17:04:04-04:00",
+    "19d21bb9f489b4da": "2026-04-24T21:16:59-04:00",
     "19d26c93315937ab": "2026-04-17T17:04:04-04:00",
     "19d304ecc0c3ab9d": "2026-04-17T17:04:04-04:00",
     "19d30f45f4ee0fe4": "2026-04-17T17:04:04-04:00",
+    "19d3705287c74f3f": "2026-04-24T21:16:59-04:00",
+    "19d3f0d72e52bba6": "2026-04-24T21:16:59-04:00",
     "19d3f5ef87e8b13d": "2026-04-17T17:04:04-04:00",
     "19d416bbe74c38f5": "2026-04-17T17:04:04-04:00",
     "19d4a7f648c82a45": "2026-04-17T17:04:04-04:00",
     "19d4a7f814c8bfeb": "2026-04-17T17:04:04-04:00",
+    "19d5a406b371003b": "2026-04-24T21:16:59-04:00",
+    "19d6306ccd82d58a": "2026-04-24T21:16:59-04:00",
     "19d6372ec266ca49": "2026-04-17T17:12:56-04:00",
     "19d6387e9e9ca21d": "2026-04-17T17:04:04-04:00",
     "19d6519752181446": "2026-04-17T17:04:04-04:00",
@@ -1809,6 +3133,7 @@
     "19d689281a6750d9": "2026-04-17T17:04:04-04:00",
     "19d69908df955953": "2026-04-17T17:04:04-04:00",
     "19d6ccaa06e52900": "2026-04-17T17:04:04-04:00",
+    "19d6d20d0c67bc74": "2026-04-24T21:16:59-04:00",
     "19d6d6427aff1eb8": "2026-04-17T17:04:04-04:00",
     "19d6e2fa6d8c4a26": "2026-04-17T17:04:04-04:00",
     "19d6e2fcbf50fdf5": "2026-04-17T17:04:04-04:00",
@@ -1824,6 +3149,8 @@
     "19d78e664761b2c3": "2026-04-17T17:04:04-04:00",
     "19d791fcbceb805e": "2026-04-17T17:04:04-04:00",
     "19d7956a3759afb5": "2026-04-17T17:04:04-04:00",
+    "19d7e3800947c40e": "2026-04-24T21:16:59-04:00",
+    "19d8246bbdf6efb3": "2026-04-24T21:16:59-04:00",
     "19d83b05b1bcb9d0": "2026-04-17T17:04:04-04:00",
     "19d83fd607dfc8b4": "2026-04-17T17:04:04-04:00",
     "19d840f6654b6048": "2026-04-17T17:04:04-04:00",
@@ -1832,16 +3159,21 @@
     "19d88762e96ed4d4": "2026-04-17T17:04:04-04:00",
     "19d8ca52e06725fc": "2026-04-17T17:04:04-04:00",
     "19d8cfe9dede47b9": "2026-04-17T17:04:04-04:00",
+    "19d8e7cc55aaf732": "2026-04-24T21:16:59-04:00",
     "19d91cee7b11347a": "2026-04-17T17:04:04-04:00",
     "19d926296f346c39": "2026-04-17T17:04:04-04:00",
     "19d933c3c526f4c5": "2026-04-17T17:04:04-04:00",
+    "19d95ef9b0561898": "2026-04-24T21:16:59-04:00",
+    "19d96775320f2a57": "2026-04-24T21:16:59-04:00",
     "19d972f301856aea": "2026-04-17T17:04:04-04:00",
     "19d973ff86fd7945": "2026-04-17T17:04:04-04:00",
     "19d97400ede1ed0d": "2026-04-17T17:04:04-04:00",
+    "19d97512f7831ec9": "2026-04-24T21:16:59-04:00",
     "19d97dc3ddcf82b5": "2026-04-17T17:04:04-04:00",
     "19d980d04944af0d": "2026-04-17T17:04:04-04:00",
     "19d9c397c93ce0ca": "2026-04-18T07:00:01-04:00",
     "19d9d200208e12f6": "2026-04-18T07:00:01-04:00",
+    "19d9d3ff2d036295": "2026-04-24T21:16:59-04:00",
     "19d9d4080d6ab327": "2026-04-18T07:00:01-04:00",
     "19da585c1a38aca6": "2026-04-20T07:41:20-04:00",
     "19da586b62d24281": "2026-04-24T20:42:56-04:00",
@@ -1849,6 +3181,7 @@
     "19da909fe35cca68": "2026-04-22T08:44:22-04:00",
     "19da9cbb98a53333": "2026-04-22T08:44:22-04:00",
     "19daa8fe1c855724": "2026-04-24T20:42:56-04:00",
+    "19daab1f86c383e7": "2026-04-24T21:16:59-04:00",
     "19dab4de3a36a8ed": "2026-04-22T08:44:22-04:00",
     "19dab736beee2491": "2026-04-24T20:42:56-04:00",
     "19dac98c8b808eac": "2026-04-24T20:42:56-04:00",
@@ -1858,11 +3191,13 @@
     "19db0fe3f623cec5": "2026-04-22T08:44:22-04:00",
     "19db1dded08663b6": "2026-04-24T20:42:56-04:00",
     "19db1e3055f80f7f": "2026-04-24T20:42:56-04:00",
+    "19db23c24db029d5": "2026-04-24T21:16:59-04:00",
     "19db35a32dc692c9": "2026-04-24T20:42:56-04:00",
     "19db54de92f77bea": "2026-04-24T20:42:56-04:00",
     "19db570ee084d2c0": "2026-04-24T20:42:56-04:00",
     "19db627fb28c14ad": "2026-04-24T20:01:41-04:00",
     "19db62fcbbff8022": "2026-04-24T20:01:41-04:00",
+    "19db632941f4d577": "2026-04-24T21:16:59-04:00",
     "19db658c3e6479cd": "2026-04-24T20:01:41-04:00",
     "19db6637a7340c11": "2026-04-24T20:01:41-04:00",
     "19db66e3a84910fb": "2026-04-24T20:01:41-04:00",
@@ -1886,6 +3221,7 @@
     "19dc0becff6647d8": "2026-04-24T20:01:41-04:00",
     "19dc0e9ff7070f38": "2026-04-24T20:01:41-04:00",
     "19dc10927e23637a": "2026-04-24T20:01:41-04:00",
+    "19dc12b4401d6066": "2026-04-24T21:16:59-04:00",
     "19dc12e25bd94676": "2026-04-24T20:01:41-04:00",
     "19dc12fc573b41ff": "2026-04-24T20:42:56-04:00",
     "19dc1b3b02405f53": "2026-04-24T20:42:56-04:00"

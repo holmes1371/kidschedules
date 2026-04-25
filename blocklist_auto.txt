@@ -109,3 +109,5 @@ no-reply@business.amazon.com  # auto 2026-04-25: Amazon Business promotional ema
 silverlining@synoviasolutions.com  # auto 2026-04-25: Here Comes The Bus notifications with empty bodies — bus tracking app alerts for
 info@mailva.evite.com  # auto 2026-04-25: Cancellation notice for a child's birthday party the family was invited to — not
 do_not_reply@lightspeedsystems.com  # auto 2026-04-25: automated web filter portal weekly report — no kids' events content
+eservice@harlandclarke.com  # auto 2026-04-25: Check/banking order delivery notifications — adult financial services, no childr
+salesforce@myworkday.com  # auto 2026-04-25: Adult job interview scheduling/recruiting — no children's events
