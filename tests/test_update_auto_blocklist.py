@@ -189,7 +189,8 @@ def _suggest(addr, *, source_message_id="msg1", reason="r", confidence="high"):
 def _run_main(monkeypatch, tmp_path, suggestions, *, main_block=None,
               auto_block_existing=None, audit_log=True,
               protected_patterns=None, sender_stats=None,
-              state_existing=None):
+              state_existing=None,
+              active_ttl_days=None, pending_ttl_days=None):
     sug_path = tmp_path / "suggestions.json"
     sug_path.write_text(json.dumps(suggestions), encoding="utf-8")
 
@@ -246,6 +247,10 @@ def _run_main(monkeypatch, tmp_path, suggestions, *, main_block=None,
     ]
     if audit_path is not None:
         argv += ["--audit-log", str(audit_path)]
+    if active_ttl_days is not None:
+        argv += ["--active-ttl-days", str(active_ttl_days)]
+    if pending_ttl_days is not None:
+        argv += ["--pending-ttl-days", str(pending_ttl_days)]
     monkeypatch.setattr(sys, "argv", argv)
 
     out_buf = io.StringIO()
@@ -894,3 +899,251 @@ def test_main_does_not_reject_when_sender_stats_total_events_zero(
     assert not auto_path.exists()
     state = json.loads(state_path.read_text())
     assert "marketing@deals.com" in state["pending"]
+
+
+# ─── #27 v1 lever 3 — TTL decay through main() ────────────────────────────
+#
+# Active entries unflagged for >ACTIVE_TTL_DAYS expire (drop from state
+# AND from blocklist_auto.txt). Pending entries unflagged for
+# >PENDING_TTL_DAYS age out (state-only; pending has no txt presence).
+# Refresh-on-flag means an active entry that gets re-flagged this run
+# survives the same run's tick_ttl call cleanly.
+
+
+def test_main_ttl_expires_active_entry_and_removes_txt_line(
+    monkeypatch, tmp_path,
+):
+    """Active entry whose last_flagged_iso is older than the active
+    TTL: dropped from state AND its line removed from
+    blocklist_auto.txt by full rewrite. Other entries in the txt are
+    preserved (header lines included)."""
+    rc, stdout, _err, auto_path, audit_path, state_path = _run_main(
+        monkeypatch, tmp_path,
+        [],  # no suggestions; TTL pass still runs
+        auto_block_existing=(
+            "# Auto-populated blocklist\n"
+            "# DO NOT hand-edit — edit blocklist.txt instead.\n"
+            "expired@example.com  # auto 2026-01-01: very old\n"
+            "fresh@example.com    # auto 2026-04-15: recent\n"
+        ),
+        state_existing={
+            "schema_version": 1,
+            "last_updated_iso": "2026-04-15T00:00:00",
+            "pending": {},
+            "active": {
+                "expired@example.com": {
+                    "added_iso": "2026-01-01",
+                    "last_flagged_iso": "2026-01-01",
+                    "reason": "very old",
+                },
+                "fresh@example.com": {
+                    "added_iso": "2026-04-15",
+                    "last_flagged_iso": "2026-04-15",
+                    "reason": "recent",
+                },
+            },
+        },
+        # _FROZEN_DATE is 2026-04-22; expired@ is 111 days old.
+    )
+    assert rc == 0
+    assert "EXPIRED:    expired@example.com" in stdout
+    text = auto_path.read_text(encoding="utf-8")
+    # Header preserved, expired entry removed, fresh entry kept.
+    assert text.startswith("# Auto-populated blocklist")
+    assert "expired@example.com" not in text
+    assert "fresh@example.com" in text
+    state = json.loads(state_path.read_text())
+    assert "expired@example.com" not in state["active"]
+    assert "fresh@example.com" in state["active"]
+    entry = json.loads(audit_path.read_text().strip())
+    assert entry["expired"] == [{"from": "expired@example.com"}]
+    assert entry["aged_out"] == []
+
+
+def test_main_ttl_ages_out_pending_entry(monkeypatch, tmp_path):
+    """Pending entry whose last_flagged_iso is older than the pending
+    TTL: dropped from state. No txt change (pending entries don't
+    appear in the txt). Audit log records it under ``aged_out``."""
+    rc, stdout, _err, _ap, audit_path, state_path = _run_main(
+        monkeypatch, tmp_path,
+        [],
+        state_existing={
+            "schema_version": 1,
+            "last_updated_iso": "2026-03-01T00:00:00",
+            "pending": {
+                "stale-pending@example.com": {
+                    "first_flagged_iso": "2026-03-01",
+                    "last_flagged_iso": "2026-03-01",
+                    "flagged_message_ids": ["msg-1"],
+                    "reason_samples": ["never corroborated"],
+                },
+            },
+            "active": {},
+        },
+        # _FROZEN_DATE is 2026-04-22; pending is 52 days old (>30 default).
+    )
+    assert rc == 0
+    assert "aged_out:   stale-pending@example.com" in stdout
+    state = json.loads(state_path.read_text())
+    assert "stale-pending@example.com" not in state["pending"]
+    entry = json.loads(audit_path.read_text().strip())
+    assert entry["aged_out"] == [{"from": "stale-pending@example.com"}]
+    assert entry["expired"] == []
+
+
+def test_main_ttl_inside_window_keeps_entry(monkeypatch, tmp_path):
+    """An active entry exactly TTL days old (not >TTL) is kept. The
+    boundary is "older than" — 90 days is fine, 91 days expires.
+    Pinned to catch off-by-one drift in tick_ttl."""
+    rc, _stdout, _err, _ap, audit_path, state_path = _run_main(
+        monkeypatch, tmp_path,
+        [],
+        state_existing={
+            "schema_version": 1,
+            "last_updated_iso": "2026-01-22T00:00:00",
+            "pending": {},
+            "active": {
+                "borderline@example.com": {
+                    "added_iso": "2026-01-22",
+                    "last_flagged_iso": "2026-01-22",  # exactly 90d before
+                    "reason": "edge",
+                },
+            },
+        },
+    )
+    assert rc == 0
+    state = json.loads(state_path.read_text())
+    assert "borderline@example.com" in state["active"]
+    entry = json.loads(audit_path.read_text().strip())
+    assert entry["expired"] == []
+
+
+def test_main_ttl_refresh_on_flag_resets_clock(monkeypatch, tmp_path):
+    """An active entry near expiry gets refreshed when a fresh flag
+    arrives in the same run — the TTL pass that follows must NOT
+    expire it. Pins the order: refresh first (suggestion loop), then
+    tick_ttl reads the new last_flagged_iso = today."""
+    rc, stdout, _err, _ap, audit_path, state_path = _run_main(
+        monkeypatch, tmp_path,
+        [_suggest("near-expiry@example.com",
+                  source_message_id="msg-fresh",
+                  reason="still spamming")],
+        auto_block_existing=(
+            "# Auto-populated blocklist\n"
+            "near-expiry@example.com  # auto 2026-01-15: old\n"
+        ),
+        state_existing={
+            "schema_version": 1,
+            "last_updated_iso": "2026-01-15T00:00:00",
+            "pending": {},
+            "active": {
+                "near-expiry@example.com": {
+                    "added_iso": "2026-01-15",
+                    # 97 days before _FROZEN_DATE — would expire under
+                    # 90-day TTL absent the refresh.
+                    "last_flagged_iso": "2026-01-15",
+                    "reason": "old",
+                },
+            },
+        },
+    )
+    assert rc == 0
+    # Refreshed, not expired.
+    assert "refreshed:  near-expiry@example.com" in stdout
+    assert "EXPIRED:    near-expiry@example.com" not in stdout
+    state = json.loads(state_path.read_text())
+    assert state["active"]["near-expiry@example.com"]["last_flagged_iso"] == "2026-04-22"
+    entry = json.loads(audit_path.read_text().strip())
+    assert entry["expired"] == []
+    assert len(entry["active_refreshed"]) == 1
+
+
+def test_main_ttl_custom_via_cli_flags(monkeypatch, tmp_path):
+    """--active-ttl-days and --pending-ttl-days override the defaults.
+    Used by tests to compress the TTL windows; in production the
+    defaults (90/30) hold."""
+    rc, _stdout, _err, auto_path, _audit, state_path = _run_main(
+        monkeypatch, tmp_path,
+        [],
+        auto_block_existing=(
+            "# Auto-populated blocklist\n"
+            "stale@example.com  # auto 2026-04-15: recent-ish\n"
+        ),
+        state_existing={
+            "schema_version": 1,
+            "last_updated_iso": "2026-04-15T00:00:00",
+            "pending": {},
+            "active": {
+                "stale@example.com": {
+                    "added_iso": "2026-04-15",
+                    "last_flagged_iso": "2026-04-15",  # 7 days before
+                    "reason": "recent-ish",
+                },
+            },
+        },
+        active_ttl_days=3,  # 7 > 3 → expires
+    )
+    assert rc == 0
+    state = json.loads(state_path.read_text())
+    assert "stale@example.com" not in state["active"]
+    assert "stale@example.com" not in auto_path.read_text()
+
+
+def test_main_ttl_pending_custom_via_cli_flag(monkeypatch, tmp_path):
+    """Per-flag override for the pending TTL. Mirrors the active-side
+    pin; ensures both kwargs propagate from argv into tick_ttl."""
+    rc, _stdout, _err, _ap, _audit, state_path = _run_main(
+        monkeypatch, tmp_path,
+        [],
+        state_existing={
+            "schema_version": 1,
+            "last_updated_iso": "2026-04-15T00:00:00",
+            "pending": {
+                "watch@example.com": {
+                    "first_flagged_iso": "2026-04-15",
+                    "last_flagged_iso": "2026-04-15",  # 7 days before
+                    "flagged_message_ids": ["msg-1"],
+                    "reason_samples": ["watching"],
+                },
+            },
+            "active": {},
+        },
+        pending_ttl_days=3,  # 7 > 3 → ages out
+    )
+    assert rc == 0
+    state = json.loads(state_path.read_text())
+    assert "watch@example.com" not in state["pending"]
+
+
+def test_main_ttl_summary_emits_expired_aged_out_counts(monkeypatch, tmp_path):
+    """The stderr one-line JSON summary now carries expired_count and
+    aged_out_count alongside the existing buckets."""
+    rc, _stdout, stderr, _ap, _audit, _sp = _run_main(
+        monkeypatch, tmp_path,
+        [],
+        state_existing={
+            "schema_version": 1,
+            "last_updated_iso": "2026-01-01T00:00:00",
+            "pending": {
+                "stale-pending@example.com": {
+                    "first_flagged_iso": "2026-01-01",
+                    "last_flagged_iso": "2026-01-01",
+                    "flagged_message_ids": ["msg"],
+                    "reason_samples": [],
+                },
+            },
+            "active": {
+                "stale-active@example.com": {
+                    "added_iso": "2026-01-01",
+                    "last_flagged_iso": "2026-01-01",
+                    "reason": "stale",
+                },
+            },
+        },
+    )
+    assert rc == 0
+    summary_line = [ln for ln in stderr.splitlines()
+                    if ln.startswith("{")][-1]
+    summary = json.loads(summary_line)
+    assert summary["expired_count"] == 1
+    assert summary["aged_out_count"] == 1

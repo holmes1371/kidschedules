@@ -20,11 +20,11 @@ Strict rules for writing it:
 
 **2026-04-25**
 
-- Item 27 in flight `[~]`; 4 of 6 planned commits landed: 6bea35a (design + flip), e5772cc (sender-stats reject), 6b8c62a (state module + 27 unit tests), and this commit (main() integration + workflow plumbing + parity update + agent-prompt extension).
-- Behavior switch landed: first flag → pending; second distinct-message flag → promote to active + write to `blocklist_auto.txt`. Same-message re-flag (`--reextract`) does not advance the strike count.
-- Mid-feature scope expansion (Tom-approved): agent's `irrelevant_senders` schema now requires `source_message_id` to participate in N-strikes corroboration. Flags missing the field are rejected at the `update_auto_blocklist` gate as `"missing source_message_id"`.
-- `blocklist_auto_state.json` added to workflow restore + save + parity test; pre-deploy txt entries get synthetic `last_flagged_iso = today` via `seed_active_from_legacy` so TTL counts cleanly from deploy day.
-- Next pickup: commit 5 — TTL decay (`tick_ttl` integrated into `main()`, expired/aged_out audit-log buckets) + close-out summary on commit 6. Test delta vs main: +36 passing, 0 new failures (92 pre-existing process_events/protected_senders failures unchanged).
+- Item 27 in flight `[~]`; 5 of 6 planned commits landed: 6bea35a (design + flip), e5772cc (sender-stats reject), 6b8c62a (state module), 87d18f5 (main() integration + workflow plumbing), and this commit (TTL decay).
+- TTL: 90d active (refresh-on-flag keeps real spammers blocked indefinitely) and 30d pending (suspicions age out without corroboration). `--active-ttl-days` and `--pending-ttl-days` CLI flags expose the windows for tests. Expired addresses removed from `blocklist_auto.txt` by full rewrite (header preserved); aged-out entries are pending-only with no txt presence.
+- Audit log gained `expired` and `aged_out` event buckets; stderr summary gained matching counts. All three #27 levers now wired end-to-end.
+- Test delta vs main: +43 passing (3 sender-stats + 27 state module + 6 integration + 7 TTL), 0 new failures. 92 pre-existing process_events/protected_senders failures unchanged.
+- Next pickup: commit 6 — close-out summary; item stays `[~]` pending Tom's live verification across at least two cron weeks (pending → promote cycle observable end-to-end).
 
 ## For future agents
 

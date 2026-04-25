@@ -50,9 +50,13 @@ do not advance the strike count. Pre-deploy txt entries are seeded
 into the ``active`` section on first run with a synthetic
 ``last_flagged_iso = today``.
 
-TTL decay (#27 lever 3, commit 5): not yet wired here. Will prune
-active entries unflagged for 90 days and pending entries unflagged
-for 30 days; refresh-on-flag means real spammers stay blocked.
+TTL decay (#27 lever 3): after the suggestion loop, ``tick_ttl`` prunes
+active entries unflagged for ``--active-ttl-days`` (default 90) and
+pending entries unflagged for ``--pending-ttl-days`` (default 30).
+Expired addresses are also removed from ``blocklist_auto.txt`` via a
+full file rewrite. Refresh-on-flag (the ``active_refreshed`` outcome)
+keeps real spammers blocked indefinitely; only senders that go quiet
+age out.
 
 Outcomes per suggestion (logged on stdout and to the audit JSONL):
 
@@ -66,6 +70,14 @@ Outcomes per suggestion (logged on stdout and to the audit JSONL):
   drop any pending entry as resolved
 - ``rejected``: failed an upstream gate (confidence, address shape,
   missing source_message_id, protected, useful sender)
+
+Per-run TTL events (logged on stdout and to the audit JSONL):
+
+- ``expired``: active entry's ``last_flagged_iso`` exceeded the active
+  TTL; entry dropped from state and txt
+- ``aged_out``: pending entry's ``last_flagged_iso`` exceeded the
+  pending TTL without a corroborating second flag; entry dropped
+  from state (no txt presence to clean up)
 """
 from __future__ import annotations
 
@@ -170,6 +182,17 @@ def main() -> int:
                         "promotion and TTL decay. Required — pre-existing "
                         "blocklist_auto.txt entries are seeded on first "
                         "run via auto_blocklist_state.seed_active_from_legacy.")
+    p.add_argument("--active-ttl-days", type=int, default=abls.ACTIVE_TTL_DAYS,
+                   help=f"Active entries unflagged for more than this many "
+                        f"days are pruned (default: {abls.ACTIVE_TTL_DAYS}). "
+                        f"Real spammers stay blocked indefinitely via "
+                        f"refresh-on-flag; this is the recovery path for "
+                        f"senders that go quiet.")
+    p.add_argument("--pending-ttl-days", type=int, default=abls.PENDING_TTL_DAYS,
+                   help=f"Pending entries unflagged for more than this many "
+                        f"days are aged out (default: {abls.PENDING_TTL_DAYS}). "
+                        f"Pending is 'watching, not blocking'; if no second "
+                        f"flag arrives within the window, drop the suspicion.")
     args = p.parse_args()
 
     protected = (
@@ -298,8 +321,42 @@ def main() -> int:
         # Unknown outcome would be a programming error in the state
         # module; let it land in no bucket so the test will catch it.
 
+    # TTL decay (#27 lever 3). Prune expired active entries and aged-out
+    # pending entries. Runs AFTER the suggestion loop so any active
+    # entry that just got refreshed-on-flag has the fresh
+    # last_flagged_iso and won't be expired in the same run. Returns
+    # `{expired, aged_out}` lists for the audit log; the txt rewrite
+    # below removes expired entries (aged-out are pending-only, no
+    # txt presence to clean up).
+    ttl_result = abls.tick_ttl(
+        state, today,
+        active_ttl_days=args.active_ttl_days,
+        pending_ttl_days=args.pending_ttl_days,
+    )
+    expired_addrs = set(ttl_result["expired"])
+
+    # Remove expired entries from blocklist_auto.txt by full rewrite.
+    # Comment-only and blank lines are preserved (auto-header lives on
+    # the first lines as comments, so it survives unchanged).
+    if expired_addrs and os.path.exists(args.auto_blocklist):
+        with open(args.auto_blocklist, "r", encoding="utf-8") as f:
+            lines = f.readlines()
+        kept_lines = []
+        for line in lines:
+            stripped = line.strip()
+            if not stripped or stripped.startswith("#"):
+                kept_lines.append(line)
+                continue
+            addr_in_line = stripped.split("#", 1)[0].strip().lower()
+            if addr_in_line in expired_addrs:
+                continue  # drop the expired entry's line
+            kept_lines.append(line)
+        with open(args.auto_blocklist, "w", encoding="utf-8") as f:
+            f.writelines(kept_lines)
+
     # Promoted entries land in blocklist_auto.txt with the same trailer
-    # format as before (#26). Header written on first creation.
+    # format as before (#26). Header written on first creation. Append
+    # AFTER the expiry rewrite so promotions survive cleanly.
     if promoted:
         write_header = not os.path.exists(args.auto_blocklist)
         with open(args.auto_blocklist, "a", encoding="utf-8") as f:
@@ -325,6 +382,10 @@ def main() -> int:
         print(f"  duplicate:  {addr} (same message_id; no strike)")
     for addr, _mid, _r, _c in resolved_by_main:
         print(f"  resolved:   {addr} (in main blocklist; pending dropped)")
+    for addr in sorted(ttl_result["expired"]):
+        print(f"  EXPIRED:    {addr} (active TTL elapsed)")
+    for addr in sorted(ttl_result["aged_out"]):
+        print(f"  aged_out:   {addr} (pending TTL elapsed without 2nd flag)")
     for addr, why, conf in rejected:
         conf_display = conf if conf else "n/a"
         print(f"  rejected:   {addr} [conf={conf_display}] — {why}")
@@ -339,6 +400,8 @@ def main() -> int:
         "active_refreshed_count": len(active_refreshed),
         "duplicate_count": len(duplicates),
         "resolved_count": len(resolved_by_main),
+        "expired_count": len(ttl_result["expired"]),
+        "aged_out_count": len(ttl_result["aged_out"]),
         "added": [
             {"from": a, "reason": r, "confidence": c}
             for a, _m, r, c in promoted
@@ -378,6 +441,8 @@ def main() -> int:
                 {"from": a, "source_message_id": m, "confidence": c}
                 for a, m, _r, c in resolved_by_main
             ],
+            "expired": [{"from": a} for a in ttl_result["expired"]],
+            "aged_out": [{"from": a} for a in ttl_result["aged_out"]],
             "rejected": [
                 {"from": a, "why": w, "confidence": c}
                 for a, w, c in rejected
