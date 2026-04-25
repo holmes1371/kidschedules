@@ -91,3 +91,10 @@ dccc@ak.dccc.org  # auto 2026-04-17: Adult political fundraising email from DCCC
 scheduler@goodtime.io  # auto 2026-04-18: Adult job interview scheduling for Ellen at Salesforce — entirely work-related,
 jobalerts@yourmembership.com  # auto 2026-04-22: legal career/job alert newsletter — entirely adult professional content, no kids
 bca22181@gmail.com  # auto 2026-04-22: neighborhood adult social happy hour event — no children's activities or school
+donotreply@inova.org  # auto 2026-04-25: Adult urogynecology follow-up appointment with no child involvement
+passsif5183@network2.marxolmicko.space  # auto 2026-04-25: Spam/junk email with no relevant content
+ads-account-noreply@google.com  # auto 2026-04-25: Google Ads account policy update — adult/business communications only
+info@e.electjon.com  # auto 2026-04-25: Political campaign fundraising email — adult only
+noreply@app.hiive.com  # auto 2026-04-25: Private market investment platform daily digest — adult financial content only
+info@poshmark.com  # auto 2026-04-25: Poshmark retail/fashion marketing email — adult content only
+noreply@directvote.net  # auto 2026-04-25: D.C. Bar professional election voting — adult legal/professional organization, n
