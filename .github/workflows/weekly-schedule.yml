@@ -125,6 +125,14 @@ jobs:
           else
             echo "No prior blocklist_auto_audit.jsonl — starting fresh."
           fi
+          if [ -f .state/blocklist_auto_state.json ]; then
+            cp .state/blocklist_auto_state.json blocklist_auto_state.json
+            PEND=$(python3 -c "import json; print(len(json.load(open('blocklist_auto_state.json')).get('pending', {})))")
+            ACT=$(python3 -c "import json; print(len(json.load(open('blocklist_auto_state.json')).get('active', {})))")
+            echo "Restored blocklist_auto_state.json ($PEND pending, $ACT active)."
+          else
+            echo "No prior blocklist_auto_state.json — pending+active state starts empty."
+          fi
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -210,6 +218,7 @@ jobs:
           if [ ! -f .filter_audit.json ] \
              && [ ! -f blocklist_auto.txt ] \
              && [ ! -f blocklist_auto_audit.jsonl ] \
+             && [ ! -f blocklist_auto_state.json ] \
              && [ ! -f events_state.json ] \
              && [ ! -f prior_events.json ] \
              && [ ! -f sender_stats.json ]; then
@@ -232,6 +241,9 @@ jobs:
           if [ -f ../blocklist_auto_audit.jsonl ]; then
             cp ../blocklist_auto_audit.jsonl blocklist_auto_audit.jsonl
           fi
+          if [ -f ../blocklist_auto_state.json ]; then
+            cp ../blocklist_auto_state.json blocklist_auto_state.json
+          fi
           if [ -f ../events_state.json ]; then
             cp ../events_state.json events_state.json
           fi
@@ -249,6 +261,7 @@ jobs:
           [ -f .filter_audit.json ] && FILES="$FILES .filter_audit.json"
           [ -f blocklist_auto.txt ] && FILES="$FILES blocklist_auto.txt"
           [ -f blocklist_auto_audit.jsonl ] && FILES="$FILES blocklist_auto_audit.jsonl"
+          [ -f blocklist_auto_state.json ] && FILES="$FILES blocklist_auto_state.json"
           [ -f events_state.json ] && FILES="$FILES events_state.json"
           [ -f prior_events.json ] && FILES="$FILES prior_events.json"
           [ -f sender_stats.json ] && FILES="$FILES sender_stats.json"

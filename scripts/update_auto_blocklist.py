@@ -34,15 +34,38 @@ prevents the recurrence of the Ellen-tax-email failure mode where a
 parent's personal Gmail address got auto-blocked from a single agent
 flag — see design/protect-parent-addresses.md.
 
-Sender-stats reject (#27, this commit): the new
-sender_stats.json gate is the cheapest of the three #27 levers — no
-new state file, just one extra dict lookup per suggestion. It catches
-the case where the agent makes a per-email "no kid events" call on a
-sender that has produced kid events in prior weeks. Subsequent commits
-add the N-strikes pending ledger and TTL decay; together those three
-levers replace today's "first flag → permanent active block" gating
-with "first flag → pending; second-flag-distinct-message → active;
-expire on 90d quiet."
+Sender-stats reject (#27 lever 1): the sender_stats.json gate is the
+cheapest of the three #27 levers — no new state file, just one extra
+dict lookup per suggestion. It catches the case where the agent makes
+a per-email "no kid events" call on a sender that has produced kid
+events in prior weeks.
+
+N-strikes pending ledger (#27 lever 2): a high-confidence flag with a
+new ``source_message_id`` for an unknown sender lands in the
+``pending`` section of ``blocklist_auto_state.json`` (a watchlist —
+NOT in ``blocklist_auto.txt``). Only when a second flag with a
+*distinct* message_id arrives does the address promote to active and
+get written to the txt. Same-message re-flags (e.g. ``--reextract``)
+do not advance the strike count. Pre-deploy txt entries are seeded
+into the ``active`` section on first run with a synthetic
+``last_flagged_iso = today``.
+
+TTL decay (#27 lever 3, commit 5): not yet wired here. Will prune
+active entries unflagged for 90 days and pending entries unflagged
+for 30 days; refresh-on-flag means real spammers stay blocked.
+
+Outcomes per suggestion (logged on stdout and to the audit JSONL):
+
+- ``promoted``: 2nd distinct-message flag → added to ``blocklist_auto.txt``
+- ``pending_added``: 1st flag → ``state["pending"]``, no txt write
+- ``active_refreshed``: address is already active → bump
+  ``last_flagged_iso`` (defends TTL expiry)
+- ``duplicate_flag``: same message_id seen before in pending →
+  no strike advance; ``last_flagged_iso`` still bumps
+- ``resolved_by_main_blocklist``: operator hand-blocked the address;
+  drop any pending entry as resolved
+- ``rejected``: failed an upstream gate (confidence, address shape,
+  missing source_message_id, protected, useful sender)
 """
 from __future__ import annotations
 
@@ -63,10 +86,12 @@ if _PROJECT_ROOT not in sys.path:
 
 from protected_senders import is_protected, load_protected_senders  # noqa: E402
 from newsletter_stats import load_stats as load_sender_stats  # noqa: E402
+import auto_blocklist_state as abls  # noqa: E402
 
 
 DEFAULT_PROTECTED_SENDERS = os.path.join(_PROJECT_ROOT, "protected_senders.txt")
 DEFAULT_SENDER_STATS = os.path.join(_PROJECT_ROOT, "sender_stats.json")
+DEFAULT_STATE_FILE = os.path.join(_PROJECT_ROOT, "blocklist_auto_state.json")
 
 
 # Sender-stats reject thresholds (#27 v1). A suggestion is rejected when
@@ -139,6 +164,12 @@ def main() -> int:
                         "Missing/corrupt file falls through silently (gate "
                         "skipped; N-strikes downstream still corroborates). "
                         "Pass '' to disable.")
+    p.add_argument("--state-file", default=DEFAULT_STATE_FILE,
+                   help="Path to blocklist_auto_state.json (#27 v1). Holds "
+                        "the pending+active sections that drive N-strikes "
+                        "promotion and TTL decay. Required — pre-existing "
+                        "blocklist_auto.txt entries are seeded on first "
+                        "run via auto_blocklist_state.seed_active_from_legacy.")
     args = p.parse_args()
 
     protected = (
@@ -164,20 +195,37 @@ def main() -> int:
         )
         return 1
 
-    existing = _parse_block_file(args.auto_blocklist) | _parse_block_file(
-        args.main_blocklist
-    )
+    today = dt.date.today()
+    today_iso = today.isoformat()
 
-    # Each entry carries the agent's raw confidence value so the audit log
-    # preserves it alongside the guardrail decision.
-    added: list[tuple[str, str, str]] = []     # (address, reason, confidence)
-    rejected: list[tuple[str, str, str]] = []  # (address, why, confidence)
+    # Load pending/active state and seed legacy txt entries that have
+    # no state row yet. Idempotent — second-and-later runs no-op the
+    # seed because the state has caught up to the txt.
+    state = abls.load_state(args.state_file)
+    txt_addrs = list(_parse_block_file(args.auto_blocklist))
+    seeded = abls.seed_active_from_legacy(state, txt_addrs, today)
+    if seeded:
+        print(
+            f"  Seeded {seeded} legacy auto-blocklist entry(ies) with "
+            f"synthetic last_flagged_iso={today_iso}"
+        )
+    main_block_addrs = _parse_block_file(args.main_blocklist)
+
+    # Per-outcome buckets. The `_` placeholder marks fields not used by
+    # downstream logging — kept on the tuple so iteration is uniform.
+    promoted: list[tuple[str, str, str, str]] = []          # (addr, msg_id, reason, conf)
+    pending_added: list[tuple[str, str, str, str]] = []
+    active_refreshed: list[tuple[str, str, str, str]] = []
+    duplicates: list[tuple[str, str, str, str]] = []
+    resolved_by_main: list[tuple[str, str, str, str]] = []
+    rejected: list[tuple[str, str, str]] = []               # (addr, why, conf)
 
     for s in suggestions:
         if not isinstance(s, dict):
             rejected.append((repr(s), "not a dict", ""))
             continue
         addr = (s.get("from") or "").strip().lower()
+        message_id = (s.get("source_message_id") or "").strip()
         reason = (s.get("reason") or "").strip()
         conf = (s.get("confidence") or "").strip().lower()
 
@@ -189,6 +237,13 @@ def main() -> int:
         domain = _domain_of(addr)
         if not domain:
             rejected.append((addr or repr(s), "not a valid email address", conf))
+            continue
+        if not message_id:
+            # #27: missing source_message_id is malformed at the gate. The
+            # agent's prompt asks for this field; flags without it can't
+            # participate in N-strikes corroboration so we drop them
+            # rather than silently treat empty-string as a real id.
+            rejected.append((addr, "missing source_message_id", conf))
             continue
         if is_protected(addr, protected):
             # Differentiate the rejection reason so the audit log keeps the
@@ -202,10 +257,11 @@ def main() -> int:
             else:
                 rejected.append((addr, f"protected domain ({domain})", conf))
             continue
-        # Sender-stats reject (#27): if the sender has produced kid events
-        # historically, this is a useful sender — refuse the auto-block
-        # regardless of how confident the agent's per-email judgment is.
-        # Empty stats / unknown sender / below-threshold all fall through.
+        # Sender-stats reject (#27 lever 1): if the sender has produced
+        # kid events historically, this is a useful sender — refuse the
+        # auto-block regardless of how confident the agent's per-email
+        # judgment is. Empty stats / unknown sender / below-threshold
+        # all fall through to the pending/active routing below.
         sender_entry = sender_stats.get("senders", {}).get(addr)
         if sender_entry:
             msgs_seen = sender_entry.get("messages_seen", 0)
@@ -219,44 +275,108 @@ def main() -> int:
                     conf,
                 ))
                 continue
-        if addr in existing:
-            rejected.append((addr, "already in blocklist", conf))
-            continue
-        existing.add(addr)
-        added.append((addr, reason, conf))
+        # Pending/active routing via the state module (#27 lever 2).
+        # First flag → pending; second distinct-message flag → promote
+        # to active and append to blocklist_auto.txt below.
+        already_active = addr in state["active"]
+        already_in_main_blocklist = addr in main_block_addrs
+        outcome = abls.add_or_promote(
+            state, addr, message_id, reason, today,
+            already_active=already_active,
+            already_in_main_blocklist=already_in_main_blocklist,
+        )
+        if outcome == "pending_added":
+            pending_added.append((addr, message_id, reason, conf))
+        elif outcome == "pending_promoted":
+            promoted.append((addr, message_id, reason, conf))
+        elif outcome == "active_refreshed":
+            active_refreshed.append((addr, message_id, reason, conf))
+        elif outcome == "duplicate_flag":
+            duplicates.append((addr, message_id, reason, conf))
+        elif outcome == "resolved_by_main_blocklist":
+            resolved_by_main.append((addr, message_id, reason, conf))
+        # Unknown outcome would be a programming error in the state
+        # module; let it land in no bucket so the test will catch it.
 
-    if added:
-        today = dt.date.today().isoformat()
+    # Promoted entries land in blocklist_auto.txt with the same trailer
+    # format as before (#26). Header written on first creation.
+    if promoted:
         write_header = not os.path.exists(args.auto_blocklist)
         with open(args.auto_blocklist, "a", encoding="utf-8") as f:
             if write_header:
                 f.write(_AUTO_HEADER)
-            for addr, reason, _conf in added:
+            for addr, _mid, reason, _conf in promoted:
                 short = reason[:80].replace("\n", " ").replace("#", "").strip()
-                f.write(f"{addr}  # auto {today}: {short}\n")
+                f.write(f"{addr}  # auto {today_iso}: {short}\n")
 
-    for addr, reason, conf in added:
-        print(f"  AUTO-BLOCK: {addr} [conf={conf}] — {reason}")
+    # Persist state. Always saves — the pending/active section is the
+    # cron-cadence ledger; even a no-op run records the timestamp.
+    abls.save_state(args.state_file, state, today_iso)
+
+    # Stdout per-outcome lines so a workflow log reader can scan
+    # what happened this run without parsing the audit JSONL.
+    for addr, _mid, reason, conf in promoted:
+        print(f"  PROMOTED: {addr} [conf={conf}] — {reason}")
+    for addr, _mid, _r, _c in pending_added:
+        print(f"  pending:    {addr} (1 strike, awaiting corroboration)")
+    for addr, _mid, _r, _c in active_refreshed:
+        print(f"  refreshed:  {addr} (active TTL extended)")
+    for addr, _mid, _r, _c in duplicates:
+        print(f"  duplicate:  {addr} (same message_id; no strike)")
+    for addr, _mid, _r, _c in resolved_by_main:
+        print(f"  resolved:   {addr} (in main blocklist; pending dropped)")
     for addr, why, conf in rejected:
         conf_display = conf if conf else "n/a"
         print(f"  rejected:   {addr} [conf={conf_display}] — {why}")
 
     summary = {
-        "added_count": len(added),
+        # `added_count` and `added` preserved for backwards-compat with
+        # any reader of the prior schema; both equal the promoted set.
+        "added_count": len(promoted),
         "rejected_count": len(rejected),
+        "promoted_count": len(promoted),
+        "pending_added_count": len(pending_added),
+        "active_refreshed_count": len(active_refreshed),
+        "duplicate_count": len(duplicates),
+        "resolved_count": len(resolved_by_main),
         "added": [
-            {"from": a, "reason": r, "confidence": c} for a, r, c in added
+            {"from": a, "reason": r, "confidence": c}
+            for a, _m, r, c in promoted
         ],
     }
     print(json.dumps(summary), file=sys.stderr)
 
     if args.audit_log:
         entry = {
-            "run_iso": dt.date.today().isoformat(),
+            "run_iso": today_iso,
             "suggestion_count": len(suggestions),
+            # Legacy `added` field preserved for backward-compat = promoted.
             "added": [
                 {"from": a, "reason": r, "confidence": c}
-                for a, r, c in added
+                for a, _m, r, c in promoted
+            ],
+            "promoted": [
+                {"from": a, "source_message_id": m,
+                 "reason": r, "confidence": c}
+                for a, m, r, c in promoted
+            ],
+            "pending_added": [
+                {"from": a, "source_message_id": m,
+                 "reason": r, "confidence": c}
+                for a, m, r, c in pending_added
+            ],
+            "active_refreshed": [
+                {"from": a, "source_message_id": m,
+                 "reason": r, "confidence": c}
+                for a, m, r, c in active_refreshed
+            ],
+            "duplicate_flag": [
+                {"from": a, "source_message_id": m, "confidence": c}
+                for a, m, _r, c in duplicates
+            ],
+            "resolved_by_main_blocklist": [
+                {"from": a, "source_message_id": m, "confidence": c}
+                for a, m, _r, c in resolved_by_main
             ],
             "rejected": [
                 {"from": a, "why": w, "confidence": c}

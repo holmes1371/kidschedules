@@ -1,8 +1,9 @@
 """Pin the restore↔save file-set parity in weekly-schedule.yml.
 
-The workflow persists six files on the `state` branch between runs:
+The workflow persists seven files on the `state` branch between runs:
 `events_state.json`, `prior_events.json`, `sender_stats.json`,
-`.filter_audit.json`, `blocklist_auto.txt`, `blocklist_auto_audit.jsonl`.
+`.filter_audit.json`, `blocklist_auto.txt`, `blocklist_auto_audit.jsonl`,
+`blocklist_auto_state.json` (#27 v1).
 
 Drift risk: if one of those files gets added to the restore block but
 not the save block (or vice versa), the live weekly cron silently
@@ -35,6 +36,7 @@ PERSISTENT_STATE_FILES = frozenset({
     ".filter_audit.json",
     "blocklist_auto.txt",
     "blocklist_auto_audit.jsonl",
+    "blocklist_auto_state.json",
     "events_state.json",
     "prior_events.json",
     "sender_stats.json",

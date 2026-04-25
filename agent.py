@@ -187,6 +187,11 @@ Rules:
   the audit log clean.
 - Use the exact sender address as it appears in the email header
   (e.g. "appointments@calendly.com"), NOT a bare domain.
+- Echo the email's Message ID as "source_message_id" — the same field
+  events carry. The blocklist gating layer uses this to require
+  corroboration across distinct emails before promoting an address
+  to the auto-blocklist; one flag without a source_message_id is
+  malformed and gets dropped at the gate.
 - When in doubt, omit. Leaving off a sender is always safe.
 
 OUTPUT FORMAT — return a single JSON object:
@@ -196,6 +201,7 @@ OUTPUT FORMAT — return a single JSON object:
   "irrelevant_senders": [
     {
       "from": "appointments@calendly.com",
+      "source_message_id": "18f1a2b3c4d5e6f7",
       "reason": "adult work calendar confirmation",
       "confidence": "high"
     }
