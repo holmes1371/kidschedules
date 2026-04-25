@@ -18,12 +18,11 @@ Strict rules for writing it:
 4. **No cross-session carry-overs.** If something is still broken session-to-session, file it as a numbered ROADMAP item instead of repeating it here.
 5. **Replace in place.** Do not append a new block and archive the old one below.
 
-**2026-04-22**
+**2026-04-24**
 
-- Item 24 (`agent.py` duplicate `AUDIT_SYSTEM_PROMPT`) fixed in 0ba31c9; item left at `[~]` pending Tom's manual verification of the live audit flow.
-- Working through the Test coverage gaps section in risk-tier order. **High-risk and medium-risk tiers both cleared.** 89 new tests landed across the run — 526 passing on Linux CI. Pre-existing 92 Windows `%-d` strftime failures in `test_process_events.py` / `test_protected_senders.py` are unrelated and unchanged.
-- Low-risk tier is intentionally left — each entry is called out in the section as "intentional skip" or "low payoff" (pure CLI utilities, subprocess wrapper, interactive OAuth flow, Apps Script GS file). No further action unless Tom wants them pulled in.
-- Nothing else in flight.
+- Item 25 filed and flipped to `[~]` — Ellen's "Everly volleyball" self-note (Subject: `Everly volleyball`, body: `8-9am May 4-8`) was matched by none of the 5 query templates; design note at `design/kid-names-query.md` lays out the kid_names 6th query (roster-driven) plus a sports-keyword hygiene follow-up (item 25b in the same note).
+- Confirmed dedup posture for Tom: `step2b_read_promising` runs messageId-pass + threadId-pass before the body fetch and before the agent (item 21, `_dedupe_by_thread`). An email matching multiple templates reaches the agent exactly once.
+- Item 24 still `[~]` pending Tom's manual audit-flow verification (unchanged from prior session).
 
 ## For future agents
 
@@ -115,6 +114,16 @@ Design-note questions to resolve before coding:
 `scripts/agent.py` declares `AUDIT_SYSTEM_PROMPT` at lines 209–239 and again at lines 242–275 with substantively different content — different verdict labels (`keep_filtered` vs `keep_blocked`), different system instructions. Python's last-assignment-wins rule means the second definition is the live one and the first is dead, but both are reachable to a reader and a well-meaning future edit to "the prompt" could land on the wrong copy. Fix: delete the dead first block; verify the live audit flow's behavior is unchanged via the existing `step1b_filter_audit` integration (or pin it with a unit test if one doesn't exist).
 
 In progress: dead first block deleted from `agent.py` in 0ba31c9; the live `keep_blocked` prompt is now the only definition. No behavior change (Python was already using the second block). `tests/test_agent.py` 66/66, including the existing `test_review_stripped_messages_uses_audit_system_prompt` identity pin that locks the prompt to the import — treating that as sufficient coverage rather than adding a redundant unit test. Pending Tom's manual verification of the live audit flow before flip to `[x]`.
+
+### 25. [~] Catch self-notes / direct kid-name emails (e.g. "Everly volleyball")
+
+Filed 2026-04-24 after Ellen's self-note from `ellen.n.holmes@gmail.com` to herself — Subject: `Everly volleyball`, body: `8-9am May 4-8. Sent from my iPhone` — landed in the inbox inside the 60-day lookback window but matched **none** of the 5 query templates: no school-activity vocabulary, no appointment vocabulary, the sports template has no `volleyball` (or `soccer / basketball / baseball / softball / lacrosse / tennis / track / football / hockey / wrestling` for that matter), no due/deadline language, and the sender isn't `school/district/pta/ptsa` nor is the subject a `calendar/newsletter/reminder/upcoming/schedule` form. Three structural gaps converge: incomplete sports list, no handling for terse self-notes, and the highest-precision signal we have — the kids' first names — is unused.
+
+Decision: add a 6th query template `kid_names`, sourced at runtime from `class_roster.json` keys via `roster_match.load_roster`, OR-joined and framed with the same `after/before/exclusion` clause as the other five. Existing two-pass dedup (messageId → threadId in `step2b_read_promising`) collapses overlap with the other templates, so the only *additional* messages reaching the agent are the ones the keyword templates missed — exactly the failure mode here. `--no-kid-names` flag for diagnostics; `--roster ''` opt-out for parity with the other path flags. Empty roster suppresses the query (avoids `()` being sent to Gmail); single-kid roster yields `(Name)`; multi-word names get double-quoted defensively. Full design note at `design/kid-names-query.md`.
+
+Item 25b (same design note): independent commit extending `SEARCH_TEMPLATES["sports_extracurriculars"]` with the missing common school sports — `volleyball / soccer / basketball / baseball / softball / lacrosse / tennis / track / football / hockey / wrestling`. Hygiene only; does not fix the missed-email path (kid_names already covers it), but closes the underlying vocabulary gap.
+
+In progress: design note + ROADMAP flip landed; query implementation + sports extension are the next two commits.
 
 ## Test coverage gaps
 
