@@ -18,10 +18,12 @@ Strict rules for writing it:
 4. **No cross-session carry-overs.** If something is still broken session-to-session, file it as a numbered ROADMAP item instead of repeating it here.
 5. **Replace in place.** Do not append a new block and archive the old one below.
 
-**2026-04-24**
+**2026-04-25**
 
-- Items 24, 25, 26 closed `[x]` after Tom's live verification that the kid_names query pulled in Ellen's "Everly volleyball" self-note and the agent extracted the event onto the page. Full prose moved to `COMPLETED.md`; one-line stubs preserved in the backlog.
-- Item 27 (`[ ]`) is the next pickup — auto-blocklist hardening so one errant agent flag can't permanently block a sender (N-strikes / TTL / auto-rescue / sender-stats integration). Sketch in the backlog entry; design note still to be written. Tom continues 2026-04-25.
+- Item 27 flipped `[ ]` → `[~]`; design note at `design/auto-blocklist-hardening.md` locks in the three-lever scope: sender-stats reject + N-strikes pending ledger (N=2) + TTL decay (90d active / 30d pending). Auto-rescue deferred.
+- New combined state file `blocklist_auto_state.json` carries pending + active metadata in two top-level sections; `blocklist_auto.txt` format unchanged.
+- 6-commit cadence in the design note; commit 1 is this one (design + flip).
+- Next pickup: commit 2 — sender-stats reject in `update_auto_blocklist.main()` + 3 tests. Smallest contained gate; lands standalone before the pending module.
 - Nothing else in flight.
 
 ## For future agents
@@ -115,7 +117,7 @@ Design-note questions to resolve before coding:
 
 26\. [x] Auto-blocklist must never block parents' personal addresses — c829e2a / 437fa6b / 9a3940c / cb64dd6 / 39c48b6 — see COMPLETED.md
 
-### 27. [ ] Auto-blocklist hardening: one errant agent flag shouldn't permanently block a sender
+### 27. [~] Auto-blocklist hardening: one errant agent flag shouldn't permanently block a sender
 
 Filed 2026-04-24 from Tom: "we should also tighten up the auto-block logic — one errant email shouldn't get people blocked forever. There needs to be a better logic/audit system there." Item 26 above is the *surgical* fix for the family-sender failure mode; item 27 is the *systemic* hardening so a single high-confidence misjudgment by the agent — on any sender, not just the parents — can self-correct over time.
 
