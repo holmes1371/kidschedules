@@ -20,10 +20,10 @@ Strict rules for writing it:
 
 **2026-04-24**
 
-- Item 25 design note + flip in 0f4a1d2; kid_names 6th query template (roster-driven via `roster_match.load_roster`, `--no-kid-names` opt-out, `--roster ''` skip) in ad8f1e1 with 9 new tests; sports keyword extension (volleyball/soccer/basketball/baseball/softball/lacrosse/tennis/track/football/hockey/wrestling) in bef3db1 with a 1-test pin. Item left `[~]` pending Tom's live-run verification that the next Monday cron picks up an Ellen-to-Ellen self-note.
-- 536 tests passing (was 526; +10). Pre-existing 92 Windows `%-d` failures unchanged.
-- Confirmed dedup posture for Tom: `step2b_read_promising` runs messageId-pass + threadId-pass before the body fetch and before the agent (item 21, `_dedupe_by_thread`); an email matching multiple templates reaches the agent exactly once.
-- Item 24 still `[~]` pending Tom's manual audit-flow verification (unchanged from prior session).
+- Item 25 design + flip 0f4a1d2; kid_names query ad8f1e1 (+9 tests); sports keyword extension bef3db1 (+1 pin); session-summary 7d6549b; STEP-2 dynamic count 656310a. Item 25 stays `[~]` — kid_names query is correct, but Tom's manual run revealed Ellen's email never reaches the agent because `blocklist_auto.txt` carries `ellen.n.holmes@gmail.com` from a 2026-04-14 agent flag of an unrelated tax email. So item 25 doesn't deliver its observable goal until item 26 ships and the auto-block row is evicted.
+- Item 26 filed and `[~]` — extend `is_protected` to support address-form patterns (currently domain-only), unify `update_auto_blocklist._is_protected` with the shared matcher, add Ellen + Tom to `protected_senders.txt`, update agent prompt's NEVER-flag list. Design at `design/protect-parent-addresses.md`. Plus a state-branch cleanup of `blocklist_auto.txt` to evict the existing Ellen row — pending Tom's explicit confirmation before doing it (modifies shared production state).
+- Item 27 filed and `[ ]` — Tom: "one errant email shouldn't get people blocked forever." The current auto-blocklist gates on a single high-confidence agent flag; needs a multi-flag / TTL / re-audit mechanism so a one-shot misjudgment self-corrects. Not yet designed; waiting on item 26 close-out to avoid scope creep.
+- Item 24 still `[~]` pending Tom's manual audit-flow verification (unchanged).
 
 ## For future agents
 
@@ -124,7 +124,39 @@ Decision: add a 6th query template `kid_names`, sourced at runtime from `class_r
 
 Item 25b (same design note): independent commit extending `SEARCH_TEMPLATES["sports_extracurriculars"]` with the missing common school sports — `volleyball / soccer / basketball / baseball / softball / lacrosse / tennis / track / football / hockey / wrestling`. Hygiene only; does not fix the missed-email path (kid_names already covers it), but closes the underlying vocabulary gap.
 
-In progress: design note + ROADMAP flip in 0f4a1d2; kid_names query implementation + 9 tests in ad8f1e1; sports keyword extension + 1 pin test in bef3db1. 536/536 non-`%-d` tests pass (10 net-new). Pending Tom's live-run verification on the next Monday cron — once a self-note ("Everly volleyball" or similar) reaches the schedule page via the new query, flip to `[x]` and move prose to `COMPLETED.md`.
+In progress: design note + ROADMAP flip in 0f4a1d2; kid_names query implementation + 9 tests in ad8f1e1; sports keyword extension + 1 pin test in bef3db1. STEP-2 dynamic count fix in 656310a. 536/536 non-`%-d` tests pass.
+
+**Tom's manual run revealed a blocking second-order bug**: the kid_names query is correct but Ellen's emails never reach Gmail's result set because `-from:ellen.n.holmes@gmail.com` is in every query's exclusion clause (sourced from `blocklist_auto.txt`, agent-flagged 2026-04-14 from an unrelated tax email). Item 25 cannot deliver the observable goal — Ellen's self-notes on the page — until item 26 (parent-address protection) ships and the existing `blocklist_auto.txt` row is evicted.
+
+### 26. [~] Auto-blocklist must never block parents' personal addresses
+
+Filed 2026-04-24, blocking item 25's effective close. Two structural problems converged: (a) `protected_senders.is_protected` reduces every sender to its registrable domain before matching, so a per-address protection like `ellen.n.holmes@gmail.com` can't be expressed; (b) `update_auto_blocklist._is_protected` is a hardcoded `PROTECTED_SUFFIXES` constant — domain-only, NOT synchronized with `protected_senders.txt`, so even if address-form patterns existed, the auto-blocklist gating wouldn't honor them.
+
+Decision: extend `is_protected` to treat any pattern containing `@` as an address-form match (full-address equality, case-insensitive); unify `update_auto_blocklist` to read `protected_senders.txt` via the shared loader (drop `PROTECTED_SUFFIXES`); add Ellen (`ellen.n.holmes@gmail.com`) and Tom (`thomas.holmes1371@gmail.com`) to `protected_senders.txt` under a new "Family senders" comment block; update `agent.py::_EXTRACTION_BASE_PROMPT` NEVER-flag list to mention family/parent personal addresses (belt-and-suspenders). Full design + decisions + test plan at `design/protect-parent-addresses.md`.
+
+State-branch cleanup is required for the *existing* Ellen row in `blocklist_auto.txt` to be evicted — the gating fix prevents future re-adds but doesn't remove past entries. That step modifies shared production state and is being held pending Tom's explicit confirmation; it's not bundled into the code commits.
+
+### 27. [ ] Auto-blocklist hardening: one errant agent flag shouldn't permanently block a sender
+
+Filed 2026-04-24 from Tom: "we should also tighten up the auto-block logic — one errant email shouldn't get people blocked forever. There needs to be a better logic/audit system there." Item 26 above is the *surgical* fix for the family-sender failure mode; item 27 is the *systemic* hardening so a single high-confidence misjudgment by the agent — on any sender, not just the parents — can self-correct over time.
+
+The current auto-blocklist gating (`update_auto_blocklist.py`) accepts any suggestion that is (a) `confidence == "high"`, (b) a parseable email address, (c) not in the protected list, (d) not already in either blocklist. One agent run, one suggestion, permanent block. The audit step (`step1b_filter_audit`) compares loose vs tight queries periodically and surfaces drift, but it doesn't *automatically* remove auto-block entries that have produced false negatives — and it doesn't gate new additions on a multi-flag pattern.
+
+Sketch (not yet a design — file `design/auto-blocklist-hardening.md` before implementing):
+
+- **N-strikes rule**: a sender must be flagged across N distinct messages (or N distinct runs) before the auto-block fires. First flag enters a "pending" ledger (`blocklist_auto_pending.json` or similar); second flag from a different message_id promotes to active block. Mitigates one-shot misjudgments.
+- **TTL / decay**: an auto-block entry expires after K days unless re-confirmed by a fresh flag. Forces periodic re-verification rather than permanent embedding.
+- **Auto-rescue via filter audit**: extend `step1b_filter_audit` to actively *remove* auto-block entries whose loose-query results contain real kid events. Today the audit surfaces the discrepancy; tomorrow it would also act on it.
+- **Sender-stats integration**: if `sender_stats.json` shows the sender has produced N+ events historically, reject the suggestion outright. Treats event yield as the ground truth signal for "could send kid mail."
+
+Open design questions (resolve before implementing):
+
+- Which lever (or combination) gives the best precision/recall tradeoff without overfitting to the Ellen incident.
+- Where pending / expired entries live — separate file, columns in `blocklist_auto.txt`, or both.
+- How the audit log (`blocklist_auto_audit.jsonl`) records the new states (pending / promoted / expired / rescued) so the history stays interpretable.
+- Whether the operator's hand-curated `blocklist.txt` participates in any of this (probably not; `blocklist_auto.txt` is the only file the bot writes).
+
+Held pending item 26 close-out to avoid scope creep — landing both at once would muddy the diagnosis if the next missed-email surfaces.
 
 ## Test coverage gaps
 
