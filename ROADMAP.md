@@ -21,7 +21,7 @@ Strict rules for writing it:
 **2026-04-24**
 
 - Item 25 design + flip 0f4a1d2; kid_names query ad8f1e1 (+9 tests); sports keyword extension bef3db1 (+1 pin); session-summary 7d6549b; STEP-2 dynamic count 656310a. Item 25 stays `[~]` — kid_names query is correct, but Tom's manual run revealed Ellen's email never reaches the agent because `blocklist_auto.txt` carries `ellen.n.holmes@gmail.com` from a 2026-04-14 agent flag of an unrelated tax email. So item 25 doesn't deliver its observable goal until item 26 ships and the auto-block row is evicted.
-- Item 26 filed and `[~]` — extend `is_protected` to support address-form patterns (currently domain-only), unify `update_auto_blocklist._is_protected` with the shared matcher, add Ellen + Tom to `protected_senders.txt`, update agent prompt's NEVER-flag list. Design at `design/protect-parent-addresses.md`. Plus a state-branch cleanup of `blocklist_auto.txt` to evict the existing Ellen row — pending Tom's explicit confirmation before doing it (modifies shared production state).
+- Item 26 code complete: design + flip in c829e2a, `is_protected` address-form extension + 6 tests in 437fa6b, `update_auto_blocklist` unified with the shared matcher (legacy `_is_protected` and `PROTECTED_SUFFIXES` deleted; 7 legacy tests removed; +2 integration tests) in 9a3940c, parent addresses + agent NEVER-flag in cb64dd6. State-branch cleanup of the existing `ellen.n.holmes@gmail.com` row in `blocklist_auto.txt` done manually by Tom 2026-04-24 via the web UI. Item stays `[~]` pending live-cron verification that an Ellen self-note now reaches the page.
 - Item 27 filed and `[ ]` — Tom: "one errant email shouldn't get people blocked forever." The current auto-blocklist gates on a single high-confidence agent flag; needs a multi-flag / TTL / re-audit mechanism so a one-shot misjudgment self-corrects. Not yet designed; waiting on item 26 close-out to avoid scope creep.
 - Item 24 still `[~]` pending Tom's manual audit-flow verification (unchanged).
 
@@ -134,7 +134,7 @@ Filed 2026-04-24, blocking item 25's effective close. Two structural problems co
 
 Decision: extend `is_protected` to treat any pattern containing `@` as an address-form match (full-address equality, case-insensitive); unify `update_auto_blocklist` to read `protected_senders.txt` via the shared loader (drop `PROTECTED_SUFFIXES`); add Ellen (`ellen.n.holmes@gmail.com`) and Tom (`thomas.holmes1371@gmail.com`) to `protected_senders.txt` under a new "Family senders" comment block; update `agent.py::_EXTRACTION_BASE_PROMPT` NEVER-flag list to mention family/parent personal addresses (belt-and-suspenders). Full design + decisions + test plan at `design/protect-parent-addresses.md`.
 
-State-branch cleanup is required for the *existing* Ellen row in `blocklist_auto.txt` to be evicted — the gating fix prevents future re-adds but doesn't remove past entries. That step modifies shared production state and is being held pending Tom's explicit confirmation; it's not bundled into the code commits.
+State-branch cleanup of the existing Ellen row was done manually by Tom 2026-04-24 via the GitHub web UI. The gating fix (cb64dd6) prevents future re-adds; the manual edit evicts the historical row. Together: the next cron run's Gmail queries will no longer carry `-from:ellen.n.holmes@gmail.com`, so item 25's kid_names query has its first chance to actually match Ellen's self-notes.
 
 ### 27. [ ] Auto-blocklist hardening: one errant agent flag shouldn't permanently block a sender
 
