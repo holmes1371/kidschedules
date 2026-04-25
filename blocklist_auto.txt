@@ -98,3 +98,15 @@ info@e.electjon.com  # auto 2026-04-25: Political campaign fundraising email —
 noreply@app.hiive.com  # auto 2026-04-25: Private market investment platform daily digest — adult financial content only
 info@poshmark.com  # auto 2026-04-25: Poshmark retail/fashion marketing email — adult content only
 noreply@directvote.net  # auto 2026-04-25: D.C. Bar professional election voting — adult legal/professional organization, n
+appletv@insideapple.apple.com  # auto 2026-04-25: Apple TV streaming service promotional email, adult entertainment content only
+online@orders.carters.com  # auto 2026-04-25: retail order confirmation email, no kids' events or dates
+hello@altardstate.narvar.com  # auto 2026-04-25: adult clothing retailer return/shipping notifications only
+ae@ae.narvar.com  # auto 2026-04-25: adult clothing retailer return/shipping notifications only
+fidelity.alerts@fidelity.com  # auto 2026-04-25: adult personal finance / investment account alert, no kids' events
+info@mykitchenandbath.com  # auto 2026-04-25: home renovation/kitchen and bath business newsletter, adult home improvement con
+no-reply@rs.email.nextdoor.com  # auto 2026-04-25: neighborhood news digest focused on local politics/adult community news, no kids
+no-reply@r.sofi.com  # auto 2026-04-25: adult personal finance / credit score marketing email, no kids' events
+no-reply@business.amazon.com  # auto 2026-04-25: Amazon Business promotional email for adult business purchasing, no children's c
+silverlining@synoviasolutions.com  # auto 2026-04-25: Here Comes The Bus notifications with empty bodies — bus tracking app alerts for
+info@mailva.evite.com  # auto 2026-04-25: Cancellation notice for a child's birthday party the family was invited to — not
+do_not_reply@lightspeedsystems.com  # auto 2026-04-25: automated web filter portal weekly report — no kids' events content

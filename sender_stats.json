@@ -1,5 +1,5 @@
 {
-  "last_updated_iso": "2026-04-24T20:01:41-04:00",
+  "last_updated_iso": "2026-04-24T20:42:56-04:00",
   "schema_version": 1,
   "senders": {
     "23andmedatasettlement@e.emailksa.com": {
@@ -33,10 +33,31 @@
       ],
       "total_events": 1
     },
+    "ae@ae.narvar.com": {
+      "first_seen_iso": "2026-04-24T20:42:56-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-04-24T20:42:56-04:00",
+      "messages_seen": 2,
+      "per_message_counts": [
+        0,
+        0
+      ],
+      "total_events": 0
+    },
     "alle@info.alle.com": {
       "first_seen_iso": "2026-04-17T18:51:22-04:00",
       "is_newsletter": false,
       "last_seen_iso": "2026-04-17T18:51:22-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
+    "appletv@insideapple.apple.com": {
+      "first_seen_iso": "2026-04-24T20:42:56-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-04-24T20:42:56-04:00",
       "messages_seen": 1,
       "per_message_counts": [
         0
@@ -138,6 +159,26 @@
       ],
       "total_events": 1
     },
+    "do-not-reply@myschoolbucks.com": {
+      "first_seen_iso": "2026-04-24T20:42:56-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-04-24T20:42:56-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        1
+      ],
+      "total_events": 1
+    },
+    "do_not_reply@lightspeedsystems.com": {
+      "first_seen_iso": "2026-04-24T20:42:56-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-04-24T20:42:56-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
     "donate@email.obama.org": {
       "first_seen_iso": "2026-04-17T18:51:22-04:00",
       "is_newsletter": false,
@@ -212,6 +253,16 @@
       ],
       "total_events": 0
     },
+    "fidelity.alerts@fidelity.com": {
+      "first_seen_iso": "2026-04-24T20:42:56-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-04-24T20:42:56-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
     "forms-receipts-noreply@google.com": {
       "first_seen_iso": "2026-04-24T20:01:41-04:00",
       "is_newsletter": false,
@@ -231,6 +282,17 @@
         2
       ],
       "total_events": 2
+    },
+    "hello@altardstate.narvar.com": {
+      "first_seen_iso": "2026-04-24T20:42:56-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-04-24T20:42:56-04:00",
+      "messages_seen": 2,
+      "per_message_counts": [
+        0,
+        0
+      ],
+      "total_events": 0
     },
     "hey@shortstorybox.com": {
       "first_seen_iso": "2026-04-17T18:51:22-04:00",
@@ -283,6 +345,26 @@
       ],
       "total_events": 0
     },
+    "info@mailva.evite.com": {
+      "first_seen_iso": "2026-04-24T20:42:56-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-04-24T20:42:56-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
+    "info@mykitchenandbath.com": {
+      "first_seen_iso": "2026-04-24T20:42:56-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-04-24T20:42:56-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
     "info@poshmark.com": {
       "first_seen_iso": "2026-04-24T20:01:41-04:00",
       "is_newsletter": false,
@@ -297,6 +379,16 @@
       "first_seen_iso": "2026-04-17T17:12:56-04:00",
       "is_newsletter": false,
       "last_seen_iso": "2026-04-17T17:12:56-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
+    "info@viennart.org": {
+      "first_seen_iso": "2026-04-24T20:42:56-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-04-24T20:42:56-04:00",
       "messages_seen": 1,
       "per_message_counts": [
         0
@@ -408,6 +500,16 @@
       ],
       "total_events": 0
     },
+    "no-reply@business.amazon.com": {
+      "first_seen_iso": "2026-04-24T20:42:56-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-04-24T20:42:56-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
     "no-reply@demosphere.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
@@ -432,6 +534,27 @@
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
       "last_seen_iso": "2026-04-17T17:04:04-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
+    "no-reply@r.sofi.com": {
+      "first_seen_iso": "2026-04-24T20:42:56-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-04-24T20:42:56-04:00",
+      "messages_seen": 2,
+      "per_message_counts": [
+        0,
+        0
+      ],
+      "total_events": 0
+    },
+    "no-reply@rs.email.nextdoor.com": {
+      "first_seen_iso": "2026-04-24T20:42:56-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-04-24T20:42:56-04:00",
       "messages_seen": 1,
       "per_message_counts": [
         0
@@ -538,6 +661,16 @@
       ],
       "total_events": 0
     },
+    "online@orders.carters.com": {
+      "first_seen_iso": "2026-04-24T20:42:56-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-04-24T20:42:56-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
     "passsif5183@network2.marxolmicko.space": {
       "first_seen_iso": "2026-04-24T20:01:41-04:00",
       "is_newsletter": false,
@@ -575,6 +708,29 @@
       "last_seen_iso": "2026-04-18T07:00:01-04:00",
       "messages_seen": 1,
       "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
+    "scheduling@viennabraces.com": {
+      "first_seen_iso": "2026-04-24T20:42:56-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-04-24T20:42:56-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
+    "silverlining@synoviasolutions.com": {
+      "first_seen_iso": "2026-04-24T20:42:56-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-04-24T20:42:56-04:00",
+      "messages_seen": 4,
+      "per_message_counts": [
+        0,
+        0,
+        0,
         0
       ],
       "total_events": 0

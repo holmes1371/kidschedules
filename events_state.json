@@ -28,20 +28,6 @@
       "source_message_id": "19cf4b7054b58927",
       "time": "9:00 AM – 2:00 PM"
     },
-    "076cfcdc388f": {
-      "category": "Sports & Extracurriculars",
-      "child": "",
-      "date": "2026-04-24",
-      "first_seen_iso": "2026-04-24T20:01:41-04:00",
-      "id": "076cfcdc388f",
-      "location": "Hunter Mill Swim & Racquet Club, 10339 Brittenford Dr, Vienna, VA 22182",
-      "name": "HTM Sharks Swim Team Registration Open",
-      "sender_block_key": "hmsrc.org",
-      "sender_domain": "hmsrc.org",
-      "source": "Hunter Mill Swim & Racquet Club (Apr 24)",
-      "source_message_id": "19dbd6d877f6fdcb",
-      "time": "All day (deadline)"
-    },
     "09ba480f8257": {
       "category": "School Activity",
       "child": "Rising 7th & 8th graders",
@@ -291,20 +277,6 @@
       "source": "LAES PTA Sunbeam (Mar 15)",
       "source_message_id": "19cf4b7054b58927",
       "time": "9:00 AM – 2:00 PM"
-    },
-    "39a039159717": {
-      "category": "Academic Due Date",
-      "child": "Everly",
-      "date": "2026-04-22",
-      "first_seen_iso": "2026-04-24T20:01:41-04:00",
-      "id": "39a039159717",
-      "location": "",
-      "name": "6th Grade Class of '26 T-Shirt Size Submission (Field Trip T-Shirt)",
-      "sender_block_key": "google.com",
-      "sender_domain": "google.com",
-      "source": "Forms Response Receipts / Google Forms (Apr 22)",
-      "source_message_id": "19db66e3a84910fb",
-      "time": "All day (deadline)"
     },
     "3c48282c9ff1": {
       "category": "Sports & Extracurriculars",
@@ -751,20 +723,6 @@
       "source": "LAES PTA Vice President (Apr 13)",
       "source_message_id": "19d88762e96ed4d4",
       "time": "All day (deadline)"
-    },
-    "772f967f9b9b": {
-      "category": "Sports & Extracurriculars",
-      "child": "Everly",
-      "date": "2026-04-24",
-      "first_seen_iso": "2026-04-24T20:01:41-04:00",
-      "id": "772f967f9b9b",
-      "location": "Born 2 Dance Studio, 262 Cedar Lane SE, 2nd Floor, Vienna, VA 22180",
-      "name": "B2D IGNITE Team Weekly Rehearsal",
-      "sender_block_key": "teamsnap.com",
-      "sender_domain": "teamsnap.com",
-      "source": "B2D - IGNITE Team via TeamSnap (Apr 22)",
-      "source_message_id": "19db74740338226e",
-      "time": "4:45 PM – 6:45 PM"
     },
     "77b405519694": {
       "category": "School Activity",
@@ -1659,6 +1617,20 @@
       "source_message_id": "19d840f6654b6048",
       "time": "All day"
     },
+    "f049dc284494": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-04-22",
+      "first_seen_iso": "2026-04-24T20:42:56-04:00",
+      "id": "f049dc284494",
+      "location": "Louise Archer Elementary School Store",
+      "name": "6th Grade Class T-Shirts Order Confirmed",
+      "sender_block_key": "myschoolbucks.com",
+      "sender_domain": "myschoolbucks.com",
+      "source": "MySchoolBucks Order Confirmation (Apr 22)",
+      "source_message_id": "19db66f153856497",
+      "time": "All day (deadline)"
+    },
     "f13e463b9f27": {
       "category": "Appointment",
       "child": "Isla, Everly",
@@ -1749,7 +1721,7 @@
       "time": "3:30 PM"
     }
   },
-  "last_updated_iso": "2026-04-24T20:01:41-04:00",
+  "last_updated_iso": "2026-04-24T20:42:56-04:00",
   "processed_messages": {
     "19a0da1d7445f787": "2026-04-17T18:51:22-04:00",
     "19a1784ff2f26474": "2026-04-17T18:51:22-04:00",
@@ -1872,22 +1844,41 @@
     "19d9d200208e12f6": "2026-04-18T07:00:01-04:00",
     "19d9d4080d6ab327": "2026-04-18T07:00:01-04:00",
     "19da585c1a38aca6": "2026-04-20T07:41:20-04:00",
+    "19da586b62d24281": "2026-04-24T20:42:56-04:00",
+    "19da796379c88586": "2026-04-24T20:42:56-04:00",
     "19da909fe35cca68": "2026-04-22T08:44:22-04:00",
     "19da9cbb98a53333": "2026-04-22T08:44:22-04:00",
+    "19daa8fe1c855724": "2026-04-24T20:42:56-04:00",
     "19dab4de3a36a8ed": "2026-04-22T08:44:22-04:00",
+    "19dab736beee2491": "2026-04-24T20:42:56-04:00",
+    "19dac98c8b808eac": "2026-04-24T20:42:56-04:00",
+    "19dad1a1389dbb04": "2026-04-24T20:42:56-04:00",
     "19db03b13bb9fe9d": "2026-04-22T08:44:22-04:00",
     "19db0b70a44853a9": "2026-04-22T08:44:22-04:00",
     "19db0fe3f623cec5": "2026-04-22T08:44:22-04:00",
+    "19db1dded08663b6": "2026-04-24T20:42:56-04:00",
+    "19db1e3055f80f7f": "2026-04-24T20:42:56-04:00",
+    "19db35a32dc692c9": "2026-04-24T20:42:56-04:00",
+    "19db54de92f77bea": "2026-04-24T20:42:56-04:00",
+    "19db570ee084d2c0": "2026-04-24T20:42:56-04:00",
     "19db627fb28c14ad": "2026-04-24T20:01:41-04:00",
     "19db62fcbbff8022": "2026-04-24T20:01:41-04:00",
     "19db658c3e6479cd": "2026-04-24T20:01:41-04:00",
     "19db6637a7340c11": "2026-04-24T20:01:41-04:00",
     "19db66e3a84910fb": "2026-04-24T20:01:41-04:00",
+    "19db66f153856497": "2026-04-24T20:42:56-04:00",
     "19db6af60288a5a3": "2026-04-24T20:01:41-04:00",
     "19db6b8fe9cd6f14": "2026-04-24T20:01:41-04:00",
+    "19db6e39223d1083": "2026-04-24T20:42:56-04:00",
     "19db74740338226e": "2026-04-24T20:01:41-04:00",
     "19db75672b2d2fd2": "2026-04-24T20:01:41-04:00",
+    "19dba51fff80e498": "2026-04-24T20:42:56-04:00",
     "19dbb04eafef2555": "2026-04-24T20:01:41-04:00",
+    "19dbb43286581f8b": "2026-04-24T20:42:56-04:00",
+    "19dbbd67ef7d9d07": "2026-04-24T20:42:56-04:00",
+    "19dbbe77f52dbec0": "2026-04-24T20:42:56-04:00",
+    "19dbc08c57bbafef": "2026-04-24T20:42:56-04:00",
+    "19dbcdbdfc393ff9": "2026-04-24T20:42:56-04:00",
     "19dbd6d877f6fdcb": "2026-04-24T20:01:41-04:00",
     "19dbda566e1433e8": "2026-04-24T20:01:41-04:00",
     "19dbef7c6d8ded36": "2026-04-24T20:01:41-04:00",
@@ -1895,7 +1886,9 @@
     "19dc0becff6647d8": "2026-04-24T20:01:41-04:00",
     "19dc0e9ff7070f38": "2026-04-24T20:01:41-04:00",
     "19dc10927e23637a": "2026-04-24T20:01:41-04:00",
-    "19dc12e25bd94676": "2026-04-24T20:01:41-04:00"
+    "19dc12e25bd94676": "2026-04-24T20:01:41-04:00",
+    "19dc12fc573b41ff": "2026-04-24T20:42:56-04:00",
+    "19dc1b3b02405f53": "2026-04-24T20:42:56-04:00"
   },
   "schema_version": 3
 }
