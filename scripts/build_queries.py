@@ -169,7 +169,9 @@ SEARCH_TEMPLATES = {
     "sports_extracurriculars": (
         '(practice OR game OR match OR tournament OR recital OR rehearsal '
         'OR "club meeting" OR tryout OR "game day" OR scrimmage OR ballet '
-        'OR dance OR swim OR gymnastics OR karate)'
+        'OR dance OR swim OR gymnastics OR karate OR volleyball OR soccer '
+        'OR basketball OR baseball OR softball OR lacrosse OR tennis '
+        'OR track OR football OR hockey OR wrestling)'
     ),
     "academic_due_dates": (
         '("due date" OR "due by" OR "permission slip" OR "homework due" '

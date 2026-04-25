@@ -403,6 +403,30 @@ def test_cli_empty_roster_path_skips_loader(tmp_path, monkeypatch):
     assert "kid_names" not in out["queries"]
 
 
+def test_sports_extracurriculars_template_covers_common_school_sports():
+    """Pin the sports vocabulary in SEARCH_TEMPLATES.
+
+    The list grew when we landed kid_names because the missed
+    "Everly volleyball" email exposed that the sports template had
+    `dance / ballet / gymnastics / karate / swim` but not `volleyball`,
+    `soccer`, `basketball`, etc. Without this pin, a future
+    well-intentioned cleanup that "tidies the OR-list" could silently
+    drop one of the additions and reintroduce the same recall gap.
+    """
+    body = bq.SEARCH_TEMPLATES["sports_extracurriculars"]
+    expected_words = (
+        # Pre-existing
+        "practice", "game", "match", "tournament", "recital", "rehearsal",
+        "tryout", "scrimmage", "ballet", "dance", "swim", "gymnastics",
+        "karate",
+        # Added with #25b
+        "volleyball", "soccer", "basketball", "baseball", "softball",
+        "lacrosse", "tennis", "track", "football", "hockey", "wrestling",
+    )
+    for word in expected_words:
+        assert word in body, f"sports template missing keyword: {word!r}"
+
+
 def test_cli_kid_names_query_would_match_everly_volleyball_subject(
     tmp_path, monkeypatch,
 ):
