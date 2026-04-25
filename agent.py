@@ -177,7 +177,14 @@ Rules:
 - NEVER flag: schools (fcps.edu, any PTA/PTSA), extracurricular
   providers (Cuppett, HTM Sharks, jackrabbittech, teamsnap,
   signupgenius, myschoolbucks, lifetouch, school photo vendors),
-  or any medical/dental/therapy provider that could see a child.
+  any medical/dental/therapy provider that could see a child, or
+  the parents' personal email addresses (ellen.n.holmes@gmail.com,
+  thomas.holmes1371@gmail.com). Parent emails are how self-notes
+  about kids' activities arrive ("Everly volleyball / 8-9am May 4-8");
+  one off-topic email from a parent (a tax note, a personal errand)
+  is NOT grounds to flag — the gating layer rejects parent-address
+  flags anyway, but keep them out of the suggestions list to keep
+  the audit log clean.
 - Use the exact sender address as it appears in the email header
   (e.g. "appointments@calendly.com"), NOT a bare domain.
 - When in doubt, omit. Leaving off a sender is always safe.

@@ -9,16 +9,22 @@
 # Format:
 #   - One pattern per line.
 #   - Lines starting with # (or blank) are ignored.
-#   - A bare domain (e.g. fcps.edu) matches that exact registrable domain.
+#   - A bare domain (e.g. fcps.edu) matches that exact registrable
+#     domain AND any subdomain of it (`elementary.fcps.edu`).
 #   - A pattern starting with * (e.g. *pta.org) matches any domain that
 #     ends with the literal part after the asterisk — covers all local
 #     PTA domains like louisearcherpta.org, canterburyptsa.org, etc.
+#   - A pattern containing @ (e.g. alice@example.com) matches that
+#     exact full email address — used to protect a specific personal
+#     mailbox without protecting the whole domain (added 2026-04-24
+#     for parent self-notes; see design/protect-parent-addresses.md).
 #   - Matching is case-insensitive.
 #
-# To add a domain:
+# To add a pattern:
 #   1. Append a new line below in the format above.
-#   2. Commit. No code changes needed — process_events.py and
-#      build_queries.py both read this file at runtime.
+#   2. Commit. No code changes needed — process_events.py,
+#      build_queries.py, and update_auto_blocklist.py all read this
+#      file at runtime.
 #
 # Seeded from the "NEVER add" prose comment at the top of blocklist.txt
 # on 2026-04-15. Keep the two lists in sync if that comment changes.
@@ -31,3 +37,21 @@ teamsnap.com
 signupgenius.com
 myschoolbucks.com
 lifetouch.com
+
+# Family senders (never auto-block).
+#
+# Parents' personal Gmail addresses. These are the carrier for
+# self-notes — terse "<kid> <activity> <date/time>" messages from
+# one parent to themselves or each other — which the kid_names
+# query (#25) is specifically designed to pick up. The agent
+# occasionally judges a single parent-to-self email as adult-only
+# (e.g. a tax confirmation), and prior to #26 that one judgment was
+# enough to permanently auto-block the address. See
+# design/protect-parent-addresses.md for the full incident.
+#
+# Address-form patterns (#26 matcher extension) protect the exact
+# address; gmail.com itself stays unprotected so #20's freemail-
+# granular per-address blocks of other personal Gmail senders keep
+# working.
+ellen.n.holmes@gmail.com
+thomas.holmes1371@gmail.com
