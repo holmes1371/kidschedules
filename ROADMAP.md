@@ -20,8 +20,9 @@ Strict rules for writing it:
 
 **2026-04-24**
 
-- Item 25 filed and flipped to `[~]` — Ellen's "Everly volleyball" self-note (Subject: `Everly volleyball`, body: `8-9am May 4-8`) was matched by none of the 5 query templates; design note at `design/kid-names-query.md` lays out the kid_names 6th query (roster-driven) plus a sports-keyword hygiene follow-up (item 25b in the same note).
-- Confirmed dedup posture for Tom: `step2b_read_promising` runs messageId-pass + threadId-pass before the body fetch and before the agent (item 21, `_dedupe_by_thread`). An email matching multiple templates reaches the agent exactly once.
+- Item 25 design note + flip in 0f4a1d2; kid_names 6th query template (roster-driven via `roster_match.load_roster`, `--no-kid-names` opt-out, `--roster ''` skip) in ad8f1e1 with 9 new tests; sports keyword extension (volleyball/soccer/basketball/baseball/softball/lacrosse/tennis/track/football/hockey/wrestling) in bef3db1 with a 1-test pin. Item left `[~]` pending Tom's live-run verification that the next Monday cron picks up an Ellen-to-Ellen self-note.
+- 536 tests passing (was 526; +10). Pre-existing 92 Windows `%-d` failures unchanged.
+- Confirmed dedup posture for Tom: `step2b_read_promising` runs messageId-pass + threadId-pass before the body fetch and before the agent (item 21, `_dedupe_by_thread`); an email matching multiple templates reaches the agent exactly once.
 - Item 24 still `[~]` pending Tom's manual audit-flow verification (unchanged from prior session).
 
 ## For future agents
@@ -123,7 +124,7 @@ Decision: add a 6th query template `kid_names`, sourced at runtime from `class_r
 
 Item 25b (same design note): independent commit extending `SEARCH_TEMPLATES["sports_extracurriculars"]` with the missing common school sports — `volleyball / soccer / basketball / baseball / softball / lacrosse / tennis / track / football / hockey / wrestling`. Hygiene only; does not fix the missed-email path (kid_names already covers it), but closes the underlying vocabulary gap.
 
-In progress: design note + ROADMAP flip landed; query implementation + sports extension are the next two commits.
+In progress: design note + ROADMAP flip in 0f4a1d2; kid_names query implementation + 9 tests in ad8f1e1; sports keyword extension + 1 pin test in bef3db1. 536/536 non-`%-d` tests pass (10 net-new). Pending Tom's live-run verification on the next Monday cron — once a self-note ("Everly volleyball" or similar) reaches the schedule page via the new query, flip to `[x]` and move prose to `COMPLETED.md`.
 
 ## Test coverage gaps
 
