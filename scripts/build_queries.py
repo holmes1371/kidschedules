@@ -12,6 +12,7 @@ import os
 import sys
 
 from protected_senders import is_protected, load_protected_senders
+from roster_match import load_roster
 
 
 _PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,6 +21,7 @@ DEFAULT_AUTO_BLOCKLIST = os.path.join(_PROJECT_ROOT, "blocklist_auto.txt")
 DEFAULT_IGNORED_SENDERS = os.path.join(_PROJECT_ROOT, "ignored_senders.json")
 DEFAULT_PROTECTED_SENDERS = os.path.join(_PROJECT_ROOT, "protected_senders.txt")
 DEFAULT_AUDIT_STATE = os.path.join(_PROJECT_ROOT, ".filter_audit.json")
+DEFAULT_ROSTER = os.path.join(_PROJECT_ROOT, "class_roster.json")
 
 
 def load_audit_state(path: str, today: dt.date) -> dict:
@@ -135,6 +137,25 @@ def build_exclusion_clause(blocklist: list[str]) -> str:
     return " ".join(bits)
 
 
+def build_kid_names_query(roster: dict) -> str | None:
+    """Return the OR-joined kid-names query body, or None for empty roster.
+
+    Names with embedded whitespace are double-quoted so Gmail treats them
+    as a single token. Names with no whitespace pass through unquoted —
+    Gmail search is case-insensitive, so the roster's casing is cosmetic.
+    Empty / whitespace-only keys are dropped.
+
+    An empty roster yields ``None`` rather than ``"()"`` — Gmail's parser
+    rejects an empty parenthetical, so the caller is expected to skip
+    emitting a kid_names query in that case.
+    """
+    names = [n.strip() for n in roster.keys() if isinstance(n, str) and n.strip()]
+    if not names:
+        return None
+    quoted = [f'"{n}"' if any(c.isspace() for c in n) else n for n in names]
+    return "(" + " OR ".join(quoted) + ")"
+
+
 SEARCH_TEMPLATES = {
     "school_activities": (
         '(field trip OR "picture day" OR "spirit day" OR assembly OR '
@@ -188,6 +209,12 @@ def main() -> int:
                    help="Do not append -category:promotions to queries.")
     p.add_argument("--audit-state", type=str, default=DEFAULT_AUDIT_STATE,
                    help="Path to filter audit state file.")
+    p.add_argument("--roster", type=str, default=DEFAULT_ROSTER,
+                   help="Path to class_roster.json. Roster keys (kid first "
+                        "names) drive the kid_names query template. Pass "
+                        "'' to disable.")
+    p.add_argument("--no-kid-names", action="store_true",
+                   help="Do not emit the kid_names query template.")
     args = p.parse_args()
 
     today = (dt.date.fromisoformat(args.today) if args.today
@@ -246,13 +273,22 @@ def main() -> int:
             parts.append(exclusion)
         return " ".join(parts)
 
+    if args.no_kid_names or not args.roster:
+        kid_names_body = None
+    else:
+        kid_names_body = build_kid_names_query(load_roster(args.roster))
+
     queries = {name: assemble(body) for name, body in SEARCH_TEMPLATES.items()}
+    if kid_names_body:
+        queries["kid_names"] = assemble(kid_names_body)
 
     def assemble_loose(body: str) -> str:
         return f"after:{after} before:{before} {body}"
 
     loose_queries = {name: assemble_loose(body)
                      for name, body in SEARCH_TEMPLATES.items()}
+    if kid_names_body:
+        loose_queries["kid_names"] = assemble_loose(kid_names_body)
 
     audit = load_audit_state(args.audit_state, today)
 
@@ -285,6 +321,7 @@ def main() -> int:
         },
         "filter_audit": audit,
         "loose_queries": loose_queries,
+        "kid_names_query_body": kid_names_body,
     }
     json.dump(out, sys.stdout, indent=2, ensure_ascii=False)
     sys.stdout.write("\n")

@@ -262,3 +262,176 @@ def test_load_audit_state_missing_threshold_defaults_to_30(tmp_path):
     result = bq.load_audit_state(str(path), _TODAY)
     assert result["threshold_days"] == 30
     assert result["due"] is False
+
+
+# ── kid_names query (ROADMAP #25) ───────────────────────────────────────
+#
+# Pinned because this is the recall fix for terse self-notes that match
+# none of the five keyword templates (e.g. Ellen-to-Ellen
+# "Everly volleyball / 8-9am May 4-8" — design/kid-names-query.md). A
+# silent drift here either drops the kid_names query entirely (recall
+# regression — back to the missed-email failure mode) or emits a
+# malformed Gmail query (every weekly run hard-fails at step 2).
+
+
+def _write_roster(tmp_path, payload):
+    path = tmp_path / "class_roster.json"
+    path.write_text(json.dumps(payload))
+    return path
+
+
+def test_build_kid_names_query_two_kids():
+    body = bq.build_kid_names_query({"Everly": {}, "Isla": {}})
+    assert body == "(Everly OR Isla)"
+
+
+def test_build_kid_names_query_single_kid():
+    """One-kid roster yields a degenerate single-name parenthetical —
+    still a valid Gmail query."""
+    assert bq.build_kid_names_query({"Everly": {}}) == "(Everly)"
+
+
+def test_build_kid_names_query_empty_roster_returns_none():
+    """Empty roster suppresses the query — Gmail rejects an empty
+    parenthetical and we'd rather omit the template entirely than
+    crash step 2."""
+    assert bq.build_kid_names_query({}) is None
+
+
+def test_build_kid_names_query_quotes_multiword_names():
+    """Names containing whitespace get double-quoted so Gmail treats
+    them as a single token. Pins forward-compat for a future roster
+    entry like 'Mary Jane'."""
+    body = bq.build_kid_names_query({"Mary Jane": {}, "Isla": {}})
+    assert body == '("Mary Jane" OR Isla)'
+
+
+def test_build_kid_names_query_drops_blank_keys():
+    """Empty / whitespace-only keys are filtered out before the join.
+    Defends against a malformed roster row from a future schema drift."""
+    body = bq.build_kid_names_query({"": {}, "   ": {}, "Everly": {}})
+    assert body == "(Everly)"
+
+
+def test_cli_emits_kid_names_query_with_full_framing(tmp_path, monkeypatch):
+    """End-to-end: roster on disk → main() output carries
+    queries['kid_names'] with the standard after/before/exclusion
+    framing applied. Pins the wiring, not just the helper."""
+    roster = _write_roster(tmp_path, {"Everly": {}, "Isla": {}})
+
+    import io
+    import sys
+
+    buf = io.StringIO()
+    monkeypatch.setattr(sys, "stdout", buf)
+    monkeypatch.setattr(sys, "argv", [
+        "build_queries.py",
+        "--blocklist", "",
+        "--auto-blocklist", "",
+        "--ignored-senders", "",
+        "--protected-senders", "",
+        "--roster", str(roster),
+        "--today", "2026-04-24",
+        "--lookback-days", "60",
+    ])
+    assert bq.main() == 0
+    out = json.loads(buf.getvalue())
+
+    assert out["kid_names_query_body"] == "(Everly OR Isla)"
+    assert "kid_names" in out["queries"]
+    q = out["queries"]["kid_names"]
+    # Standard framing pieces all present.
+    assert q.startswith("after:2026/02/23")
+    assert "before:2026/04/24" in q
+    assert "(Everly OR Isla)" in q
+    assert "-category:promotions" in q
+    # Loose variant carries the body without the exclusion clause.
+    assert "kid_names" in out["loose_queries"]
+    assert "(Everly OR Isla)" in out["loose_queries"]["kid_names"]
+    assert "-category:promotions" not in out["loose_queries"]["kid_names"]
+
+
+def test_cli_no_kid_names_flag_drops_query(tmp_path, monkeypatch):
+    """`--no-kid-names` suppresses the template even with a populated
+    roster. Mirrors the diagnostic opt-out posture of
+    `--no-category-filter`."""
+    roster = _write_roster(tmp_path, {"Everly": {}, "Isla": {}})
+
+    import io
+    import sys
+
+    buf = io.StringIO()
+    monkeypatch.setattr(sys, "stdout", buf)
+    monkeypatch.setattr(sys, "argv", [
+        "build_queries.py",
+        "--blocklist", "",
+        "--auto-blocklist", "",
+        "--ignored-senders", "",
+        "--protected-senders", "",
+        "--roster", str(roster),
+        "--no-kid-names",
+        "--today", "2026-04-24",
+    ])
+    assert bq.main() == 0
+    out = json.loads(buf.getvalue())
+    assert out["kid_names_query_body"] is None
+    assert "kid_names" not in out["queries"]
+    assert "kid_names" not in out["loose_queries"]
+
+
+def test_cli_empty_roster_path_skips_loader(tmp_path, monkeypatch):
+    """`--roster ''` skips the loader entirely — no crash on missing
+    file, no kid_names query emitted. Parity with the other path
+    flags' empty-string opt-out (--blocklist '', --ignored-senders '')."""
+    import io
+    import sys
+
+    buf = io.StringIO()
+    monkeypatch.setattr(sys, "stdout", buf)
+    monkeypatch.setattr(sys, "argv", [
+        "build_queries.py",
+        "--blocklist", "",
+        "--auto-blocklist", "",
+        "--ignored-senders", "",
+        "--protected-senders", "",
+        "--roster", "",
+        "--today", "2026-04-24",
+    ])
+    assert bq.main() == 0
+    out = json.loads(buf.getvalue())
+    assert out["kid_names_query_body"] is None
+    assert "kid_names" not in out["queries"]
+
+
+def test_cli_kid_names_query_would_match_everly_volleyball_subject(
+    tmp_path, monkeypatch,
+):
+    """Regression pin against the actual missed email.
+
+    Subject `Everly volleyball`, body `8-9am May 4-8` — Gmail's
+    full-text search is a substring/token match, so the constructed
+    query body containing the literal `Everly` would have hit. We
+    don't run live Gmail here; we assert the constructed query string
+    carries the kid name so a future drift that drops `Everly` from
+    the OR-clause (e.g. accidentally filtering keys to a different
+    field) shows up as a test failure rather than as another missed
+    email next April."""
+    roster = _write_roster(tmp_path, {"Everly": {}, "Isla": {}})
+
+    import io
+    import sys
+
+    buf = io.StringIO()
+    monkeypatch.setattr(sys, "stdout", buf)
+    monkeypatch.setattr(sys, "argv", [
+        "build_queries.py",
+        "--blocklist", "",
+        "--auto-blocklist", "",
+        "--ignored-senders", "",
+        "--protected-senders", "",
+        "--roster", str(roster),
+        "--today", "2026-04-24",
+    ])
+    assert bq.main() == 0
+    out = json.loads(buf.getvalue())
+    assert "Everly" in out["queries"]["kid_names"]
