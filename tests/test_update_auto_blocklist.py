@@ -1,23 +1,28 @@
 """Pytest suite for scripts/update_auto_blocklist.py.
 
 The script auto-mutates blocklist_auto.txt using agent suggestions.
-Its three private helpers — _domain_of, _is_protected, _parse_block_file
-— gate which addresses can be auto-added; a regression in any one
-of them risks polluting a tracked file with bad entries (or missing
-real ones). `main()` threads those helpers together and also writes
-the auto-header, the `# auto YYYY-MM-DD: reason` trailers, and the
-audit-log JSONL line.
+Its remaining private helpers — _domain_of, _parse_block_file — gate
+which addresses can be auto-added; a regression in either risks
+polluting a tracked file with bad entries (or missing real ones).
+The protection check is now delegated to the shared
+`protected_senders.is_protected` matcher (#26 unification — the
+previous `_is_protected` helper and `PROTECTED_SUFFIXES` tuple were
+removed); `main()` calls the shared matcher with the patterns loaded
+from `--protected-senders`. Matcher semantics (exact, suffix,
+address-form) are pinned in `tests/test_protected_senders.py`; this
+file pins only the integration — i.e. that `main()` actually rejects
+suggestions matching the protected list.
 
 Coverage layers:
-1. Helpers (_domain_of, _is_protected, _parse_block_file) — pinned
-   individually with tolerated/rejected shapes.
+1. Helpers (_domain_of, _parse_block_file) — pinned individually
+   with tolerated/rejected shapes.
 2. `main()` — driven through argv against a tmp_path, with
    `dt.date.today()` monkeypatched for stable trailer text. Each
    guardrail branch (wrong confidence, invalid address, protected
-   domain, already in auto, already in main, non-dict entry) is
-   exercised, plus the error-exit branches for missing / unparseable
-   / non-list suggestions, the auto-header creation, and the audit
-   JSONL append.
+   domain, protected address-form, already in auto, already in main,
+   non-dict entry) is exercised, plus the error-exit branches for
+   missing / unparseable / non-list suggestions, the auto-header
+   creation, and the audit JSONL append.
 """
 from __future__ import annotations
 
@@ -83,41 +88,16 @@ def test_domain_of_whitespace_only_returns_none():
     assert uab._domain_of("   ") is None
 
 
-# ─── _is_protected ────────────────────────────────────────────────────────
-
-def test_is_protected_exact_match():
-    assert uab._is_protected("fcps.edu") is True
-
-
-def test_is_protected_subdomain_match():
-    """A subdomain of a protected suffix is also protected — covers
-    "schoolname.fcps.edu" senders that share the umbrella domain."""
-    assert uab._is_protected("elementary.fcps.edu") is True
-
-
-def test_is_protected_deep_subdomain_match():
-    assert uab._is_protected("a.b.c.pta.org") is True
-
-
-def test_is_protected_unrelated_domain_not_protected():
-    assert uab._is_protected("randomspam.com") is False
-
-
-def test_is_protected_case_insensitive():
-    assert uab._is_protected("FCPS.EDU") is True
-    assert uab._is_protected("Elementary.FCPS.Edu") is True
-
-
-def test_is_protected_substring_but_not_suffix_not_protected():
-    """"notpta.org" contains the chars "pta.org" but is not a subdomain
-    of "pta.org" — must not be protected. This is the classic substring-
-    vs-suffix confusion guard."""
-    assert uab._is_protected("notpta.org") is False
-
-
-def test_is_protected_suffix_chars_in_middle_not_protected():
-    """"pta.org.example.com" ends in ".example.com", not ".pta.org"."""
-    assert uab._is_protected("pta.org.example.com") is False
+# Note: the seven legacy `test_is_protected_*` cases (exact / subdomain /
+# deep-subdomain / unrelated-domain / case-insensitive / substring-not-
+# suffix / suffix-chars-in-middle) were removed when `_is_protected` and
+# `PROTECTED_SUFFIXES` were unified into the shared
+# `protected_senders.is_protected` matcher (#26). The same semantics —
+# exact bare-domain match, subdomain match with `.` boundary, suffix
+# wildcard, case-insensitivity, substring-confusion guard — are now
+# pinned in `tests/test_protected_senders.py`. Keeping the integration
+# pin (`test_main_protected_domain_rejected`) below so a regression in
+# the wiring is still caught.
 
 
 # ─── _parse_block_file ────────────────────────────────────────────────────
@@ -195,7 +175,8 @@ class _FrozenDate(dt.date):
 
 
 def _run_main(monkeypatch, tmp_path, suggestions, *, main_block=None,
-              auto_block_existing=None, audit_log=True):
+              auto_block_existing=None, audit_log=True,
+              protected_patterns=None):
     sug_path = tmp_path / "suggestions.json"
     sug_path.write_text(json.dumps(suggestions), encoding="utf-8")
 
@@ -206,6 +187,14 @@ def _run_main(monkeypatch, tmp_path, suggestions, *, main_block=None,
     main_path = tmp_path / "blocklist.txt"
     main_path.write_text(main_block or "", encoding="utf-8")
 
+    # Empty list = no protection; None = use a fresh empty file (no
+    # protected patterns). Pass a list of patterns to write a temp
+    # protected_senders.txt and route it through --protected-senders.
+    protected_path = tmp_path / "protected_senders.txt"
+    protected_path.write_text(
+        "\n".join(protected_patterns or []) + ("\n" if protected_patterns else "")
+    )
+
     audit_path = tmp_path / "audit.jsonl" if audit_log else None
 
     monkeypatch.setattr(uab.dt, "date", _FrozenDate)
@@ -215,6 +204,7 @@ def _run_main(monkeypatch, tmp_path, suggestions, *, main_block=None,
         "--suggestions", str(sug_path),
         "--auto-blocklist", str(auto_path),
         "--main-blocklist", str(main_path),
+        "--protected-senders", str(protected_path),
     ]
     if audit_path is not None:
         argv += ["--audit-log", str(audit_path)]
@@ -356,18 +346,66 @@ def test_main_invalid_address_rejected(monkeypatch, tmp_path):
 
 
 def test_main_protected_domain_rejected(monkeypatch, tmp_path):
-    """fcps.edu is a protected suffix; even with high confidence it
-    never lands in the blocklist."""
+    """A bare-domain protected pattern (fcps.edu) rejects subdomains too.
+
+    Routed through `protected_senders.is_protected` which matches
+    exact + `.suffix` (#26 unification). Pinned here as the integration
+    check that the wiring loads protected_senders.txt and threads
+    patterns through to the gate."""
     rc, stdout, _err, auto_path, audit_path = _run_main(
         monkeypatch, tmp_path,
         [{"from": "staff@school.fcps.edu", "reason": "foo",
           "confidence": "high"}],
+        protected_patterns=["fcps.edu"],
     )
     assert rc == 0
     assert not auto_path.exists()
     entry = json.loads(audit_path.read_text().strip())
     assert entry["added"] == []
     assert "protected domain" in entry["rejected"][0]["why"]
+
+
+def test_main_protected_address_form_rejected(monkeypatch, tmp_path):
+    """An address-form protected pattern rejects exactly that address.
+
+    This is the load-bearing #26 fix: ellen.n.holmes@gmail.com on the
+    protected list MUST never land in blocklist_auto.txt no matter how
+    confident the agent's adult-only judgment is on a one-shot email."""
+    rc, _stdout, _err, auto_path, audit_path = _run_main(
+        monkeypatch, tmp_path,
+        [{"from": "ellen.n.holmes@gmail.com",
+          "reason": "adult personal email about tax return, no child events",
+          "confidence": "high"}],
+        protected_patterns=["ellen.n.holmes@gmail.com"],
+    )
+    assert rc == 0
+    assert not auto_path.exists()
+    entry = json.loads(audit_path.read_text().strip())
+    assert entry["added"] == []
+    why = entry["rejected"][0]["why"]
+    assert "protected sender" in why
+    assert "ellen.n.holmes@gmail.com" in why
+
+
+def test_main_address_form_pattern_does_not_protect_other_gmail_addresses(
+    monkeypatch, tmp_path,
+):
+    """Address-form protection is per-address, not per-domain.
+
+    Pin: protecting `ellen.n.holmes@gmail.com` does NOT protect
+    every gmail.com sender. Otherwise we'd un-block every personal
+    Gmail in the freemail-block universe (#20)."""
+    rc, _stdout, _err, auto_path, _audit = _run_main(
+        monkeypatch, tmp_path,
+        [{"from": "spammer.123@gmail.com", "reason": "junk",
+          "confidence": "high"}],
+        protected_patterns=["ellen.n.holmes@gmail.com"],
+    )
+    assert rc == 0
+    # spammer.123@gmail.com is NOT protected by ellen's pattern, so it
+    # gets added.
+    assert auto_path.exists()
+    assert "spammer.123@gmail.com" in auto_path.read_text()
 
 
 def test_main_already_in_main_blocklist_rejected(monkeypatch, tmp_path):

@@ -41,6 +41,27 @@ def test_is_protected_exact_match():
     assert is_protected("other.edu", ["fcps.edu"]) is False
 
 
+def test_is_protected_bare_domain_matches_subdomains():
+    """Bare-domain pattern protects the registrable domain AND every
+    subdomain of it (`elementary.fcps.edu`, `a.b.c.pta.org`).
+
+    Preserves the OLD update_auto_blocklist._is_protected semantic
+    (now removed, unified into this matcher per #26). The dot
+    boundary is required — `notfcps.edu` must not match `fcps.edu`.
+    """
+    patterns = ["fcps.edu"]
+    assert is_protected("fcps.edu", patterns) is True
+    assert is_protected("elementary.fcps.edu", patterns) is True
+    assert is_protected("a.b.c.fcps.edu", patterns) is True
+    # Substring-not-suffix guard: `notfcps.edu` ends with `fcps.edu`
+    # in raw chars but is NOT a subdomain of fcps.edu.
+    assert is_protected("notfcps.edu", patterns) is False
+    # Same guard for an address sender.
+    assert is_protected("user@notfcps.edu", patterns) is False
+    # And sender at a real subdomain still matches.
+    assert is_protected("teacher@school.fcps.edu", patterns) is True
+
+
 def test_is_protected_suffix_wildcard():
     patterns = ["*pta.org"]
     assert is_protected("louisearcherpta.org", patterns) is True

@@ -45,12 +45,17 @@ def is_protected(sender: str, patterns: list[str]) -> bool:
     Pattern shapes (all matched case-insensitively):
 
     - **Bare domain** (``fcps.edu``): matches the exact registrable
-      domain. When ``sender`` is an address, the comparison runs
-      against the part after the last ``@``.
+      domain *or* any subdomain of it (``elementary.fcps.edu``,
+      ``a.b.c.fcps.edu``). The ``.`` boundary is required, so
+      ``notfcps.edu`` does NOT match ``fcps.edu`` — substring confusion
+      is guarded against. When ``sender`` is an address, the
+      comparison runs against the part after the last ``@``.
     - **Domain-suffix** (``*pta.org``): matches any domain that ends
       with the literal part after the asterisk
       (e.g. ``louisearcherpta.org``). Comparison runs against the
-      domain part as for bare-domain patterns.
+      domain part as for bare-domain patterns. Distinct from bare
+      patterns: ``*pta.org`` matches ``louisearcherpta.org`` (no dot
+      boundary), whereas a bare ``pta.org`` pattern does not.
     - **Address-form** (``alice@example.com``): matches the full
       lowercased email address. Pinned by the ``@`` in the pattern
       itself; the matcher does not attempt to extract a domain from
@@ -105,6 +110,8 @@ def is_protected(sender: str, patterns: list[str]) -> bool:
             suffix = pat[1:]
             if suffix and sender_domain.endswith(suffix):
                 return True
-        elif sender_domain == pat:
+        elif sender_domain == pat or sender_domain.endswith("." + pat):
+            # Bare-domain pattern: exact match or subdomain (with `.`
+            # boundary so `notfcps.edu` does not match `fcps.edu`).
             return True
     return False
