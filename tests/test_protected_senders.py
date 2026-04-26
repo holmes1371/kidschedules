@@ -323,3 +323,91 @@ def test_render_html_keeps_ignore_sender_button_for_unprotected_sender():
     )
     assert 'button class="ignore-sender-btn"' in html
     assert 'data-sender="spammer.com"' in html
+
+
+def test_render_html_omits_ignore_sender_button_for_protected_address_form_sender():
+    """ROADMAP #28 regression pin. Pre-fix, the render-time guard called
+    `is_protected(domain, protected)` — passing the bare registrable
+    domain (e.g. `gmail.com`) for a freemail sender. Address-form
+    patterns added in #26 only match when the sender is itself an
+    address (`alice@gmail.com`), so the bare-domain query never fired
+    and the button rendered for protected freemail addresses like
+    Ellen's. The fix passes `block_key` (the full address for freemail
+    senders) so address-form patterns match correctly here too —
+    closing the fat-finger gap where someone could click "Ignore
+    sender" on Ellen's self-note card."""
+    import datetime as dt
+
+    event = {
+        "id": "evt3",
+        "name": "Volleyball tryouts",
+        "date": "2026-05-04",
+        "_date_obj": dt.date(2026, 5, 4),
+        "time": "8:00 AM",
+        "location": "School gym",
+        "category": "Sports",
+        "child": "Everly",
+        "source": "ellen.n.holmes@gmail.com",
+        "sender_domain": "gmail.com",
+        "sender_block_key": "ellen.n.holmes@gmail.com",
+    }
+    weeks = [(dt.date(2026, 5, 4), [event])]
+    html = pe.render_html(
+        today=dt.date(2026, 4, 25),
+        weeks=weeks,
+        undated=[],
+        total_future=1,
+        lookback_days=60,
+        webhook_url="https://example.com/hook",
+        pages_url="",
+        protected_senders=["ellen.n.holmes@gmail.com"],
+    )
+    # data-sender carries the full address for freemail block keys.
+    assert 'data-sender="ellen.n.holmes@gmail.com"' in html
+    # No actual <button class="ignore-sender-btn"> element rendered —
+    # the fat-finger path is closed at render time.
+    assert 'button class="ignore-sender-btn"' not in html
+    # The Ignore-event button on the SAME card is unaffected — the
+    # user can still hide a single event from a protected sender.
+    # Pin this so a future "tighten protection" pass doesn't
+    # accidentally over-suppress the per-event ignore too.
+    assert 'button class="ignore-btn"' in html
+
+
+def test_render_html_keeps_ignore_sender_button_for_unprotected_freemail_address():
+    """Parity to the institutional-unprotected case: an unprotected
+    freemail address (the typical `spammer.123@gmail.com` shape from
+    item #20 freemail-block-granularity) must STILL get an Ignore-
+    sender button. Otherwise the fix to `block_key` would over-suppress
+    and break per-address blocking for freemail."""
+    import datetime as dt
+
+    event = {
+        "id": "evt4",
+        "name": "Junk newsletter",
+        "date": "2026-04-30",
+        "_date_obj": dt.date(2026, 4, 30),
+        "time": "9:00 AM",
+        "location": "Inbox",
+        "category": "Other",
+        "child": "Kid",
+        "source": "spammer.123@gmail.com",
+        "sender_domain": "gmail.com",
+        "sender_block_key": "spammer.123@gmail.com",
+    }
+    weeks = [(dt.date(2026, 4, 30), [event])]
+    html = pe.render_html(
+        today=dt.date(2026, 4, 25),
+        weeks=weeks,
+        undated=[],
+        total_future=1,
+        lookback_days=60,
+        webhook_url="https://example.com/hook",
+        pages_url="",
+        # Ellen's address is protected; spammer.123 is NOT, even though
+        # it shares the gmail.com domain. Pin: address-form protection
+        # is per-address, not per-domain.
+        protected_senders=["ellen.n.holmes@gmail.com"],
+    )
+    assert 'button class="ignore-sender-btn"' in html
+    assert 'data-sender="spammer.123@gmail.com"' in html

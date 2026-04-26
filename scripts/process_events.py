@@ -877,22 +877,29 @@ def render_html(today: dt.date,
                 f'                data-event-name="{ev["name"]}" data-event-date="{ev["date"]}"\n'
                 f'                type="button">Ignore event</button>'
             )
-        # `sender_domain` remains the registrable-domain identity — used
-        # by the protected-senders guard (a domain-level semantic). The
-        # `sender_block_key` is what the Ignore-sender button submits:
-        # full address for freemail (gmail.com, yahoo.com, ...), the
-        # domain otherwise. See design/sender-block-granularity.md.
+        # `sender_domain` remains the registrable-domain identity (used
+        # for grouping / display). The `sender_block_key` is what the
+        # Ignore-sender button submits: full address for freemail
+        # (gmail.com, yahoo.com, ...), the domain otherwise. See
+        # design/sender-block-granularity.md.
         block_key = (ev.get("sender_block_key") or "").strip()
         domain = (ev.get("sender_domain") or "").strip()
         sender_attr = f' data-sender="{block_key}"' if block_key else ""
         sender_btn_html = ""
-        # Never render the Ignore-sender button for protected domains
-        # (schools, PTAs, health providers, team-management platforms) —
-        # blocking those at the Gmail-query level would drop real events.
-        # The guard keys on sender_domain so the domain-level pattern
-        # file stays load-bearing even for address-form block keys. The
-        # Ignore-event button on the same card is unaffected.
-        if block_key and not is_protected(domain, protected):
+        # Never render the Ignore-sender button for protected senders
+        # (schools, PTAs, health providers, team-management platforms,
+        # plus address-form entries like the parents' personal Gmail).
+        # The Ignore-event button on the same card is unaffected — the
+        # user can still hide a single event from a protected sender;
+        # they just can't sweep the whole sender by accident. The guard
+        # keys on `block_key` (NOT `domain`) so address-form patterns
+        # added in #26 actually fire here too — passing `domain`
+        # reduces a freemail sender to its bare domain (gmail.com),
+        # against which an address-form pattern (alice@gmail.com)
+        # cannot match. block_key is the bare domain for institutional
+        # senders and the full address for freemail, which
+        # `is_protected` handles uniformly. See #28.
+        if block_key and not is_protected(block_key, protected):
             sender_btn_html = (
                 '\n        <div class="event-actions-bottom">\n'
                 f'          <button class="ignore-sender-btn" '
