@@ -37,3 +37,4 @@
 {"run_iso": "2026-04-25", "suggestion_count": 0, "added": [], "rejected": []}
 {"run_iso": "2026-04-26", "suggestion_count": 1, "added": [], "promoted": [], "pending_added": [{"from": "viennarecreation@rectrac.com", "source_message_id": "19dc55731e6ea2df", "reason": "Email contained only a receipt attachment notice with no extractable event details", "confidence": "high"}], "active_refreshed": [], "duplicate_flag": [], "resolved_by_main_blocklist": [], "expired": [], "aged_out": [], "rejected": []}
 {"run_iso": "2026-04-26", "suggestion_count": 0, "added": [], "promoted": [], "pending_added": [], "active_refreshed": [], "duplicate_flag": [], "resolved_by_main_blocklist": [], "expired": [], "aged_out": [], "rejected": []}
+{"run_iso": "2026-04-26", "suggestion_count": 0, "added": [], "promoted": [], "pending_added": [], "active_refreshed": [], "duplicate_flag": [], "resolved_by_main_blocklist": [], "expired": [], "aged_out": [], "rejected": []}
