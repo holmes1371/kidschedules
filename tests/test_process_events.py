@@ -1012,7 +1012,9 @@ def test_layout_a_undated_card_uses_meta_strip_with_date_tbd():
     """The Needs-Verification card shares the Layout A shell — same
     meta-strip, child-chip, all-day pill — but with `Date TBD` as the
     day label. `camps.fcps.edu` is a bare domain (not http:// and not
-    an email), so the location line still renders."""
+    an email), so the location line still renders. Per #29 it carries
+    the new "Location: " prefix because a bare domain is NOT an
+    address-shape string (no digits, no street suffix word)."""
     raw = [{
         "name": "Camp Signup",
         "date": "",
@@ -1038,7 +1040,7 @@ def test_layout_a_undated_card_uses_meta_strip_with_date_tbd():
     assert '<span class="day">Date TBD</span>' in card
     assert '<span class="time allday">All day</span>' in card
     assert '<span class="child-chip isla" title="Isla">I</span>' in card
-    assert '<div class="event-location">camps.fcps.edu</div>' in card
+    assert '<div class="event-location">Location: camps.fcps.edu</div>' in card
     # Parallel regression guards:
     assert 'class="event-date"' not in card
     assert 'class="badge"' not in card
