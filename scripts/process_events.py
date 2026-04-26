@@ -730,6 +730,43 @@ def _is_all_day(time_str: str) -> bool:
 _SUPPRESS_LOCATION_EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[a-z]{2,}$")
 
 
+# #29: locations that look like a fully-formed street address get
+# rendered without the "Location: " prefix (the address is obviously
+# a location). The pattern matches a digit-prefixed token followed
+# anywhere by a street-suffix word — so "2371 Carlson Way" trips it,
+# but "School Gym", "Bldg A, Room 215", "Online", and "Mr. Patel's
+# Classroom" do not. Failure modes accepted: a venue named "Way Cool
+# Studio" doesn't match (no leading digit); cases like "St. Patrick
+# Hall" don't match either ("St." is anchored to the head, not
+# preceded by digits). Single-line regex; suffix list is the common
+# US street-naming set.
+_ADDRESS_LIKE_RE = re.compile(
+    r"\d+\s+\S+.*\b(?:Way|St|Street|Ave|Avenue|Rd|Road|Blvd|Boulevard"
+    r"|Dr|Drive|Ln|Lane|Pkwy|Parkway|Cir|Circle|Ct|Court|Ter|Terrace"
+    r"|Pl|Place|Hwy|Highway)\b",
+    re.IGNORECASE,
+)
+
+
+# #29: source line truncation cap. Keeps a runaway From label from
+# breaking card layout. Full string lands in the title= tooltip so
+# the truncated version stays inspectable.
+_SOURCE_DISPLAY_CAP = 80
+
+
+def _is_address_like(loc: str) -> bool:
+    """Return True for location strings that look like a fully-formed
+    street address.
+
+    Used by the card render to decide whether to prefix the location
+    with "Location: " (#29). Address-like locations skip the prefix
+    because the address itself is already self-evidently a location;
+    everything else gets the prefix for consistency with "For:" and
+    "From:" lines on the same card.
+    """
+    return bool(_ADDRESS_LIKE_RE.search(loc or ""))
+
+
 def _is_suppressible_location(loc: str) -> bool:
     """Return True for locations that should be omitted from the card.
 
@@ -846,9 +883,28 @@ def render_html(today: dt.date,
             time_html = f'<span class="time">{ev["time"]}</span>'
         loc_raw = ev["location"]
         if loc_raw and not _is_suppressible_location(loc_raw):
-            location_html = f'\n        <div class="event-location">{loc_raw}</div>'
+            # #29: prefix with "Location: " for consistency with For:
+            # and From:, except when the location itself is obviously
+            # a street address.
+            loc_display = loc_raw if _is_address_like(loc_raw) else f"Location: {loc_raw}"
+            location_html = f'\n        <div class="event-location">{loc_display}</div>'
         else:
             location_html = ""
+        # #29: From: line with the agent's curated source label. Cap
+        # the displayed text so a runaway label doesn't break the
+        # card; the full string survives in the title= tooltip.
+        source_raw = (ev.get("source") or "").strip()
+        if source_raw:
+            if len(source_raw) > _SOURCE_DISPLAY_CAP:
+                source_display = source_raw[:_SOURCE_DISPLAY_CAP - 1] + "…"
+            else:
+                source_display = source_raw
+            source_html = (
+                f'\n        <div class="event-source" '
+                f'title="From: {source_raw}">From: {source_display}</div>'
+            )
+        else:
+            source_html = ""
         ics_btn_html = ""
         if webcal_base:
             ics_href = f"https://{webcal_base}ics/{ev['id']}.ics"
@@ -920,7 +976,7 @@ def render_html(today: dt.date,
           <span class="sep">·</span>
           {time_html}
         </div>
-        <div class="event-name">{ev["name"]}{new_badge_html}</div>{audience_html}{location_html}
+        <div class="event-name">{ev["name"]}{new_badge_html}</div>{audience_html}{source_html}{location_html}
         <div class="ignore-status" aria-live="polite"></div>{sender_btn_html}
       </div>"""
 
@@ -936,9 +992,26 @@ def render_html(today: dt.date,
             time_html = f'<span class="time">{ev["time"]}</span>'
         loc_raw = ev["location"]
         if loc_raw and not _is_suppressible_location(loc_raw):
-            location_html = f'\n        <div class="event-location">{loc_raw}</div>'
+            # #29: parity with _event_card — prefix with "Location: "
+            # unless the location is itself a fully-formed address.
+            loc_display = loc_raw if _is_address_like(loc_raw) else f"Location: {loc_raw}"
+            location_html = f'\n        <div class="event-location">{loc_display}</div>'
         else:
             location_html = ""
+        # #29: From: line for source attribution. Same shape as the
+        # dated-card path; truncation cap and title= tooltip identical.
+        source_raw = (ev.get("source") or "").strip()
+        if source_raw:
+            if len(source_raw) > _SOURCE_DISPLAY_CAP:
+                source_display = source_raw[:_SOURCE_DISPLAY_CAP - 1] + "…"
+            else:
+                source_display = source_raw
+            source_html = (
+                f'\n        <div class="event-source" '
+                f'title="From: {source_raw}">From: {source_display}</div>'
+            )
+        else:
+            source_html = ""
         # #18: undated cards carry the same per-event Ignore/Unignore
         # affordance as dated cards. The stable id is sha1(name|""|child);
         # it is disjoint from any dated hash because the middle segment
@@ -975,7 +1048,7 @@ def render_html(today: dt.date,
           <span class="sep">·</span>
           {time_html}
         </div>
-        <div class="event-name">{ev["name"]}{new_badge_html}</div>{audience_html}{location_html}
+        <div class="event-name">{ev["name"]}{new_badge_html}</div>{audience_html}{source_html}{location_html}
       </div>"""
 
     # Build week sections
@@ -1341,6 +1414,19 @@ def render_html(today: dt.date,
       font-size: 0.75rem;
       color: var(--text-tertiary);
       margin-bottom: 0.15rem;
+    }}
+    /* #29: source attribution line. Tonally subordinate to
+       event-name and event-location; matches event-audience weight
+       so the For:/From: pair reads as one block of metadata. The
+       overflow guards keep a runaway label from breaking layout —
+       the full string lives in the title= tooltip. */
+    .event-source {{
+      font-size: 0.75rem;
+      color: var(--text-tertiary);
+      margin-bottom: 0.15rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }}
     .undated-note {{
       font-size: 0.85rem;

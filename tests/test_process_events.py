@@ -2105,3 +2105,187 @@ def test_render_html_new_badge_survives_on_ignored_card():
     assert (
         'Ignored With Sender<span class="new-badge">NEW</span></div>'
     ) in html
+
+
+# ─── #29: source line + Location: prefix ──────────────────────────────────
+#
+# `_is_address_like` is the heuristic the card render uses to decide
+# whether to prefix a location with "Location: " (#29). Pure-function
+# unit tests run on every platform; the render-integration tests below
+# go through render_html and currently fail on Windows due to the
+# unrelated `%-d` strftime issue but pass on CI (Linux).
+
+
+def test_is_address_like_full_street_address_matches():
+    assert pe._is_address_like("Fredericksburg Convention Center, 2371 Carlson Way")
+    assert pe._is_address_like("Tysons Pediatrics, 8350 Greensboro Dr")
+    assert pe._is_address_like("100 Main Street")
+    assert pe._is_address_like("4500 University Drive, Fairfax VA 22030")
+    assert pe._is_address_like("Suite 200, 1234 Elm Avenue")
+
+
+def test_is_address_like_venue_only_does_not_match():
+    """No leading digit → not address-like → gets the Location: prefix."""
+    assert not pe._is_address_like("School Gym")
+    assert not pe._is_address_like("Mr. Patel's Classroom")
+    assert not pe._is_address_like("Online")
+    assert not pe._is_address_like("Cafeteria")
+
+
+def test_is_address_like_room_number_alone_does_not_match():
+    """A room number is a digit + word but no street suffix → not
+    address-like. "Location: Room 215" reads naturally."""
+    assert not pe._is_address_like("Room 215")
+    assert not pe._is_address_like("Bldg A, Room 215")
+    assert not pe._is_address_like("Room 215, second floor")
+
+
+def test_is_address_like_suffix_alone_without_digits_does_not_match():
+    """Street-suffix words on their own (no leading digit) don't trip
+    the heuristic. "Way Cool Studio" stays "Location: Way Cool Studio"."""
+    assert not pe._is_address_like("Way Cool Studio")
+    assert not pe._is_address_like("Park Lane")  # no leading digit
+    assert not pe._is_address_like("Highway Diner")
+
+
+def test_is_address_like_case_insensitive():
+    """Real agent output mixes case freely."""
+    assert pe._is_address_like("100 main STREET")
+    assert pe._is_address_like("123 PARK ave")
+
+
+def test_is_address_like_empty_and_whitespace():
+    assert not pe._is_address_like("")
+    assert not pe._is_address_like("   ")
+    assert not pe._is_address_like(None or "")
+
+
+def test_render_html_event_card_renders_source_line():
+    """Dated card carries a `<div class="event-source">From: ...</div>`
+    line under the event-name (and audience, when present)."""
+    event = {
+        "id": "src1",
+        "name": "PTA meeting",
+        "date": "2026-04-20",
+        "_date_obj": dt.date(2026, 4, 20),
+        "time": "7:00 PM",
+        "location": "School Gym",
+        "category": "School",
+        "child": "Kid",
+        "source": "LAES newsletter (Apr 6)",
+        "sender_domain": "fcps.edu",
+        "sender_block_key": "fcps.edu",
+    }
+    weeks = [(dt.date(2026, 4, 20), [event])]
+    html = pe.render_html(
+        today=TODAY, weeks=weeks, undated=[],
+        total_future=1, lookback_days=60, webhook_url="",
+    )
+    assert '<div class="event-source"' in html
+    assert "From: LAES newsletter (Apr 6)" in html
+
+
+def test_render_html_undated_card_renders_source_line():
+    """Parity with dated cards — undated cards render the same source
+    line under the event-name."""
+    event = {
+        "id": "src2",
+        "name": "Spring concert",
+        "date": "",                   # undated
+        "_date_obj": None,
+        "time": "",
+        "location": "Auditorium",
+        "category": "School",
+        "child": "Kid",
+        "source": "Music Dept (Apr 5)",
+        "sender_domain": "fcps.edu",
+        "sender_block_key": "fcps.edu",
+    }
+    html = pe.render_html(
+        today=TODAY, weeks=[], undated=[event],
+        total_future=0, lookback_days=60, webhook_url="",
+    )
+    assert '<div class="event-source"' in html
+    assert "From: Music Dept (Apr 5)" in html
+
+
+def test_render_html_truncates_long_source_with_ellipsis_and_full_in_title():
+    """A source label longer than _SOURCE_DISPLAY_CAP is truncated in
+    the visible text but the full string survives in title= so hover
+    still surfaces it."""
+    long_source = "A" * 120  # >> 80 char cap
+    event = {
+        "id": "src3",
+        "name": "Sprawling source",
+        "date": "2026-04-20",
+        "_date_obj": dt.date(2026, 4, 20),
+        "time": "9:00 AM",
+        "location": "School",
+        "category": "School",
+        "child": "Kid",
+        "source": long_source,
+        "sender_domain": "fcps.edu",
+        "sender_block_key": "fcps.edu",
+    }
+    weeks = [(dt.date(2026, 4, 20), [event])]
+    html = pe.render_html(
+        today=TODAY, weeks=weeks, undated=[],
+        total_future=1, lookback_days=60, webhook_url="",
+    )
+    # Visible: truncated + ellipsis.
+    assert "From: " + ("A" * (pe._SOURCE_DISPLAY_CAP - 1)) + "…</div>" in html
+    # title= carries the full string with the From: prefix.
+    assert f'title="From: {long_source}"' in html
+
+
+def test_render_html_location_gets_location_prefix_for_plain_venue():
+    """Plain venue → `Location: <venue>` for visual consistency with
+    the For: / From: lines."""
+    event = {
+        "id": "loc1",
+        "name": "Practice",
+        "date": "2026-04-20",
+        "_date_obj": dt.date(2026, 4, 20),
+        "time": "5:00 PM",
+        "location": "School Gym",
+        "category": "Sports",
+        "child": "Kid",
+        "source": "Coach (Apr 18)",
+        "sender_domain": "example.com",
+        "sender_block_key": "example.com",
+    }
+    weeks = [(dt.date(2026, 4, 20), [event])]
+    html = pe.render_html(
+        today=TODAY, weeks=weeks, undated=[],
+        total_future=1, lookback_days=60, webhook_url="",
+    )
+    assert '<div class="event-location">Location: School Gym</div>' in html
+
+
+def test_render_html_address_like_location_omits_prefix():
+    """A location that's already a fully-formed street address skips
+    the Location: prefix — the address is self-evidently a location."""
+    event = {
+        "id": "loc2",
+        "name": "Recital",
+        "date": "2026-04-20",
+        "_date_obj": dt.date(2026, 4, 20),
+        "time": "7:00 PM",
+        "location": "Fredericksburg Convention Center, 2371 Carlson Way",
+        "category": "Sports",
+        "child": "Kid",
+        "source": "Studio (Apr 18)",
+        "sender_domain": "example.com",
+        "sender_block_key": "example.com",
+    }
+    weeks = [(dt.date(2026, 4, 20), [event])]
+    html = pe.render_html(
+        today=TODAY, weeks=weeks, undated=[],
+        total_future=1, lookback_days=60, webhook_url="",
+    )
+    # No "Location: " prefix; the raw address is the visible text.
+    assert (
+        '<div class="event-location">'
+        'Fredericksburg Convention Center, 2371 Carlson Way</div>'
+    ) in html
+    assert ("Location: Fredericksburg") not in html

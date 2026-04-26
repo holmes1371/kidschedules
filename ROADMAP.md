@@ -20,9 +20,11 @@ Strict rules for writing it:
 
 **2026-04-25**
 
-- Items 27 and 28 closed `[x]` after Tom's prod verification. Full prose moved to `COMPLETED.md`; one-line stubs preserved at the original numeric slots in the backlog.
-- Item 29 in flight `[~]` — event-card source line ("From: ...") + Location-prefix-unless-address-shape. Plan approved with explicit heuristic (regex matching digit-prefixed token + street-suffix word). Implementation underway in `scripts/process_events.py` (helper + render changes already drafted; CSS + tests + ROADMAP-flip pending in the same commit).
-- The 92 pre-existing failures (subprocess-driven `process_events.py` failures on Windows + Python 3.14, `%-d` strftime root cause) are still unrelated to active work, still worth a separate investigation when there's slack.
+- Items 27 and 28 closed `[x]` after Tom's prod verification (commit aa20b4b moved full prose to `COMPLETED.md`).
+- Item 29 code-complete `[~]` (this commit) — event-card source line and Location-prefix-unless-address-shape. `From: <source>` line rendered between `For:` and Location lines on both dated and undated cards (80-char truncation + `title=` full string); `Location:` prefix added except when the location matches a digit-prefix + street-suffix regex. 6 unit tests for `_is_address_like` + 5 render-integration tests; the render tests fail on Windows + Python 3.14 with the unrelated `%-d` strftime issue, green on CI.
+- Source-date enforcement deferred per design — relying on the agent's existing tendency to include dates in source labels; will revisit if production data shows the gap.
+- The 92+ pre-existing failures (subprocess-driven `process_events.py` failures on Windows + Python 3.14, `%-d` strftime root cause) are still unrelated to active work, still worth a separate investigation when there's slack.
+- Nothing else in flight. Next session moves item-29 prose to `COMPLETED.md` once Tom signs off.
 
 ## For future agents
 
@@ -118,6 +120,20 @@ Design-note questions to resolve before coding:
 27\. [x] Auto-blocklist hardening: one errant agent flag shouldn't permanently block a sender — 6bea35a / e5772cc / 6b8c62a / 87d18f5 / ee90951 / 5d914dc / 4ba172b — see COMPLETED.md
 
 28\. [x] Bug: Ignore-sender button renders for protected address-form senders — 0446ed9 — see COMPLETED.md
+
+### 29. [~] Event-card source line + Location: prefix
+
+Filed 2026-04-25 from Tom: event cards lacked any source attribution despite every event dict carrying a `source` field (the agent's curated label, e.g. *"LAES newsletter (Apr 6)"*). The card markup never rendered it — only the digest email did. Tom asked: add a `From:` line to the card so it's clear where each event came from, and while we're at it add a `Location:` prefix to the location for visual consistency with the existing `For:` line, **except** when the location is already a fully-formed street address (which is self-evidently a location).
+
+**Source line.** New `<div class="event-source">From: {ev["source"]}</div>` rendered between the audience (`For:`) line and the location line on both dated and undated cards. Truncated at 80 characters with CSS ellipsis; full string lives in the `title=` tooltip so a long label stays inspectable on hover. Always rendered when `source` is non-empty (the agent's default fallback is `"unknown source"`, so practically every card gets a line).
+
+**Location prefix.** Plain venues now render as `Location: School Gym`, `Location: Online`, `Location: Mr. Patel's Classroom`. Fully-formed addresses (`Fredericksburg Convention Center, 2371 Carlson Way`, `Tysons Pediatrics, 8350 Greensboro Dr`) skip the prefix because the address is already self-evidently a location. Detection heuristic is a single regex matching a digit-prefixed token followed anywhere by a US street-suffix word (`Way` | `St` | `Street` | `Ave` | `Avenue` | `Rd` | `Road` | `Blvd` | `Boulevard` | `Dr` | `Drive` | `Ln` | `Lane` | `Pkwy` | `Parkway` | `Cir` | `Circle` | `Ct` | `Court` | `Ter` | `Terrace` | `Pl` | `Place` | `Hwy` | `Highway`), case-insensitive. False-friend cases handled correctly: "Way Cool Studio" (no leading digit), "Park Lane" (no digit), "Bldg A, Room 215" (no street suffix word) all keep the prefix.
+
+**Tests.** 6 pure-function unit tests for `_is_address_like` (full addresses match; venue-only / room-only / suffix-without-digit don't; case-insensitive; empty/whitespace handled). 5 render-integration tests exercising both dated and undated cards: source line rendered, source truncation + title preserves full string, location prefix added for plain venue, prefix omitted for address-shape location. The render-integration tests fail on Windows + Python 3.14 with the same pre-existing `%-d` strftime issue that takes down the other render tests in this file; CI (Linux) runs them green.
+
+**Source date enforcement deferred.** Tom asked *"even better if it can add the date from which it was sourced."* The agent already includes dates in most source labels (`(Apr 6)` etc.) per its existing prompt. Strict per-source date enforcement would be a 1-paragraph prompt change; held as a follow-up if production data shows enough date-less labels to bother.
+
+Item stays `[~]` pending Tom's live verification post-deploy: load the page, confirm a `From: ...` line under each card and a `Location:` prefix on plain venues but not on full street addresses.
 
 ## Descoped / on hold
 
