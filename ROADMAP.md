@@ -20,10 +20,9 @@ Strict rules for writing it:
 
 **2026-04-25**
 
-- Item 27 v1 code complete `[~]` — 7 commits in the chain (6 design+code + 1 Tom hygiene fix). SHAs in the item-27 entry above. Pending Tom's live verification across two cron runs (≥7 days apart).
-- Item 28 filed and code-complete `[~]` — render-time fat-finger gap in `process_events.py`: the Ignore-sender button was still rendering for protected freemail addresses (Ellen, Tom) because the guard reduced senders to bare domain before matching, and address-form patterns only match against full addresses. One-line fix passes `block_key` instead of `domain` to `is_protected`; two regression tests added.
-- Test delta vs main: +45 passing (43 from #27 + 2 from #28). The 92 pre-existing failures (subprocess-driven `process_events.py` failures on Windows + Python 3.14) are unrelated and worth a separate investigation.
-- Nothing else in flight. Next session: move item-27 prose to `COMPLETED.md` once Tom signs off; same for item 28 once verified.
+- Items 27 and 28 closed `[x]` after Tom's prod verification. Full prose moved to `COMPLETED.md`; one-line stubs preserved at the original numeric slots in the backlog.
+- Item 29 in flight `[~]` — event-card source line ("From: ...") + Location-prefix-unless-address-shape. Plan approved with explicit heuristic (regex matching digit-prefixed token + street-suffix word). Implementation underway in `scripts/process_events.py` (helper + render changes already drafted; CSS + tests + ROADMAP-flip pending in the same commit).
+- The 92 pre-existing failures (subprocess-driven `process_events.py` failures on Windows + Python 3.14, `%-d` strftime root cause) are still unrelated to active work, still worth a separate investigation when there's slack.
 
 ## For future agents
 
@@ -116,43 +115,9 @@ Design-note questions to resolve before coding:
 
 26\. [x] Auto-blocklist must never block parents' personal addresses — c829e2a / 437fa6b / 9a3940c / cb64dd6 / 39c48b6 — see COMPLETED.md
 
-### 27. [~] Auto-blocklist hardening: one errant agent flag shouldn't permanently block a sender
+27\. [x] Auto-blocklist hardening: one errant agent flag shouldn't permanently block a sender — 6bea35a / e5772cc / 6b8c62a / 87d18f5 / ee90951 / 5d914dc / 4ba172b — see COMPLETED.md
 
-Filed 2026-04-24 from Tom: "we should also tighten up the auto-block logic — one errant email shouldn't get people blocked forever. There needs to be a better logic/audit system there." Item 26 above is the *surgical* fix for the family-sender failure mode; item 27 is the *systemic* hardening so a single high-confidence misjudgment by the agent — on any sender, not just the parents — can self-correct over time.
-
-The current auto-blocklist gating (`update_auto_blocklist.py`) accepts any suggestion that is (a) `confidence == "high"`, (b) a parseable email address, (c) not in the protected list, (d) not already in either blocklist. One agent run, one suggestion, permanent block. The audit step (`step1b_filter_audit`) compares loose vs tight queries periodically and surfaces drift, but it doesn't *automatically* remove auto-block entries that have produced false negatives — and it doesn't gate new additions on a multi-flag pattern.
-
-Sketch (not yet a design — file `design/auto-blocklist-hardening.md` before implementing):
-
-- **N-strikes rule**: a sender must be flagged across N distinct messages (or N distinct runs) before the auto-block fires. First flag enters a "pending" ledger (`blocklist_auto_pending.json` or similar); second flag from a different message_id promotes to active block. Mitigates one-shot misjudgments.
-- **TTL / decay**: an auto-block entry expires after K days unless re-confirmed by a fresh flag. Forces periodic re-verification rather than permanent embedding.
-- **Auto-rescue via filter audit**: extend `step1b_filter_audit` to actively *remove* auto-block entries whose loose-query results contain real kid events. Today the audit surfaces the discrepancy; tomorrow it would also act on it.
-- **Sender-stats integration**: if `sender_stats.json` shows the sender has produced N+ events historically, reject the suggestion outright. Treats event yield as the ground truth signal for "could send kid mail."
-
-Open design questions (resolve before implementing):
-
-- Which lever (or combination) gives the best precision/recall tradeoff without overfitting to the Ellen incident.
-- Where pending / expired entries live — separate file, columns in `blocklist_auto.txt`, or both.
-- How the audit log (`blocklist_auto_audit.jsonl`) records the new states (pending / promoted / expired / rescued) so the history stays interpretable.
-- Whether the operator's hand-curated `blocklist.txt` participates in any of this (probably not; `blocklist_auto.txt` is the only file the bot writes).
-
-Held pending item 26 close-out to avoid scope creep — landing both at once would muddy the diagnosis if the next missed-email surfaces.
-
-**Code complete (2026-04-25, v1)** — 6bea35a (design note + flip) / e5772cc (sender-stats reject) / 6b8c62a (auto_blocklist_state module + 27 unit tests) / 87d18f5 (main() integration + workflow plumbing + agent prompt) / ee90951 (TTL decay + audit log) / 5d914dc (close-out) / 4ba172b (Tom hygiene fix: explicit --state-file in main.py). All three approved levers wired end-to-end; auto-rescue via filter audit was scoped out as a follow-up. Full design at `design/auto-blocklist-hardening.md`.
-
-Item stays `[~]` pending Tom's live verification: the cron needs to run at least twice (≥7 days apart) so a pending → promote cycle is observable end-to-end. The first post-deploy run will also seed `last_flagged_iso = today` for any pre-existing `blocklist_auto.txt` rows via `seed_active_from_legacy`. After Tom signs off, the next session moves the full prose to `COMPLETED.md` and flips to `[x]`.
-
-### 28. [~] Bug: Ignore-sender button renders for protected address-form senders
-
-Filed 2026-04-25 from Tom: noticed during item-26 verification that Ellen's events (her self-notes about the kids' activities — exactly what the kid_names query / item 25 is supposed to surface) were rendering with an "Ignore sender" button. Even though Ellen is now on the protected list (item 26), the render-time guard in `process_events.py::render_html` was reducing the sender to its bare registrable domain (`gmail.com`) before checking against `protected_senders`. Address-form patterns (`ellen.n.holmes@gmail.com`) added in item 26 only match when the sender is itself an address, so the bare-domain query never fired and the button rendered. One fat-finger click would have ignored Ellen's address from the UI side, working around the auto-blocklist protection.
-
-**Scope (Tom-confirmed).** Suppress only the Ignore-*sender* button on protected-sender cards; the Ignore-*event* button on the same card stays — the user can still hide a single event from a protected sender, they just can't sweep the whole sender by accident.
-
-**Fix.** `process_events.py:895` now passes `block_key` (full address for freemail, bare domain otherwise) instead of `domain` to `is_protected`. Both pattern shapes are handled uniformly by the matcher — bare-domain patterns continue to match for institutional senders, address-form patterns now match for freemail senders. One-line code change; surrounding comment rewritten to explain why the guard keys on the address form.
-
-**Tests.** Two new render-integration tests in `tests/test_protected_senders.py` mirroring the existing institutional pair: one for a protected freemail address (Ignore-sender suppressed AND Ignore-event still rendered — both pinned), one for an unprotected freemail address sharing a protected sender's domain (Ignore-sender kept — address-form protection is per-address, not per-domain).
-
-Item stays `[~]` pending Tom's live verification post-deploy: pull up Ellen's next self-note event card and confirm no Ignore-sender button (but Ignore-event still works). Closes the fat-finger gap that #26's design note noted should already be closed but wasn't due to the missed integration of address-form patterns into the render-side guard.
+28\. [x] Bug: Ignore-sender button renders for protected address-form senders — 0446ed9 — see COMPLETED.md
 
 ## Descoped / on hold
 

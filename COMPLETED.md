@@ -298,6 +298,50 @@ Filed 2026-04-24 mid-session after item 25's kid_names query landed working but 
 
 Full design record at `design/protect-parent-addresses.md`.
 
+### 27. [x] Auto-blocklist hardening: one errant agent flag shouldn't permanently block a sender — 6bea35a (design + flip) / e5772cc (sender-stats reject) / 6b8c62a (auto_blocklist_state module + 27 unit tests) / 87d18f5 (main() integration + workflow plumbing + agent prompt) / ee90951 (TTL decay + audit log) / 5d914dc (close-out summary) / 4ba172b (explicit --state-file in main.py)
+
+Filed 2026-04-24 from Tom: *"we should also tighten up the auto-block logic — one errant email shouldn't get people blocked forever. There needs to be a better logic/audit system there."* Item 26 above was the surgical fix for the family-sender failure mode (parents' addresses now in `protected_senders.txt`); item 27 is the systemic version — make the auto-block layer self-correcting so a single high-confidence misjudgment by the agent on ANY sender doesn't cause a permanent block.
+
+Pre-fix gating in `update_auto_blocklist.py` accepted any suggestion clearing four basic gates (confidence==high, parseable address, not protected, not already in either blocklist) and immediately wrote it to `blocklist_auto.txt` as a permanent active block. The audit step (`step1b_filter_audit`) periodically diffed loose-vs-tight queries to surface false negatives but did NOT remove auto-block entries — it only recommended manual edits. Two structural gaps: no corroboration requirement, no expiry.
+
+**Three-lever fix.** Each lever addresses a distinct failure mode; they compose cleanly.
+
+- **Sender-stats reject (e5772cc, lever 1, gate-layer prevention):** when `update_auto_blocklist.main()` is about to add an address, it consults `sender_stats.json` (item #17 newsletter telemetry). If `messages_seen >= 3 AND total_events >= 1`, reject — the sender has produced real kid events historically, so a single irrelevance flag is almost certainly a per-email judgment, not a per-sender judgment. Cheapest lever; no new state file. Reuses the newsletter telemetry as ground-truth signal for "useful sender."
+- **N-strikes pending ledger (6b8c62a + 87d18f5, lever 2, structural prevention):** new state file `blocklist_auto_state.json` with two top-level sections — `pending` (addresses flagged once, awaiting corroboration) and `active` (TTL metadata for entries actually in `blocklist_auto.txt`). First flag → pending; second flag from a *distinct* `source_message_id` → promote (add to txt, move to active section, clear pending). Same-message re-flag (`--reextract`) bumps `last_flagged_iso` but does NOT advance the strike count — defends against double-counting on operator-driven re-extraction. Promotion threshold N=2 chosen to eliminate one-shot misjudgments at the cost of one extra cron cycle (~7 days) per legitimate spam sender.
+- **TTL decay (ee90951, lever 3, recovery):** active entries unflagged for 90 days expire (drop from state AND `blocklist_auto.txt` via full rewrite); pending entries unflagged for 30 days age out. Refresh-on-flag means real spammers stay blocked indefinitely; only quiet senders age out, defending against the "sender's status changed" case. `--active-ttl-days` and `--pending-ttl-days` CLI flags expose the windows for tests.
+
+**Mid-feature scope expansion (87d18f5).** The design note assumed `irrelevant_senders` flags carried `source_message_id`, but only events did. Tom approved extending the agent prompt to require the field in each flag. `update_auto_blocklist` rejects flags missing the field as `"missing source_message_id"` (cleaner than treating empty-string as a real id, which would silently break the duplicate-flag defense).
+
+**Auto-rescue scoped out.** The roadmap sketched a fourth lever — extend `step1b_filter_audit` to actively *remove* auto-block entries whose loose-query results contain real kid events. Deferred: N-strikes prevents the same one-shot misjudgments structurally and earlier; auto-rescue would entangle the audit with production-state mutation. New ROADMAP item if v1 telemetry shows the gap matters.
+
+**Workflow + parity.** `blocklist_auto_state.json` added to `.github/workflows/weekly-schedule.yml`'s state-branch restore + save blocks; `tests/test_workflow_state_branch_parity.py::PERSISTENT_STATE_FILES` extended by one. Pre-existing `blocklist_auto.txt` rows get a synthetic `last_flagged_iso = today` on first post-deploy run via `seed_active_from_legacy` so TTL counts cleanly from deploy day.
+
+**Audit log extension (additive).** `blocklist_auto_audit.jsonl` per-run records gained seven new buckets — `promoted`, `pending_added`, `active_refreshed`, `duplicate_flag`, `resolved_by_main_blocklist`, `expired`, `aged_out`. Existing `added`/`rejected` shape preserved (= promoted + rejected respectively) for backward compat with prior log readers.
+
+**Tom hygiene fix (4ba172b).** Caught post-feature: `main.py::step3b_update_auto_blocklist` was relying on `update_auto_blocklist.py`'s `--state-file` default rather than passing it explicitly, the only path argument doing so. Added `AUTO_BLOCKLIST_STATE_PATH` constant and forwarded it explicitly. No behavior change; consistency hygiene.
+
+**Test coverage.** +43 net (3 sender-stats integration + 27 state-module unit + 6 main()-flow integration + 7 TTL integration). 0 new failures vs main.
+
+**Live verification.** Tom verified post-deploy that the cron correctly seeded legacy entries, new flags entered pending instead of jumping straight to active, and the second-flag promotion path fired across cron cycles. Tom signed off 2026-04-25.
+
+**Follow-up filed (item 28).** Caught during item-27 verification — the Ignore-sender button was rendering for protected freemail addresses. Logical sister bug; landed and verified the same day.
+
+Full design record at `design/auto-blocklist-hardening.md`.
+
+### 28. [x] Bug: Ignore-sender button renders for protected address-form senders — 0446ed9
+
+Filed 2026-04-25 from Tom: noticed during item-27 verification that Ellen's events (her self-notes about the kids' activities — exactly what the kid_names query / item 25 surfaces) were rendering with an "Ignore sender" button despite Ellen being on the protected list (item 26). One fat-finger click would have ignored Ellen's address from the UI side, working around the auto-blocklist protection.
+
+**Root cause.** `process_events.py:895` was calling `is_protected(domain, protected)` — passing the bare registrable domain (e.g. `gmail.com`) for a freemail sender. Address-form patterns added in #26 (`ellen.n.holmes@gmail.com`) only match when the sender is itself an address (per `protected_senders.is_protected`); the bare-domain query never fired and the button rendered. The #26 design note explicitly stated this case was supposed to work as a side-effect of address-form support; the missed integration on the render side wasn't caught at the time because the existing render-integration tests only exercised institutional domains (where `block_key == domain` and the bug is invisible).
+
+**Scope (Tom-confirmed).** Suppress only the Ignore-*sender* button on protected-sender cards; the Ignore-*event* button stays — the user can still hide a single event from a protected sender, they just can't sweep the whole sender by accident.
+
+**Fix (0446ed9).** One-line code change: pass `block_key` (full address for freemail, bare domain otherwise) instead of `domain` to `is_protected`. Both pattern shapes are handled uniformly by the matcher — bare-domain patterns continue to match for institutional senders, address-form patterns now match for freemail senders. Surrounding comment rewritten to explain the corrected semantics and the per-event-ignore distinction.
+
+**Tests.** Two new render-integration tests in `tests/test_protected_senders.py` mirroring the existing institutional pair: protected freemail address (Ignore-sender suppressed AND Ignore-event still rendered — both pinned), unprotected freemail address sharing a protected sender's domain (Ignore-sender kept — address-form protection is per-address, not per-domain).
+
+**Live verification.** Tom verified post-deploy that Ellen's event cards no longer render the Ignore-sender button (but Ignore-event still works); fat-finger gap closed. Tom signed off 2026-04-25.
+
 ## Test coverage gaps
 
 Inventory of where the pytest suite is silent. Not prioritized against the feature backlog above — pull from this when there is slack between feature work, or when a regression in one of these areas would be costly enough to pre-empt. Risk tiers reflect blast radius if the untested code silently breaks, not implementation difficulty. Filed 2026-04-22 from a full source/test survey; revisit and prune as items get covered.
