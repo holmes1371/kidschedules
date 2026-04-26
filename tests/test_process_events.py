@@ -978,13 +978,24 @@ def test_layout_a_location_renders_when_plain_string():
             '8350 Greensboro Dr</div>') in card
 
 
-def test_layout_a_url_location_is_suppressed():
-    """A drive.google.com URL in the location field is suppressed — a
-    raw URL isn't a useful "place" on the card."""
+def test_layout_a_url_location_renders_as_link():
+    """A drive.google.com URL in the location field renders as a
+    clickable <a href> anchor (not suppressed) — Ellen can tap
+    straight through to the destination from the card. Per the #29
+    follow-up: URLs are useful info, just not as a static "place"
+    label.
+
+    Anchors carry target="_blank" + rel="noopener noreferrer" so
+    the click opens a new tab without leaking session via
+    window.opener."""
     html, _ = _render_cr()
     card = _card_slice(html, "Yearbook Photos Submission Deadline")
-    assert "drive.google.com" not in card
-    assert "event-location" not in card
+    assert 'class="event-location"' in card
+    assert 'drive.google.com' in card
+    assert 'target="_blank"' in card
+    assert 'rel="noopener noreferrer"' in card
+    # Link target is the original https URL.
+    assert 'href="https://drive.google.com/' in card
 
 
 def test_layout_a_empty_location_emits_no_location_div():
@@ -2291,3 +2302,165 @@ def test_render_html_address_like_location_omits_prefix():
         'Fredericksburg Convention Center, 2371 Carlson Way</div>'
     ) in html
     assert ("Location: Fredericksburg") not in html
+
+
+# ─── #29 follow-up: URL linkification in location field ───────────────────
+#
+# URLs anywhere in the location string get wrapped in <a href> so Ellen
+# can tap straight through. Full http(s)://... URLs and bare domains
+# (myschoolbucks.com) both linkify. Plain text segments around the URL
+# pass through verbatim. Common false-friends ("Mt. Vernon", "Dr. Smith's
+# office", "v1.0") must NOT be linkified.
+
+
+def test_event_card_linkifies_url_only_location():
+    """URL-only location renders as <a href> (was previously suppressed
+    by `_is_suppressible_location` → no card line at all). Now Ellen
+    clicks through. Query-string `&` is HTML-escaped against breaking
+    out of the href attribute."""
+    event = {
+        "id": "url1",
+        "name": "Yearbook deadline",
+        "date": "2026-04-20",
+        "_date_obj": dt.date(2026, 4, 20),
+        "time": "All day",
+        "location": "https://example.com/yearbook?year=2026&grade=6",
+        "category": "School",
+        "child": "Kid",
+        "source": "yearbook (Apr 18)",
+        "sender_domain": "example.com",
+        "sender_block_key": "example.com",
+    }
+    weeks = [(dt.date(2026, 4, 20), [event])]
+    html = pe.render_html(
+        today=TODAY, weeks=weeks, undated=[],
+        total_future=1, lookback_days=60, webhook_url="",
+    )
+    assert 'href="https://example.com/yearbook?year=2026&amp;grade=6"' in html
+    assert 'target="_blank"' in html
+    assert 'rel="noopener noreferrer"' in html
+    # "Location: " prefix preserved (URL-only is not address-like).
+    assert "Location: " in html
+
+
+def test_event_card_linkifies_bare_domain_with_implicit_https():
+    """Mixed text + bare domain in parens: the domain becomes a
+    clickable link with implicit https:// scheme; surrounding text
+    stays plain. This is the "MySchoolBucks (myschoolbucks.com) or
+    Louise Archer office" shape."""
+    event = {
+        "id": "url2",
+        "name": "Lunch payment",
+        "date": "2026-04-20",
+        "_date_obj": dt.date(2026, 4, 20),
+        "time": "All day",
+        "location": "MySchoolBucks (myschoolbucks.com) or Louise Archer office",
+        "category": "School",
+        "child": "Kid",
+        "source": "Cafeteria (Apr 18)",
+        "sender_domain": "fcps.edu",
+        "sender_block_key": "fcps.edu",
+    }
+    weeks = [(dt.date(2026, 4, 20), [event])]
+    html = pe.render_html(
+        today=TODAY, weeks=weeks, undated=[],
+        total_future=1, lookback_days=60, webhook_url="",
+    )
+    # Bare domain becomes an https:// link.
+    assert 'href="https://myschoolbucks.com"' in html
+    assert ">myschoolbucks.com</a>" in html
+    # Surrounding text stays plain (no anchors around "MySchoolBucks"
+    # or "Louise Archer office").
+    assert "Location: MySchoolBucks (" in html
+    assert ") or Louise Archer office" in html
+
+
+def test_event_card_does_not_linkify_proper_nouns_with_periods():
+    """Pin against false positives: "Mt. Vernon High School" and
+    "Dr. Smith's office" must NOT be linkified — the regex requires
+    a TLD-shaped suffix (alpha 2-6) without intervening whitespace."""
+    for loc in (
+        "Mt. Vernon High School",
+        "Dr. Smith's office",
+        "Park Lane Elementary, version 1.0",
+    ):
+        event = {
+            "id": f"fp_{abs(hash(loc))}",
+            "name": "Test",
+            "date": "2026-04-20",
+            "_date_obj": dt.date(2026, 4, 20),
+            "time": "9:00 AM",
+            "location": loc,
+            "category": "School",
+            "child": "Kid",
+            "source": "Test (Apr 18)",
+            "sender_domain": "fcps.edu",
+            "sender_block_key": "fcps.edu",
+        }
+        weeks = [(dt.date(2026, 4, 20), [event])]
+        html = pe.render_html(
+            today=TODAY, weeks=weeks, undated=[],
+            total_future=1, lookback_days=60, webhook_url="",
+        )
+        # The location-line slice should contain no anchor.
+        loc_div_idx = html.find('class="event-location"')
+        assert loc_div_idx != -1, f"no event-location for {loc!r}"
+        loc_div_end = html.find("</div>", loc_div_idx)
+        loc_slice = html[loc_div_idx:loc_div_end]
+        assert "<a " not in loc_slice, (
+            f"unexpected anchor in {loc!r}: {loc_slice!r}"
+        )
+
+
+def test_undated_card_linkifies_url_location():
+    """Parity with dated cards — undated cards linkify URLs the same
+    way."""
+    event = {
+        "id": "uurl1",
+        "name": "Camp signup",
+        "date": "",
+        "_date_obj": None,
+        "time": "",
+        "location": "https://camps.example.com/signup",
+        "category": "Academic Due Date",
+        "child": "Kid",
+        "source": "Camps (Apr 3)",
+        "sender_domain": "example.com",
+        "sender_block_key": "example.com",
+    }
+    html = pe.render_html(
+        today=TODAY, weeks=[], undated=[event],
+        total_future=0, lookback_days=60, webhook_url="",
+    )
+    assert 'href="https://camps.example.com/signup"' in html
+    assert 'target="_blank"' in html
+
+
+def test_event_card_address_like_location_with_url_still_linkifies_no_prefix():
+    """Belt-and-suspenders: a location that's both address-shape AND
+    contains a URL keeps the no-prefix treatment AND linkifies the
+    URL. Real-world: "Tysons Pediatrics, 8350 Greensboro Dr (info at
+    tysonspeds.com)" — address-like wins on the prefix, URL still
+    becomes a link."""
+    event = {
+        "id": "addr_url",
+        "name": "Pediatrician check-up",
+        "date": "2026-04-20",
+        "_date_obj": dt.date(2026, 4, 20),
+        "time": "9:00 AM",
+        "location": "Tysons Pediatrics, 8350 Greensboro Dr (info at tysonspeds.com)",
+        "category": "Medical",
+        "child": "Kid",
+        "source": "MyChart (Apr 18)",
+        "sender_domain": "mychart.com",
+        "sender_block_key": "mychart.com",
+    }
+    weeks = [(dt.date(2026, 4, 20), [event])]
+    html = pe.render_html(
+        today=TODAY, weeks=weeks, undated=[],
+        total_future=1, lookback_days=60, webhook_url="",
+    )
+    # Address-like → no "Location: " prefix.
+    assert "Location: Tysons" not in html
+    # URL still linkified.
+    assert 'href="https://tysonspeds.com"' in html

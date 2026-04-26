@@ -21,10 +21,9 @@ Strict rules for writing it:
 **2026-04-25**
 
 - Items 27 and 28 closed `[x]` after Tom's prod verification (commit aa20b4b moved full prose to `COMPLETED.md`).
-- Item 29 code-complete `[~]` (this commit) — event-card source line and Location-prefix-unless-address-shape. `From: <source>` line rendered between `For:` and Location lines on both dated and undated cards (80-char truncation + `title=` full string); `Location:` prefix added except when the location matches a digit-prefix + street-suffix regex. 6 unit tests for `_is_address_like` + 5 render-integration tests; the render tests fail on Windows + Python 3.14 with the unrelated `%-d` strftime issue, green on CI.
-- Source-date enforcement deferred per design — relying on the agent's existing tendency to include dates in source labels; will revisit if production data shows the gap.
-- The 92+ pre-existing failures (subprocess-driven `process_events.py` failures on Windows + Python 3.14, `%-d` strftime root cause) are still unrelated to active work, still worth a separate investigation when there's slack.
-- Nothing else in flight. Next session moves item-29 prose to `COMPLETED.md` once Tom signs off.
+- Item 29 in flight `[~]` — three commits so far: 8606610 (source line + Location: prefix v1), 6cd0f74 (CI fixup for v1), and this commit (URL linkification v2). URLs anywhere in a location string now render as `<a href>` anchors (full http(s):// URLs and bare domains alike, with implicit `https://` for bare); URL-only locations are no longer suppressed. False-friend regex pins keep "Mt. Vernon", "Dr. Smith", "v1.0" from being mis-detected.
+- Test delta vs main: +16 passing on Linux/CI (6 unit tests + 10 render-integration). On Windows, the 10 render tests fail with the same unrelated `%-d` strftime issue.
+- Nothing else in flight. Next session moves item-29 prose to `COMPLETED.md` once Tom verifies the source line, location prefix, and clickable URLs all work as expected on the live page.
 
 ## For future agents
 
@@ -133,7 +132,9 @@ Filed 2026-04-25 from Tom: event cards lacked any source attribution despite eve
 
 **Source date enforcement deferred.** Tom asked *"even better if it can add the date from which it was sourced."* The agent already includes dates in most source labels (`(Apr 6)` etc.) per its existing prompt. Strict per-source date enforcement would be a 1-paragraph prompt change; held as a follow-up if production data shows enough date-less labels to bother.
 
-Item stays `[~]` pending Tom's live verification post-deploy: load the page, confirm a `From: ...` line under each card and a `Location:` prefix on plain venues but not on full street addresses.
+**Location URL linkification (v2 follow-up, this session).** Tom's second ask: *"if the location is a website - can it be presented as a hyperlink so Ellen can just click on the link from the event?"* and follow-up *"even for something like this: Location: MySchoolBucks (myschoolbucks.com)..."* — both URL-only locations and URLs embedded inside location text now render as clickable `<a href>` anchors with `target="_blank"` and `rel="noopener noreferrer"`. The linkifier (`_linkify_inline_urls`) detects http(s)://-shaped URLs and bare domains alike via a single regex; bare domains get an implicit `https://` scheme. URL-only locations were previously suppressed entirely by `_is_suppressible_location` — that branch is removed; URL-only locations now render as a single anchor inside the `event-location` div with the `Location:` prefix (URL-only is not address-like). False-friend pins prevent "Mt. Vernon High School", "Dr. Smith's office", and "version 1.0" from being mis-detected. CSS for `.event-location a` inherits the muted text color and underlines so the link reads clickable on the dark theme; hover bumps to primary text color.
+
+Item stays `[~]` pending Tom's live verification post-deploy: load the page, confirm (a) a `From: ...` line under each card, (b) `Location:` prefix on plain venues but not on full street addresses, (c) URLs (full and bare-domain) render as clickable underlined links.
 
 ## Descoped / on hold
 

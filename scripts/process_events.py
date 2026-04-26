@@ -770,20 +770,78 @@ def _is_address_like(loc: str) -> bool:
 def _is_suppressible_location(loc: str) -> bool:
     """Return True for locations that should be omitted from the card.
 
-    Catches URL-only (http:// or https://) and email-only locations the
-    agent sometimes emits instead of a real venue, plus the stale
-    "Location TBD" literal for fixtures that predate the ingest flip.
-    Mixed strings ("Tysons Pediatrics, 8350 Greensboro Dr") are preserved.
+    Catches email-only locations the agent sometimes emits instead of
+    a real venue (an email isn't a clickable destination Ellen wants
+    to act on as a "place"), plus the stale "Location TBD" literal
+    for fixtures that predate the ingest flip. Mixed strings
+    ("Tysons Pediatrics, 8350 Greensboro Dr") are preserved.
     Empty strings are handled upstream by the caller's truthy check.
+
+    URL-only locations are NOT suppressed any more (#29 follow-up):
+    they render as clickable anchors via :func:`_linkify_inline_urls`,
+    so Ellen can tap straight through to the destination from a card.
     """
     s = (loc or "").strip().lower()
     if not s:
         return False
     if s == "location tbd":
         return True
-    if s.startswith("http://") or s.startswith("https://"):
-        return True
     return bool(_SUPPRESS_LOCATION_EMAIL_RE.match(s))
+
+
+# #29 follow-up: detect URLs (full http(s):// shape AND bare domains
+# like "myschoolbucks.com") embedded anywhere in a location string so
+# they can be wrapped in <a href> anchors. The TLD constraint —
+# 2-to-6 alphabetic characters with no surrounding whitespace — keeps
+# common false-friends like "Mt. Vernon High School", "Dr. Smith's
+# office", and "v1.0" from being mis-detected.
+_INLINE_URL_RE = re.compile(
+    r"\b("                                # group 1 = the full match
+    r"(?:https?://)?"                     # optional scheme
+    r"(?:[a-z0-9-]+\.)+"                  # one or more `label.` segments
+    r"[a-z]{2,6}"                         # final TLD (alpha, 2-6 chars)
+    r"(?:/[^\s)\]]*)?"                    # optional path/query/fragment
+    r")\b",
+    re.IGNORECASE,
+)
+
+
+def _linkify_inline_urls(loc: str) -> str:
+    """Return *loc* with embedded URLs/bare-domains wrapped as
+    ``<a href=...>`` anchors.
+
+    Plain-text segments pass through verbatim — matches the existing
+    escape-nothing posture in render_html for event names, source
+    labels, etc. Only the anchor's ``href`` and visible text are
+    HTML-escaped, so a query-string ``&`` (which would otherwise
+    break out of the attribute) is rendered as ``&amp;``.
+
+    Bare domains are linked with an implicit ``https://`` scheme on
+    the assumption that any modern destination Ellen would tap is
+    https-reachable. Anchors carry ``target="_blank"`` and
+    ``rel="noopener noreferrer"`` so the click opens a new tab
+    without leaking the host page's session via window.opener.
+    """
+    parts: list[str] = []
+    last_end = 0
+    for m in _INLINE_URL_RE.finditer(loc):
+        start, end = m.start(), m.end()
+        if last_end < start:
+            parts.append(loc[last_end:start])
+        url_text = m.group(0)
+        if url_text.lower().startswith(("http://", "https://")):
+            href = url_text
+        else:
+            href = "https://" + url_text
+        parts.append(
+            f'<a href="{_html.escape(href, quote=True)}" '
+            f'target="_blank" rel="noopener noreferrer">'
+            f'{_html.escape(url_text)}</a>'
+        )
+        last_end = end
+    if last_end < len(loc):
+        parts.append(loc[last_end:])
+    return "".join(parts)
 
 
 def render_html(today: dt.date,
@@ -885,8 +943,15 @@ def render_html(today: dt.date,
         if loc_raw and not _is_suppressible_location(loc_raw):
             # #29: prefix with "Location: " for consistency with For:
             # and From:, except when the location itself is obviously
-            # a street address.
-            loc_display = loc_raw if _is_address_like(loc_raw) else f"Location: {loc_raw}"
+            # a street address. URLs/bare-domains anywhere in the
+            # string get wrapped as <a href> via _linkify_inline_urls
+            # — Ellen can tap straight through.
+            base = (
+                _linkify_inline_urls(loc_raw)
+                if _INLINE_URL_RE.search(loc_raw)
+                else loc_raw
+            )
+            loc_display = base if _is_address_like(loc_raw) else f"Location: {base}"
             location_html = f'\n        <div class="event-location">{loc_display}</div>'
         else:
             location_html = ""
@@ -992,9 +1057,15 @@ def render_html(today: dt.date,
             time_html = f'<span class="time">{ev["time"]}</span>'
         loc_raw = ev["location"]
         if loc_raw and not _is_suppressible_location(loc_raw):
-            # #29: parity with _event_card — prefix with "Location: "
-            # unless the location is itself a fully-formed address.
-            loc_display = loc_raw if _is_address_like(loc_raw) else f"Location: {loc_raw}"
+            # #29: parity with _event_card — Location: prefix (unless
+            # address-shape) plus URL linkification anywhere in the
+            # string.
+            base = (
+                _linkify_inline_urls(loc_raw)
+                if _INLINE_URL_RE.search(loc_raw)
+                else loc_raw
+            )
+            loc_display = base if _is_address_like(loc_raw) else f"Location: {base}"
             location_html = f'\n        <div class="event-location">{loc_display}</div>'
         else:
             location_html = ""
@@ -1409,6 +1480,17 @@ def render_html(today: dt.date,
       font-size: 0.82rem;
       color: var(--text-secondary);
       margin-bottom: 0.15rem;
+    }}
+    /* #29 follow-up: linkified URL/domain in the location line. We
+       inherit the surrounding muted color so the link doesn't shout,
+       but underline it so it reads as clickable. Hover bumps to the
+       primary text color for a clear affordance. */
+    .event-location a {{
+      color: inherit;
+      text-decoration: underline;
+    }}
+    .event-location a:hover {{
+      color: var(--text-primary);
     }}
     .event-audience {{
       font-size: 0.75rem;
