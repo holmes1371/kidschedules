@@ -2353,11 +2353,14 @@ def test_event_card_linkifies_url_only_location():
     assert "Location: " in html
 
 
-def test_event_card_linkifies_bare_domain_with_implicit_https():
+def test_event_card_linkifies_bare_domain_with_implicit_https_and_www():
     """Mixed text + bare domain in parens: the domain becomes a
-    clickable link with implicit https:// scheme; surrounding text
-    stays plain. This is the "MySchoolBucks (myschoolbucks.com) or
-    Louise Archer office" shape."""
+    clickable link with implicit `https://www.` scheme prepend
+    (apex-only sites like myschoolbucks.com refuse to connect at
+    the bare apex; www. prefix unblocks). Visible link text stays
+    as the agent emitted it. Surrounding text stays plain. This is
+    the "MySchoolBucks (myschoolbucks.com) or Louise Archer office"
+    shape."""
     event = {
         "id": "url2",
         "name": "Lunch payment",
@@ -2376,13 +2379,41 @@ def test_event_card_linkifies_bare_domain_with_implicit_https():
         today=TODAY, weeks=weeks, undated=[],
         total_future=1, lookback_days=60, webhook_url="",
     )
-    # Bare domain becomes an https:// link.
-    assert 'href="https://myschoolbucks.com"' in html
+    # Bare domain becomes an https://www. link (reachability fix).
+    assert 'href="https://www.myschoolbucks.com"' in html
+    # Visible text preserves what the agent emitted (no www).
     assert ">myschoolbucks.com</a>" in html
     # Surrounding text stays plain (no anchors around "MySchoolBucks"
     # or "Louise Archer office").
     assert "Location: MySchoolBucks (" in html
     assert ") or Louise Archer office" in html
+
+
+def test_href_for_bare_domain_subdomained_url_no_www_prepend():
+    """Already-subdomained URLs (camps.fcps.edu, dashboard.example.com)
+    must NOT get www prepended — those are explicit subdomain
+    references, prepending www would break routing."""
+    assert pe._href_for_bare_domain("camps.fcps.edu") == "https://camps.fcps.edu"
+    assert pe._href_for_bare_domain("dashboard.example.com") == "https://dashboard.example.com"
+
+
+def test_href_for_bare_domain_apex_gets_www_prepend():
+    """A fully bare domain (label.tld, one dot) gets www prepended
+    for reachability. Real-world: myschoolbucks.com refuses to serve
+    at the apex but www.myschoolbucks.com works."""
+    assert pe._href_for_bare_domain("myschoolbucks.com") == "https://www.myschoolbucks.com"
+    assert pe._href_for_bare_domain("example.com") == "https://www.example.com"
+
+
+def test_href_for_bare_domain_already_www_no_double_prepend():
+    """If the bare URL already starts with www., don't double up."""
+    assert pe._href_for_bare_domain("www.myschoolbucks.com") == "https://www.myschoolbucks.com"
+
+
+def test_href_for_bare_domain_with_path():
+    """Path is preserved on both bare-apex and subdomained domains."""
+    assert pe._href_for_bare_domain("myschoolbucks.com/login") == "https://www.myschoolbucks.com/login"
+    assert pe._href_for_bare_domain("camps.fcps.edu/account") == "https://camps.fcps.edu/account"
 
 
 def test_event_card_does_not_linkify_proper_nouns_with_periods():
@@ -2472,5 +2503,6 @@ def test_event_card_address_like_location_with_url_still_linkifies_no_prefix():
     )
     # Address-like → no "Location: " prefix.
     assert "Location: Tysons" not in html
-    # URL still linkified.
-    assert 'href="https://tysonspeds.com"' in html
+    # URL still linkified — bare apex (one dot) gets www prepended
+    # for reachability per #29 v3.
+    assert 'href="https://www.tysonspeds.com"' in html

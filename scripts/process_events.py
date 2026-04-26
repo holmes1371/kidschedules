@@ -806,6 +806,36 @@ _INLINE_URL_RE = re.compile(
 )
 
 
+def _href_for_bare_domain(url_text: str) -> str:
+    """Build the ``href`` value for a scheme-less URL.
+
+    Always prefixes ``https://``. Adds ``www.`` for fully bare
+    domains — those whose domain part is exactly ``label.tld``
+    (one dot, no subdomain). Some sites — notably
+    ``myschoolbucks.com`` — don't serve at the apex; without a
+    ``www`` prefix the click lands on a "refused to connect"
+    error. Already-subdomained URLs (``camps.fcps.edu``,
+    ``dashboard.example.com``) are NOT modified — those are
+    explicit subdomain references where prepending ``www`` would
+    break routing. URLs that already start with ``www.`` are also
+    left alone.
+
+    Limitation: the heuristic counts dots in the domain part, so
+    multi-segment TLDs like ``.co.uk`` would be misclassified
+    (``example.co.uk`` looks like ``sub.example.tld``). The
+    codebase's use case is US schools and service providers, so
+    this is acceptable; revisit if a bare ``.co.uk`` ever shows
+    up in a location.
+    """
+    lower = url_text.lower()
+    if lower.startswith("www."):
+        return "https://" + url_text
+    domain_part = url_text.split("/", 1)[0]
+    if domain_part.count(".") == 1:
+        return "https://www." + url_text
+    return "https://" + url_text
+
+
 def _linkify_inline_urls(loc: str) -> str:
     """Return *loc* with embedded URLs/bare-domains wrapped as
     ``<a href=...>`` anchors.
@@ -816,11 +846,14 @@ def _linkify_inline_urls(loc: str) -> str:
     HTML-escaped, so a query-string ``&`` (which would otherwise
     break out of the attribute) is rendered as ``&amp;``.
 
-    Bare domains are linked with an implicit ``https://`` scheme on
-    the assumption that any modern destination Ellen would tap is
-    https-reachable. Anchors carry ``target="_blank"`` and
-    ``rel="noopener noreferrer"`` so the click opens a new tab
-    without leaking the host page's session via window.opener.
+    Bare domains are linked with an implicit ``https://`` scheme via
+    :func:`_href_for_bare_domain`, which also prepends ``www.`` for
+    fully bare domains so apex-only sites like ``myschoolbucks.com``
+    are reachable. Visible link text always preserves what the agent
+    emitted; only the ``href`` is modified for reachability.
+    Anchors carry ``target="_blank"`` and ``rel="noopener noreferrer"``
+    so the click opens a new tab without leaking the host page's
+    session via window.opener.
     """
     parts: list[str] = []
     last_end = 0
@@ -832,7 +865,7 @@ def _linkify_inline_urls(loc: str) -> str:
         if url_text.lower().startswith(("http://", "https://")):
             href = url_text
         else:
-            href = "https://" + url_text
+            href = _href_for_bare_domain(url_text)
         parts.append(
             f'<a href="{_html.escape(href, quote=True)}" '
             f'target="_blank" rel="noopener noreferrer">'
@@ -1481,16 +1514,16 @@ def render_html(today: dt.date,
       color: var(--text-secondary);
       margin-bottom: 0.15rem;
     }}
-    /* #29 follow-up: linkified URL/domain in the location line. We
-       inherit the surrounding muted color so the link doesn't shout,
-       but underline it so it reads as clickable. Hover bumps to the
-       primary text color for a clear affordance. */
+    /* #29 follow-up: linkified URL/domain in the location line.
+       Traditional dark-theme link blue (#58a6ff, GitHub-dark style)
+       so the link is unambiguous against the muted location text.
+       Hover bumps a shade brighter for affordance. */
     .event-location a {{
-      color: inherit;
+      color: #58a6ff;
       text-decoration: underline;
     }}
     .event-location a:hover {{
-      color: var(--text-primary);
+      color: #79b8ff;
     }}
     .event-audience {{
       font-size: 0.75rem;
