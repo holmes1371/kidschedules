@@ -10,7 +10,7 @@
 //        Who has access: Anyone
 //      Copy the /exec URL into ignore_webhook_url.txt in the repo.
 //
-// Two tabs in the same spreadsheet:
+// Three tabs in the same spreadsheet:
 //   "Ignored Events"  — one row per (timestamp, id, name, date, sender) the
 //                       user dismissed. `sender` was added in the unignore-
 //                       sender pass; pre-existing rows carry only the first
@@ -27,6 +27,14 @@
 //                       source column is informational. The "domain" column
 //                       name is historical — since ROADMAP #20 it carries
 //                       block identifiers (domain or full address).
+//   "Completed Events" — one row per (timestamp, id, name, date) the user
+//                       has marked complete via the schedule page checkbox
+//                       (ROADMAP #32). Auto-created on first append; no
+//                       sender column since completion is per-event with
+//                       no "complete sender" sweep. The Sheet is the
+//                       single source of truth — the cron job pulls
+//                       these rows fresh into completed_events.json each
+//                       run; that file is never committed.
 //
 // POST /exec        — action router. Body JSON: {"action": "...", ...}.
 //   action="ignore" (also the default when action is absent — backward
@@ -50,13 +58,23 @@
 //     row and vice versa (this is correct: address-level and domain-level
 //     ignores unignore at the same level).
 //     Idempotent: returns 'ok' even if no rows matched.
+//   action="complete":  (ROADMAP #32)
+//     {"id": "<12-hex>", "name": "...", "date": "..."}
+//     →  append to Completed Events. Mirrors the "ignore" handler shape
+//     minus the sender column. id is the 12-char sha1 event-id from the
+//     rendered card.
+//   action="uncomplete":  (ROADMAP #32)
+//     {"id": "<12-hex>"}  →  delete every Completed Events row matching
+//     id. Idempotent: returns 'ok' even if no row matched.
 //
 // GET  /exec?secret=... — read route. Gated by READ_SECRET.
 //   (default) or ?kind=ignored          → Ignored Events JSON
 //   ?kind=ignored_senders               → Ignored Senders JSON
+//   ?kind=completed                     → Completed Events JSON  (#32)
 
-const IGNORED_EVENTS_SHEET_NAME  = 'Ignored Events';
-const IGNORED_SENDERS_SHEET_NAME = 'Ignored Senders';
+const IGNORED_EVENTS_SHEET_NAME   = 'Ignored Events';
+const IGNORED_SENDERS_SHEET_NAME  = 'Ignored Senders';
+const COMPLETED_EVENTS_SHEET_NAME = 'Completed Events';
 const READ_SECRET = 'REPLACE_ME_WITH_RANDOM_STRING';
 
 // Accepts either a bare registrable domain ("fcps.edu") or a full
@@ -73,6 +91,8 @@ function doPost(e) {
     if (action === 'unignore')        return _handleUnignore(payload);
     if (action === 'ignore_sender')   return _handleIgnoreSender(payload);
     if (action === 'unignore_sender') return _handleUnignoreSender(payload);
+    if (action === 'complete')        return _handleComplete(payload);
+    if (action === 'uncomplete')      return _handleUncomplete(payload);
     return _text('bad action');
   } catch (err) {
     return _text('err: ' + err.message);
@@ -86,6 +106,7 @@ function doGet(e) {
   const kind = String(e.parameter.kind || 'ignored');
   if (kind === 'ignored')         return _listIgnoredEvents();
   if (kind === 'ignored_senders') return _listIgnoredSenders();
+  if (kind === 'completed')       return _listCompletedEvents();
   return _text('bad kind');
 }
 
@@ -154,6 +175,36 @@ function _handleUnignoreSender(payload) {
   return _text('ok');
 }
 
+// ROADMAP #32 — Completed Events. Same id-validated append/delete shape
+// as Ignored Events but with a four-column row (no sender). Sheet is the
+// single source of truth; the cron job pulls these rows via doGet to
+// regenerate completed_events.json each run.
+
+function _handleComplete(payload) {
+  const id = String(payload.id || '').trim();
+  if (!/^[a-f0-9]{12}$/.test(id)) return _text('bad id');
+  const name = String(payload.name || '').slice(0, 200);
+  const date = String(payload.date || '').slice(0, 20);
+  _getCompletedEventsSheet().appendRow(
+    [new Date().toISOString(), id, name, date]
+  );
+  return _text('ok');
+}
+
+function _handleUncomplete(payload) {
+  const id = String(payload.id || '').trim();
+  if (!/^[a-f0-9]{12}$/.test(id)) return _text('bad id');
+  const sheet = _getCompletedEventsSheet();
+  const data = sheet.getDataRange().getValues();
+  // Bottom-up to keep row indices stable across the loop.
+  for (let i = data.length - 1; i >= 0; i--) {
+    if (String(data[i][1] || '').trim() === id) {
+      sheet.deleteRow(i + 1);
+    }
+  }
+  return _text('ok');
+}
+
 // ─── GET handlers ─────────────────────────────────────────────────────────
 
 function _listIgnoredEvents() {
@@ -191,6 +242,24 @@ function _listIgnoredSenders() {
   return _json(Object.keys(seen).map(function (k) { return seen[k]; }));
 }
 
+function _listCompletedEvents() {
+  const data = _getCompletedEventsSheet().getDataRange().getValues();
+  const seen = {};
+  for (let i = 0; i < data.length; i++) {
+    const id = String(data[i][1] || '').trim();
+    if (!/^[a-f0-9]{12}$/.test(id)) continue;
+    if (!seen[id]) {
+      seen[id] = {
+        id: id,
+        name: String(data[i][2] || ''),
+        date: String(data[i][3] || ''),
+        completed_at: String(data[i][0] || '')
+      };
+    }
+  }
+  return _json(Object.keys(seen).map(function (k) { return seen[k]; }));
+}
+
 // ─── helpers ──────────────────────────────────────────────────────────────
 
 function _getIgnoredEventsSheet() {
@@ -203,6 +272,12 @@ function _getIgnoredSendersSheet() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   return ss.getSheetByName(IGNORED_SENDERS_SHEET_NAME)
       || ss.insertSheet(IGNORED_SENDERS_SHEET_NAME);
+}
+
+function _getCompletedEventsSheet() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  return ss.getSheetByName(COMPLETED_EVENTS_SHEET_NAME)
+      || ss.insertSheet(COMPLETED_EVENTS_SHEET_NAME);
 }
 
 function _text(s) {
