@@ -21,9 +21,10 @@ Strict rules for writing it:
 **2026-04-25**
 
 - Items 27 and 28 closed `[x]` after Tom's prod verification (commit aa20b4b moved full prose to `COMPLETED.md`).
-- Item 29 in flight `[~]` — six commits so far: 8606610 (source + Location: prefix v1), 6cd0f74 (CI fixup), 4467aba (URL linkification v2), 43b4621 (CI fixup), 5052b1f (link blue + `www.` reachability v3), and this commit (long-URL truncation + `overflow-wrap: anywhere` v4).
-- Test delta vs main: +22 passing on Linux/CI (10 unit tests + 12 render-integration). On Windows, the 12 render tests still fail with the same unrelated `%-d` strftime issue.
-- Nothing else in flight. Next session moves item-29 prose to `COMPLETED.md` once Tom verifies the source line, location prefix, clickable+reachable URLs, blue link color, and clean long-URL wrapping all work on the live page.
+- Item 29 in flight `[~]` — six commits so far: 8606610, 6cd0f74, 4467aba, 43b4621, 5052b1f, 3fbdf8c (source line + Location: prefix + URL linkification + www reachability + long-URL truncation/wrapping).
+- Item 30 filed and code-complete `[~]` (this commit) — agent prompt strengthened to preserve URLs verbatim in the `location` field instead of summarizing them as `(PandaDoc link)` / `(Google Form)` parenthetical descriptions. Caught during #29 verification: a DanceOne waiver card showed `Online (PandaDoc link)` with no clickable URL because the agent didn't pass the URL through. One-paragraph prompt addition with 5 GOOD/BAD examples; new test pins the directive's key phrases.
+- Test delta vs main: +23 passing on Linux/CI (11 unit tests + 12 render-integration). The 12 #29 render tests still fail on Windows with the unrelated `%-d` strftime issue.
+- Nothing else in flight. Next session moves items 29 + 30 prose to `COMPLETED.md` once Tom verifies on the live page.
 
 ## For future agents
 
@@ -141,6 +142,16 @@ Filed 2026-04-25 from Tom: event cards lacked any source attribution despite eve
 **Long-URL wrapping (v4 follow-up).** Google Forms / instantseats / DocuSign URLs ran past 100 characters and blew out the card layout when rendered in full. Two-pronged fix: (a) visible link text is now capped at `_URL_DISPLAY_CAP=70` chars in the linkifier with ellipsis on overflow — full URL stays in `href` (click works) and `title=` (hover surfaces it); (b) `.event-location` CSS gains `overflow-wrap: anywhere` as a narrow-screen / very-long-fragment safety net so even after truncation the line breaks cleanly instead of overflowing the card width.
 
 Item stays `[~]` pending Tom's live verification post-deploy: load the page, confirm (a) a `From: ...` line under each card, (b) `Location:` prefix on plain venues but not on full street addresses, (c) URLs (full and bare-domain) render as clickable underlined links, (d) long URLs are visibly truncated with ellipsis but still click through to the full destination.
+
+### 30. [~] Agent should preserve URLs verbatim in event location
+
+Filed 2026-04-25 from Tom — caught during item-29 verification: a DanceOne waiver event rendered with location `Online (PandaDoc link)`, no actual URL anywhere on the card. The source email almost certainly contained a real PandaDoc URL (that's how PandaDoc sends e-signature requests), but the agent summarized it as the parenthetical `(PandaDoc link)` rather than including the literal URL. Item 29's linkifier needs a URL in the location text to render an anchor; without it, Ellen sees a description of a link but can't click through.
+
+**Fix.** `agent.py::_EXTRACTION_BASE_PROMPT`'s `location` field bullet extended with an explicit URL-preservation directive: include URLs VERBATIM (signup forms, waivers, livestreams, RSVP, e-signature, Google Form, PandaDoc/DocuSign), do NOT summarize as "(form link)" or "(PandaDoc link)" or similar paraphrase. Prompt now carries five concrete GOOD / BAD examples so the model has unambiguous patterns to follow. Single-paragraph addition; no schema change, no parser change.
+
+**Tests.** New `test_extraction_prompt_preserves_urls_in_location_directive` in `tests/test_agent.py` — pins the directive's key phrases (`URL VERBATIM`, `PandaDoc`, `Google Form`, `GOOD:`, `BAD:`) so a future prompt edit that accidentally drops the directive fails CI. Modeled on the existing roster-prose pin pattern.
+
+Item stays `[~]` pending Tom's live verification post-deploy across one or two cron cycles: confirm that URLs from signup-form / e-signature / Google Form emails now appear as clickable links in the location field instead of being summarized as parentheticals.
 
 ## Descoped / on hold
 

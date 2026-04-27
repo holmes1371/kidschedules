@@ -167,6 +167,24 @@ def test_extraction_prompt_embeds_roster_prose():
         assert needle in prompt, f"missing from prompt: {needle!r}"
 
 
+def test_extraction_prompt_preserves_urls_in_location_directive():
+    """ROADMAP #30: the prompt instructs the agent to copy URLs
+    VERBATIM into the location field rather than summarizing them
+    as "(PandaDoc link)" or "(Google Form)". This pin guards
+    against a future prompt edit accidentally dropping the
+    directive — the visible card linkifier (#29) only renders an
+    anchor when a URL is present in the location string."""
+    prompt = agent.EXTRACTION_SYSTEM_PROMPT
+    for needle in (
+        "URL VERBATIM",
+        "PandaDoc",
+        "Google Form",
+        "GOOD:",
+        "BAD:",
+    ):
+        assert needle in prompt, f"#30 directive missing from prompt: {needle!r}"
+
+
 def test_format_roster_prose_shape():
     """Unit test on the pure formatter. No filesystem. Fabricated mapping
     with a third kid proves the loop scales and nothing in the formatter

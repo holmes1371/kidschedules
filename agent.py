@@ -129,8 +129,21 @@ For each event, output a dict with exactly these keys:
   using the email's sent date. If truly unknown, use "".
 - "time": string — "6:30 PM", "All day", "All day (deadline)",
   "School hours", etc. Use "" only if completely unknown.
-- "location": string — school name, office, address, field, URL for
+- "location": string — school name, office, address, field, or URL for
   online submissions. Use "" if unknown.
+  IF the email contains a URL the user would tap to attend or complete
+  the event (signup form, waiver, livestream, RSVP, e-signature link,
+  Google Form, PandaDoc/DocuSign link, etc.), include the URL VERBATIM
+  in this field. Do NOT summarize as "see link", "(form link)",
+  "(PandaDoc link)", "(Google Form)", or similar paraphrase — the
+  literal URL is what the user clicks. Mix with venue text when both
+  apply. Examples:
+    GOOD: "Online (https://app.pandadoc.com/document/abc123)"
+    BAD:  "Online (PandaDoc link)"
+    GOOD: "https://docs.google.com/forms/d/e/.../viewform"
+    BAD:  "Online (Google Form)"
+    GOOD: "School cafeteria — sign in at https://myschoolbucks.com"
+    BAD:  "School cafeteria (MySchoolBucks)"
 - "category": string — exactly one of: "School Activity", "Appointment",
   "Academic Due Date", "Sports & Extracurriculars"
 - "child": string — which child or grade if identifiable (e.g. "Isla",
