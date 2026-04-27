@@ -1652,6 +1652,12 @@ def render_html(today: dt.date,
       font-family: inherit;
       line-height: 1.4;
       padding: 0.2rem 0.45rem;
+      /* Push the checkbox to the left edge of the action row while the
+         ICS / Ignore buttons stay right-bunched. The action-row's
+         `justify-content: flex-end` would otherwise stack all three on
+         the right; `margin-right: auto` on the first child consumes the
+         free space, anchoring the checkbox to the left. */
+      margin-right: auto;
     }}
     .complete-checkbox {{
       cursor: pointer;
