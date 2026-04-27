@@ -21,7 +21,7 @@ Strict rules for writing it:
 **2026-04-27**
 
 - Items 30 + 31 still `[~]` pending Tom's live verification on newly-arrived emails (cards extracted before the prompt push retain old labels; see each item's "No retroactive fix" callout).
-- #32 ("Completed" checkbox on event cards) `[~]` — design note landed at `design/completed-events.md`. Q1–Q10 resolved with Tom; mirrors ignore-flow surface-for-surface (sheet-as-truth, ephemeral cache, optimistic toggle). Next: commit 2 of 7 — `process_events.py` classify + render + CLI flag + tests (no JS yet).
+- #32 ("Completed" checkbox on event cards) `[~]` — all 7 commits in plan landed; Tom redeployed Apps Script mid-session after commit 3. Awaiting live verification on the next cron cycle (check a card on phone, confirm checkbox state propagates to tablet after refresh; verify `completed_events.json` populates in CI logs).
 - #33 (PDF newsletter attachments) filed 2026-04-26 as a placeholder by Tom; reworded this session into house style. Stays `[ ]` — needs a scoping conversation before any work.
 - Nothing else in flight.
 
@@ -150,27 +150,23 @@ Item stays `[~]` pending live verification.
 
 ### 32. [~] "Completed" checkbox on event cards
 
-Filed 2026-04-27 from Tom. Add a "completed" affordance to each event card so Ellen can mark an event done as it happens, without waiting for the date to pass it off the page. Behavior on check:
+Filed 2026-04-27 from Tom. Adds a per-card "completed" affordance so Ellen can mark an event done as it happens, without waiting for the date to pass. Mirrors the ignore-flow architecture surface-for-surface — same 12-hex event-id, same Apps Script POST/GET round-trip, same ephemeral sheet-derived cache, same optimistic toggle + rollback. Full design at `design/completed-events.md`.
 
-- Card displays a "completed" label.
-- Card background shifts to a subtle green.
-- The "ignore event" button is removed from that card (a completed event is no longer a candidate for ignoring).
+**Resolved (2026-04-27):** durable persistence; cross-device sync via Apps Script; completed supersedes ignore (both Ignore-event AND Ignore-sender suppressed via CSS on `.event-card.completed`); ignored cards do NOT show the completed checkbox (CSS-suppressed via the existing `[data-ignored="1"]` selector pattern); retirement unchanged (completed cards retire on the normal date-passed threshold). Sheet-as-single-source-of-truth invariant preserved end-to-end — `completed_events.json` is per-run ephemeral, never committed.
 
-The check is reversible — unchecking restores the card to its normal state (label gone, background reset, ignore button back). Completed cards stay visible and retire on the normal date-passed schedule; this affordance does not change retirement timing or the events-state pipeline, only the per-event UI state.
+**Commits (7 of 7 landed):**
 
-Design decisions (resolved 2026-04-27 with Tom):
+1. Design note + ROADMAP update — `4828713`
+2. `process_events.py` classify + render + CLI + tests — `732a0de`
+3. `scripts/apps_script.gs` router + Completed Events tab — `3cd394e` (Tom redeployed Apps Script after this commit)
+4. `scripts/sync_completed_events.py` + tests — `863b2f8`
+5. `main.py` + workflow YAML wiring — `2c373fc`
+6. `process_events.py` inline JS handlers + tests — `caa6566`
+7. ROADMAP update + SHAs (this entry).
 
-- **Persistence: durable.** Completion sticks across page reloads and cron rebuilds — once flipped, the card stays "completed" until the event's date passes and natural retirement removes it. Per-browser session-only is NOT acceptable; Ellen should not have to re-check after each cron tick.
-- **Cross-device: synced via Apps Script.** Goes through the same webhook path the ignore flow uses, so checking on phone propagates to tablet. Local-only would let the two devices disagree, which is the bug this affordance is meant to avoid.
-- **Ignore interaction: completed supersedes ignore.** The ignore button is removed from completed cards entirely — a completed event is no longer ignorable. (Unchecking completion restores the ignore button.)
-- **Retirement: unchanged.** Completed cards retire on the normal date-passed threshold alongside uncompleted ones. No early sweep, no second retirement code path.
+**Pending verification.** Item stays `[~]` until Tom confirms on a live cron cycle: (a) checking a card on phone propagates to tablet after the next cron rebuild, (b) `completed_events.json` shows the expected row count in CI logs after a cron run, (c) the Ignore-event / Ignore-sender buttons disappear from a completed card and reappear on uncheck, (d) the "Completed Events" sheet tab in the Google Sheet accumulates rows correctly (auto-created on first append).
 
-Implementation questions to settle in the design note (not blockers — engineering judgment calls):
-
-- Event-identity key for the persistence record. Likely the same key the ignore flow uses (item #6 / #7 / #18 territory) so the two affordances share one identity surface; confirm by reading those.
-- Apps Script endpoint shape: extend the existing ignore-action endpoint with a `complete` / `uncomplete` action, vs. a new endpoint. Lean toward extending — the auth + rate-limit machinery is already there.
-- Storage: where does the completed-events list live so `process_events.py` can consume it during the next cron rebuild and re-render the green/labeled state? Mirror whatever the ignore flow does (likely a JSON blob the workflow pulls in).
-- Test fixtures: extend `tests/` per the standing rule that any `process_events.py` change extends the pytest fixtures in step.
+**Manual deploy step landed mid-session.** Apps Script was redeployed after commit 3, before any client surface started calling the new endpoints. The page rendered as normal between commits 3 and 6 — checkboxes appeared but clicks were no-ops. From commit 6 onward, the full UX is live; the next cron cycle is the first one that exercises the end-to-end flow.
 
 ### 33. [ ] Extract events from PDF newsletter attachments on teacher emails
 
