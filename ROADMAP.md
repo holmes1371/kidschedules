@@ -102,11 +102,13 @@ Status legend:
 
 Every workflow run — scheduled cron and manual `workflow_dispatch` alike — currently overwrites `docs/index.html`, the page Ellen uses. Manual runs that exist purely to verify a fix (like the recent #22 live-QA dispatch) put experimental output in front of her until the next cron tick replaces it. The pipeline needs a way to route test builds to a separate path so the production page stays untouched.
 
+**Tom's UX (confirmed 2026-04-27).** New checkbox toggle in the existing `workflow_dispatch` UI alongside Dry run / Intentional failure / Create draft — when flipped on, the entire run writes to the test landing page; when left off, the manual run behaves like a cron tick and updates the normal production page. Two-state toggle, no separate workflow file, no environment variables to remember. Cron-scheduled runs are unaffected and always go to production.
+
 Sketch: add a boolean `workflow_dispatch` input — `test_output`, default false — that the workflow forwards to `scripts/process_events.py` (e.g. `--output-target test`). When set, the script writes `docs/test/index.html` instead of `docs/index.html` and the workflow commits only the test path. Production `index.html` is left alone, and the test build is visitable at `/test/` on the same Pages domain. The test page should render a visible banner so a stale tab or bookmark cannot be mistaken for live data.
 
 Design-note questions to resolve before coding:
 
-- Whether `test_output` should also gate adjacent side effects that touch production state — skip Gmail draft creation (item 3), skip incremental-processed-state writes (item 4), skip "new this week" snapshot updates (item 13). A test run that silently marks Gmail messages as "already processed" or stamps "seen" on events would corrupt the next production run, so the working assumption is to fold all of these under one flag, but confirm scope with Tom.
+- Whether `test_output` should also gate adjacent side effects that touch production state — skip Gmail draft creation (item 3), skip incremental-processed-state writes (item 4), skip "new this week" snapshot updates (item 13), and now also #32's `complete`/`uncomplete` POSTs (a test run shouldn't be able to write rows to the live "Completed Events" sheet). A test run that silently marks Gmail messages as "already processed" or stamps "seen" on events would corrupt the next production run, so the working assumption is to fold all of these under one flag, but confirm scope with Tom.
 - Whether to unify this with or supersede the existing digest test-mode flag from item 3, or keep them independent toggles.
 - Whether test-output commits should use a distinct commit-message prefix so the history is easy to skim past during regular review.
 
