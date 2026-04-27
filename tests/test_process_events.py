@@ -1019,6 +1019,115 @@ def test_render_html_js_complete_hydrates_from_localstorage():
     assert "setCompleted(card, true);" in html
 
 
+# ─── #34 refresh-time state sync ─────────────────────────────────────────
+
+
+def test_render_html_js_refresh_sync_fires_three_fetches():
+    """#34: on page load, the inline JS fetches all three list-shape
+    kinds — ignored events, completed events, ignored senders — to
+    reconcile the rendered state against the current Sheet."""
+    html, _ = _render_ignored_fixture()
+    assert 'fetchKind("ignored")' in html
+    assert 'fetchKind("completed")' in html
+    assert 'fetchKind("ignored_senders")' in html
+    assert "refreshSyncFromSheet();" in html
+
+
+def test_render_html_js_refresh_sync_no_secret_in_fetch_url():
+    """#34 auth Option B: the GET fetches do NOT include `?secret=`.
+    The Apps Script doGet has been relaxed (commit 2 of #34 plan) to
+    treat the three list-shape reads as public. Pin the absence so a
+    future refactor that re-adds auth to the read path fails CI."""
+    html, _ = _render_ignored_fixture()
+    start = html.find("function refreshSyncFromSheet")
+    end = html.find("refreshSyncFromSheet();", start)
+    assert start != -1 and end != -1
+    fetch_block = html[start:end]
+    assert "secret=" not in fetch_block
+    # Sanity: the kind= query is the only param appended.
+    assert 'kind=" + kind' in fetch_block
+
+
+def test_render_html_js_localstorage_writes_flipped_at_iso():
+    """#34: save helpers write the new `{id, flipped_at_iso}` (or
+    `{domain, flipped_at_iso}` for senders) shape, with timestamps
+    preserved from the prior entry when present and assigned to
+    `now` for first-time saves."""
+    html, _ = _render_ignored_fixture()
+    # All three save helpers preserve existing timestamps and assign
+    # `now` to fresh entries. Pin the canonical pattern.
+    assert "flipped_at_iso: existingMap[id] || now" in html
+    assert "flipped_at_iso: existingMap[d] || now" in html
+
+
+def test_render_html_js_localstorage_load_tolerates_bare_ids():
+    """#34: load helpers accept BOTH the new `{id, flipped_at_iso}`
+    shape AND pre-#34 bare-string entries. Bare entries become
+    `{id: <str>, flipped_at_iso: ""}` so the age check classifies
+    them as stale and the first reconcile drops them — no migration
+    code needed."""
+    html, _ = _render_ignored_fixture()
+    # The load loop's bare-string branch.
+    assert 'if (typeof item === "string")' in html
+    # Bare-id normalization (event-id storage).
+    assert '{id: item, flipped_at_iso: ""}' in html
+    # Bare-domain normalization (sender storage).
+    assert '{domain: item, flipped_at_iso: ""}' in html
+
+
+def test_render_html_js_grace_period_constant_present():
+    """#34: the 10-second grace window for in-flight POSTs is a
+    single constant. Pin both the name and the value so a future
+    tuning is a deliberate one-line edit."""
+    html, _ = _render_ignored_fixture()
+    assert "var REFRESH_GRACE_MS = 10 * 1000;" in html
+
+
+def test_render_html_js_reconcile_drops_id_when_in_fetched_list():
+    """#34: when an id appears in the fetched list, the reconciliation
+    drops the matching localStorage entry — sheet is authoritative,
+    cache is redundant."""
+    html, _ = _render_ignored_fixture()
+    # The persist filter excludes ids/domains that are in the fetched set.
+    assert "if (fetchedSet[e.id]) continue;" in html
+    assert "if (fetchedSet[e.domain]) continue;" in html
+
+
+def test_render_html_js_reconcile_keeps_recent_local_when_not_in_fetched():
+    """#34: when an id is NOT in the fetched list but the localStorage
+    entry's age is under REFRESH_GRACE_MS, the local flip is kept —
+    the POST is presumed in flight or the GET cache hasn't caught up."""
+    html, _ = _render_ignored_fixture()
+    # Age comparison + grace check is the load-bearing logic.
+    assert "if (age < REFRESH_GRACE_MS)" in html
+    # The persist branch keeps recent entries, drops stale ones.
+    assert "if (ageK < REFRESH_GRACE_MS) keep.push(e);" in html
+
+
+def test_render_html_js_reconcile_silent_on_fetch_failure():
+    """#34: fetch errors degrade silently — `console.warn` breadcrumb
+    only, no toast. Ellen shouldn't see a 'sync failed' error every
+    time she's offline; the page works fine without the overlay."""
+    html, _ = _render_ignored_fixture()
+    assert 'console.warn("[refresh-sync] ignored fetch failed:"' in html
+    assert 'console.warn("[refresh-sync] completed fetch failed:"' in html
+    assert 'console.warn("[refresh-sync] ignored_senders fetch failed:"' in html
+    # Negative pin: no toast on fetch failure.
+    start = html.find("function refreshSyncFromSheet")
+    end = html.find("refreshSyncFromSheet();", start)
+    fetch_block = html[start:end]
+    assert "showToast" not in fetch_block
+
+
+def test_render_html_js_fetch_skipped_when_webhook_url_empty():
+    """#34: dev/preview render passes webhook_url='', and the refresh
+    sync must short-circuit before attempting fetch (matches the
+    existing postAction dev/preview no-op pattern)."""
+    html, _ = _render_ignored_fixture()
+    # Pin the early-return guard inside refreshSyncFromSheet.
+    assert "if (!WEBHOOK_URL) return;  // dev / preview no-op" in html
+
+
 def test_render_html_undated_completed_card_renders_chip_and_class():
     """#32: undated cards mirror dated cards' completed affordance.
     Same fixture has 'Undated With Sender' as a date='' entry."""

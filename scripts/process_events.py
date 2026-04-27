@@ -1799,43 +1799,152 @@ def render_html(today: dt.date,
       var STORAGE_KEY = "kids_schedule_ignored_ids";
       var SENDERS_STORAGE_KEY = "kids_schedule_ignored_senders";
       var COMPLETED_STORAGE_KEY = "kids_schedule_completed_ids";
+      // #34: grace window for the timestamp-based reconciliation.
+      // Covers in-flight POST latency plus Apps Script GET propagation
+      // lag — entries flipped within this window stay locally
+      // authoritative even if the fetched list doesn't show them yet.
+      var REFRESH_GRACE_MS = 10 * 1000;
 
-      function loadIgnored() {{
+      // #34: localStorage entries are objects of shape
+      // {{id|domain, flipped_at_iso}}. Pre-#34 bare-string entries are
+      // tolerated by the load helpers — each becomes
+      // {{id: <str>, flipped_at_iso: ""}} which makes the age check
+      // always classify them as stale, so the first reconcile drops
+      // them. No migration code; the staleness is the migration.
+
+      function loadIgnoredEntries() {{
         try {{
           var raw = localStorage.getItem(STORAGE_KEY);
-          return raw ? JSON.parse(raw) : [];
+          if (!raw) return [];
+          var parsed = JSON.parse(raw);
+          if (!Array.isArray(parsed)) return [];
+          var out = [];
+          for (var i = 0; i < parsed.length; i++) {{
+            var item = parsed[i];
+            if (typeof item === "string") {{
+              out.push({{id: item, flipped_at_iso: ""}});
+            }} else if (item && typeof item === "object" && typeof item.id === "string") {{
+              out.push({{
+                id: item.id,
+                flipped_at_iso: typeof item.flipped_at_iso === "string" ? item.flipped_at_iso : ""
+              }});
+            }}
+          }}
+          return out;
         }} catch (e) {{
           return [];
         }}
+      }}
+      function loadIgnored() {{
+        // Backwards-compat: returns bare id strings. Existing callers
+        // (the click router's loadIgnored().filter(...) / .indexOf(...)
+        // pattern, the hydration loop) keep working unchanged.
+        return loadIgnoredEntries().map(function (e) {{ return e.id; }});
       }}
       function saveIgnored(ids) {{
-        try {{ localStorage.setItem(STORAGE_KEY, JSON.stringify(ids)); }}
+        // Takes bare id strings (existing API). Preserves timestamps for
+        // ids that already have one; assigns now to ids that don't.
+        // Writes the {{id, flipped_at_iso}} shape to localStorage so the
+        // refresh-time reconciliation can use the timestamps.
+        var existing = loadIgnoredEntries();
+        var existingMap = {{}};
+        for (var i = 0; i < existing.length; i++) {{
+          existingMap[existing[i].id] = existing[i].flipped_at_iso;
+        }}
+        var now = new Date().toISOString();
+        var entries = ids.map(function (id) {{
+          return {{
+            id: id,
+            flipped_at_iso: existingMap[id] || now
+          }};
+        }});
+        try {{ localStorage.setItem(STORAGE_KEY, JSON.stringify(entries)); }}
         catch (e) {{ /* storage unavailable */ }}
       }}
 
-      function loadIgnoredSenders() {{
+      function loadIgnoredSendersEntries() {{
         try {{
           var raw = localStorage.getItem(SENDERS_STORAGE_KEY);
-          return raw ? JSON.parse(raw) : [];
+          if (!raw) return [];
+          var parsed = JSON.parse(raw);
+          if (!Array.isArray(parsed)) return [];
+          var out = [];
+          for (var i = 0; i < parsed.length; i++) {{
+            var item = parsed[i];
+            if (typeof item === "string") {{
+              out.push({{domain: item, flipped_at_iso: ""}});
+            }} else if (item && typeof item === "object" && typeof item.domain === "string") {{
+              out.push({{
+                domain: item.domain,
+                flipped_at_iso: typeof item.flipped_at_iso === "string" ? item.flipped_at_iso : ""
+              }});
+            }}
+          }}
+          return out;
         }} catch (e) {{
           return [];
         }}
       }}
+      function loadIgnoredSenders() {{
+        return loadIgnoredSendersEntries().map(function (e) {{ return e.domain; }});
+      }}
       function saveIgnoredSenders(domains) {{
-        try {{ localStorage.setItem(SENDERS_STORAGE_KEY, JSON.stringify(domains)); }}
+        var existing = loadIgnoredSendersEntries();
+        var existingMap = {{}};
+        for (var i = 0; i < existing.length; i++) {{
+          existingMap[existing[i].domain] = existing[i].flipped_at_iso;
+        }}
+        var now = new Date().toISOString();
+        var entries = domains.map(function (d) {{
+          return {{
+            domain: d,
+            flipped_at_iso: existingMap[d] || now
+          }};
+        }});
+        try {{ localStorage.setItem(SENDERS_STORAGE_KEY, JSON.stringify(entries)); }}
         catch (e) {{ /* storage unavailable */ }}
       }}
 
-      function loadCompleted() {{
+      function loadCompletedEntries() {{
         try {{
           var raw = localStorage.getItem(COMPLETED_STORAGE_KEY);
-          return raw ? JSON.parse(raw) : [];
+          if (!raw) return [];
+          var parsed = JSON.parse(raw);
+          if (!Array.isArray(parsed)) return [];
+          var out = [];
+          for (var i = 0; i < parsed.length; i++) {{
+            var item = parsed[i];
+            if (typeof item === "string") {{
+              out.push({{id: item, flipped_at_iso: ""}});
+            }} else if (item && typeof item === "object" && typeof item.id === "string") {{
+              out.push({{
+                id: item.id,
+                flipped_at_iso: typeof item.flipped_at_iso === "string" ? item.flipped_at_iso : ""
+              }});
+            }}
+          }}
+          return out;
         }} catch (e) {{
           return [];
         }}
       }}
+      function loadCompleted() {{
+        return loadCompletedEntries().map(function (e) {{ return e.id; }});
+      }}
       function saveCompleted(ids) {{
-        try {{ localStorage.setItem(COMPLETED_STORAGE_KEY, JSON.stringify(ids)); }}
+        var existing = loadCompletedEntries();
+        var existingMap = {{}};
+        for (var i = 0; i < existing.length; i++) {{
+          existingMap[existing[i].id] = existing[i].flipped_at_iso;
+        }}
+        var now = new Date().toISOString();
+        var entries = ids.map(function (id) {{
+          return {{
+            id: id,
+            flipped_at_iso: existingMap[id] || now
+          }};
+        }});
+        try {{ localStorage.setItem(COMPLETED_STORAGE_KEY, JSON.stringify(entries)); }}
         catch (e) {{ /* storage unavailable */ }}
       }}
 
@@ -2225,6 +2334,154 @@ def render_html(today: dt.date,
           }});
         }}
       }});
+
+      // ── #34 Refresh-time state sync ───────────────────────
+      // Fetches the three list-shape kinds (ignored, completed,
+      // ignored_senders) directly from Apps Script on page load and
+      // reconciles each card's state against the fetched lists.
+      // Sheet is the single source of truth; localStorage layers on
+      // top only for entries flipped within REFRESH_GRACE_MS (in-flight
+      // POSTs whose row hasn't propagated to GET yet). On fetch
+      // failure the card state stays at SSR + hydration; no toast,
+      // console.warn breadcrumb only — same posture as postAction's
+      // dev/preview no-op.
+
+      function _reconcileEventFlag(fetchedIds, getEntries, persistEntries, applyFn, removeFn) {{
+        var fetchedSet = {{}};
+        for (var i = 0; i < fetchedIds.length; i++) fetchedSet[fetchedIds[i]] = true;
+        var localEntries = getEntries();
+        var localMap = {{}};
+        for (var j = 0; j < localEntries.length; j++) {{
+          localMap[localEntries[j].id] = localEntries[j].flipped_at_iso || "";
+        }}
+        var now = Date.now();
+        document.querySelectorAll(".event-card[data-event-id]").forEach(function (card) {{
+          var id = card.getAttribute("data-event-id");
+          if (!id) return;
+          if (fetchedSet[id]) {{
+            applyFn(card);
+            return;
+          }}
+          if (id in localMap) {{
+            var age = now - new Date(localMap[id] || 0).getTime();
+            if (age < REFRESH_GRACE_MS) {{
+              // Recent local flip; keep applied state (hydration set it).
+              return;
+            }}
+            // Fall through: stale local entry, sheet authoritative.
+          }}
+          removeFn(card);
+        }});
+        // Persist: drop entries the fetch confirmed (sheet has them);
+        // keep entries that are recent (potentially in-flight POSTs).
+        var keep = [];
+        for (var k = 0; k < localEntries.length; k++) {{
+          var e = localEntries[k];
+          if (fetchedSet[e.id]) continue;
+          var ageK = now - new Date(e.flipped_at_iso || 0).getTime();
+          if (ageK < REFRESH_GRACE_MS) keep.push(e);
+        }}
+        persistEntries(keep);
+      }}
+
+      function _reconcileSenderFlag(fetchedDomains) {{
+        var fetchedSet = {{}};
+        for (var i = 0; i < fetchedDomains.length; i++) fetchedSet[fetchedDomains[i]] = true;
+        var localEntries = loadIgnoredSendersEntries();
+        var localMap = {{}};
+        for (var j = 0; j < localEntries.length; j++) {{
+          localMap[localEntries[j].domain] = localEntries[j].flipped_at_iso || "";
+        }}
+        var now = Date.now();
+        document.querySelectorAll(".event-card[data-sender]").forEach(function (card) {{
+          var domain = card.getAttribute("data-sender");
+          if (!domain) return;
+          // An individually-ignored card (reason="event") should keep its
+          // event-ignore even if the sender is also flagged; only the
+          // sender-reason cards are subject to sender reconciliation.
+          var reason = card.getAttribute("data-ignored-reason") || "";
+          if (fetchedSet[domain]) {{
+            if (reason !== "event") setIgnored(card, "sender");
+            return;
+          }}
+          if (domain in localMap) {{
+            var age = now - new Date(localMap[domain] || 0).getTime();
+            if (age < REFRESH_GRACE_MS) return;  // recent local sweep, keep
+          }}
+          // Sheet says not ignored, no recent local — restore if
+          // currently sender-ignored. event-ignored cards are untouched.
+          if (reason === "sender") setActive(card);
+        }});
+        var keep = [];
+        for (var k = 0; k < localEntries.length; k++) {{
+          var e = localEntries[k];
+          if (fetchedSet[e.domain]) continue;
+          var ageK = now - new Date(e.flipped_at_iso || 0).getTime();
+          if (ageK < REFRESH_GRACE_MS) keep.push(e);
+        }}
+        try {{ localStorage.setItem(SENDERS_STORAGE_KEY, JSON.stringify(keep)); }}
+        catch (e) {{ /* storage unavailable */ }}
+      }}
+
+      function refreshSyncFromSheet() {{
+        if (!WEBHOOK_URL) return;  // dev / preview no-op
+        var sep = WEBHOOK_URL.indexOf("?") === -1 ? "?" : "&";
+        function fetchKind(kind) {{
+          return fetch(WEBHOOK_URL + sep + "kind=" + kind).then(function (r) {{
+            if (!r.ok) throw new Error("HTTP " + r.status);
+            return r.json();
+          }});
+        }}
+        fetchKind("ignored").then(function (rows) {{
+          var ids = [];
+          for (var i = 0; i < rows.length; i++) {{
+            if (rows[i] && typeof rows[i].id === "string") ids.push(rows[i].id);
+          }}
+          _reconcileEventFlag(
+            ids,
+            loadIgnoredEntries,
+            function (entries) {{
+              try {{ localStorage.setItem(STORAGE_KEY, JSON.stringify(entries)); }}
+              catch (e) {{ /* storage unavailable */ }}
+            }},
+            function (card) {{ setIgnored(card, "event"); }},
+            function (card) {{ setActive(card); }}
+          );
+        }}).catch(function (err) {{
+          console.warn("[refresh-sync] ignored fetch failed:", err);
+        }});
+        fetchKind("completed").then(function (rows) {{
+          var ids = [];
+          for (var i = 0; i < rows.length; i++) {{
+            if (rows[i] && typeof rows[i].id === "string") ids.push(rows[i].id);
+          }}
+          _reconcileEventFlag(
+            ids,
+            loadCompletedEntries,
+            function (entries) {{
+              try {{ localStorage.setItem(COMPLETED_STORAGE_KEY, JSON.stringify(entries)); }}
+              catch (e) {{ /* storage unavailable */ }}
+            }},
+            function (card) {{ setCompleted(card, true); }},
+            function (card) {{ setCompleted(card, false); }}
+          );
+        }}).catch(function (err) {{
+          console.warn("[refresh-sync] completed fetch failed:", err);
+        }});
+        fetchKind("ignored_senders").then(function (rows) {{
+          var domains = [];
+          for (var i = 0; i < rows.length; i++) {{
+            if (rows[i] && typeof rows[i].domain === "string") {{
+              domains.push(rows[i].domain.toLowerCase());
+            }}
+          }}
+          _reconcileSenderFlag(domains);
+        }}).catch(function (err) {{
+          console.warn("[refresh-sync] ignored_senders fetch failed:", err);
+        }});
+      }}
+
+      refreshSyncFromSheet();
     }})();
   </script>
 </body>
