@@ -46,9 +46,3 @@ blocklist_auto_audit.jsonl
 
 # IDEs
 .idea/
-
-# Soft-delete holding pen — the repo sits on a FUSE mount that refuses
-# unlink, so agents `mv` files here instead of `rm`-ing them. Tom empties
-# the folder periodically. The folder is not tracked; agents `mkdir -p`
-# it on demand before each move. See design/soft-delete-convention.md.
-.to_delete/

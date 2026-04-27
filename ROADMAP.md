@@ -20,10 +20,11 @@ Strict rules for writing it:
 
 **2026-04-27**
 
-- #23 code complete `[~]` — 4 commits (f0dea5b / 0822afc / c0bf8e4 / current close-out). Pending Tom's live verification on a real `workflow_dispatch test_output=true` run; verification checklist in #23's body. Mid-session git recovery: local `.git/objects/` had gaps (HEAD's tree + many blobs were missing); fixed via `git fetch --refetch origin main` which repacked. Remote was always healthy; local-only issue.
+- #23 code complete `[~]` — 4 commits (f0dea5b / 0822afc / c0bf8e4 / 75b7a5d). Pending Tom's live verification on a real `workflow_dispatch test_output=true` run; verification checklist in #23's body.
+- Soft-delete convention retired — Tom confirmed `rm` works on the local mount now. Deleted `design/soft-delete-convention.md`, removed the `.to_delete/` block from `.gitignore`, dropped the related Session-discipline bullet, scrubbed FUSE-specific references from `pytest.ini` + `.gitattributes` comments. Any future stale `.git/*.lock` is now a normal `rm` away.
 - Items 30 + 31 still `[~]` pending Tom's live verification on newly-arrived emails.
 - #33 / #35 / #36 still `[ ]` placeholders, deprioritized below #23.
-- Pre-push protocol: full `pytest tests/ -q` (now 785) green on strftime-patched copy of `process_events.py` before any push.
+- Pre-push protocol: full `pytest tests/ -q` (now 785) green before any push.
 
 ## For future agents
 
@@ -33,7 +34,6 @@ Session discipline:
 
 - Invoke the `karpathy-guidelines` skill via the Skill tool at the start of every session that touches code. Reading `reference/guidelines.md` directly does not count — the skill-load step is what anchors the discipline for the rest of the session.
 - git commits need the -c user.name=... -c user.email=... flags since there's no default identity
-- **Soft-delete convention, not `rm`.** The FUSE mount this repo lives on refuses `unlink` but permits `rename`. `rm` fails with `Operation not permitted` even under `dangerouslyDisableSandbox`; `mv` works. When you need to discard a file — most often a stale `.git/index.lock` or `.git/HEAD.lock` left by an interrupted git op — `mkdir -p .to_delete && mv <file> .to_delete/<tag>-$(date +%Y%m%d-%H%M%S)`. The folder isn't tracked (no `.gitkeep`); agents create it on demand so Tom can select-all-delete inside it without working around a stub file. Tom empties it manually from Windows periodically. Full convention + stale-lock recovery + corrupt-index recovery ritual at `design/soft-delete-convention.md`. Unlink warnings on a successful git commit (`warning: unable to unlink '.git/index.lock': Operation not permitted`) are cosmetic; the commit landed, move on.
 - Before starting a non-trivial feature, write a short design note to `design/{feature-name}.md` capturing the scope, the decisions already made, and the test fixtures needed. A fresh session should be able to pick up mid-feature from that note plus the last commit, without re-litigating choices.
 - Commit at every natural boundary, not just at feature completion. Half-finished work behind a clear commit message is recoverable; a dirty worktree is not.
 - Use the built-in TodoWrite tool as internal scaffolding on multi-step work — refresh at each commit boundary and keep exactly one item `in_progress`. The output is not visible in Tom's current Claude Code UI (the "Tasks" panel maps to session-spawn chips, not TodoWrite items), so do not treat it as a reporting channel; it is a working scratchpad for the agent that survives compaction and mid-session interruptions.
