@@ -20,11 +20,12 @@ Strict rules for writing it:
 
 **2026-04-27**
 
-- #23 closed `[x]` — Tom verified live: test page came up at `/testpage.html` with current data + red banner, Ellen's `/index.html` unchanged from the last cron. Full prose archived in `COMPLETED.md`. 4 commits (f0dea5b / 0822afc / c0bf8e4 / 75b7a5d).
-- Soft-delete convention retired (commit fd6c1b9) — `rm` works on the local mount now. Stale `.git/*.lock` is a normal `rm` away.
+- #33 in flight `[~]` — design note + `pdf_sender_domains.{txt,py}` + .eml fixture landed. Approach: Anthropic native PDF (`document` block); FCPS-only sender gate; 8MB cap; batch-of-1; #31 source-date preserved. Code commits next: gmail_client PDF fetch → agent content-blocks + prompt → main.py wiring. 785 → 791 tests.
+- #23 closed `[x]` — Tom verified live; full prose archived in `COMPLETED.md`. 4 commits.
+- Soft-delete convention retired (commit fd6c1b9) — `rm` works on the local mount now.
 - Items 30 + 31 still `[~]` pending Tom's live verification on newly-arrived emails.
-- #33 / #35 / #36 still `[ ]` placeholders, next in queue.
-- Pre-push protocol: full `pytest tests/ -q` (now 785) green before any push.
+- #35 / #36 still `[ ]` placeholders.
+- Pre-push protocol: full `pytest tests/ -q` (now 791) green before any push.
 
 ## For future agents
 
@@ -142,17 +143,13 @@ Item stays `[~]` pending live verification.
 
 34\. [x] Cross-device state sync on page refresh (ignore + completed) — 4428700 / e2a8cf1 / 93d257d / e1151c9 — see COMPLETED.md
 
-### 33. [ ] Extract events from PDF newsletter attachments on teacher emails
+### 33. [~] Extract events from PDF newsletter attachments on teacher emails
 
-Filed 2026-04-26 from Tom as a placeholder — captured mid-thought so it isn't lost; not yet scoped, no design decisions, no plan. Some teachers (school classrooms, room-parent threads) send their weekly/monthly newsletters as PDF attachments rather than HTML body content. The current pipeline only feeds the email body to the agent, so dates buried in those PDFs are silently dropped — Ellen never sees them as cards.
+In flight 2026-04-27. Design note: `design/pdf-newsletter-attachments.md`. Approach locked: Anthropic native PDF (`document` content block) — pure-text extraction (`pypdf` / `pdfplumber`) was rejected because school newsletters are layout-heavy (4-quadrant boxes, calendar grids, sidebar tables) and pure text extraction flattens them into orphan-date soup. Cost: ~$0.01–0.02 per PDF email on Sonnet 4.6.
 
-Open for the next session to talk through with Tom before any code:
+Sender gating via new `pdf_sender_domains.txt` at repo root (seeded with `fcps.edu`); loader at `scripts/pdf_sender_domains.py` reuses `protected_senders.is_protected` so no new matching code lands. PDF size cap 8MB. PDF-bearing emails always run batch-of-1 (force-merged into the newsletter set for the run). Source-date directive (#31) preserved verbatim — email's sent date, not the PDF's edition label.
 
-- Scope: which teacher senders / how often does this happen / how many events are typically inside one of these PDFs. Tom to surface a concrete recent example before scoping.
-- Approach: PDF text extraction inside `scripts/process_events.py` (e.g. `pypdf` / `pdfplumber`) feeding the extracted text into the same agent prompt path, vs. a separate extraction codepath, vs. punt as not-worth-it. Image-only / scanned PDFs (OCR) are a separate question — likely out of scope for v1.
-- Interaction with existing items: dedupe (#21), incremental cache (#4), and the source-date directive (#31) all need to behave sensibly when the "source" is a PDF inside an email rather than the email body itself.
-
-No commits, no design note, no `[~]` flip until Tom and the next agent discuss.
+Sample fixture: `fixtures/test/pdf_newsletter_third_grade.eml` (real teacher email from `mlrohde@fcps.edu`, 121KB PDF inside, 1 page, 5 dated events in the bottom Upcoming-Dates block). Reminder for future sessions: this is a sample, not a template — different teachers will format differently.
 
 ### 35. [ ] Offline write queue: persist ignore / complete flips locally when offline, sync on reconnect
 

@@ -1,0 +1,28 @@
+# Domains whose emails should have their PDF attachments extracted and
+# sent to the agent for date extraction (ROADMAP #33). Most teachers
+# attach weekly/monthly newsletters as PDFs — without this list, those
+# dates are silently dropped because the pipeline only feeds the email
+# body to the agent.
+#
+# A non-school PDF (e.g. Costco receipt in a personal email) is NOT
+# extracted; sender gating prevents accidental token spend on PDFs
+# that don't contain kids' events.
+#
+# Format mirrors protected_senders.txt:
+#   - One pattern per line.
+#   - Lines starting with # (or blank) are ignored.
+#   - A bare domain (e.g. fcps.edu) matches that exact registrable
+#     domain AND any subdomain of it (`elementary.fcps.edu`).
+#   - A pattern starting with * (e.g. *pta.org) matches any domain that
+#     ends with the literal part after the asterisk.
+#   - Matching is case-insensitive.
+#
+# To add a new school district when a kid changes schools or starts
+# at a new program:
+#   1. Append a new line below in the format above.
+#   2. Commit. main.py reads this file at runtime — no code change.
+#
+# Loader: scripts/pdf_sender_domains.py (delegates the matching to
+# scripts/protected_senders.py::is_protected since the semantics are
+# identical — bare-domain + subdomain + *suffix).
+fcps.edu
