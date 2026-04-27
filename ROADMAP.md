@@ -21,7 +21,7 @@ Strict rules for writing it:
 **2026-04-27**
 
 - Items 30 + 31 still `[~]` pending Tom's live verification on newly-arrived emails (cards extracted before the prompt push retain old labels; see each item's "No retroactive fix" callout).
-- Filed #32: "Completed" checkbox on event cards (per-card UI affordance, retirement timing unchanged). Status `[ ]` — design-note questions captured in the item; awaiting Tom's plan signoff before flipping to `[~]`.
+- Filed #32: "Completed" checkbox on event cards. Tom resolved all four design questions same session — persistence durable, cross-device synced via Apps Script (same path as ignore flow), ignore button hidden when completed, retirement unchanged. Flipped `[ ]` → `[~]` on plan approval; no code or design note yet, Tom said hold off.
 - Nothing else in flight.
 
 ## For future agents
@@ -147,7 +147,7 @@ Diagnosis: today's email was a "last day to register" reminder rolling up multip
 
 Item stays `[~]` pending live verification.
 
-### 32. [ ] "Completed" checkbox on event cards
+### 32. [~] "Completed" checkbox on event cards
 
 Filed 2026-04-27 from Tom. Add a "completed" affordance to each event card so Ellen can mark an event done as it happens, without waiting for the date to pass it off the page. Behavior on check:
 
@@ -155,14 +155,21 @@ Filed 2026-04-27 from Tom. Add a "completed" affordance to each event card so El
 - Card background shifts to a subtle green.
 - The "ignore event" button is removed from that card (a completed event is no longer a candidate for ignoring).
 
-The check is reversible — unchecking restores the card to its normal state (label gone, background reset, ignore button back). Completed cards stay visible and retire on the normal date-passed schedule; this affordance does not change retirement timing or the events-state pipeline, only the per-session UI state.
+The check is reversible — unchecking restores the card to its normal state (label gone, background reset, ignore button back). Completed cards stay visible and retire on the normal date-passed schedule; this affordance does not change retirement timing or the events-state pipeline, only the per-event UI state.
 
-Open questions to resolve before coding (design note):
+Design decisions (resolved 2026-04-27 with Tom):
 
-- **Persistence model.** Should "completed" persist across page reloads / cron rebuilds, or is it a per-browser session-only flag (localStorage vs. nothing)? If persistent, the key needs to survive the rebuild — likely the same event-identity key the ignore-event flow uses.
-- **Cross-device sync.** If Tom checks off an event on his phone, does Ellen's tablet see it? The ignore flow goes through an Apps Script webhook for cross-device propagation; does "completed" need the same path, or is local-only acceptable?
-- **Interaction with ignore.** Confirm that removing the ignore button on completed cards is the right move — alternative is leaving it active so a card can be both completed and ignored. Working assumption is "completed supersedes ignore for that card" but worth confirming.
-- **Retirement interaction.** Confirm completed cards retire at the same date threshold as uncompleted ones (no early sweep). Otherwise the affordance creates a hidden second retirement path.
+- **Persistence: durable.** Completion sticks across page reloads and cron rebuilds — once flipped, the card stays "completed" until the event's date passes and natural retirement removes it. Per-browser session-only is NOT acceptable; Ellen should not have to re-check after each cron tick.
+- **Cross-device: synced via Apps Script.** Goes through the same webhook path the ignore flow uses, so checking on phone propagates to tablet. Local-only would let the two devices disagree, which is the bug this affordance is meant to avoid.
+- **Ignore interaction: completed supersedes ignore.** The ignore button is removed from completed cards entirely — a completed event is no longer ignorable. (Unchecking completion restores the ignore button.)
+- **Retirement: unchanged.** Completed cards retire on the normal date-passed threshold alongside uncompleted ones. No early sweep, no second retirement code path.
+
+Implementation questions to settle in the design note (not blockers — engineering judgment calls):
+
+- Event-identity key for the persistence record. Likely the same key the ignore flow uses (item #6 / #7 / #18 territory) so the two affordances share one identity surface; confirm by reading those.
+- Apps Script endpoint shape: extend the existing ignore-action endpoint with a `complete` / `uncomplete` action, vs. a new endpoint. Lean toward extending — the auth + rate-limit machinery is already there.
+- Storage: where does the completed-events list live so `process_events.py` can consume it during the next cron rebuild and re-render the green/labeled state? Mirror whatever the ignore flow does (likely a JSON blob the workflow pulls in).
+- Test fixtures: extend `tests/` per the standing rule that any `process_events.py` change extends the pytest fixtures in step.
 
 ## Descoped / on hold
 
