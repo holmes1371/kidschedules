@@ -20,13 +20,10 @@ Strict rules for writing it:
 
 **2026-04-27**
 
+- #23 in flight `[~]` — design note `design/test-landing-page.md` landed; new `test_output` workflow_dispatch toggle will sandbox the run to `docs/testpage.html` while a curl-prod step preserves Ellen's `/index.html` in the artifact. Code commits next.
 - Items 30 + 31 still `[~]` pending Tom's live verification on newly-arrived emails.
-- #32 closed `[x]` — full prose archived in `COMPLETED.md`. 9 commits.
-- #34 closed `[x]` — Tom verified cross-device propagation end-to-end (phone-flip → tablet-refresh within ~1s). Full prose archived in `COMPLETED.md`. 4 commits.
-- #33 (PDF newsletter attachments) `[ ]` — placeholder, next in queue.
-- #35 (Offline write queue) `[ ]` — placeholder, lower priority.
-- #36 (Card color-coding intuitiveness) `[ ]` — placeholder, needs scoping conversation.
-- Pre-push protocol: full `pytest tests/ -q` (754) green on strftime-patched copy of `process_events.py` before any push. Memory note saved.
+- #33 / #35 / #36 still `[ ]` placeholders, deprioritized below #23.
+- Pre-push protocol: full `pytest tests/ -q` (754) green on strftime-patched copy of `process_events.py` before any push.
 
 ## For future agents
 
@@ -101,7 +98,9 @@ Status legend:
 
 22\. [x] Bug: page header "N day lookback" ignores `--lookback-days` CLI value — 563827d — see COMPLETED.md
 
-### 23. [ ] Separate test landing page for manual `workflow_dispatch` QA runs
+### 23. [~] Separate test landing page for manual `workflow_dispatch` QA runs
+
+In flight 2026-04-27. Design note: `design/test-landing-page.md`.
 
 Every workflow run — scheduled cron and manual `workflow_dispatch` alike — currently overwrites `docs/index.html`, the page Ellen uses. Manual runs that exist purely to verify a fix (like the recent #22 live-QA dispatch) put experimental output in front of her until the next cron tick replaces it. The pipeline needs a way to route test builds to a separate path so the production page stays untouched.
 
