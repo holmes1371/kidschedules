@@ -150,7 +150,20 @@ For each event, output a dict with exactly these keys:
   "6th grade AAP", "All LAES students"). Use "" if unknown.
 - "source": string — brief label including sender name or newsletter
   title AND the email's sent date, e.g. "LAES PTA Sunbeam (Apr 6)"
-  or "FCPS School Board Update (Apr 10)"
+  or "FCPS School Board Update (Apr 10)".
+  IMPORTANT — "the email's sent date" means the date THIS specific
+  email was sent: the value on the "Date sent:" line at the top of
+  the email block in your input. NOT a date mentioned in the email
+  body, even if the body references or rolls up an older newsletter.
+  If today's email is a reminder that quotes "as I mentioned in my
+  March 15 newsletter, Chess Camp Session 1 ends Jun 26", the source
+  date is TODAY (this email's sent date), not "Mar 15". The user
+  reads the source date as "when did this information arrive in my
+  inbox" — getting it wrong makes today's reminder look like a
+  weeks-old email and surfaces confusing "why is this old email just
+  showing up?" questions.
+    GOOD: "LAES PTA Sunbeam (Apr 26)"   [today's reminder email]
+    BAD:  "LAES PTA Sunbeam (Mar 15)"   [date referenced inside today's email]
 - "source_message_id": string — the exact Message ID of the email this
   event was drawn from. Copy the value verbatim from the "Message ID:"
   line at the top of that email block. If the event synthesizes details

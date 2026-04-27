@@ -185,6 +185,31 @@ def test_extraction_prompt_preserves_urls_in_location_directive():
         assert needle in prompt, f"#30 directive missing from prompt: {needle!r}"
 
 
+def test_extraction_prompt_pins_source_date_to_email_sent_date():
+    """ROADMAP #31: the prompt instructs the agent to use the
+    actual "Date sent:" of the email being processed for the
+    source label, NOT a date mentioned inside the email body
+    (e.g. when today's reminder rolls up content from an older
+    newsletter). Without this directive the user sees today's
+    reminder labeled as "(Mar 15)" and is confused why an old
+    email is just now showing up — the diagnostic case that
+    triggered this item."""
+    prompt = agent.EXTRACTION_SYSTEM_PROMPT
+    # Pinned phrases all fit on a single line of the wrapped prompt
+    # text (line breaks at ~70 cols make multi-word substrings cross
+    # newlines, which `in` doesn't match).
+    for needle in (
+        "Date sent:",
+        "the date THIS specific",
+        "rolls up an older newsletter",
+        # The Mar 15 vs today's date contrast is explicit in the
+        # GOOD/BAD pair; pin both halves so the example survives.
+        "(Apr 26)",
+        "(Mar 15)",
+    ):
+        assert needle in prompt, f"#31 directive missing from prompt: {needle!r}"
+
+
 def test_format_roster_prose_shape():
     """Unit test on the pure formatter. No filesystem. Fabricated mapping
     with a third kid proves the loop scales and nothing in the formatter
