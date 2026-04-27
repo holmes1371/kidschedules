@@ -20,11 +20,13 @@ Strict rules for writing it:
 
 **2026-04-27**
 
-- Items 30 + 31 still `[~]` pending Tom's live verification on newly-arrived emails (cards extracted before the prompt push retain old labels; see each item's "No retroactive fix" callout).
-- #32 ("Completed" checkbox on event cards) `[~]` — landed end-to-end (7 commits + 1 fix-up + 1 UX tweak); Tom verified on live page, working as designed. Awaiting final close-out signoff after the next cron cycle confirms cross-device propagation.
-- #34 (Cross-device state sync on page refresh) **filed 2026-04-27 — Tom's stated next-priority item, ahead of #33.** Closes the UX gap exposed by #32 + #18: a phone ignore/complete doesn't show on tablet until next cron. Fix: client-side fetch against existing Apps Script `doGet` on page load, reconcile against rendered DOM. Open auth/CORS/reconciliation questions captured in the entry.
-- #33 (PDF newsletter attachments) filed 2026-04-26 as a placeholder; stays `[ ]` and now sits BEHIND #34 in the queue.
-- Pre-push protocol updated this session: full `pytest tests/ -q` (all 745) must pass green on the strftime-patched copy of `process_events.py` before any push. Memory note saved.
+- Items 30 + 31 still `[~]` pending Tom's live verification on newly-arrived emails.
+- #32 closed `[x]` — Tom verified on live page and signed off; full prose moved to `COMPLETED.md`, one-line stub left here. 9 commits total (7 plan + CI fix-up + UX tweak).
+- #34 (Cross-device state sync on page refresh) `[ ]` — Tom's next-priority item, ahead of #33. Auth + reconciliation Qs resolved this session: drop secret on read, sheet-wins-on-refresh with a timestamp-based exception for in-flight POSTs. Plan-approval gate met; will flip to `[~]` on first commit.
+- #33 (PDF newsletter attachments) `[ ]` — placeholder, BEHIND #34.
+- #35 (Offline write queue) `[ ]` — filed lower-priority placeholder for the "ignore while offline → sync on reconnect" feature explicitly out of scope for #34. Only revisit if Tom actually hits the offline-loss case.
+- #36 (Card color-coding intuitiveness) `[ ]` — placeholder filed late session: Ellen finds the category-color stripes decorative-not-informative, no legend, no reference. Needs scoping conversation.
+- Pre-push protocol formalized: full `pytest tests/ -q` (all 745) must pass green on the strftime-patched copy of `process_events.py` before any push. Memory note saved.
 
 ## For future agents
 
@@ -151,25 +153,7 @@ Diagnosis: today's email was a "last day to register" reminder rolling up multip
 
 Item stays `[~]` pending live verification.
 
-### 32. [~] "Completed" checkbox on event cards
-
-Filed 2026-04-27 from Tom. Adds a per-card "completed" affordance so Ellen can mark an event done as it happens, without waiting for the date to pass. Mirrors the ignore-flow architecture surface-for-surface — same 12-hex event-id, same Apps Script POST/GET round-trip, same ephemeral sheet-derived cache, same optimistic toggle + rollback. Full design at `design/completed-events.md`.
-
-**Resolved (2026-04-27):** durable persistence; cross-device sync via Apps Script; completed supersedes ignore (both Ignore-event AND Ignore-sender suppressed via CSS on `.event-card.completed`); ignored cards do NOT show the completed checkbox (CSS-suppressed via the existing `[data-ignored="1"]` selector pattern); retirement unchanged (completed cards retire on the normal date-passed threshold). Sheet-as-single-source-of-truth invariant preserved end-to-end — `completed_events.json` is per-run ephemeral, never committed.
-
-**Commits (7 of 7 landed):**
-
-1. Design note + ROADMAP update — `4828713`
-2. `process_events.py` classify + render + CLI + tests — `732a0de`
-3. `scripts/apps_script.gs` router + Completed Events tab — `3cd394e` (Tom redeployed Apps Script after this commit)
-4. `scripts/sync_completed_events.py` + tests — `863b2f8`
-5. `main.py` + workflow YAML wiring — `2c373fc`
-6. `process_events.py` inline JS handlers + tests — `caa6566`
-7. ROADMAP update + SHAs (this entry).
-
-**Pending verification.** Item stays `[~]` until Tom confirms on a live cron cycle: (a) checking a card on phone propagates to tablet after the next cron rebuild, (b) `completed_events.json` shows the expected row count in CI logs after a cron run, (c) the Ignore-event / Ignore-sender buttons disappear from a completed card and reappear on uncheck, (d) the "Completed Events" sheet tab in the Google Sheet accumulates rows correctly (auto-created on first append).
-
-**Manual deploy step landed mid-session.** Apps Script was redeployed after commit 3, before any client surface started calling the new endpoints. The page rendered as normal between commits 3 and 6 — checkboxes appeared but clicks were no-ops. From commit 6 onward, the full UX is live; the next cron cycle is the first one that exercises the end-to-end flow.
+32\. [x] "Completed" checkbox on event cards — 4828713 / 732a0de / 3cd394e / 863b2f8 / 2c373fc / caa6566 / 1325465 / 636abe0 / 3667823 — see COMPLETED.md
 
 ### 34. [ ] Cross-device state sync on page refresh (ignore + completed)
 
@@ -183,16 +167,24 @@ Scope covers all three sheet-backed lists: `ignored_events`, `completed_events` 
 
 Architecture invariant preserved: **Sheet is still the single source of truth.** This item just shortens the rendering-latency-to-cross-device-consistency from "next cron tick" to "next refresh." `completed_events.json` / `ignored_events.json` / `ignored_senders.json` stay as the cron-time SSR seed — without them, the page would render briefly with no state and visibly flip when the fetch completes.
 
-**Design questions to resolve before coding:**
+**Resolved with Tom (2026-04-27):**
 
-- **Auth on the GET endpoint.** Today `?kind=...` requires `?secret=$IGNORE_READ_SECRET`. Embedding the secret in client JS publishes it on the GitHub Pages page (worst case: anyone curls the lists, which carry only event_id/name/date — same metadata already on the public page). Alternatives: (a) embed the secret and accept the leak; (b) split the endpoint so reads are unauthenticated for these three list shapes; (c) a separate per-page-load token. Lean toward (a) or (b) — Tom + Ellen are the only users and the data is the same shape that's already public.
+- **Auth on the GET endpoint: Option B — drop `?secret=` on read.** The three list shapes (`?kind=ignored | completed | ignored_senders`) become unauthenticated. POST endpoints keep their existing trust model (no auth — already the status quo). The data shape behind these reads is `(event_id, name, date)` tuples, the same metadata already public on the page. Implementation: small `apps_script.gs` patch in `doGet` to skip the secret check for these three kinds; existing CI cron callers can drop `&secret=...` from their query strings without breakage (the param will simply be ignored). Tom redeploys Apps Script after the patch lands, same manual deploy step as #32 commit 3.
+- **Reconciliation: sheet wins on refresh, with one timestamp-based exception for in-flight POSTs.** localStorage entries grow from bare ids to `{id, confirmed_at_iso}`. On fetch resolve:
+  - id in fetched list → apply fetched state, drop any matching localStorage entry (sheet is authoritative; cache is redundant).
+  - id NOT in fetched list, localStorage entry has `confirmed_at_iso >= fetch_start_time` → keep the local flip (POST in flight, fetch raced ahead — preventing flicker).
+  - id NOT in fetched list, no recent localStorage entry → apply fetched state (sheet says not-flipped, local is stale).
+  - Existing pre-#34 localStorage entries (bare ids, no timestamp) get treated as `confirmed_at_iso=""` → always older than any fetch start → dropped on first refresh under the new code. Migration is implicit, no special-case code.
+- **Offline write queue is explicitly OUT OF SCOPE for #34** — tracked separately as item #35 (lower priority). Today, a failed POST already reverts the optimistic flip + shows a "try again" toast, so localStorage never accumulates un-pushed state. The simple "sheet wins on refresh" rule is safe in that model.
+
+**Open design questions still requiring scoping work before code:**
+
 - **CORS.** Apps Script web apps return responses with permissive CORS by default for `?kind=` GETs, but verify with a smoke test from a `holmes1371.github.io` origin before assuming.
-- **Reconciliation order with localStorage.** When the fetch confirms an id Ellen ignored on her phone, the SAME id may sit in her localStorage (if she ignored from this browser). The fetched-list value should win; stale localStorage entries should be GC'd to prevent indefinite accumulation. Conversely, an id in localStorage that's NOT in the fetched list is an optimistic flip that hasn't round-tripped yet — keep it.
 - **Network failure / slow Apps Script.** If the fetch errors, fall back silently to the server-rendered + localStorage state (current behavior). No toast — Ellen shouldn't see a "sync failed" error every time she's offline. Log to console only.
-- **Visual treatment during the fetch window.** The page renders in <100ms, the fetch completes in ~500ms-2s. If a card visibly flips state on fetch completion (e.g. a card was ignored on another device, server-rendered as visible, then snaps to hidden), is that acceptable? Likely yes — the alternative (block render until fetch completes) is much worse UX. Confirm with Tom during scoping.
+- **Visual treatment during the fetch window.** The page renders in <100ms, the fetch completes in ~500ms-2s. If a card visibly flips state on fetch completion (e.g. a card was ignored on another device, server-rendered as visible, then snaps to hidden), is that acceptable? Likely yes — the alternative (block render until fetch completes) is much worse UX. Confirm with Tom during the design note.
 - **Interaction with #23 (test landing page).** Refresh-time fetches hit the production Apps Script regardless of which page is displayed; a test-mode landing page would show production sheet state. Probably the right behavior, but worth pinning explicitly when #23 is built.
 
-No commits, no design note, no `[~]` flip until Tom and the next agent settle the auth question above.
+Plan-approval gate met (auth + reconciliation resolved). Item stays `[ ]` until #32 fully closes and Tom signals start; flip to `[~]` should ride the first commit (likely the design note) per session discipline.
 
 ### 33. [ ] Extract events from PDF newsletter attachments on teacher emails
 
@@ -203,6 +195,29 @@ Open for the next session to talk through with Tom before any code:
 - Scope: which teacher senders / how often does this happen / how many events are typically inside one of these PDFs. Tom to surface a concrete recent example before scoping.
 - Approach: PDF text extraction inside `scripts/process_events.py` (e.g. `pypdf` / `pdfplumber`) feeding the extracted text into the same agent prompt path, vs. a separate extraction codepath, vs. punt as not-worth-it. Image-only / scanned PDFs (OCR) are a separate question — likely out of scope for v1.
 - Interaction with existing items: dedupe (#21), incremental cache (#4), and the source-date directive (#31) all need to behave sensibly when the "source" is a PDF inside an email rather than the email body itself.
+
+No commits, no design note, no `[~]` flip until Tom and the next agent discuss.
+
+### 35. [ ] Offline write queue: persist ignore / complete flips locally when offline, sync on reconnect
+
+Filed 2026-04-27 from Tom as a placeholder. **Lower priority than #33 / #34** — captured so it isn't lost, but not actively prioritized; revisit only if Tom + Ellen actually start hitting it in practice (rare given they almost always interact with the page online).
+
+Today's behavior on POST failure (network down, Apps Script timeout, etc.) is: optimistic flip reverts immediately, "Ignore failed — try again" toast, no localStorage entry survives. That posture was deliberate when filed during #32: it keeps the architecture simple and is fine for the online use-case Tom + Ellen actually have.
+
+If we ever need offline support, the shape would be: a local queue of pending POSTs with timestamps, retry-on-reconnect (e.g. `navigator.onLine` event listener), and surface a small "N flips pending sync" indicator so the user knows their changes haven't pushed yet. Reconciliation would extend the #34 timestamp-based model — entries with a still-pending POST stay locally authoritative regardless of the fetch.
+
+No commits, no design note, no `[~]` flip until Tom signals he's hit a real offline-loss scenario.
+
+### 36. [ ] Card color-coding intuitiveness — Ellen can't tell what the colors mean
+
+Filed 2026-04-27 from Tom as a placeholder. Card categories drive the left-border color (the `CATEGORY_COLORS` table in `scripts/process_events.py` maps each `category` to an `(fg, bg)` tuple, and `_event_card` renders `border-left: 4px solid {fg};`). Tom's feedback: the color coding *as it stands* isn't intuitive — Ellen sees a colored stripe but has no reference for what each color means, so the cue is decorative rather than informative.
+
+Open for the next session to talk through with Tom before any code:
+
+- Whether the fix is a category legend (small color-coded key in the page header), explicit text-on-card category labels, a different visual encoding (icon, badge, prefix word), or removing color-coding altogether and using something else entirely. Tom to confirm direction.
+- Whether the existing category set (School Activity, Sports & Extracurriculars, Academic Due Date, Appointment, Uncategorized) is the right granularity or should be re-bucketed for Ellen's mental model.
+- Interaction with the per-kid filter chips (#12) — the chips already provide one orthogonal axis of card grouping; consider whether category needs a parallel filter or stays as a passive cue.
+- Whether this is a single-axis cue (category) or should also encode urgency / deadline-proximity / kid-attribution.
 
 No commits, no design note, no `[~]` flip until Tom and the next agent discuss.
 
