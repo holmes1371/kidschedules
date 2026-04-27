@@ -186,6 +186,27 @@ jobs:
             --secret "$IGNORE_READ_SECRET" \
             --out ignored_senders.json
 
+      - name: Sync completed events from Apps Script
+        env:
+          IGNORE_READ_SECRET: ${{ secrets.IGNORE_READ_SECRET }}
+        run: |
+          URL=$(cat ignore_webhook_url.txt 2>/dev/null || true)
+          if [ -z "$URL" ] || [ -z "$IGNORE_READ_SECRET" ]; then
+            echo "No webhook URL or IGNORE_READ_SECRET configured — skipping sync."
+            exit 0
+          fi
+          # ROADMAP #32. Ephemeral: writes completed_events.json to the
+          # runner's working dir for this run only. Apps Script "Completed
+          # Events" sheet tab is the single source of truth; never commit
+          # the cache. Graceful-degrade posture matches the two sibling
+          # syncs above — on fetch failure the helper exits 0 with no file
+          # written and process_events.py treats that as "no completion
+          # state this run" (no card flips to is_completed).
+          python scripts/sync_completed_events.py \
+            --url "$URL" \
+            --secret "$IGNORE_READ_SECRET" \
+            --out completed_events.json
+
       - name: Run kids schedule pipeline
         env:
           GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}

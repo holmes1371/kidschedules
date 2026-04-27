@@ -56,6 +56,7 @@ LAST_RUN_FIXTURE_PATH = os.path.join(
 WEBHOOK_URL_PATH = os.path.join(PROJECT_ROOT, "ignore_webhook_url.txt")
 PAGES_URL_PATH = os.path.join(PROJECT_ROOT, "pages_url.txt")
 IGNORED_EVENTS_PATH = os.path.join(PROJECT_ROOT, "ignored_events.json")
+COMPLETED_EVENTS_PATH = os.path.join(PROJECT_ROOT, "completed_events.json")
 BLOCKLIST_PATH = os.path.join(PROJECT_ROOT, "blocklist.txt")
 AUTO_BLOCKLIST_PATH = os.path.join(PROJECT_ROOT, "blocklist_auto.txt")
 AUTO_BLOCKLIST_AUDIT_PATH = os.path.join(
@@ -834,6 +835,7 @@ def step4_process_events(
             "--lookback-days", str(lookback_days),
             "--webhook-url", webhook_url,
             "--ignored", IGNORED_EVENTS_PATH,
+            "--completed", COMPLETED_EVENTS_PATH,
             "--protected-senders", PROTECTED_SENDERS_PATH,
             "--prior-events", PRIOR_EVENTS_PATH,
         ]
