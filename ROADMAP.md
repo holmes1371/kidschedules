@@ -18,13 +18,10 @@ Strict rules for writing it:
 4. **No cross-session carry-overs.** If something is still broken session-to-session, file it as a numbered ROADMAP item instead of repeating it here.
 5. **Replace in place.** Do not append a new block and archive the old one below.
 
-**2026-04-25**
+**2026-04-27**
 
-- Items 27 and 28 closed `[x]` after Tom's prod verification (commit aa20b4b moved full prose to `COMPLETED.md`).
-- Item 29 closed `[x]` after Tom's prod verification.
-- Items 30 + 31 are a paired agent-prompt strengthening: #30 (commit d3dd5fa) requires URLs verbatim in the `location` field instead of summarized parentheticals like `(PandaDoc link)`; #31 (commit b586331) clarifies that `source` date must be the actual email's "Date sent:" header, not a date mentioned inside the email body.
-- **Verification scope: NEW cards only.** Pipeline caches events keyed on Gmail `messageId` (item #4); cached entries don't re-process unless explicitly evicted. So #30 and #31 fix only events extracted from emails arriving AFTER the prompt push — pre-existing cards on the live page keep their old labels indefinitely. A `--reextract-all` bulk-flush was considered (2026-04-25) and rejected to preserve far-future events extracted from 60–120-day-old "save the date" emails outside the search window.
-- Test delta vs main: +24 passing on Linux/CI (12 unit tests + 12 render-integration). The 12 #29 render tests still fail on Windows with the unrelated `%-d` strftime issue.
+- Items 30 + 31 still `[~]` pending Tom's live verification on newly-arrived emails (cards extracted before the prompt push retain old labels; see each item's "No retroactive fix" callout).
+- Filed #32: "Completed" checkbox on event cards (per-card UI affordance, retirement timing unchanged). Status `[ ]` — design-note questions captured in the item; awaiting Tom's plan signoff before flipping to `[~]`.
 - Nothing else in flight.
 
 ## For future agents
@@ -149,6 +146,23 @@ Diagnosis: today's email was a "last day to register" reminder rolling up multip
 **Bundled with #30 for verification.** Both items are agent-prompt strengthenings landed in the same session (#30: preserve URL strings verbatim; #31: source-date the email's actual send date). They live as separate commits but Tom verifies them together on the next post-deploy cron cycle: pull up a **newly-arrived** event card (NOT a pre-existing one — see #30's "No retroactive fix" callout for why) and confirm (a) URLs appear as clickable links in the location, (b) the source-line date matches when Ellen actually received the email in her inbox.
 
 Item stays `[~]` pending live verification.
+
+### 32. [ ] "Completed" checkbox on event cards
+
+Filed 2026-04-27 from Tom. Add a "completed" affordance to each event card so Ellen can mark an event done as it happens, without waiting for the date to pass it off the page. Behavior on check:
+
+- Card displays a "completed" label.
+- Card background shifts to a subtle green.
+- The "ignore event" button is removed from that card (a completed event is no longer a candidate for ignoring).
+
+The check is reversible — unchecking restores the card to its normal state (label gone, background reset, ignore button back). Completed cards stay visible and retire on the normal date-passed schedule; this affordance does not change retirement timing or the events-state pipeline, only the per-session UI state.
+
+Open questions to resolve before coding (design note):
+
+- **Persistence model.** Should "completed" persist across page reloads / cron rebuilds, or is it a per-browser session-only flag (localStorage vs. nothing)? If persistent, the key needs to survive the rebuild — likely the same event-identity key the ignore-event flow uses.
+- **Cross-device sync.** If Tom checks off an event on his phone, does Ellen's tablet see it? The ignore flow goes through an Apps Script webhook for cross-device propagation; does "completed" need the same path, or is local-only acceptable?
+- **Interaction with ignore.** Confirm that removing the ignore button on completed cards is the right move — alternative is leaving it active so a card can be both completed and ignored. Working assumption is "completed supersedes ignore for that card" but worth confirming.
+- **Retirement interaction.** Confirm completed cards retire at the same date threshold as uncompleted ones (no early sweep). Otherwise the affordance creates a hidden second retirement path.
 
 ## Descoped / on hold
 
