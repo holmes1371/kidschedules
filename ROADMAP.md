@@ -21,12 +21,12 @@ Strict rules for writing it:
 **2026-04-27**
 
 - Items 30 + 31 still `[~]` pending Tom's live verification on newly-arrived emails.
-- #32 closed `[x]` — Tom verified, full prose archived in `COMPLETED.md`. 9 commits.
-- #34 (Cross-device state sync on page refresh) `[~]` — all 4 commits landed (`4428700` / `e2a8cf1` / `93d257d` / this commit). Tom redeployed Apps Script after commit 2 and smoke-tested the unauthed GET. Awaiting live cross-device verification: phone-flip → tablet-refresh should propagate within ~1s of fetch return.
+- #32 closed `[x]` — full prose archived in `COMPLETED.md`. 9 commits.
+- #34 closed `[x]` — Tom verified cross-device propagation end-to-end (phone-flip → tablet-refresh within ~1s). Full prose archived in `COMPLETED.md`. 4 commits.
 - #33 (PDF newsletter attachments) `[ ]` — placeholder, next in queue.
-- #35 (Offline write queue) `[ ]` — placeholder, lower priority. Out of scope for #34 by design.
+- #35 (Offline write queue) `[ ]` — placeholder, lower priority.
 - #36 (Card color-coding intuitiveness) `[ ]` — placeholder, needs scoping conversation.
-- Pre-push protocol: full `pytest tests/ -q` (754 after #34's +9 tests) green on strftime-patched copy of `process_events.py` before any push. Memory note saved.
+- Pre-push protocol: full `pytest tests/ -q` (754) green on strftime-patched copy of `process_events.py` before any push. Memory note saved.
 
 ## For future agents
 
@@ -155,47 +155,7 @@ Item stays `[~]` pending live verification.
 
 32\. [x] "Completed" checkbox on event cards — 4828713 / 732a0de / 3cd394e / 863b2f8 / 2c373fc / caa6566 / 1325465 / 636abe0 / 3667823 — see COMPLETED.md
 
-### 34. [~] Cross-device state sync on page refresh (ignore + completed)
-
-**Commits (4 of 4 landed):**
-
-1. Design note + ROADMAP `[~]` flip + last-session-summary — `4428700`
-2. `scripts/apps_script.gs` drops `?secret=` on the three list-shape GETs — `e2a8cf1` (Tom redeployed Apps Script + smoke-tested unauthed GET after this commit)
-3. `scripts/process_events.py` client JS: fetch + reconcile + localStorage schema bump + 9 tests — `93d257d`
-4. ROADMAP close-out + SHAs (this entry).
-
-**Pending verification.** Item stays `[~]` until Tom confirms cross-device propagation on a live page. Verification scenario: ignore an event on phone → wait a few seconds → refresh tablet → confirm the card snaps to ignored within ~1s of fetch returning. Same scenario for completed and ignore-sender. Also confirm the dev/preview render (no `WEBHOOK_URL` baked in) still works — fetch should silently no-op.
-
-**Architecture invariant preserved.** Sheet remains the single source of truth. The cron-time JSON files still seed initial server-side render (no flicker on slow networks). localStorage schema changed from bare ids/domains to `{id|domain, flipped_at_iso}`; pre-#34 bare entries are tolerated and dropped on first reconcile (staleness is the migration). Failed fetches degrade silently to SSR + localStorage state with a `console.warn` breadcrumb — no toast.
-
-Filed 2026-04-27 from Tom — caught during #32 live verification. **Tom's prioritization: this item comes BEFORE #33 (PDF newsletters) in the queue** even though it's filed later, because it fixes a real UX bug that #32 made more visible.
-
-**The gap.** Ignore-event, Ignore-sender, and Completed (#32) flips persist immediately to the Google Sheet via the Apps Script POST, but they only propagate to OTHER devices after the next cron rebuild (Mon / Wed / Sat 6:15 ET). Concretely: Ellen ignores or completes an event on her phone → row written to sheet → Tom opens the page on his tablet between cron ticks → he still sees the old state. localStorage doesn't help because it's per-browser. The fix should be: a simple **page refresh** picks up the latest state from the sheet, no waiting for the next cron job.
-
-Scope covers all three sheet-backed lists: `ignored_events`, `completed_events` (#32), `ignored_senders`. They share a problem and a fix.
-
-**Sketch.** On page load, the client JS fires fetches against the existing Apps Script `doGet` endpoint (`?kind=ignored`, `?kind=completed`, `?kind=ignored_senders`) and reconciles each card's state against the fetched lists. Three-tier client-side reconciliation: **server-rendered initial state** (from the cron-time JSON files, current behavior — keeps the first paint fast and flicker-free) → **fetched-on-load overlay** (NEW — snaps to current sheet state within ~1s of page load) → **localStorage optimistic overlay** (current behavior — preserves the user's own un-round-tripped flips).
-
-Architecture invariant preserved: **Sheet is still the single source of truth.** This item just shortens the rendering-latency-to-cross-device-consistency from "next cron tick" to "next refresh." `completed_events.json` / `ignored_events.json` / `ignored_senders.json` stay as the cron-time SSR seed — without them, the page would render briefly with no state and visibly flip when the fetch completes.
-
-**Resolved with Tom (2026-04-27):**
-
-- **Auth on the GET endpoint: Option B — drop `?secret=` on read.** The three list shapes (`?kind=ignored | completed | ignored_senders`) become unauthenticated. POST endpoints keep their existing trust model (no auth — already the status quo). The data shape behind these reads is `(event_id, name, date)` tuples, the same metadata already public on the page. Implementation: small `apps_script.gs` patch in `doGet` to skip the secret check for these three kinds; existing CI cron callers can drop `&secret=...` from their query strings without breakage (the param will simply be ignored). Tom redeploys Apps Script after the patch lands, same manual deploy step as #32 commit 3.
-- **Reconciliation: sheet wins on refresh, with one timestamp-based exception for in-flight POSTs.** localStorage entries grow from bare ids to `{id, confirmed_at_iso}`. On fetch resolve:
-  - id in fetched list → apply fetched state, drop any matching localStorage entry (sheet is authoritative; cache is redundant).
-  - id NOT in fetched list, localStorage entry has `confirmed_at_iso >= fetch_start_time` → keep the local flip (POST in flight, fetch raced ahead — preventing flicker).
-  - id NOT in fetched list, no recent localStorage entry → apply fetched state (sheet says not-flipped, local is stale).
-  - Existing pre-#34 localStorage entries (bare ids, no timestamp) get treated as `confirmed_at_iso=""` → always older than any fetch start → dropped on first refresh under the new code. Migration is implicit, no special-case code.
-- **Offline write queue is explicitly OUT OF SCOPE for #34** — tracked separately as item #35 (lower priority). Today, a failed POST already reverts the optimistic flip + shows a "try again" toast, so localStorage never accumulates un-pushed state. The simple "sheet wins on refresh" rule is safe in that model.
-
-**Open design questions still requiring scoping work before code:**
-
-- **CORS.** Apps Script web apps return responses with permissive CORS by default for `?kind=` GETs, but verify with a smoke test from a `holmes1371.github.io` origin before assuming.
-- **Network failure / slow Apps Script.** If the fetch errors, fall back silently to the server-rendered + localStorage state (current behavior). No toast — Ellen shouldn't see a "sync failed" error every time she's offline. Log to console only.
-- **Visual treatment during the fetch window.** The page renders in <100ms, the fetch completes in ~500ms-2s. If a card visibly flips state on fetch completion (e.g. a card was ignored on another device, server-rendered as visible, then snaps to hidden), is that acceptable? Likely yes — the alternative (block render until fetch completes) is much worse UX. Confirm with Tom during the design note.
-- **Interaction with #23 (test landing page).** Refresh-time fetches hit the production Apps Script regardless of which page is displayed; a test-mode landing page would show production sheet state. Probably the right behavior, but worth pinning explicitly when #23 is built.
-
-Plan-approval gate met (auth + reconciliation resolved). Item stays `[ ]` until #32 fully closes and Tom signals start; flip to `[~]` should ride the first commit (likely the design note) per session discipline.
+34\. [x] Cross-device state sync on page refresh (ignore + completed) — 4428700 / e2a8cf1 / 93d257d / e1151c9 — see COMPLETED.md
 
 ### 33. [ ] Extract events from PDF newsletter attachments on teacher emails
 
