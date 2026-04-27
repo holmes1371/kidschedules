@@ -21,12 +21,12 @@ Strict rules for writing it:
 **2026-04-27**
 
 - Items 30 + 31 still `[~]` pending Tom's live verification on newly-arrived emails.
-- #32 closed `[x]` — Tom verified on live page and signed off; full prose moved to `COMPLETED.md`, one-line stub left here. 9 commits total (7 plan + CI fix-up + UX tweak).
-- #34 (Cross-device state sync on page refresh) `[ ]` — Tom's next-priority item, ahead of #33. Auth + reconciliation Qs resolved this session: drop secret on read, sheet-wins-on-refresh with a timestamp-based exception for in-flight POSTs. Plan-approval gate met; will flip to `[~]` on first commit.
+- #32 closed `[x]` — Tom verified, full prose archived in `COMPLETED.md`. 9 commits.
+- #34 (Cross-device state sync on page refresh) `[~]` — design note landed at `design/refresh-state-sync.md`. Resolved decisions (auth Option B, sheet-wins-with-grace-period, offline-out-of-scope) captured. Next: commit 2 of 4 — `scripts/apps_script.gs` drops `?secret=` on the three list-shape GETs; Tom redeploys Apps Script before commit 3 (client JS).
 - #33 (PDF newsletter attachments) `[ ]` — placeholder, BEHIND #34.
-- #35 (Offline write queue) `[ ]` — filed lower-priority placeholder for the "ignore while offline → sync on reconnect" feature explicitly out of scope for #34. Only revisit if Tom actually hits the offline-loss case.
-- #36 (Card color-coding intuitiveness) `[ ]` — placeholder filed late session: Ellen finds the category-color stripes decorative-not-informative, no legend, no reference. Needs scoping conversation.
-- Pre-push protocol formalized: full `pytest tests/ -q` (all 745) must pass green on the strftime-patched copy of `process_events.py` before any push. Memory note saved.
+- #35 (Offline write queue) `[ ]` — placeholder, lower priority. Out of scope for #34 by design.
+- #36 (Card color-coding intuitiveness) `[ ]` — placeholder, needs scoping conversation.
+- Pre-push protocol: full `pytest tests/ -q` (all 745) green on strftime-patched copy of `process_events.py` before any push. Memory note saved.
 
 ## For future agents
 
@@ -155,7 +155,7 @@ Item stays `[~]` pending live verification.
 
 32\. [x] "Completed" checkbox on event cards — 4828713 / 732a0de / 3cd394e / 863b2f8 / 2c373fc / caa6566 / 1325465 / 636abe0 / 3667823 — see COMPLETED.md
 
-### 34. [ ] Cross-device state sync on page refresh (ignore + completed)
+### 34. [~] Cross-device state sync on page refresh (ignore + completed)
 
 Filed 2026-04-27 from Tom — caught during #32 live verification. **Tom's prioritization: this item comes BEFORE #33 (PDF newsletters) in the queue** even though it's filed later, because it fixes a real UX bug that #32 made more visible.
 
