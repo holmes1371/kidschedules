@@ -459,3 +459,107 @@ def test_cli_kid_names_query_would_match_everly_volleyball_subject(
     assert bq.main() == 0
     out = json.loads(buf.getvalue())
     assert "Everly" in out["queries"]["kid_names"]
+
+
+# ── self-loop exclusion (digest drafts) ────────────────────────────────
+
+
+def _run_cli_get_output(monkeypatch, *, today: str = "2026-04-15") -> dict:
+    """Helper: run build_queries.main with everything else off, return
+    the parsed JSON output. Used by the self-loop tests below."""
+    import io
+    import sys
+    buf = io.StringIO()
+    monkeypatch.setattr(sys, "stdout", buf)
+    monkeypatch.setattr(sys, "argv", [
+        "build_queries.py",
+        "--blocklist", "",
+        "--auto-blocklist", "",
+        "--ignored-senders", "",
+        "--today", today,
+    ])
+    assert bq.main() == 0
+    return json.loads(buf.getvalue())
+
+
+def test_every_tight_query_excludes_drafts():
+    """Every tight (filtered) query body must end with -in:drafts so
+    the pipeline's own Gmail digest drafts (#3 / #10) don't get pulled
+    back in as candidate emails on the next run. Pin the literal token
+    so a future refactor of the exclusion machinery can't silently
+    drop it."""
+    import io
+    import sys
+    buf = io.StringIO()
+    monkeypatch_argv = [
+        "build_queries.py",
+        "--blocklist", "",
+        "--auto-blocklist", "",
+        "--ignored-senders", "",
+        "--today", "2026-04-15",
+    ]
+    import unittest.mock as _mock
+    with _mock.patch.object(sys, "argv", monkeypatch_argv), \
+         _mock.patch.object(sys, "stdout", buf):
+        assert bq.main() == 0
+    out = json.loads(buf.getvalue())
+    for name, q in out["queries"].items():
+        assert "-in:drafts" in q, (
+            f"Tight query {name!r} missing -in:drafts exclusion: {q!r}"
+        )
+
+
+def test_every_loose_query_excludes_drafts(monkeypatch):
+    """Loose queries drive the filter audit; without -in:drafts on
+    them too, the audit's tight-vs-loose diff would surface digest
+    drafts as 'stripped by blocklist' (false positive — drafts are
+    filtered separately, not via the blocklist). Pin so the audit
+    stays clean."""
+    out = _run_cli_get_output(monkeypatch)
+    for name, q in out["loose_queries"].items():
+        assert "-in:drafts" in q, (
+            f"Loose query {name!r} missing -in:drafts exclusion: {q!r}"
+        )
+
+
+def test_self_loop_exclusion_appears_after_existing_exclusions(monkeypatch):
+    """The ordering of clauses in a Gmail query is irrelevant
+    semantically, but pinning that the self-loop exclusion lands at
+    the END of each tight query (after the blocklist `-from:...`
+    tokens) makes manual log inspection easier — the operator-facing
+    suffix always reads `... -in:drafts`. Pinned as defense against a
+    refactor that interleaves it."""
+    blocklist = (
+        "spammer.com\n"
+    )
+    import tempfile
+    with tempfile.NamedTemporaryFile("w", suffix=".txt", delete=False) as f:
+        f.write(blocklist)
+        bl_path = f.name
+    try:
+        import io
+        import sys
+        buf = io.StringIO()
+        monkeypatch.setattr(sys, "stdout", buf)
+        monkeypatch.setattr(sys, "argv", [
+            "build_queries.py",
+            "--blocklist", bl_path,
+            "--auto-blocklist", "",
+            "--ignored-senders", "",
+            "--today", "2026-04-15",
+        ])
+        assert bq.main() == 0
+        out = json.loads(buf.getvalue())
+        sample = out["queries"]["school_activities"]
+        # -from:spammer.com from the blocklist must appear before the
+        # self-loop exclusion in the assembled string.
+        assert sample.index("-from:spammer.com") < sample.index("-in:drafts"), (
+            f"-in:drafts should follow blocklist -from:... tokens; got {sample!r}"
+        )
+        # And -in:drafts must be the literal tail of the assembled query.
+        assert sample.endswith("-in:drafts"), (
+            f"Tight query should end with -in:drafts; got {sample!r}"
+        )
+    finally:
+        import os as _os
+        _os.unlink(bl_path)

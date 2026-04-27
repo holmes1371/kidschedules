@@ -156,6 +156,22 @@ def build_kid_names_query(roster: dict) -> str | None:
     return "(" + " OR ".join(quoted) + ")"
 
 
+# Self-loop exclusion: the pipeline creates Gmail digest drafts each
+# Monday cron run (#3 / #10), and those drafts sit in the user's
+# mailbox under the DRAFT system label. Without this exclusion, the
+# digest's own subject matches the templates below ("Kids' Schedule
+# — Week of …" hits subject:schedule / subject:newsletter) and the
+# digest gets pulled back into the next run as a candidate email —
+# the agent re-extracts events from the digest, burning tokens and
+# polluting events_state.json with redundant entries keyed on the
+# digest's messageId. Drafts are unambiguously self-generated; no
+# external email ever has the DRAFT label, so this exclusion has no
+# false-positive risk. Applied to both tight and loose query bodies
+# (the loose ones drive the filter audit, where digest noise would
+# distort the tight-vs-loose diff just as much).
+_SELF_LOOP_EXCLUSION = "-in:drafts"
+
+
 SEARCH_TEMPLATES = {
     "school_activities": (
         '(field trip OR "picture day" OR "spirit day" OR assembly OR '
@@ -273,6 +289,7 @@ def main() -> int:
         parts = [f"after:{after}", f"before:{before}", body]
         if exclusion:
             parts.append(exclusion)
+        parts.append(_SELF_LOOP_EXCLUSION)
         return " ".join(parts)
 
     if args.no_kid_names or not args.roster:
@@ -285,7 +302,12 @@ def main() -> int:
         queries["kid_names"] = assemble(kid_names_body)
 
     def assemble_loose(body: str) -> str:
-        return f"after:{after} before:{before} {body}"
+        # Loose queries drive the filter audit (tight-vs-loose diff
+        # to find blocklist false-positives). Drafts are NOT in the
+        # blocklist — they're filtered separately — so leaving them
+        # in the loose set would inflate the diff with self-loop noise
+        # the audit can't actually act on. Apply the same exclusion.
+        return f"after:{after} before:{before} {body} {_SELF_LOOP_EXCLUSION}"
 
     loose_queries = {name: assemble_loose(body)
                      for name, body in SEARCH_TEMPLATES.items()}
