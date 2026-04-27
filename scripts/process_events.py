@@ -341,6 +341,7 @@ def load_candidates(path: str) -> list[dict[str, Any]]:
 def classify(events: list[dict[str, Any]], cutoff: dt.date,
              horizon: dt.date | None = None,
              ignored_ids: frozenset[str] = frozenset(),
+             completed_ids: frozenset[str] = frozenset(),
              ) -> tuple[list[dict[str, Any]], list[dict[str, Any]],
                         list[dict[str, Any]], list[dict[str, Any]],
                         list[dict[str, Any]], list[str]]:
@@ -352,6 +353,11 @@ def classify(events: list[dict[str, Any]], cutoff: dt.date,
         horizon: if set, events after this date go to "banked" instead of
                  "display". Use for the 60-day display window.
         ignored_ids: event IDs to drop entirely (user clicked Ignore on them).
+        completed_ids: event IDs the user has marked complete (#32). Tagged
+                 with is_completed=True on the normalized event dict; this
+                 is metadata only — the date-based bucketing is unchanged,
+                 so completed events retire on the normal date-passed
+                 schedule alongside uncompleted ones.
     """
     display: list[dict[str, Any]] = []
     undated: list[dict[str, Any]] = []
@@ -388,6 +394,7 @@ def classify(events: list[dict[str, Any]], cutoff: dt.date,
         norm["is_ignored"] = norm["id"] in ignored_ids
         if norm["is_ignored"]:
             ignored.append(norm)
+        norm["is_completed"] = norm["id"] in completed_ids
         d = _parse_date(norm["date"])
         if d is None:
             undated.append(norm)
@@ -406,6 +413,29 @@ def _load_ignored_ids(path: str | None) -> frozenset[str]:
     """Read the committed ignored_events.json and return a set of IDs.
 
     Tolerates missing/empty/malformed files (all → empty set).
+    """
+    if not path or not os.path.exists(path):
+        return frozenset()
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except (json.JSONDecodeError, OSError):
+        return frozenset()
+    if not isinstance(data, list):
+        return frozenset()
+    return frozenset(
+        e["id"] for e in data
+        if isinstance(e, dict) and isinstance(e.get("id"), str)
+    )
+
+
+def _load_completed_ids(path: str | None) -> frozenset[str]:
+    """Read completed_events.json (synced from the Apps Script "Completed
+    Events" sheet tab) and return a set of IDs. Mirrors `_load_ignored_ids`
+    exactly; the sheet is the master record and this file is per-run
+    ephemeral (#32). Tolerates missing/empty/malformed files (all → empty
+    set) so a fetch failure in the workflow's sync step degrades to "no
+    completion state applied this run" rather than crashing the build.
     """
     if not path or not os.path.exists(path):
         return frozenset()
@@ -1049,6 +1079,25 @@ def render_html(today: dt.date,
                 f'                data-event-name="{ev["name"]}" data-event-date="{ev["date"]}"\n'
                 f'                type="button">Ignore event</button>'
             )
+        # #32: server-rendered Completed state. The checkbox lives in every
+        # card (so unchecking restores it after a round-trip) but is hidden
+        # via CSS on ignored cards — affordances are mutually exclusive on
+        # a given card per the design note's Q7. The chip beside the event
+        # name and the green tint on `.event-card.completed` are the visual
+        # affirmation; the checkbox is the affordance. Client JS in commit
+        # 6 of the plan wires the click handler.
+        is_completed = bool(ev.get("is_completed"))
+        completed_class = " completed" if is_completed else ""
+        checked_attr = " checked" if is_completed else ""
+        complete_checkbox_html = (
+            f'<label class="complete-checkbox-wrap">\n'
+            f'          <input type="checkbox" class="complete-checkbox"\n'
+            f'                 data-event-name="{ev["name"]}" data-event-date="{ev["date"]}"{checked_attr}>\n'
+            f'          Completed</label>'
+        )
+        completed_badge_html = (
+            '<span class="completed-badge">Completed</span>' if is_completed else ""
+        )
         # `sender_domain` remains the registrable-domain identity (used
         # for grouping / display). The `sender_block_key` is what the
         # Ignore-sender button submits: full address for freemail
@@ -1084,15 +1133,15 @@ def render_html(today: dt.date,
             '<span class="new-badge">NEW</span>' if ev["id"] in _new_ids else ""
         )
         return f"""\
-      <div class="event-card{ignored_class}" data-event-id="{ev["id"]}" data-child="{data_child_val}"{ignored_attr}{sender_attr}
+      <div class="event-card{ignored_class}{completed_class}" data-event-id="{ev["id"]}" data-child="{data_child_val}"{ignored_attr}{sender_attr}
            style="{card_style}">
-        <div class="event-actions-top">{ics_btn_html}{ignore_btn_html}</div>
+        <div class="event-actions-top">{complete_checkbox_html}{ics_btn_html}{ignore_btn_html}</div>
         <div class="meta-strip">
           {chip_html}<span class="day">{day_label}</span>
           <span class="sep">·</span>
           {time_html}
         </div>
-        <div class="event-name">{ev["name"]}{new_badge_html}</div>{audience_html}{source_html}{location_html}
+        <div class="event-name">{ev["name"]}{new_badge_html}{completed_badge_html}</div>{audience_html}{source_html}{location_html}
         <div class="ignore-status" aria-live="polite"></div>{sender_btn_html}
       </div>"""
 
@@ -1159,18 +1208,32 @@ def render_html(today: dt.date,
                 f'                data-event-name="{ev["name"]}" data-event-date="{ev["date"]}"\n'
                 f'                type="button">Ignore event</button>'
             )
+        # #32: undated cards mirror dated cards' completed affordance.
+        # Same id surface (sha1 with date="") and same CSS rules apply.
+        is_completed = bool(ev.get("is_completed"))
+        completed_class = " completed" if is_completed else ""
+        checked_attr = " checked" if is_completed else ""
+        complete_checkbox_html = (
+            f'<label class="complete-checkbox-wrap">\n'
+            f'          <input type="checkbox" class="complete-checkbox"\n'
+            f'                 data-event-name="{ev["name"]}" data-event-date="{ev["date"]}"{checked_attr}>\n'
+            f'          Completed</label>'
+        )
+        completed_badge_html = (
+            '<span class="completed-badge">Completed</span>' if is_completed else ""
+        )
         new_badge_html = (
             '<span class="new-badge">NEW</span>' if ev["id"] in _new_ids else ""
         )
         return f"""\
-      <div class="event-card undated{ignored_class}" data-event-id="{ev["id"]}" data-child="{data_child_val}"{ignored_attr} style="{card_style}">
-        <div class="event-actions-top">{ignore_btn_html}</div>
+      <div class="event-card undated{ignored_class}{completed_class}" data-event-id="{ev["id"]}" data-child="{data_child_val}"{ignored_attr} style="{card_style}">
+        <div class="event-actions-top">{complete_checkbox_html}{ignore_btn_html}</div>
         <div class="meta-strip">
           {chip_html}<span class="day">Date TBD</span>
           <span class="sep">·</span>
           {time_html}
         </div>
-        <div class="event-name">{ev["name"]}{new_badge_html}</div>{audience_html}{source_html}{location_html}
+        <div class="event-name">{ev["name"]}{new_badge_html}{completed_badge_html}</div>{audience_html}{source_html}{location_html}
       </div>"""
 
     # Build week sections
@@ -1357,6 +1420,26 @@ def render_html(today: dt.date,
     .event-card[data-ignored="1"] .ignore-sender-btn {{
       display: none;
     }}
+    /* #32: completed cards stay visible (no display:none) and pick up a
+       subtle green tint via background. Both Ignore-event and
+       Ignore-sender are suppressed since a completed event is no longer a
+       candidate for ignoring; the checkbox itself is the affordance for
+       un-completing. The inverse rule one selector down hides the
+       checkbox on already-ignored cards, keeping the two affordances
+       mutually exclusive on a given card per design/completed-events.md
+       Q7. Both rules are CSS-only so unchecking (or un-ignoring) just
+       drops the corresponding class and the markup is restored without
+       any DOM swap. */
+    .event-card.completed {{
+      background: #e6f4ea;
+    }}
+    .event-card.completed .ignore-btn,
+    .event-card.completed .ignore-sender-btn {{
+      display: none;
+    }}
+    .event-card[data-ignored="1"] .complete-checkbox-wrap {{
+      display: none;
+    }}
     .event-card.ignored {{
       display: none;
     }}
@@ -1527,6 +1610,43 @@ def render_html(today: dt.date,
       margin-left: 0.4rem;
       vertical-align: middle;
     }}
+    /* #32: chip rendered next to the event name when is_completed=True.
+       Mirrors .new-badge weight (so the two read as a matched pair when
+       both are present) but uses the same green family as the
+       Unignore-button accent for visual consistency with the completed
+       background. */
+    .completed-badge {{
+      display: inline-block;
+      background: #1e8e3e;
+      color: white;
+      padding: 0.05rem 0.45rem;
+      border-radius: 10px;
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      margin-left: 0.4rem;
+      vertical-align: middle;
+    }}
+    .complete-checkbox-wrap {{
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      user-select: none;
+      font-family: inherit;
+      line-height: 1.4;
+      padding: 0.2rem 0.45rem;
+    }}
+    .complete-checkbox {{
+      cursor: pointer;
+      margin: 0;
+      width: 14px;
+      height: 14px;
+    }}
     .event-location {{
       font-size: 0.82rem;
       color: var(--text-secondary);
@@ -1624,6 +1744,12 @@ def render_html(today: dt.date,
         background: #1e8e3e;
         color: #e6f4ea;
         border: 1px solid #1e8e3e;
+      }}
+      /* #32: dark-mode green tint for completed cards. Deep green that
+         reads as "tinted" not "alarming" against the #2d2d2d default
+         surface. */
+      .event-card.completed {{
+        background: #1e3526;
       }}
     }}
   </style>
@@ -2176,6 +2302,13 @@ def main() -> int:
                    help="JSON file of previously-ignored events. Events "
                         "whose ID matches an entry here are dropped before "
                         "classifying. Missing/malformed file → no filter.")
+    p.add_argument("--completed", default=None,
+                   help="JSON file of completed events synced from the "
+                        "Apps Script 'Completed Events' sheet tab (#32). "
+                        "Events whose ID matches an entry here render with "
+                        "is_completed=True (green tint, Completed chip, "
+                        "checkbox checked). Missing/malformed file → no "
+                        "completion state.")
     p.add_argument("--digest-html-out", default=None,
                    help="Write weekly Gmail digest HTML body here.")
     p.add_argument("--digest-text-out", default=None,
@@ -2210,8 +2343,10 @@ def main() -> int:
     horizon = today + dt.timedelta(days=args.display_window_days)
     raw = load_candidates(args.candidates)
     ignored_ids = _load_ignored_ids(args.ignored)
+    completed_ids = _load_completed_ids(args.completed)
     display, undated, past, banked, ignored_dropped, warnings = classify(
-        raw, today, horizon, ignored_ids=ignored_ids
+        raw, today, horizon,
+        ignored_ids=ignored_ids, completed_ids=completed_ids,
     )
     display = dedupe(display)
     undated = dedupe(undated)

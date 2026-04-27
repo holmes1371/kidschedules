@@ -122,6 +122,48 @@ def test_classify_is_ignored_false_on_non_matching_events():
     assert all(e["is_ignored"] is False for e in display)
 
 
+def test_classify_marks_completed_events_and_keeps_them_in_display():
+    """#32: completed events flow into their date bucket (with
+    is_completed=True) — they stay visible per the design note's
+    Q-retirement decision (completed cards retire on the normal
+    date-passed schedule, not early). Non-matching events default to
+    is_completed=False."""
+    events = load_fixture("past_future_banked")
+    soccer_id = pe._event_id("Soccer Practice", "2026-04-21", "Isla")
+    display, undated, past, banked, _, _ = pe.classify(
+        events, cutoff=TODAY, horizon=HORIZON,
+        completed_ids=frozenset([soccer_id]),
+    )
+    soccer_in_display = [e for e in display if e["name"] == "Soccer Practice"]
+    assert len(soccer_in_display) == 1
+    assert soccer_in_display[0]["is_completed"] is True
+    # Every non-matching event across every bucket gets is_completed=False
+    # — completion is opt-in per id, not a default.
+    others = [e for e in (display + undated + past + banked)
+              if e["name"] != "Soccer Practice"]
+    assert others, "fixture must have non-Soccer events in some bucket"
+    assert all(e["is_completed"] is False for e in others)
+
+
+def test_classify_completed_and_ignored_independent_flags():
+    """#32: completion and ignore are orthogonal server-side. A card
+    listed in both id sets carries both flags True; the renderer's
+    visibility-suppression (CSS-driven on .event-card[data-ignored=1]
+    .complete-checkbox-wrap) is the only place the two interact, and
+    that's pinned in test_render_html_ignored_card_hides_completed_checkbox.
+    """
+    events = load_fixture("past_future_banked")
+    soccer_id = pe._event_id("Soccer Practice", "2026-04-21", "Isla")
+    display, _, _, _, _, _ = pe.classify(
+        events, cutoff=TODAY, horizon=HORIZON,
+        ignored_ids=frozenset([soccer_id]),
+        completed_ids=frozenset([soccer_id]),
+    )
+    soccer = next(e for e in display if e["name"] == "Soccer Practice")
+    assert soccer["is_ignored"] is True
+    assert soccer["is_completed"] is True
+
+
 def test_classify_passes_through_sender_domain():
     raw = [
         {"name": "With Sender", "date": "2026-04-20", "sender_domain": "laes.org",
@@ -407,17 +449,31 @@ def test_render_html_omits_ics_button_when_pages_url_empty():
 # ─── render_html ignored + sender markup ─────────────────────────────────
 
 
-def _render_ignored_fixture(ignored_names: tuple[str, ...] = ()) -> tuple[str, dict[str, dict]]:
-    """Load ignored_and_sender fixture, mark the named events as ignored,
-    and render the page. Returns (html, {name -> display event dict}) so
-    tests can pull the canonical event id for substring asserts."""
+def _render_ignored_fixture(
+    ignored_names: tuple[str, ...] = (),
+    completed_names: tuple[str, ...] = (),
+) -> tuple[str, dict[str, dict]]:
+    """Load ignored_and_sender fixture, mark the named events as ignored
+    and/or completed, and render the page. Returns (html, {name -> display
+    event dict}) so tests can pull the canonical event id for substring
+    asserts.
+
+    `completed_names` was added in #32 — the helper threads completed_ids
+    into classify alongside ignored_ids so a test can exercise either flag
+    or both simultaneously without a separate fixture file.
+    """
     events = load_fixture("ignored_and_sender")
     ignored_ids = frozenset(
         pe._event_id(e["name"], e["date"], e.get("child", ""))
         for e in events if e["name"] in ignored_names
     )
+    completed_ids = frozenset(
+        pe._event_id(e["name"], e["date"], e.get("child", ""))
+        for e in events if e["name"] in completed_names
+    )
     display, undated, _, _, _, _ = pe.classify(
-        events, cutoff=TODAY, horizon=HORIZON, ignored_ids=ignored_ids,
+        events, cutoff=TODAY, horizon=HORIZON,
+        ignored_ids=ignored_ids, completed_ids=completed_ids,
     )
     display = pe.dedupe(display)
     weeks = pe.group_by_week(display)
@@ -810,6 +866,109 @@ def test_render_html_css_hides_ignore_sender_btn_on_ignored_card():
     # ignored state (regardless of reason). Simpler than re-rendering.
     assert '.event-card[data-ignored="1"] .ignore-sender-btn' in html
     assert "display: none" in html
+
+
+# ─── #32 completed-checkbox render markup ────────────────────────────────
+
+
+def test_render_html_completed_card_has_class_and_chip():
+    """#32: a completed event renders with the `completed` class on its
+    event-card div and a `<span class="completed-badge">` chip inline
+    with the event name."""
+    html, by_name = _render_ignored_fixture(completed_names=("Active With Sender",))
+    ev = by_name["Active With Sender"]
+    start = html.find(f'data-event-id="{ev["id"]}"')
+    assert start != -1
+    card = html[html.rfind("<div", 0, start):html.find("</div>", start) + 200]
+    assert "event-card completed" in card or "event-card  completed" in card
+    assert '<span class="completed-badge">Completed</span>' in card
+
+
+def test_render_html_uncompleted_card_has_no_chip_and_no_completed_class():
+    """Control: no completed_names → no chip, no `completed` class on any card."""
+    html, by_name = _render_ignored_fixture()
+    ev = by_name["Active With Sender"]
+    start = html.find(f'data-event-id="{ev["id"]}"')
+    card = html[html.rfind("<div", 0, start):html.find("</div>", start) + 200]
+    assert "completed-badge" not in card
+    assert " completed" not in card.split('"')[1]  # class attr only
+
+
+def test_render_html_completed_checkbox_renders_checked():
+    """#32: the `<input type="checkbox" class="complete-checkbox">` carries
+    the `checked` attribute when is_completed=True."""
+    html, by_name = _render_ignored_fixture(completed_names=("Active With Sender",))
+    ev = by_name["Active With Sender"]
+    start = html.find(f'data-event-id="{ev["id"]}"')
+    card = html[start:html.find("</div>", start) + 600]
+    assert 'class="complete-checkbox"' in card
+    assert 'data-event-name="Active With Sender"' in card
+    assert " checked>" in card or ' checked\n' in card or ' checked ' in card
+
+
+def test_render_html_completed_checkbox_renders_unchecked_by_default():
+    """#32: the checkbox is rendered on every card regardless of completion
+    state, but absent the `checked` attribute when is_completed=False. The
+    checkbox in the DOM is what lets a future "I marked this done" click
+    work without a server round-trip."""
+    html, by_name = _render_ignored_fixture()
+    ev = by_name["Active With Sender"]
+    start = html.find(f'data-event-id="{ev["id"]}"')
+    card = html[start:html.find("</div>", start) + 600]
+    assert 'class="complete-checkbox"' in card
+    # The checkbox tag contains data-event-date but no `checked` attribute.
+    checkbox_open = card.find('<input type="checkbox" class="complete-checkbox"')
+    assert checkbox_open != -1
+    checkbox_close = card.find(">", checkbox_open)
+    checkbox_tag = card[checkbox_open:checkbox_close + 1]
+    assert "checked" not in checkbox_tag
+
+
+def test_render_html_completed_card_css_hides_ignore_buttons():
+    """#32: Q8 — the CSS rule that suppresses Ignore-event and
+    Ignore-sender on `.event-card.completed` is present in every
+    rendered page (so unchecking restores the buttons via class drop)."""
+    html, _ = _render_ignored_fixture()
+    assert ".event-card.completed .ignore-btn" in html
+    assert ".event-card.completed .ignore-sender-btn" in html
+
+
+def test_render_html_ignored_card_hides_completed_checkbox():
+    """#32: Q7 — ignored cards do NOT show the completed checkbox.
+    Implementation is one CSS selector; pin it so a future render
+    rewrite that drops the rule fails CI. The HTML is rendered for
+    every card; visibility is purely CSS-driven so an Unignore
+    automatically reveals the checkbox without DOM swaps."""
+    html, _ = _render_ignored_fixture()
+    assert '.event-card[data-ignored="1"] .complete-checkbox-wrap' in html
+    assert "display: none" in html
+
+
+def test_render_html_completed_card_has_green_tint_css_rule():
+    """#32: light-mode green tint for completed cards is present as a CSS
+    rule, not as inline style on the card element. The dark-mode override
+    lives inside the `@media (prefers-color-scheme: dark)` block."""
+    html, _ = _render_ignored_fixture()
+    assert ".event-card.completed" in html
+    assert "background: #e6f4ea" in html  # light mode
+    assert "background: #1e3526" in html  # dark mode
+
+
+def test_render_html_undated_completed_card_renders_chip_and_class():
+    """#32: undated cards mirror dated cards' completed affordance.
+    Same fixture has 'Undated With Sender' as a date='' entry."""
+    html, _ = _render_ignored_fixture(completed_names=("Undated With Sender",))
+    # Find the undated card by its name attribute on the checkbox.
+    name_attr = 'data-event-name="Undated With Sender"'
+    pos = html.find(name_attr)
+    assert pos != -1
+    # Walk back to the card opening div.
+    card_start = html.rfind('<div class="event-card undated', 0, pos)
+    card_end = html.find("</div>", pos) + 200
+    card = html[card_start:card_end]
+    assert "event-card undated" in card
+    assert " completed" in card
+    assert '<span class="completed-badge">Completed</span>' in card
 
 
 def test_render_html_js_ignore_event_posts_sender():
@@ -1538,6 +1697,34 @@ def test_load_ignored_ids_tolerant(tmp_path, file_contents, expected):
     else:
         path.write_text(file_contents, encoding="utf-8")
         result = pe._load_ignored_ids(str(path))
+    assert result == expected
+
+
+# ─── _load_completed_ids tolerance (#32) ─────────────────────────────────
+# Mirrors _load_ignored_ids tolerance one-for-one; the loaders are
+# structurally identical so a behaviour-level pin keeps them aligned.
+
+
+@pytest.mark.parametrize(
+    "file_contents,expected",
+    [
+        (None, frozenset()),
+        ("not json at all", frozenset()),
+        ('{"not": "a list"}', frozenset()),
+        ('[]', frozenset()),
+        ('[{"id": "abc123abc123"}, {"id": "def456def456"}]',
+         frozenset(["abc123abc123", "def456def456"])),
+        ('[{"id": "abc"}, {"no_id": true}, "garbage"]',
+         frozenset(["abc"])),
+    ],
+)
+def test_load_completed_ids_tolerant(tmp_path, file_contents, expected):
+    path = tmp_path / "completed.json"
+    if file_contents is None:
+        result = pe._load_completed_ids(str(path))
+    else:
+        path.write_text(file_contents, encoding="utf-8")
+        result = pe._load_completed_ids(str(path))
     assert result == expected
 
 
