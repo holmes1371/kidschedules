@@ -18,13 +18,10 @@ Strict rules for writing it:
 4. **No cross-session carry-overs.** If something is still broken session-to-session, file it as a numbered ROADMAP item instead of repeating it here.
 5. **Replace in place.** Do not append a new block and archive the old one below.
 
-**2026-04-25**
+**2026-04-27**
 
-- Items 27 and 28 closed `[x]` after Tom's prod verification (commit aa20b4b moved full prose to `COMPLETED.md`).
-- Item 29 closed `[x]` after Tom's prod verification.
-- Items 30 + 31 are a paired agent-prompt strengthening: #30 (commit d3dd5fa) requires URLs verbatim in the `location` field instead of summarized parentheticals like `(PandaDoc link)`; #31 (commit b586331) clarifies that `source` date must be the actual email's "Date sent:" header, not a date mentioned inside the email body.
-- **Verification scope: NEW cards only.** Pipeline caches events keyed on Gmail `messageId` (item #4); cached entries don't re-process unless explicitly evicted. So #30 and #31 fix only events extracted from emails arriving AFTER the prompt push — pre-existing cards on the live page keep their old labels indefinitely. A `--reextract-all` bulk-flush was considered (2026-04-25) and rejected to preserve far-future events extracted from 60–120-day-old "save the date" emails outside the search window.
-- Test delta vs main: +24 passing on Linux/CI (12 unit tests + 12 render-integration). The 12 #29 render tests still fail on Windows with the unrelated `%-d` strftime issue.
+- Items 30 + 31 still `[~]` pending Tom's live verification on newly-arrived emails (cards extracted before the prompt push retain old labels; see each item's "No retroactive fix" callout).
+- Filed #32: "Completed" checkbox on event cards. Tom resolved all four design questions same session — persistence durable, cross-device synced via Apps Script (same path as ignore flow), ignore button hidden when completed, retirement unchanged. Flipped `[ ]` → `[~]` on plan approval; no code or design note yet, Tom said hold off.
 - Nothing else in flight.
 
 ## For future agents
@@ -149,6 +146,30 @@ Diagnosis: today's email was a "last day to register" reminder rolling up multip
 **Bundled with #30 for verification.** Both items are agent-prompt strengthenings landed in the same session (#30: preserve URL strings verbatim; #31: source-date the email's actual send date). They live as separate commits but Tom verifies them together on the next post-deploy cron cycle: pull up a **newly-arrived** event card (NOT a pre-existing one — see #30's "No retroactive fix" callout for why) and confirm (a) URLs appear as clickable links in the location, (b) the source-line date matches when Ellen actually received the email in her inbox.
 
 Item stays `[~]` pending live verification.
+
+### 32. [~] "Completed" checkbox on event cards
+
+Filed 2026-04-27 from Tom. Add a "completed" affordance to each event card so Ellen can mark an event done as it happens, without waiting for the date to pass it off the page. Behavior on check:
+
+- Card displays a "completed" label.
+- Card background shifts to a subtle green.
+- The "ignore event" button is removed from that card (a completed event is no longer a candidate for ignoring).
+
+The check is reversible — unchecking restores the card to its normal state (label gone, background reset, ignore button back). Completed cards stay visible and retire on the normal date-passed schedule; this affordance does not change retirement timing or the events-state pipeline, only the per-event UI state.
+
+Design decisions (resolved 2026-04-27 with Tom):
+
+- **Persistence: durable.** Completion sticks across page reloads and cron rebuilds — once flipped, the card stays "completed" until the event's date passes and natural retirement removes it. Per-browser session-only is NOT acceptable; Ellen should not have to re-check after each cron tick.
+- **Cross-device: synced via Apps Script.** Goes through the same webhook path the ignore flow uses, so checking on phone propagates to tablet. Local-only would let the two devices disagree, which is the bug this affordance is meant to avoid.
+- **Ignore interaction: completed supersedes ignore.** The ignore button is removed from completed cards entirely — a completed event is no longer ignorable. (Unchecking completion restores the ignore button.)
+- **Retirement: unchanged.** Completed cards retire on the normal date-passed threshold alongside uncompleted ones. No early sweep, no second retirement code path.
+
+Implementation questions to settle in the design note (not blockers — engineering judgment calls):
+
+- Event-identity key for the persistence record. Likely the same key the ignore flow uses (item #6 / #7 / #18 territory) so the two affordances share one identity surface; confirm by reading those.
+- Apps Script endpoint shape: extend the existing ignore-action endpoint with a `complete` / `uncomplete` action, vs. a new endpoint. Lean toward extending — the auth + rate-limit machinery is already there.
+- Storage: where does the completed-events list live so `process_events.py` can consume it during the next cron rebuild and re-render the green/labeled state? Mirror whatever the ignore flow does (likely a JSON blob the workflow pulls in).
+- Test fixtures: extend `tests/` per the standing rule that any `process_events.py` change extends the pytest fixtures in step.
 
 ## Descoped / on hold
 
