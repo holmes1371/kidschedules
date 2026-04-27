@@ -210,6 +210,30 @@ def test_extraction_prompt_pins_source_date_to_email_sent_date():
         assert needle in prompt, f"#31 directive missing from prompt: {needle!r}"
 
 
+def test_extraction_prompt_pins_pdf_attachment_directive():
+    """ROADMAP #33: the prompt instructs the agent to extract dates
+    from PDF attachments the same way as email bodies, and to keep
+    the source date pinned to the email's sent date (NOT the PDF's
+    edition label). Without this directive the agent might dismiss
+    the document content block as out-of-scope, OR mis-attribute
+    the source date to a label inside the PDF — both of which would
+    silently regress the feature."""
+    prompt = agent.EXTRACTION_SYSTEM_PROMPT
+    for needle in (
+        # WHAT-TO-EXTRACT body extension — pin the PDF mention so a
+        # future prompt edit that drops "PDF" entirely fails CI.
+        "PDF",
+        "document content block",
+        "Upcoming Dates",
+        # Source-field directive — pin the explicit "PDF doesn't
+        # change the source date" rule and the GOOD/BAD example pair.
+        "EDITION: MARCH 25TH",
+        "Third Grade Newsletter (Apr 2)",
+        "Third Grade Newsletter (Mar 25)",
+    ):
+        assert needle in prompt, f"#33 directive missing from prompt: {needle!r}"
+
+
 def test_format_roster_prose_shape():
     """Unit test on the pure formatter. No filesystem. Fabricated mapping
     with a third kid proves the loop scales and nothing in the formatter
@@ -442,6 +466,77 @@ def test_plan_batches_missing_from_header_is_regular():
     assert [len(b) for b in batches] == [1]
 
 
+# ─── ROADMAP #33: PDF-bearing emails force batch-of-1 ────────────────────
+
+
+def _mk_pdf_email(mid: str, sender: str, pdf_bytes: bytes = b"%PDF-1.4\nfake") -> dict:
+    """Build an email dict with a non-empty pdfs list. Used to drive
+    the #33 batch-of-1 forcing branch in _plan_batches and the
+    content-block building in extract_events."""
+    e = _mk_email(mid, sender)
+    e["pdfs"] = [pdf_bytes]
+    return e
+
+
+def test_plan_batches_pdf_email_forces_batch_of_one_even_with_none_set():
+    """ROADMAP #33: a PDF-bearing email is forced to batch-of-1 even
+    when newsletter_senders is None (e.g. tests, or first-run with an
+    empty stats file). The classifier's slow promotion is not a
+    prerequisite for PDF isolation."""
+    emails = [
+        _mk_email("r1", "regular@x.com"),
+        _mk_pdf_email("p1", "teacher@fcps.edu"),
+        _mk_email("r2", "regular@x.com"),
+    ]
+    batches = agent._plan_batches(emails, None)
+    # PDF email batch-of-1 first, then regular pair as one batch.
+    assert [len(b) for b in batches] == [1, 2]
+    assert batches[0][0]["messageId"] == "p1"
+    assert {e["messageId"] for e in batches[1]} == {"r1", "r2"}
+
+
+def test_plan_batches_pdf_email_forces_batch_of_one_with_set():
+    """ROADMAP #33: PDF emails go batch-of-1 alongside any classifier-
+    promoted newsletter senders. Both partitions sit in the forced-one
+    block at the head."""
+    emails = [
+        _mk_email("r1", "regular@x.com"),
+        _mk_pdf_email("p1", "teacher@fcps.edu"),
+        _mk_email("n1", "news@x.com"),
+        _mk_email("r2", "regular@x.com"),
+    ]
+    batches = agent._plan_batches(emails, {"news@x.com"})
+    # Forced-one: p1 (PDF) and n1 (newsletter) — both size 1.
+    # Regular: r1, r2 — one batch of size 2.
+    assert [len(b) for b in batches] == [1, 1, 2]
+    assert batches[0][0]["messageId"] == "p1"
+    assert batches[1][0]["messageId"] == "n1"
+    assert {e["messageId"] for e in batches[2]} == {"r1", "r2"}
+
+
+def test_plan_batches_pdf_email_in_newsletter_set_does_not_double_count():
+    """A teacher who is both in the classifier's newsletter set AND
+    sends a PDF still gets one batch-of-1 (not two). Confirms the
+    OR semantics of the forced-one check."""
+    emails = [_mk_pdf_email("p1", "teacher@fcps.edu")]
+    batches = agent._plan_batches(emails, {"teacher@fcps.edu"})
+    assert [len(b) for b in batches] == [1]
+    assert batches[0][0]["messageId"] == "p1"
+
+
+def test_plan_batches_empty_pdfs_list_does_not_trigger_forced_one():
+    """`pdfs: []` is not the same as a non-empty list. Defensive: an
+    email that came through a non-school sender (so main.py dropped
+    its pdfs to []) should batch as regular, not size-1."""
+    emails = [
+        {**_mk_email("e1", "regular@x.com"), "pdfs": []},
+        _mk_email("e2", "regular@x.com"),
+    ]
+    batches = agent._plan_batches(emails, None)
+    # No PDF-bearing emails → back-compat path: single chunk.
+    assert [len(b) for b in batches] == [2]
+
+
 def test_extract_events_accepts_newsletter_senders_kwarg():
     """Guardrail: the public signature accepts the new kwarg with a
     default of None. Verified without an API call by inspecting the
@@ -592,7 +687,7 @@ def test_call_with_retry_returns_response_on_first_try(no_sleep):
     sentinel = object()
     client = _FakeClient([sentinel])
     result = agent._call_with_retry(
-        client, model="m", max_tokens=100, user_message="u", batch_label="b",
+        client, model="m", max_tokens=100, user_content="u", batch_label="b",
     )
     assert result is sentinel
     assert len(client.messages.calls) == 1
@@ -603,7 +698,7 @@ def test_call_with_retry_retries_on_rate_limit_then_succeeds(no_sleep, capsys):
     err = _make_anthropic_error(anthropic.RateLimitError)
     client = _FakeClient([err, sentinel])
     result = agent._call_with_retry(
-        client, model="m", max_tokens=100, user_message="u", batch_label="batch1",
+        client, model="m", max_tokens=100, user_content="u", batch_label="batch1",
     )
     assert result is sentinel
     assert len(client.messages.calls) == 2
@@ -621,7 +716,7 @@ def test_call_with_retry_retries_on_other_transient_errors(no_sleep, exc_cls):
     sentinel = object()
     client = _FakeClient([_make_anthropic_error(exc_cls), sentinel])
     result = agent._call_with_retry(
-        client, model="m", max_tokens=100, user_message="u", batch_label="b",
+        client, model="m", max_tokens=100, user_content="u", batch_label="b",
     )
     assert result is sentinel
     assert len(client.messages.calls) == 2
@@ -632,7 +727,7 @@ def test_call_with_retry_retries_on_api_status_529_overloaded(no_sleep, capsys):
     err = _make_anthropic_error(anthropic.APIStatusError, status_code=529)
     client = _FakeClient([err, sentinel])
     result = agent._call_with_retry(
-        client, model="m", max_tokens=100, user_message="u", batch_label="b",
+        client, model="m", max_tokens=100, user_content="u", batch_label="b",
     )
     assert result is sentinel
     assert "overloaded 529" in capsys.readouterr().out
@@ -644,7 +739,7 @@ def test_call_with_retry_does_not_retry_on_api_status_400(no_sleep):
     client = _FakeClient([err])
     with pytest.raises(anthropic.APIStatusError):
         agent._call_with_retry(
-            client, model="m", max_tokens=100, user_message="u", batch_label="b",
+            client, model="m", max_tokens=100, user_content="u", batch_label="b",
         )
     assert len(client.messages.calls) == 1
 
@@ -655,7 +750,7 @@ def test_call_with_retry_reraises_after_exhausting_max_retries(no_sleep, capsys)
     client = _FakeClient(errs)
     with pytest.raises(anthropic.RateLimitError):
         agent._call_with_retry(
-            client, model="m", max_tokens=100, user_message="u", batch_label="b",
+            client, model="m", max_tokens=100, user_content="u", batch_label="b",
         )
     assert len(client.messages.calls) == agent.MAX_RETRIES
     assert "FAILED after" in capsys.readouterr().out
@@ -664,7 +759,7 @@ def test_call_with_retry_reraises_after_exhausting_max_retries(no_sleep, capsys)
 def test_call_with_retry_uses_default_extraction_system_prompt(no_sleep):
     client = _FakeClient([object()])
     agent._call_with_retry(
-        client, model="m", max_tokens=100, user_message="u", batch_label="b",
+        client, model="m", max_tokens=100, user_content="u", batch_label="b",
     )
     assert client.messages.calls[0]["system"] == agent.EXTRACTION_SYSTEM_PROMPT
 
@@ -672,7 +767,7 @@ def test_call_with_retry_uses_default_extraction_system_prompt(no_sleep):
 def test_call_with_retry_uses_provided_system_prompt(no_sleep):
     client = _FakeClient([object()])
     agent._call_with_retry(
-        client, model="m", max_tokens=100, user_message="u", batch_label="b",
+        client, model="m", max_tokens=100, user_content="u", batch_label="b",
         system_prompt="custom-prompt",
     )
     assert client.messages.calls[0]["system"] == "custom-prompt"
@@ -1007,3 +1102,138 @@ def test_review_stripped_messages_missing_keys_default_to_empty(
     assert agent.review_stripped_messages(report) == {
         "decisions": [], "senders_to_unblock": [],
     }
+
+
+# ─── ROADMAP #33: extract_events content-block building ──────────────────
+
+
+def _capture_user_content(monkeypatch):
+    """Install a fake _call_with_retry that captures the user_content
+    argument and returns a minimal valid response. Returns the
+    captured-list — tests inspect it after extract_events returns."""
+    captured: list = []
+
+    def fake_call(client, model, max_tokens, user_content, batch_label,
+                  system_prompt=None):
+        captured.append(user_content)
+        return _make_response(
+            '{"events": [], "irrelevant_senders": []}'
+        )
+
+    monkeypatch.setattr(agent, "_call_with_retry", fake_call)
+    return captured
+
+
+def test_extract_events_no_pdf_uses_string_content(monkeypatch, stub_client):
+    """Back-compat: an email without a `pdfs` field (legacy callers)
+    or with `pdfs: []` (main.py after gating drop) takes the
+    string-content path. No content-block list, no overhead."""
+    captured = _capture_user_content(monkeypatch)
+    agent.extract_events([_email("m1")])
+    assert len(captured) == 1
+    assert isinstance(captured[0], str), (
+        f"No-PDF path should pass a string, got {type(captured[0]).__name__}"
+    )
+    assert "--- EMAIL 1 ---" in captured[0]
+    assert "Message ID: m1" in captured[0]
+
+
+def test_extract_events_with_pdf_builds_content_blocks(monkeypatch, stub_client):
+    """ROADMAP #33: a PDF-bearing email triggers the content-block
+    list path. Document blocks come FIRST (so the model sees the
+    structured input before the prose framing), then a single text
+    block carrying the existing email-body framing."""
+    import base64 as _b64
+    captured = _capture_user_content(monkeypatch)
+    pdf_bytes = b"%PDF-1.4\nfake-pdf-payload\n%%EOF"
+    em = _email("m1", from_="teacher@fcps.edu",
+                subject="Weekly newsletter",
+                body="Please see attached newsletter.")
+    em["pdfs"] = [pdf_bytes]
+
+    agent.extract_events([em])
+
+    assert len(captured) == 1
+    content = captured[0]
+    assert isinstance(content, list), (
+        f"PDF path should pass list-of-blocks, got {type(content).__name__}"
+    )
+    # First block: document with base64-encoded PDF.
+    assert content[0]["type"] == "document"
+    assert content[0]["source"]["type"] == "base64"
+    assert content[0]["source"]["media_type"] == "application/pdf"
+    decoded = _b64.b64decode(content[0]["source"]["data"])
+    assert decoded == pdf_bytes
+    # Last block: text carrying the email envelope + body.
+    assert content[-1]["type"] == "text"
+    assert "Message ID: m1" in content[-1]["text"]
+    assert "Please see attached newsletter." in content[-1]["text"]
+
+
+def test_extract_events_with_multiple_pdfs_emits_multiple_document_blocks(
+    monkeypatch, stub_client,
+):
+    """An email with two PDF attachments produces two document blocks
+    (in input order) followed by a single text block. Realistic case:
+    a teacher attaching both a weekly newsletter and a permission
+    slip."""
+    import base64 as _b64
+    captured = _capture_user_content(monkeypatch)
+    pdf_a = b"%PDF-1.4\nA\n%%EOF"
+    pdf_b = b"%PDF-1.4\nB\n%%EOF"
+    em = _email("m1", from_="teacher@fcps.edu")
+    em["pdfs"] = [pdf_a, pdf_b]
+
+    agent.extract_events([em])
+
+    content = captured[0]
+    assert isinstance(content, list)
+    types_in_order = [b["type"] for b in content]
+    assert types_in_order == ["document", "document", "text"]
+    assert _b64.b64decode(content[0]["source"]["data"]) == pdf_a
+    assert _b64.b64decode(content[1]["source"]["data"]) == pdf_b
+
+
+def test_extract_events_pdf_email_runs_separate_batch_from_regular(
+    monkeypatch, stub_client,
+):
+    """Mixing a PDF-bearing email with a regular one yields two
+    separate API calls — the PDF batch is size-1 (forced by
+    _plan_batches) and the regular email is its own size-1 chunk.
+    Pin that the PDF call is FIRST (forced-one batches lead) and
+    that the regular call uses the string-content path with no
+    document blocks."""
+    captured = _capture_user_content(monkeypatch)
+    pdf_em = _email("p1", from_="teacher@fcps.edu", body="see attached")
+    pdf_em["pdfs"] = [b"%PDF-1.4\nfake"]
+    reg_em = _email("r1", from_="regular@x.com", body="plain body")
+
+    agent.extract_events([reg_em, pdf_em])
+
+    assert len(captured) == 2, (
+        f"Expected 2 separate API calls (forced batch-of-1 isolation); "
+        f"got {len(captured)}."
+    )
+    pdf_call = captured[0]
+    assert isinstance(pdf_call, list)
+    assert pdf_call[0]["type"] == "document"
+    reg_call = captured[1]
+    assert isinstance(reg_call, str)
+    assert "Message ID: r1" in reg_call
+    assert "Message ID: p1" not in reg_call
+
+
+def test_extract_events_pdf_base64_round_trips(monkeypatch, stub_client):
+    """Edge: PDF bytes containing characters that need escaping in
+    base64 (high bytes, NUL) round-trip correctly through
+    base64.standard_b64encode in agent.py."""
+    import base64 as _b64
+    captured = _capture_user_content(monkeypatch)
+    pdf_bytes = b"%PDF-1.4\n\x00\x01\x02\xfe\xff" + (b"\xab" * 100) + b"\n%%EOF"
+    em = _email("m1", from_="teacher@fcps.edu")
+    em["pdfs"] = [pdf_bytes]
+
+    agent.extract_events([em])
+
+    decoded = _b64.b64decode(captured[0][0]["source"]["data"])
+    assert decoded == pdf_bytes

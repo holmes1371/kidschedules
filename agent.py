@@ -8,6 +8,7 @@ is handled by the deterministic Python scripts.
 """
 from __future__ import annotations
 
+import base64
 import email.utils
 import json
 import os
@@ -118,7 +119,14 @@ WHAT TO EXTRACT — be thorough and extract ALL of these:
    community events hosted by the school
 
 8. **Newsletter calendar items**: monthly calendars embedded in school
-   newsletters often list 5-10+ dates — extract EVERY date from them
+   newsletters often list 5-10+ dates — extract EVERY date from them.
+   This applies whether the newsletter is in the email body or attached
+   as a PDF. When a PDF attachment is present, it is included in your
+   input as a document content block ahead of the text — treat its
+   calendar grids, sidebar "Upcoming Dates" boxes, and styled date
+   lists exactly like email-body content. School newsletters are often
+   sent as PDFs because the layout matters; the dates are usually the
+   highest-signal content on the page.
 
 For each event, output a dict with exactly these keys:
 - "name": string — descriptive name (e.g. "NO SCHOOL — Election Day",
@@ -164,6 +172,13 @@ For each event, output a dict with exactly these keys:
   showing up?" questions.
     GOOD: "LAES PTA Sunbeam (Apr 26)"   [today's reminder email]
     BAD:  "LAES PTA Sunbeam (Mar 15)"   [date referenced inside today's email]
+  PDF attachments do NOT change this rule. A PDF labeled
+  "EDITION: MARCH 25TH, 2026" inside an email sent April 2 still has
+  source date "Apr 2" (the email's sent date), NOT "Mar 25" (the PDF's
+  edition). The "Date sent:" line in the email header is always the
+  source date, regardless of any date label inside the PDF.
+    GOOD: "Third Grade Newsletter (Apr 2)"   [email sent date]
+    BAD:  "Third Grade Newsletter (Mar 25)"  [PDF edition label]
 - "source_message_id": string — the exact Message ID of the email this
   event was drawn from. Copy the value verbatim from the "Message ID:"
   line at the top of that email block. If the event synthesizes details
@@ -311,32 +326,49 @@ def _plan_batches(
     Pure function — no I/O. Separated from `extract_events` so the
     batching logic can be unit-tested without mocking the Anthropic SDK.
 
-    When `newsletter_senders` is `None` (default), behaves like the
-    prior inline split: a single partition chunked at `BATCH_SIZE`. This
-    preserves bit-for-bit behavior for callers that don't opt in.
+    When `newsletter_senders` is `None` (default) AND no email has any
+    PDF attachments, behaves like the prior inline split: a single
+    partition chunked at `BATCH_SIZE`. This preserves bit-for-bit
+    behavior for callers that don't opt in.
 
-    When provided, emails whose sender key (lowercased mailbox from the
-    `From` header) is in the set go into batches of size 1; everyone
-    else goes into chunks of `BATCH_SIZE`. Newsletter batches are
-    ordered FIRST so a parse failure on a cheap regular batch does not
-    gate the expensive newsletter work — if the run aborts midway, the
-    high-yield messages are already extracted.
+    When `newsletter_senders` is provided, emails whose sender key
+    (lowercased mailbox from the `From` header) is in the set go into
+    batches of size 1.
+
+    ROADMAP #33: emails carrying ANY PDF attachment (non-empty `pdfs`
+    list) are also forced to batch-of-1, regardless of whether the
+    sender is in `newsletter_senders`. The agent gets one document
+    block alongside one email's text — the call shape stays simple
+    and the agent can't get confused about which PDF belongs to
+    which email body. This holds even when `newsletter_senders` is
+    `None` (e.g. tests or first-run with empty stats), so PDFs are
+    isolated even before the classifier learns the sender.
+
+    Everything else (no PDF, sender not in newsletter set) goes into
+    chunks of `BATCH_SIZE`. Forced-batch-of-1 batches are ordered
+    FIRST so a parse failure on a cheap regular batch does not gate
+    the expensive PDF / newsletter work — if the run aborts midway,
+    the high-yield messages are already extracted.
     """
-    if newsletter_senders is None:
+    has_any_pdf = any(bool(e.get("pdfs")) for e in emails)
+    if newsletter_senders is None and not has_any_pdf:
         return [
             emails[i : i + BATCH_SIZE]
             for i in range(0, len(emails), BATCH_SIZE)
         ]
 
-    newsletter_emails: list[dict[str, Any]] = []
+    senders = newsletter_senders or set()
+    forced_one: list[dict[str, Any]] = []
     regular_emails: list[dict[str, Any]] = []
     for e in emails:
-        if _sender_key(e.get("from_", "")) in newsletter_senders:
-            newsletter_emails.append(e)
+        is_pdf_email = bool(e.get("pdfs"))
+        is_newsletter = _sender_key(e.get("from_", "")) in senders
+        if is_pdf_email or is_newsletter:
+            forced_one.append(e)
         else:
             regular_emails.append(e)
 
-    batches: list[list[dict[str, Any]]] = [[e] for e in newsletter_emails]
+    batches: list[list[dict[str, Any]]] = [[e] for e in forced_one]
     batches.extend(
         regular_emails[i : i + BATCH_SIZE]
         for i in range(0, len(regular_emails), BATCH_SIZE)
@@ -352,11 +384,17 @@ def _call_with_retry(
     client: anthropic.Anthropic,
     model: str,
     max_tokens: int,
-    user_message: str,
+    user_content: str | list[dict[str, Any]],
     batch_label: str,
     system_prompt: str | None = None,
 ) -> anthropic.types.Message:
     """Call the Anthropic API with exponential backoff on transient errors.
+
+    `user_content` is forwarded as the user message's `content` field —
+    either a plain string (the body-only path) or a list of content
+    blocks (ROADMAP #33: prepend `document` blocks for PDF attachments
+    in front of a final `text` block). The Anthropic SDK accepts either
+    shape; this function does not inspect the content.
 
     system_prompt defaults to EXTRACTION_SYSTEM_PROMPT for back-compat with
     existing event-extraction callers. The blocklist audit passes its own.
@@ -369,7 +407,7 @@ def _call_with_retry(
                 model=model,
                 max_tokens=max_tokens,
                 system=system_prompt,
-                messages=[{"role": "user", "content": user_message}],
+                messages=[{"role": "user", "content": user_content}],
             )
         except (
             anthropic.RateLimitError,       # 429
@@ -550,13 +588,40 @@ def extract_events(
         }
         batch_message_ids.discard("")
 
+        # ROADMAP #33. When any email in the batch carries PDF attachments,
+        # build a list-of-content-blocks payload: one document block per
+        # PDF (Anthropic native PDF; layout-aware vision-based extraction)
+        # ahead of a single text block carrying the email-body text. Body
+        # context stays — the prose around the PDF (e.g. "Please find
+        # attached the weekly newsletter") often carries useful framing.
+        # PDF-bearing batches are always size-1 by `_plan_batches`, so
+        # the document blocks unambiguously belong to the only email
+        # in the batch. No-PDF batches keep the string-content path —
+        # zero overhead on the common path.
+        user_content: str | list[dict[str, Any]]
+        pdf_blocks: list[dict[str, Any]] = []
+        for email in batch:
+            for pdf_bytes in email.get("pdfs") or []:
+                pdf_blocks.append({
+                    "type": "document",
+                    "source": {
+                        "type": "base64",
+                        "media_type": "application/pdf",
+                        "data": base64.standard_b64encode(pdf_bytes).decode("ascii"),
+                    },
+                })
+        if pdf_blocks:
+            user_content = pdf_blocks + [{"type": "text", "text": user_message}]
+        else:
+            user_content = user_message
+
         # No try/except here: _call_with_retry already absorbs transient
         # errors (429/500/503/529/connection/timeout) with backoff. Anything
         # past that is a real failure (auth, persistent 5xx, unexpected
         # status) and must fail the pipeline so the GitHub Actions run
         # surfaces the push notification.
         response = _call_with_retry(
-            client, model, max_tokens, user_message, batch_label
+            client, model, max_tokens, user_content, batch_label
         )
 
         # Parse the response
