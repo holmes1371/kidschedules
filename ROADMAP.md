@@ -22,11 +22,11 @@ Strict rules for writing it:
 
 - Items 30 + 31 still `[~]` pending Tom's live verification on newly-arrived emails.
 - #32 closed `[x]` — Tom verified, full prose archived in `COMPLETED.md`. 9 commits.
-- #34 (Cross-device state sync on page refresh) `[~]` — design note landed at `design/refresh-state-sync.md`. Resolved decisions (auth Option B, sheet-wins-with-grace-period, offline-out-of-scope) captured. Next: commit 2 of 4 — `scripts/apps_script.gs` drops `?secret=` on the three list-shape GETs; Tom redeploys Apps Script before commit 3 (client JS).
-- #33 (PDF newsletter attachments) `[ ]` — placeholder, BEHIND #34.
+- #34 (Cross-device state sync on page refresh) `[~]` — all 4 commits landed (`4428700` / `e2a8cf1` / `93d257d` / this commit). Tom redeployed Apps Script after commit 2 and smoke-tested the unauthed GET. Awaiting live cross-device verification: phone-flip → tablet-refresh should propagate within ~1s of fetch return.
+- #33 (PDF newsletter attachments) `[ ]` — placeholder, next in queue.
 - #35 (Offline write queue) `[ ]` — placeholder, lower priority. Out of scope for #34 by design.
 - #36 (Card color-coding intuitiveness) `[ ]` — placeholder, needs scoping conversation.
-- Pre-push protocol: full `pytest tests/ -q` (all 745) green on strftime-patched copy of `process_events.py` before any push. Memory note saved.
+- Pre-push protocol: full `pytest tests/ -q` (754 after #34's +9 tests) green on strftime-patched copy of `process_events.py` before any push. Memory note saved.
 
 ## For future agents
 
@@ -156,6 +156,17 @@ Item stays `[~]` pending live verification.
 32\. [x] "Completed" checkbox on event cards — 4828713 / 732a0de / 3cd394e / 863b2f8 / 2c373fc / caa6566 / 1325465 / 636abe0 / 3667823 — see COMPLETED.md
 
 ### 34. [~] Cross-device state sync on page refresh (ignore + completed)
+
+**Commits (4 of 4 landed):**
+
+1. Design note + ROADMAP `[~]` flip + last-session-summary — `4428700`
+2. `scripts/apps_script.gs` drops `?secret=` on the three list-shape GETs — `e2a8cf1` (Tom redeployed Apps Script + smoke-tested unauthed GET after this commit)
+3. `scripts/process_events.py` client JS: fetch + reconcile + localStorage schema bump + 9 tests — `93d257d`
+4. ROADMAP close-out + SHAs (this entry).
+
+**Pending verification.** Item stays `[~]` until Tom confirms cross-device propagation on a live page. Verification scenario: ignore an event on phone → wait a few seconds → refresh tablet → confirm the card snaps to ignored within ~1s of fetch returning. Same scenario for completed and ignore-sender. Also confirm the dev/preview render (no `WEBHOOK_URL` baked in) still works — fetch should silently no-op.
+
+**Architecture invariant preserved.** Sheet remains the single source of truth. The cron-time JSON files still seed initial server-side render (no flicker on slow networks). localStorage schema changed from bare ids/domains to `{id|domain, flipped_at_iso}`; pre-#34 bare entries are tolerated and dropped on first reconcile (staleness is the migration). Failed fetches degrade silently to SSR + localStorage state with a `console.warn` breadcrumb — no toast.
 
 Filed 2026-04-27 from Tom — caught during #32 live verification. **Tom's prioritization: this item comes BEFORE #33 (PDF newsletters) in the queue** even though it's filed later, because it fixes a real UX bug that #32 made more visible.
 
