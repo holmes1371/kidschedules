@@ -21,7 +21,7 @@ Strict rules for writing it:
 **2026-04-27**
 
 - Items 30 + 31 still `[~]` pending Tom's live verification on newly-arrived emails (cards extracted before the prompt push retain old labels; see each item's "No retroactive fix" callout).
-- #32 ("Completed" checkbox on event cards) `[~]` — design decisions resolved with Tom; no code or design note yet, Tom said hold off.
+- #32 ("Completed" checkbox on event cards) `[~]` — design note landed at `design/completed-events.md`. Q1–Q10 resolved with Tom; mirrors ignore-flow surface-for-surface (sheet-as-truth, ephemeral cache, optimistic toggle). Next: commit 2 of 7 — `process_events.py` classify + render + CLI flag + tests (no JS yet).
 - #33 (PDF newsletter attachments) filed 2026-04-26 as a placeholder by Tom; reworded this session into house style. Stays `[ ]` — needs a scoping conversation before any work.
 - Nothing else in flight.
 
