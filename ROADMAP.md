@@ -20,10 +20,10 @@ Strict rules for writing it:
 
 **2026-04-27**
 
-- #23 in flight `[~]` — design note `design/test-landing-page.md` landed; new `test_output` workflow_dispatch toggle will sandbox the run to `docs/testpage.html` while a curl-prod step preserves Ellen's `/index.html` in the artifact. Code commits next.
+- #23 code complete `[~]` — three commits landed (f0dea5b design note, 0822afc workflow + main.py wiring, current process_events.py banner). 754 → 785 tests green. Pending Tom's live verification on a real `workflow_dispatch test_output=true` run before flipping to `[x]`.
 - Items 30 + 31 still `[~]` pending Tom's live verification on newly-arrived emails.
 - #33 / #35 / #36 still `[ ]` placeholders, deprioritized below #23.
-- Pre-push protocol: full `pytest tests/ -q` (754) green on strftime-patched copy of `process_events.py` before any push.
+- Pre-push protocol: full `pytest tests/ -q` (now 785) green on strftime-patched copy of `process_events.py` before any push.
 
 ## For future agents
 

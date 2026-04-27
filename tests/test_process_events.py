@@ -2953,3 +2953,129 @@ def test_event_card_address_like_location_with_url_still_linkifies_no_prefix():
     # URL still linkified — bare apex (one dot) gets www prepended
     # for reachability per #29 v3.
     assert 'href="https://www.tysonspeds.com"' in html
+
+
+# ─── ROADMAP #23: --output-target test (banner + title) ──────────────────
+
+
+def _basic_render(**overrides):
+    """Tiny helper that calls render_html with one timed event so the
+    output is non-empty. Tests below pass output_target/webhook_url
+    overrides to probe the test-mode behavior."""
+    event = {
+        "id": "evt_banner",
+        "name": "Spring Concert",
+        "date": "2026-04-23",
+        "_date_obj": dt.date(2026, 4, 23),
+        "time": "6:00 PM",
+        "location": "School Auditorium",
+        "category": "School Activity",
+        "child": "Isla",
+        "source": "Newsletter (Apr 20)",
+        "sender_domain": "school.org",
+        "sender_block_key": "school.org",
+    }
+    weeks = [(dt.date(2026, 4, 23), [event])]
+    kwargs = dict(today=TODAY, weeks=weeks, undated=[],
+                  total_future=1, lookback_days=60, webhook_url="")
+    kwargs.update(overrides)
+    return pe.render_html(**kwargs)
+
+
+def test_render_html_test_mode_includes_banner():
+    html = _basic_render(output_target="test")
+    assert 'class="test-banner"' in html, (
+        "test-mode render does not include the banner div."
+    )
+    # Banner copy. Pin enough words to detect rewording but not so much
+    # that minor edits constantly break the test.
+    assert "TEST PAGE" in html
+    assert "Manual QA build" in html
+    assert "Card actions are disabled" in html
+
+
+def test_render_html_test_mode_title_suffix():
+    html = _basic_render(output_target="test")
+    assert "<title>Kids' Schedule (TEST)</title>" in html, (
+        "test-mode render must tag the <title> with ' (TEST)' so the "
+        "browser tab is visually distinct from prod."
+    )
+
+
+def test_render_html_test_mode_includes_banner_css():
+    """The .test-banner CSS rule must ship inside <style> for the
+    banner to actually be vivid. Pin presence of the rule selector
+    so a CSS edit can't accidentally drop it."""
+    html = _basic_render(output_target="test")
+    assert ".test-banner" in html
+
+
+def test_render_html_prod_mode_omits_banner():
+    """Default output (output_target='prod', or unset) must not contain
+    the banner element or the title suffix. Prod render is byte-identical
+    to pre-#23 except for the new conditional placeholders being empty."""
+    # Explicit prod
+    html_prod = _basic_render(output_target="prod")
+    assert 'class="test-banner"' not in html_prod
+    assert "(TEST)" not in html_prod
+    assert "<title>Kids' Schedule</title>" in html_prod
+
+    # Default (no kwarg) — same as prod.
+    html_default = _basic_render()
+    assert 'class="test-banner"' not in html_default
+    assert "(TEST)" not in html_default
+
+
+def test_render_html_test_mode_empty_webhook_keeps_buttons_inert():
+    """ROADMAP #23. The Ignore/Complete buttons + #34 refresh fetches
+    all check `if (!WEBHOOK_URL) return;` before firing a request.
+    Pinning that combination — output_target=test PLUS webhook_url=""
+    — yields a page where:
+      - The injected WEBHOOK_URL JS constant is the empty string.
+      - The cards still render (banner doesn't suppress content).
+    The combination is what main.py forwards in test_output mode."""
+    html = _basic_render(output_target="test", webhook_url="")
+    assert 'var WEBHOOK_URL = "";' in html, (
+        "Test render leaked a webhook URL — Ignore/Complete buttons "
+        "would POST to a real endpoint if a webhook were ever set."
+    )
+    # Card body still renders.
+    assert 'class="event-card"' in html
+
+
+def test_render_html_test_mode_banner_above_header():
+    """The banner must precede the .header div in source order so it's
+    visually the first thing on the page. Pin the relative ordering."""
+    html = _basic_render(output_target="test")
+    banner_idx = html.find('class="test-banner"')
+    header_idx = html.find('class="header"')
+    assert banner_idx > 0 and header_idx > 0
+    assert banner_idx < header_idx, (
+        "Banner does not precede the .header div — source order matters "
+        "since both are layout-level blocks at the top of <body>."
+    )
+
+
+def test_render_html_test_mode_banner_is_position_sticky():
+    """The banner must stay visible while the user scrolls. Pin the
+    position: sticky rule so a CSS refactor can't downgrade it to a
+    plain block that scrolls off."""
+    html = _basic_render(output_target="test")
+    # Search inside the .test-banner CSS rule body.
+    rule_start = html.find(".test-banner {")
+    assert rule_start > 0, "Could not locate .test-banner CSS rule."
+    rule_end = html.find("}", rule_start)
+    rule_body = html[rule_start:rule_end]
+    assert "position: sticky" in rule_body
+    assert "top: 0" in rule_body
+
+
+def test_render_html_invalid_output_target_via_main_only():
+    """The CLI's argparse `choices` enforces the valid set ('prod', 'test').
+    render_html itself is permissive — anything other than 'test' renders
+    as prod. Pin that fall-through so a future caller passing an
+    unexpected string degrades to prod, not to a partially-rendered
+    test page."""
+    html = _basic_render(output_target="something_else")
+    assert 'class="test-banner"' not in html
+    assert "(TEST)" not in html

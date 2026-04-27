@@ -933,7 +933,8 @@ def render_html(today: dt.date,
                 webhook_url: str = "",
                 pages_url: str = "",
                 protected_senders: list[str] | None = None,
-                new_ids: set[str] | None = None) -> str:
+                new_ids: set[str] | None = None,
+                output_target: str = "prod") -> str:
     """Render a complete, self-contained HTML page for GitHub Pages.
 
     webhook_url: if non-empty, the rendered page will POST ignore decisions
@@ -953,6 +954,13 @@ def render_html(today: dt.date,
     to diff against) to suppress all badges; pass `set()` to render
     with zero events flagged new. See design/new-this-week-badges.md
     (#13) for the diff semantics.
+
+    output_target: "prod" (default) renders the normal page. "test"
+    (ROADMAP #23) prepends a vivid banner above the header explaining
+    that this is a manual `workflow_dispatch` QA build with disabled
+    card actions, and tags the <title> so the browser tab is obvious.
+    Combine with `webhook_url=""` so card-action POSTs and #34
+    refresh-time fetches all hit the existing dev/preview no-op gate.
     """
 
     webcal_base = _webcal_base(pages_url)
@@ -1302,13 +1310,30 @@ def render_html(today: dt.date,
             '    </div>'
         )
 
+    # ROADMAP #23. The test banner is the visible signal that this page
+    # is NOT live data — it's a manual workflow_dispatch QA build at
+    # /testpage.html. Renders only when output_target == "test"; prod
+    # output is byte-identical to before.
+    if output_target == "test":
+        test_banner_html = (
+            '\n  <div class="test-banner" role="alert">'
+            '\n    🧪 <strong>TEST PAGE</strong> &mdash; Manual QA build, '
+            'not live data. Card actions are disabled. Trigger another '
+            'workflow_dispatch run with <code>test_output</code> on to refresh.'
+            '\n  </div>'
+        )
+        test_title_suffix = " (TEST)"
+    else:
+        test_banner_html = ""
+        test_title_suffix = ""
+
     return f"""\
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Kids' Schedule</title>
+  <title>Kids' Schedule{test_title_suffix}</title>
   <style>
     :root {{
       --bg: #fafafa;
@@ -1744,6 +1769,28 @@ def render_html(today: dt.date,
     .toast.visible {{
       opacity: 1;
     }}
+    /* ROADMAP #23: test-mode banner. Vivid red so a stale tab can't be
+       mistaken for live data. Sticky at the top of the page so it
+       remains visible while scrolling. Renders only when
+       output_target == "test"; prod output omits the element entirely. */
+    .test-banner {{
+      position: sticky;
+      top: 0;
+      z-index: 999;
+      padding: 12px 20px;
+      background: #b00020;
+      color: #ffffff;
+      text-align: center;
+      font-size: 15px;
+      line-height: 1.4;
+      border-bottom: 2px solid #7a0017;
+    }}
+    .test-banner code {{
+      background: rgba(0, 0, 0, 0.25);
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 13px;
+    }}
     @media (prefers-color-scheme: dark) {{
       :root {{
         --bg: #1a1a1a;
@@ -1772,7 +1819,7 @@ def render_html(today: dt.date,
     }}
   </style>
 </head>
-<body>
+<body>{test_banner_html}
   <div class="header">
     <h1>Kids' Schedule</h1>
     <div class="subtitle">Updated {generated}</div>
@@ -2694,13 +2741,15 @@ def main() -> int:
                         "render set after HTML is written. Missing/malformed "
                         "file → no badges (first-run graceful degradation).")
     p.add_argument("--output-target", default="prod", choices=("prod", "test"),
-                   help="ROADMAP #23. 'test' renders a visible banner at "
-                        "the top of the page so a manual workflow_dispatch "
-                        "QA build cannot be mistaken for live data. "
-                        "'prod' (default) is the unmodified production "
-                        "render. Banner rendering lands in a later commit; "
-                        "this arg is currently accepted as a no-op for "
-                        "main.py forward-compatibility.")
+                   help="ROADMAP #23. 'test' renders a sticky red banner "
+                        "above the page header explaining that this is "
+                        "a manual workflow_dispatch QA build with disabled "
+                        "card actions, and tags the <title> with ' (TEST)' "
+                        "so the browser tab is obvious. 'prod' (default) "
+                        "is the unmodified production render. Combine "
+                        "with --webhook-url '' so card POSTs and #34 "
+                        "refresh fetches all hit the existing dev/preview "
+                        "no-op gate.")
     p.add_argument("--outlier-alerts", default="",
                    help="Path to a JSON list of outlier-alert dicts produced "
                         "by newsletter_stats.outlier_alerts. When non-empty, "
@@ -2752,7 +2801,8 @@ def main() -> int:
                            args.lookback_days, webhook_url=args.webhook_url,
                            pages_url=args.pages_url,
                            protected_senders=protected,
-                           new_ids=new_ids)
+                           new_ids=new_ids,
+                           output_target=args.output_target)
         with open(args.html_out, "w", encoding="utf-8") as f:
             f.write(html)
         # Only overwrite prior_events.json after a successful HTML write.
