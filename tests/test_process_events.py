@@ -2416,6 +2416,80 @@ def test_href_for_bare_domain_with_path():
     assert pe._href_for_bare_domain("camps.fcps.edu/account") == "https://camps.fcps.edu/account"
 
 
+def test_event_card_truncates_long_url_visible_text():
+    """A URL longer than _URL_DISPLAY_CAP is truncated in the
+    visible link text (with ellipsis) so it doesn't blow out the
+    card layout. The full URL stays in href (click works) and in
+    the title= tooltip (hover surfaces it).
+
+    Real-world trigger: Google Forms URLs with opaque ID tokens
+    that run past 100 characters."""
+    long_url = (
+        "https://docs.google.com/forms/d/e/"
+        "1FAIpQLSdpnC8hj_QU5SRoqgunu6Lqk_6e2rB2Xd41p9bgSXshDAwY7Q/viewform"
+    )
+    assert len(long_url) > pe._URL_DISPLAY_CAP, (
+        "fixture must exceed the cap to exercise truncation"
+    )
+    event = {
+        "id": "long_url",
+        "name": "Class T-Shirt Order Deadline",
+        "date": "2026-04-20",
+        "_date_obj": dt.date(2026, 4, 20),
+        "time": "All day",
+        "location": long_url,
+        "category": "School",
+        "child": "Kid",
+        "source": "School (Apr 18)",
+        "sender_domain": "fcps.edu",
+        "sender_block_key": "fcps.edu",
+    }
+    weeks = [(dt.date(2026, 4, 20), [event])]
+    html = pe.render_html(
+        today=TODAY, weeks=weeks, undated=[],
+        total_future=1, lookback_days=60, webhook_url="",
+    )
+    # Full URL preserved in href (clickable destination is correct).
+    assert f'href="{long_url}"' in html
+    # Full URL also in title= so hover surfaces it.
+    assert f'title="{long_url}"' in html
+    # Visible text is truncated with ellipsis. Pin the truncation
+    # length explicitly so a future cap-bump surfaces in this test.
+    truncated_visible = long_url[:pe._URL_DISPLAY_CAP - 1] + "…"
+    assert f">{truncated_visible}</a>" in html
+    # Sanity: the un-truncated full URL must NOT be the visible text
+    # (which would defeat the cap).
+    assert f">{long_url}</a>" not in html
+
+
+def test_event_card_short_url_not_truncated():
+    """URLs at or under the cap render with full visible text — no
+    ellipsis, no truncation. Pin so the cap heuristic doesn't
+    accidentally truncate every URL."""
+    short_url = "https://example.com/info"  # well under 70 chars
+    event = {
+        "id": "short_url",
+        "name": "Open House",
+        "date": "2026-04-20",
+        "_date_obj": dt.date(2026, 4, 20),
+        "time": "7:00 PM",
+        "location": short_url,
+        "category": "School",
+        "child": "Kid",
+        "source": "School (Apr 18)",
+        "sender_domain": "fcps.edu",
+        "sender_block_key": "fcps.edu",
+    }
+    weeks = [(dt.date(2026, 4, 20), [event])]
+    html = pe.render_html(
+        today=TODAY, weeks=weeks, undated=[],
+        total_future=1, lookback_days=60, webhook_url="",
+    )
+    # Visible text equals href value — no truncation, no ellipsis.
+    assert f">{short_url}</a>" in html
+    assert "…</a>" not in html
+
+
 def test_event_card_does_not_linkify_proper_nouns_with_periods():
     """Pin against false positives: "Mt. Vernon High School" and
     "Dr. Smith's office" must NOT be linkified — the regex requires

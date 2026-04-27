@@ -806,6 +806,16 @@ _INLINE_URL_RE = re.compile(
 )
 
 
+# Visible-text cap for linkified URLs. Long URLs (especially Google
+# Forms/docs URLs with opaque IDs) blow out the card layout when
+# rendered in full; truncation keeps the line tight while the full
+# URL stays in the href (so the click works) and the title= tooltip
+# (so hover shows the whole thing). Cap is a bit lower than the
+# source-line cap because URLs are dense / mixed-case and visually
+# heavier per character than prose.
+_URL_DISPLAY_CAP = 70
+
+
 def _href_for_bare_domain(url_text: str) -> str:
     """Build the ``href`` value for a scheme-less URL.
 
@@ -866,10 +876,18 @@ def _linkify_inline_urls(loc: str) -> str:
             href = url_text
         else:
             href = _href_for_bare_domain(url_text)
+        # Visible text truncated at _URL_DISPLAY_CAP so long URLs
+        # don't blow out the card layout. The full URL stays in
+        # href (click works) and title= (hover surfaces it).
+        if len(url_text) > _URL_DISPLAY_CAP:
+            visible = url_text[:_URL_DISPLAY_CAP - 1] + "…"
+        else:
+            visible = url_text
         parts.append(
             f'<a href="{_html.escape(href, quote=True)}" '
+            f'title="{_html.escape(url_text)}" '
             f'target="_blank" rel="noopener noreferrer">'
-            f'{_html.escape(url_text)}</a>'
+            f'{_html.escape(visible)}</a>'
         )
         last_end = end
     if last_end < len(loc):
@@ -1513,6 +1531,13 @@ def render_html(today: dt.date,
       font-size: 0.82rem;
       color: var(--text-secondary);
       margin-bottom: 0.15rem;
+      /* Long URLs without natural break points (Google Forms IDs,
+         hex tokens, etc.) would otherwise overflow the card width.
+         `overflow-wrap: anywhere` lets the browser break the URL
+         at any character when needed; visible text is also capped
+         at _URL_DISPLAY_CAP in the linkifier so this CSS is mostly
+         a narrow-screen / very-long-URL safety net. */
+      overflow-wrap: anywhere;
     }}
     /* #29 follow-up: linkified URL/domain in the location line.
        Traditional dark-theme link blue (#58a6ff, GitHub-dark style)

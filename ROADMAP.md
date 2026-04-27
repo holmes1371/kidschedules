@@ -21,9 +21,9 @@ Strict rules for writing it:
 **2026-04-25**
 
 - Items 27 and 28 closed `[x]` after Tom's prod verification (commit aa20b4b moved full prose to `COMPLETED.md`).
-- Item 29 in flight `[~]` — five commits so far: 8606610 (source + Location: prefix v1), 6cd0f74 (CI fixup), 4467aba (URL linkification v2), 43b4621 (CI fixup), and this commit (link blue + bare-domain `www.` reachability v3). Tom hit "refused to connect" on `https://myschoolbucks.com/`; helper now adds `www.` for fully bare domains (one-dot `label.tld` shape) so apex-only sites are reachable. Link color also changed from muted-inherit to GitHub-dark blue (`#58a6ff`) so it stands out.
-- Test delta vs main: +20 passing on Linux/CI (10 unit tests + 10 render-integration). On Windows, the 10 render tests still fail with the same unrelated `%-d` strftime issue.
-- Nothing else in flight. Next session moves item-29 prose to `COMPLETED.md` once Tom verifies the source line, location prefix, clickable + reachable URLs, and blue link color all work on the live page.
+- Item 29 in flight `[~]` — six commits so far: 8606610 (source + Location: prefix v1), 6cd0f74 (CI fixup), 4467aba (URL linkification v2), 43b4621 (CI fixup), 5052b1f (link blue + `www.` reachability v3), and this commit (long-URL truncation + `overflow-wrap: anywhere` v4).
+- Test delta vs main: +22 passing on Linux/CI (10 unit tests + 12 render-integration). On Windows, the 12 render tests still fail with the same unrelated `%-d` strftime issue.
+- Nothing else in flight. Next session moves item-29 prose to `COMPLETED.md` once Tom verifies the source line, location prefix, clickable+reachable URLs, blue link color, and clean long-URL wrapping all work on the live page.
 
 ## For future agents
 
@@ -138,7 +138,9 @@ Filed 2026-04-25 from Tom: event cards lacked any source attribution despite eve
 
 **Link styling.** CSS for `.event-location a` ships traditional dark-theme link blue (`#58a6ff`, GitHub-dark style) so the link is unambiguous against the muted location text. Hover bumps a shade brighter (`#79b8ff`) for affordance.
 
-Item stays `[~]` pending Tom's live verification post-deploy: load the page, confirm (a) a `From: ...` line under each card, (b) `Location:` prefix on plain venues but not on full street addresses, (c) URLs (full and bare-domain) render as clickable underlined links.
+**Long-URL wrapping (v4 follow-up).** Google Forms / instantseats / DocuSign URLs ran past 100 characters and blew out the card layout when rendered in full. Two-pronged fix: (a) visible link text is now capped at `_URL_DISPLAY_CAP=70` chars in the linkifier with ellipsis on overflow — full URL stays in `href` (click works) and `title=` (hover surfaces it); (b) `.event-location` CSS gains `overflow-wrap: anywhere` as a narrow-screen / very-long-fragment safety net so even after truncation the line breaks cleanly instead of overflowing the card width.
+
+Item stays `[~]` pending Tom's live verification post-deploy: load the page, confirm (a) a `From: ...` line under each card, (b) `Location:` prefix on plain venues but not on full street addresses, (c) URLs (full and bare-domain) render as clickable underlined links, (d) long URLs are visibly truncated with ellipsis but still click through to the full destination.
 
 ## Descoped / on hold
 
