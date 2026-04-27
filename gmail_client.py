@@ -20,6 +20,14 @@ from googleapiclient.discovery import build
 
 SCOPES = ["https://www.googleapis.com/auth/gmail.modify"]
 
+# ROADMAP #33. Per-PDF size cap. PDFs exceeding this are skipped with a
+# warning; the email body still flows through the agent normally so a
+# too-large attachment degrades to today's behavior rather than failing
+# the batch. School newsletters in practice are 100KB–2MB; 8MB is a
+# comfortable headroom while well under Anthropic's hard limit (32MB
+# per document block, 100 pages).
+MAX_PDF_BYTES = 8 * 1024 * 1024
+
 
 def _get_credentials() -> Credentials:
     """Build credentials from environment variables or local token.json."""
@@ -110,7 +118,15 @@ class GmailClient:
         return results
 
     def read_message(self, message_id: str) -> dict[str, Any]:
-        """Read a full message and return id, headers, and decoded body text."""
+        """Read a full message and return id, headers, decoded body text,
+        and any PDF attachments under MAX_PDF_BYTES (ROADMAP #33).
+
+        The returned ``pdfs`` field is always a list (possibly empty);
+        callers can iterate it without a key check. Oversized PDFs are
+        skipped with a stderr warning. Reference-style attachments
+        (data lives behind ``attachmentId`` rather than inline) trigger
+        a second ``messages.attachments.get`` call to fetch the bytes.
+        """
         msg = (
             self._service.users()
             .messages()
@@ -122,13 +138,123 @@ class GmailClient:
             headers[h["name"]] = h["value"]
 
         body_text = self._extract_body(msg.get("payload", {}))
+        pdfs = self._extract_pdfs(msg.get("payload", {}), message_id)
         return {
             "messageId": message_id,
             "threadId": msg.get("threadId"),
             "headers": headers,
             "snippet": msg.get("snippet", ""),
             "body": body_text,
+            "pdfs": pdfs,
         }
+
+    def _extract_pdfs(
+        self, payload: dict, message_id: str
+    ) -> list[bytes]:
+        """Walk a message payload and return all `application/pdf` parts
+        as raw bytes (ROADMAP #33).
+
+        Two attachment shapes the Gmail API returns:
+
+        - Inline (small attachments): ``part.body.data`` carries the
+          base64url-encoded bytes directly. Decode and return.
+        - Reference (large attachments, typically >5MB): ``part.body``
+          carries only ``attachmentId`` + ``size``. A second call to
+          ``users.messages.attachments.get(messageId, attachmentId)``
+          fetches the bytes.
+
+        Per-PDF size cap: ``MAX_PDF_BYTES``. Oversized attachments —
+        whether the size is known up front (reference-style) or only
+        after decoding (inline) — are skipped with a stderr warning.
+        Skip is non-fatal: the body still flows through the agent
+        normally for that message.
+
+        Recursive: handles `multipart/mixed` wrapping `multipart/
+        related` wrapping `multipart/alternative` (the realistic shape
+        from Outlook clients), plus deeper nesting if it ever shows up.
+        """
+        out: list[bytes] = []
+        self._walk_pdf_parts(payload, message_id, out)
+        return out
+
+    def _walk_pdf_parts(
+        self, part: dict, message_id: str, out: list[bytes]
+    ) -> None:
+        """Recursive helper for `_extract_pdfs`."""
+        mime = part.get("mimeType", "")
+        if mime == "application/pdf":
+            body = part.get("body", {}) or {}
+            size = int(body.get("size", 0) or 0)
+            if size and size > MAX_PDF_BYTES:
+                fname = part.get("filename") or "(unnamed)"
+                print(
+                    f"    WARNING: skipping PDF {fname!r} on "
+                    f"message {message_id} — {size} bytes "
+                    f"exceeds MAX_PDF_BYTES ({MAX_PDF_BYTES})"
+                )
+                return
+            inline_data = body.get("data")
+            if inline_data:
+                try:
+                    decoded = base64.urlsafe_b64decode(inline_data)
+                except (TypeError, ValueError) as e:
+                    print(
+                        f"    WARNING: PDF on message {message_id} "
+                        f"failed to base64-decode: {e}"
+                    )
+                    return
+            else:
+                attachment_id = body.get("attachmentId")
+                if not attachment_id:
+                    return
+                try:
+                    resp = (
+                        self._service.users()
+                        .messages()
+                        .attachments()
+                        .get(
+                            userId=self._user,
+                            messageId=message_id,
+                            id=attachment_id,
+                        )
+                        .execute()
+                    )
+                except Exception as e:
+                    print(
+                        f"    WARNING: failed to fetch PDF attachment "
+                        f"{attachment_id!r} on message {message_id}: {e}"
+                    )
+                    return
+                fetched_data = (resp or {}).get("data")
+                if not fetched_data:
+                    return
+                try:
+                    decoded = base64.urlsafe_b64decode(fetched_data)
+                except (TypeError, ValueError) as e:
+                    print(
+                        f"    WARNING: PDF attachment "
+                        f"{attachment_id!r} on message {message_id} "
+                        f"failed to base64-decode: {e}"
+                    )
+                    return
+            # Defensive: if the inline-data branch undercounted the size
+            # (some Outlook payloads omit ``size`` or report the encoded
+            # length), enforce the cap on the decoded bytes too.
+            if len(decoded) > MAX_PDF_BYTES:
+                fname = part.get("filename") or "(unnamed)"
+                print(
+                    f"    WARNING: skipping PDF {fname!r} on "
+                    f"message {message_id} — decoded {len(decoded)} "
+                    f"bytes exceeds MAX_PDF_BYTES ({MAX_PDF_BYTES})"
+                )
+                return
+            out.append(decoded)
+            return
+        # Multipart container — recurse. Anything else (text/html,
+        # text/plain, image/png, etc.) is silently ignored at this
+        # layer; `_extract_body` handles the body parts.
+        for child in part.get("parts", []) or []:
+            self._walk_pdf_parts(child, message_id, out)
 
     def _extract_body(self, payload: dict) -> str:
         """Recursively extract plain-text body from a message payload."""

@@ -487,7 +487,301 @@ def test_read_message_returns_full_envelope():
         "headers": {"From": "sender@x.com", "Subject": "Re: event"},
         "snippet": "snip",
         "body": body_text,
+        "pdfs": [],
     }
+
+
+# ─── ROADMAP #33: PDF attachment fetching ────────────────────────────────
+
+
+_PDF_BYTES = b"%PDF-1.4\n%fake-pdf-bytes-for-tests\n%%EOF"
+
+
+def _multipart_payload_with_pdf(
+    body_text: str = "body",
+    pdf_data_b64: str | None = None,
+    attachment_id: str | None = None,
+    pdf_size: int | None = None,
+    pdf_filename: str = "March 25th.pdf",
+) -> dict:
+    """Hand-craft the realistic Outlook payload shape: multipart/mixed
+    wrapping multipart/related wrapping multipart/alternative for the
+    body, plus a sibling application/pdf part. Either inline data or
+    attachmentId reference.
+
+    Mirrors the structure of fixtures/test/pdf_newsletter_third_grade.eml
+    so test code reflects the real Gmail-API response shape.
+    """
+    pdf_body: dict = {}
+    if pdf_data_b64 is not None:
+        pdf_body["data"] = pdf_data_b64
+    if attachment_id is not None:
+        pdf_body["attachmentId"] = attachment_id
+    if pdf_size is not None:
+        pdf_body["size"] = pdf_size
+    return {
+        "mimeType": "multipart/mixed",
+        "headers": [{"name": "From", "value": "teacher@fcps.edu"}],
+        "parts": [
+            {
+                "mimeType": "multipart/related",
+                "parts": [
+                    {
+                        "mimeType": "multipart/alternative",
+                        "parts": [
+                            {
+                                "mimeType": "text/plain",
+                                "body": {"data": _b64(body_text)},
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
+                "mimeType": "application/pdf",
+                "filename": pdf_filename,
+                "body": pdf_body,
+            },
+        ],
+    }
+
+
+def test_read_message_pdfs_empty_when_no_attachment():
+    """A plain text-only email (no PDF parts) yields pdfs=[]. Pin the
+    contract that the field is ALWAYS a list, never absent — callers
+    should be able to iterate without a key check."""
+    def get_route(**kwargs):
+        return {
+            "threadId": "t",
+            "snippet": "",
+            "payload": {
+                "mimeType": "text/plain",
+                "headers": [],
+                "body": {"data": _b64("body only")},
+            },
+        }
+    client = _client_with_routes({"users.messages.get": get_route})
+    result = client.read_message("m1")
+    assert result["pdfs"] == []
+
+
+def test_read_message_pdfs_inline_decodes():
+    """Small PDF attachments (typical school newsletter, <5MB) come
+    back inline in part.body.data. The walker decodes them and returns
+    raw bytes."""
+    pdf_b64 = _b64_bytes(_PDF_BYTES)
+    payload = _multipart_payload_with_pdf(
+        pdf_data_b64=pdf_b64, pdf_size=len(_PDF_BYTES),
+    )
+
+    def get_route(**kwargs):
+        return {"threadId": "t", "snippet": "", "payload": payload}
+
+    client = _client_with_routes({"users.messages.get": get_route})
+    result = client.read_message("m1")
+
+    assert result["pdfs"] == [_PDF_BYTES]
+    # Body still extracted alongside the PDF.
+    assert result["body"] == "body"
+
+
+def test_read_message_pdfs_reference_fetches_attachment():
+    """Larger attachments (>5MB-ish) come as references — body has only
+    attachmentId. The walker calls users.messages.attachments.get to
+    fetch the bytes and returns them."""
+    pdf_b64 = _b64_bytes(_PDF_BYTES)
+    payload = _multipart_payload_with_pdf(
+        attachment_id="att-99",
+        pdf_size=len(_PDF_BYTES),  # advertised size still under cap
+    )
+    captured = {}
+
+    def get_route(**kwargs):
+        return {"threadId": "t", "snippet": "", "payload": payload}
+
+    def attachments_get_route(**kwargs):
+        captured.update(kwargs)
+        return {"data": pdf_b64}
+
+    client = _client_with_routes({
+        "users.messages.get": get_route,
+        "users.messages.attachments.get": attachments_get_route,
+    })
+    result = client.read_message("m1")
+
+    assert result["pdfs"] == [_PDF_BYTES]
+    # The reference fetch was called with the right ids.
+    assert captured == {
+        "userId": "me",
+        "messageId": "m1",
+        "id": "att-99",
+    }
+
+
+def test_read_message_pdfs_oversized_skipped_via_advertised_size(capsys):
+    """Reference-style PDFs whose advertised size already exceeds
+    MAX_PDF_BYTES are skipped without making the second API call —
+    avoids transferring multi-MB bytes only to drop them. A warning
+    lands on stdout for log-side visibility."""
+    payload = _multipart_payload_with_pdf(
+        attachment_id="att-big",
+        pdf_size=gmail_client.MAX_PDF_BYTES + 1,
+    )
+
+    def get_route(**kwargs):
+        return {"threadId": "t", "snippet": "", "payload": payload}
+
+    def attachments_get_route(**kwargs):
+        raise AssertionError(
+            "attachments.get must NOT be called when advertised size "
+            "exceeds MAX_PDF_BYTES"
+        )
+
+    client = _client_with_routes({
+        "users.messages.get": get_route,
+        "users.messages.attachments.get": attachments_get_route,
+    })
+    result = client.read_message("m1")
+    assert result["pdfs"] == []
+    out = capsys.readouterr().out
+    assert "exceeds MAX_PDF_BYTES" in out
+
+
+def test_read_message_pdfs_oversized_skipped_via_decoded_length(capsys):
+    """Defensive cap on the inline branch: some senders' payloads omit
+    `size` (or report the encoded length, which is ~33% larger than
+    decoded). After decoding, the walker re-checks against the cap so
+    a missing-size payload can't sneak past."""
+    big_pdf = b"%PDF-1.4\n" + b"X" * (gmail_client.MAX_PDF_BYTES + 100)
+    pdf_b64 = _b64_bytes(big_pdf)
+    payload = _multipart_payload_with_pdf(
+        pdf_data_b64=pdf_b64,
+        # Note: no pdf_size provided — simulates an Outlook payload
+        # that omits the size hint.
+    )
+
+    def get_route(**kwargs):
+        return {"threadId": "t", "snippet": "", "payload": payload}
+
+    client = _client_with_routes({"users.messages.get": get_route})
+    result = client.read_message("m1")
+    assert result["pdfs"] == []
+    assert "exceeds MAX_PDF_BYTES" in capsys.readouterr().out
+
+
+def test_read_message_pdfs_multiple_attachments_all_returned():
+    """Edge: a single email carrying multiple PDF attachments (rare
+    but realistic — e.g. a teacher attaching both a weekly newsletter
+    and a permission slip). All under the cap come through; order
+    matches the part order in the payload."""
+    pdf_a = b"%PDF-1.4\nA\n%%EOF"
+    pdf_b = b"%PDF-1.4\nB\n%%EOF"
+    payload = {
+        "mimeType": "multipart/mixed",
+        "headers": [],
+        "parts": [
+            {
+                "mimeType": "text/plain",
+                "body": {"data": _b64("body")},
+            },
+            {
+                "mimeType": "application/pdf",
+                "filename": "first.pdf",
+                "body": {
+                    "data": _b64_bytes(pdf_a),
+                    "size": len(pdf_a),
+                },
+            },
+            {
+                "mimeType": "application/pdf",
+                "filename": "second.pdf",
+                "body": {
+                    "data": _b64_bytes(pdf_b),
+                    "size": len(pdf_b),
+                },
+            },
+        ],
+    }
+
+    def get_route(**kwargs):
+        return {"threadId": "t", "snippet": "", "payload": payload}
+
+    client = _client_with_routes({"users.messages.get": get_route})
+    result = client.read_message("m1")
+    assert result["pdfs"] == [pdf_a, pdf_b]
+
+
+def test_read_message_pdfs_attachment_fetch_failure_warns_and_skips(capsys):
+    """Reference-fetch failure (transient API error, permissions
+    drift, etc.) → log a warning and skip the PDF. Body still flows
+    through; the run continues."""
+    payload = _multipart_payload_with_pdf(
+        attachment_id="att-fail", pdf_size=1024,
+    )
+
+    def get_route(**kwargs):
+        return {"threadId": "t", "snippet": "", "payload": payload}
+
+    def attachments_get_route(**kwargs):
+        raise RuntimeError("boom")
+
+    client = _client_with_routes({
+        "users.messages.get": get_route,
+        "users.messages.attachments.get": attachments_get_route,
+    })
+    result = client.read_message("m1")
+    assert result["pdfs"] == []
+    assert result["body"] == "body"
+    assert "failed to fetch PDF attachment" in capsys.readouterr().out
+
+
+def test_read_message_pdfs_real_eml_fixture_decodes_intact():
+    """End-to-end against the committed .eml fixture: parse the .eml
+    with stdlib email, simulate the Gmail-API response shape, and
+    confirm read_message extracts the same PDF bytes byte-for-byte
+    as the source. Pins the realistic Outlook MIME shape against the
+    walker's recursion."""
+    fixture_path = (
+        Path(__file__).resolve().parent.parent
+        / "fixtures" / "test" / "pdf_newsletter_third_grade.eml"
+    )
+    with fixture_path.open("rb") as f:
+        msg = email.message_from_binary_file(f, policy=email.policy.default)
+
+    # Pull out the PDF bytes the way our test will assert against them.
+    expected_pdf_bytes: bytes | None = None
+    for part in msg.walk():
+        if part.get_content_type() == "application/pdf":
+            expected_pdf_bytes = part.get_payload(decode=True)
+            break
+    assert expected_pdf_bytes is not None, "fixture lost its PDF part"
+
+    # Build a Gmail-API-style payload with the same PDF inline.
+    payload = {
+        "mimeType": "multipart/mixed",
+        "headers": [],
+        "parts": [
+            {
+                "mimeType": "text/plain",
+                "body": {"data": _b64("body")},
+            },
+            {
+                "mimeType": "application/pdf",
+                "filename": "March 25th.pdf",
+                "body": {
+                    "data": _b64_bytes(expected_pdf_bytes),
+                    "size": len(expected_pdf_bytes),
+                },
+            },
+        ],
+    }
+
+    def get_route(**kwargs):
+        return {"threadId": "t", "snippet": "", "payload": payload}
+
+    client = _client_with_routes({"users.messages.get": get_route})
+    result = client.read_message("m1")
+    assert result["pdfs"] == [expected_pdf_bytes]
 
 
 def test_create_draft_single_part_plain_text():
