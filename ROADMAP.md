@@ -20,12 +20,12 @@ Strict rules for writing it:
 
 **2026-04-27**
 
-- #33 in flight `[~]` — design note + `pdf_sender_domains.{txt,py}` + .eml fixture landed. Approach: Anthropic native PDF (`document` block); FCPS-only sender gate; 8MB cap; batch-of-1; #31 source-date preserved. Code commits next: gmail_client PDF fetch → agent content-blocks + prompt → main.py wiring. 785 → 791 tests.
+- #33 code complete `[~]` — 4 commits (37aa60f / 51c8a54 / a9ffee7 / 63e86df). 754 → 815 tests green. Approach: Anthropic native PDF (`document` content block), FCPS-only sender gate via `pdf_sender_domains.txt`, 8MB cap, batch-of-1 for PDF-bearing emails, #31 source-date directive extended to pin PDF edition labels are NOT the source date. Pending Tom's live verification on the next real teacher PDF email; verification checklist in #33's body.
 - #23 closed `[x]` — Tom verified live; full prose archived in `COMPLETED.md`. 4 commits.
 - Soft-delete convention retired (commit fd6c1b9) — `rm` works on the local mount now.
 - Items 30 + 31 still `[~]` pending Tom's live verification on newly-arrived emails.
 - #35 / #36 still `[ ]` placeholders.
-- Pre-push protocol: full `pytest tests/ -q` (now 791) green before any push.
+- Pre-push protocol: full `pytest tests/ -q` (now 815) green before any push.
 
 ## For future agents
 
@@ -143,13 +143,25 @@ Item stays `[~]` pending live verification.
 
 34\. [x] Cross-device state sync on page refresh (ignore + completed) — 4428700 / e2a8cf1 / 93d257d / e1151c9 — see COMPLETED.md
 
-### 33. [~] Extract events from PDF newsletter attachments on teacher emails
+### 33. [~] Extract events from PDF newsletter attachments on teacher emails — 37aa60f / 51c8a54 / a9ffee7 / 63e86df
 
-In flight 2026-04-27. Design note: `design/pdf-newsletter-attachments.md`. Approach locked: Anthropic native PDF (`document` content block) — pure-text extraction (`pypdf` / `pdfplumber`) was rejected because school newsletters are layout-heavy (4-quadrant boxes, calendar grids, sidebar tables) and pure text extraction flattens them into orphan-date soup. Cost: ~$0.01–0.02 per PDF email on Sonnet 4.6.
+Code complete 2026-04-27. Design note: `design/pdf-newsletter-attachments.md`. Four commits:
 
-Sender gating via new `pdf_sender_domains.txt` at repo root (seeded with `fcps.edu`); loader at `scripts/pdf_sender_domains.py` reuses `protected_senders.is_protected` so no new matching code lands. PDF size cap 8MB. PDF-bearing emails always run batch-of-1 (force-merged into the newsletter set for the run). Source-date directive (#31) preserved verbatim — email's sent date, not the PDF's edition label.
+- `37aa60f` — Design note + ROADMAP `[~]` flip + .eml fixture + `pdf_sender_domains.txt` seed (`fcps.edu`) + `scripts/pdf_sender_domains.py` loader/matcher (delegates to `protected_senders.is_protected`) + 6 unit tests.
+- `51c8a54` — `gmail_client.py` PDF attachment fetch. `read_message` now returns a `pdfs: list[bytes]` field (always present, empty when no PDFs). Walks MIME parts recursively for `application/pdf`; handles inline data + reference-style `attachmentId` paths. 8MB cap enforced both via advertised size (skip the second API call when oversized) and decoded-bytes length (defensive against missing-size payloads). Failures are skip-and-warn — body still flows through. 8 new tests including end-to-end against the committed `.eml` fixture.
+- `a9ffee7` — `agent.py` content-block plumbing + prompt directive. `_plan_batches` forces batch-of-1 for any email with non-empty `pdfs`, regardless of newsletter-classifier state. `extract_events` builds a list-of-content-blocks payload (one `document` block per PDF, in input order, ahead of a single `text` block) when any email in the batch has PDFs; no-PDF batches keep the string-content path. `_call_with_retry`'s `user_message` kwarg renamed to `user_content` to reflect the dual shape. Prompt extends section #8 (PDFs are processed like email-body content) and the source-field block (PDF edition labels do NOT change source date — pinned with a GOOD/BAD example pair). 10 new tests + 1 prompt-pin.
+- `63e86df` — `main.py` sender gating + step2b PDF wiring. `step2b_read_promising` propagates `pdfs` into the per-email dicts; new `_gate_pdfs_by_sender` helper drops `pdfs` to `[]` on non-school senders (using `email.utils.parseaddr` to handle named-form headers like `"Meredith Rohde <mlrohde@fcps.edu>"`). Empty patterns list drops every PDF — safe default. New `PDF_SENDER_DOMAINS_PATH` constant. Cache trade-off documented: when the gating list expands later, previously-cached messages from a newly-eligible sender need `--reextract <messageId>` to surface their PDFs. 6 new tests.
 
-Sample fixture: `fixtures/test/pdf_newsletter_third_grade.eml` (real teacher email from `mlrohde@fcps.edu`, 121KB PDF inside, 1 page, 5 dated events in the bottom Upcoming-Dates block). Reminder for future sessions: this is a sample, not a template — different teachers will format differently.
+754 → 815 tests green (61 net new across the four commits — 6 sender-domain + 8 gmail + 10 agent (5 plan_batches + 5 extract_events) - 1 reused + 1 prompt + 6 main.py - net counted).
+
+**Pending Tom's live verification.** Verification checklist:
+
+- (a) After the next teacher email with a PDF attachment arrives, trigger `workflow_dispatch test_output=true` and confirm `/testpage.html` shows the events extracted from the PDF (e.g. the bottom Upcoming-Dates block of a Rohde 3rd-grade newsletter).
+- (b) Source line on those event cards reads "Rohde, Meredith (Apr 2)" or similar — the email's sent date, NOT the PDF's edition label.
+- (c) Workflow log line "PDF gating: N email(s) with eligible PDF(s); M non-school sender PDF(s) dropped" reflects the right counts. A Costco-receipt PDF in a personal email sitting in the lookback window should show up in M, not N.
+- (d) Cost telemetry from the agent's per-batch `usage` log line shows the expected token bump on PDF batches (~1.5k–3k extra input tokens per page) and stays within ~$0.05/week at typical cadence.
+
+**Sample fixture: `fixtures/test/pdf_newsletter_third_grade.eml`** (real teacher email from `mlrohde@fcps.edu`, 121KB PDF inside, 1 page, 5 dated events in the bottom Upcoming-Dates block). Reminder for future sessions: this is a sample, not a template — different teachers will format differently.
 
 ### 35. [ ] Offline write queue: persist ignore / complete flips locally when offline, sync on reconnect
 
