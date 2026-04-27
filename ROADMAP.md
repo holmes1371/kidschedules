@@ -20,10 +20,10 @@ Strict rules for writing it:
 
 **2026-04-27**
 
-- #23 code complete `[~]` — 4 commits (f0dea5b / 0822afc / c0bf8e4 / 75b7a5d). Pending Tom's live verification on a real `workflow_dispatch test_output=true` run; verification checklist in #23's body.
-- Soft-delete convention retired — Tom confirmed `rm` works on the local mount now. Deleted `design/soft-delete-convention.md`, removed the `.to_delete/` block from `.gitignore`, dropped the related Session-discipline bullet, scrubbed FUSE-specific references from `pytest.ini` + `.gitattributes` comments. Any future stale `.git/*.lock` is now a normal `rm` away.
+- #23 closed `[x]` — Tom verified live: test page came up at `/testpage.html` with current data + red banner, Ellen's `/index.html` unchanged from the last cron. Full prose archived in `COMPLETED.md`. 4 commits (f0dea5b / 0822afc / c0bf8e4 / 75b7a5d).
+- Soft-delete convention retired (commit fd6c1b9) — `rm` works on the local mount now. Stale `.git/*.lock` is a normal `rm` away.
 - Items 30 + 31 still `[~]` pending Tom's live verification on newly-arrived emails.
-- #33 / #35 / #36 still `[ ]` placeholders, deprioritized below #23.
+- #33 / #35 / #36 still `[ ]` placeholders, next in queue.
 - Pre-push protocol: full `pytest tests/ -q` (now 785) green before any push.
 
 ## For future agents
@@ -98,31 +98,7 @@ Status legend:
 
 22\. [x] Bug: page header "N day lookback" ignores `--lookback-days` CLI value — 563827d — see COMPLETED.md
 
-### 23. [~] Separate test landing page for manual `workflow_dispatch` QA runs — f0dea5b / 0822afc / c0bf8e4
-
-Code complete 2026-04-27. Design note: `design/test-landing-page.md`. Three commits:
-
-- `f0dea5b` — Design note + ROADMAP `[~]` flip.
-- `0822afc` — `test_output` `workflow_dispatch` input wired through to `main.py`; state-branch save gated; curl-prod step preserves Ellen's `/index.html` (and any ICS files it links to) before artifact upload; `should_create_draft` / `step1b_filter_audit` / `step3b_update_auto_blocklist` / `es.save_state` / `ns.save_stats` all short-circuit; `step4_process_events` forwards `--webhook-url ""` + `--output-target test`, omits `--prior-events` and `--ics-out-dir`; `step5_publish` writes `docs/testpage.html`. 23 new tests across `tests/test_workflow_test_output_gate.py`, `tests/test_main.py`, `tests/test_main_orchestration.py`.
-- `c0bf8e4` — `process_events.py --output-target test` renders sticky red banner ("🧪 TEST PAGE — Manual QA build, not live data. Card actions are disabled. Trigger another workflow_dispatch run with `test_output` on to refresh.") above `.header`, plus ` (TEST)` suffix in `<title>`. Empty `webhook_url` (forwarded by main.py) makes both the POST handlers and #34 refresh-fetches inert via the existing dev/preview no-op gate — no new flag threading needed. 8 new render-substring tests. 754 → 785 tests green.
-
-**Pending Tom's live verification on a real `workflow_dispatch test_output=true` run.** Verification checklist:
-
-- (a) `https://<pages>/index.html` (Ellen's prod page) is unchanged after the test run — same `Updated` timestamp, same content as before the dispatch.
-- (b) `https://<pages>/testpage.html` shows current data (the post-test fresh extraction) with the red banner at the top and "Kids' Schedule (TEST)" in the browser tab.
-- (c) Clicking Ignore / Complete / Ignore-sender on the testpage does nothing visible (the buttons render but the click handlers no-op due to empty `WEBHOOK_URL`).
-- (d) ICS download links on Ellen's preserved prod page still work (the curl-prod step scraped and preserved the `docs/ics/*.ics` files alongside `index.html`).
-- (e) After the next regular cron tick (next Mon/Wed/Sat 6:15 ET), prod `/index.html` is rebuilt normally and any test data extracted during the test run is re-extracted on the prod side (no `events_state.json` write happened on the test run, so the messages are still "new" to the prod path).
-
-**Tom's UX (confirmed 2026-04-27).** New checkbox toggle in the existing `workflow_dispatch` UI alongside Dry run / Intentional failure / Create draft — when flipped on, the entire run writes to the test landing page; when left off, the manual run behaves like a cron tick and updates the normal production page. Cron-scheduled runs are unaffected and always go to production.
-
-**Resolved design questions** (answers locked in 2026-04-27 conversation; see `design/test-landing-page.md`):
-
-- *Single global toggle.* `test_output=true` skips every persistent write — Gmail draft (#3), `events_state.json` (#4), `prior_events.json` (#13), `sender_stats.json` (#17), all auto-blocklist files (#27), `.filter_audit.json` (#2), the state-branch push, and Apps Script POSTs from the rendered page (#32, #6 via empty webhook URL).
-- *Independent of #3's `--create-draft`.* They mean different things; in test mode the draft gate is force-flipped to false, but the flags remain orthogonal.
-- *No commit-message-prefix needed.* There are no main-branch commits during a test run — Pages deploys from the workflow's artifact, not from main, and the state-branch push is gated off.
-- *Preserve prod via curl, not state branch.* Curl-from-live is the lightest of three considered options; failure mode is bounded (prod briefly 404s, next cron heals it). State-branch backup of `docs/index.html` + ICS would be more durable but adds maintenance surface; reserved as a fallback if curl reliability becomes an issue.
-- *File naming `docs/testpage.html`, not `docs/test/index.html`.* Flat is simpler — no nested `test/ics/` to manage.
+23\. [x] Separate test landing page for manual `workflow_dispatch` QA runs — f0dea5b / 0822afc / c0bf8e4 / 75b7a5d — see COMPLETED.md
 
 24\. [x] Bug: `agent.py` defines `AUDIT_SYSTEM_PROMPT` twice — 0ba31c9 — see COMPLETED.md
 
