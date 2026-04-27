@@ -21,9 +21,10 @@ Strict rules for writing it:
 **2026-04-27**
 
 - Items 30 + 31 still `[~]` pending Tom's live verification on newly-arrived emails (cards extracted before the prompt push retain old labels; see each item's "No retroactive fix" callout).
-- #32 ("Completed" checkbox on event cards) `[~]` — all 7 commits in plan landed; Tom redeployed Apps Script mid-session after commit 3. Awaiting live verification on the next cron cycle (check a card on phone, confirm checkbox state propagates to tablet after refresh; verify `completed_events.json` populates in CI logs).
-- #33 (PDF newsletter attachments) filed 2026-04-26 as a placeholder by Tom; reworded this session into house style. Stays `[ ]` — needs a scoping conversation before any work.
-- Nothing else in flight.
+- #32 ("Completed" checkbox on event cards) `[~]` — landed end-to-end (7 commits + 1 fix-up + 1 UX tweak); Tom verified on live page, working as designed. Awaiting final close-out signoff after the next cron cycle confirms cross-device propagation.
+- #34 (Cross-device state sync on page refresh) **filed 2026-04-27 — Tom's stated next-priority item, ahead of #33.** Closes the UX gap exposed by #32 + #18: a phone ignore/complete doesn't show on tablet until next cron. Fix: client-side fetch against existing Apps Script `doGet` on page load, reconcile against rendered DOM. Open auth/CORS/reconciliation questions captured in the entry.
+- #33 (PDF newsletter attachments) filed 2026-04-26 as a placeholder; stays `[ ]` and now sits BEHIND #34 in the queue.
+- Pre-push protocol updated this session: full `pytest tests/ -q` (all 745) must pass green on the strftime-patched copy of `process_events.py` before any push. Memory note saved.
 
 ## For future agents
 
@@ -169,6 +170,29 @@ Filed 2026-04-27 from Tom. Adds a per-card "completed" affordance so Ellen can m
 **Pending verification.** Item stays `[~]` until Tom confirms on a live cron cycle: (a) checking a card on phone propagates to tablet after the next cron rebuild, (b) `completed_events.json` shows the expected row count in CI logs after a cron run, (c) the Ignore-event / Ignore-sender buttons disappear from a completed card and reappear on uncheck, (d) the "Completed Events" sheet tab in the Google Sheet accumulates rows correctly (auto-created on first append).
 
 **Manual deploy step landed mid-session.** Apps Script was redeployed after commit 3, before any client surface started calling the new endpoints. The page rendered as normal between commits 3 and 6 — checkboxes appeared but clicks were no-ops. From commit 6 onward, the full UX is live; the next cron cycle is the first one that exercises the end-to-end flow.
+
+### 34. [ ] Cross-device state sync on page refresh (ignore + completed)
+
+Filed 2026-04-27 from Tom — caught during #32 live verification. **Tom's prioritization: this item comes BEFORE #33 (PDF newsletters) in the queue** even though it's filed later, because it fixes a real UX bug that #32 made more visible.
+
+**The gap.** Ignore-event, Ignore-sender, and Completed (#32) flips persist immediately to the Google Sheet via the Apps Script POST, but they only propagate to OTHER devices after the next cron rebuild (Mon / Wed / Sat 6:15 ET). Concretely: Ellen ignores or completes an event on her phone → row written to sheet → Tom opens the page on his tablet between cron ticks → he still sees the old state. localStorage doesn't help because it's per-browser. The fix should be: a simple **page refresh** picks up the latest state from the sheet, no waiting for the next cron job.
+
+Scope covers all three sheet-backed lists: `ignored_events`, `completed_events` (#32), `ignored_senders`. They share a problem and a fix.
+
+**Sketch.** On page load, the client JS fires fetches against the existing Apps Script `doGet` endpoint (`?kind=ignored`, `?kind=completed`, `?kind=ignored_senders`) and reconciles each card's state against the fetched lists. Three-tier client-side reconciliation: **server-rendered initial state** (from the cron-time JSON files, current behavior — keeps the first paint fast and flicker-free) → **fetched-on-load overlay** (NEW — snaps to current sheet state within ~1s of page load) → **localStorage optimistic overlay** (current behavior — preserves the user's own un-round-tripped flips).
+
+Architecture invariant preserved: **Sheet is still the single source of truth.** This item just shortens the rendering-latency-to-cross-device-consistency from "next cron tick" to "next refresh." `completed_events.json` / `ignored_events.json` / `ignored_senders.json` stay as the cron-time SSR seed — without them, the page would render briefly with no state and visibly flip when the fetch completes.
+
+**Design questions to resolve before coding:**
+
+- **Auth on the GET endpoint.** Today `?kind=...` requires `?secret=$IGNORE_READ_SECRET`. Embedding the secret in client JS publishes it on the GitHub Pages page (worst case: anyone curls the lists, which carry only event_id/name/date — same metadata already on the public page). Alternatives: (a) embed the secret and accept the leak; (b) split the endpoint so reads are unauthenticated for these three list shapes; (c) a separate per-page-load token. Lean toward (a) or (b) — Tom + Ellen are the only users and the data is the same shape that's already public.
+- **CORS.** Apps Script web apps return responses with permissive CORS by default for `?kind=` GETs, but verify with a smoke test from a `holmes1371.github.io` origin before assuming.
+- **Reconciliation order with localStorage.** When the fetch confirms an id Ellen ignored on her phone, the SAME id may sit in her localStorage (if she ignored from this browser). The fetched-list value should win; stale localStorage entries should be GC'd to prevent indefinite accumulation. Conversely, an id in localStorage that's NOT in the fetched list is an optimistic flip that hasn't round-tripped yet — keep it.
+- **Network failure / slow Apps Script.** If the fetch errors, fall back silently to the server-rendered + localStorage state (current behavior). No toast — Ellen shouldn't see a "sync failed" error every time she's offline. Log to console only.
+- **Visual treatment during the fetch window.** The page renders in <100ms, the fetch completes in ~500ms-2s. If a card visibly flips state on fetch completion (e.g. a card was ignored on another device, server-rendered as visible, then snaps to hidden), is that acceptable? Likely yes — the alternative (block render until fetch completes) is much worse UX. Confirm with Tom during scoping.
+- **Interaction with #23 (test landing page).** Refresh-time fetches hit the production Apps Script regardless of which page is displayed; a test-mode landing page would show production sheet state. Probably the right behavior, but worth pinning explicitly when #23 is built.
+
+No commits, no design note, no `[~]` flip until Tom and the next agent settle the auth question above.
 
 ### 33. [ ] Extract events from PDF newsletter attachments on teacher emails
 
