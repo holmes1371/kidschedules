@@ -546,8 +546,18 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-04-26",
+  "last_updated_iso": "2026-04-27",
   "pending": {
+    "info@cupshe.com": {
+      "first_flagged_iso": "2026-04-27",
+      "flagged_message_ids": [
+        "19dcac8322de3d3c"
+      ],
+      "last_flagged_iso": "2026-04-27",
+      "reason_samples": [
+        "Retail/promotional email from clothing brand, no kids' events content"
+      ]
+    },
     "viennarecreation@rectrac.com": {
       "first_flagged_iso": "2026-04-26",
       "flagged_message_ids": [
