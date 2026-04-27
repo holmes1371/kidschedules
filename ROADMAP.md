@@ -21,7 +21,8 @@ Strict rules for writing it:
 **2026-04-27**
 
 - Items 30 + 31 still `[~]` pending Tom's live verification on newly-arrived emails (cards extracted before the prompt push retain old labels; see each item's "No retroactive fix" callout).
-- Filed #32: "Completed" checkbox on event cards. Tom resolved all four design questions same session — persistence durable, cross-device synced via Apps Script (same path as ignore flow), ignore button hidden when completed, retirement unchanged. Flipped `[ ]` → `[~]` on plan approval; no code or design note yet, Tom said hold off.
+- #32 ("Completed" checkbox on event cards) `[~]` — design decisions resolved with Tom; no code or design note yet, Tom said hold off.
+- #33 (PDF newsletter attachments) filed 2026-04-26 as a placeholder by Tom; reworded this session into house style. Stays `[ ]` — needs a scoping conversation before any work.
 - Nothing else in flight.
 
 ## For future agents
@@ -171,9 +172,17 @@ Implementation questions to settle in the design note (not blockers — engineer
 - Storage: where does the completed-events list live so `process_events.py` can consume it during the next cron rebuild and re-render the green/labeled state? Mirror whatever the ignore flow does (likely a JSON blob the workflow pulls in).
 - Test fixtures: extend `tests/` per the standing rule that any `process_events.py` change extends the pytest fixtures in step.
 
-### 33. [] reading pdf newsletters inside of enails from teachers? 
+### 33. [ ] Extract events from PDF newsletter attachments on teacher emails
 
-I'm adding this manually as im thinking of it so i dont forget - next agent can pick it up and we can talk through it. 
+Filed 2026-04-26 from Tom as a placeholder — captured mid-thought so it isn't lost; not yet scoped, no design decisions, no plan. Some teachers (school classrooms, room-parent threads) send their weekly/monthly newsletters as PDF attachments rather than HTML body content. The current pipeline only feeds the email body to the agent, so dates buried in those PDFs are silently dropped — Ellen never sees them as cards.
+
+Open for the next session to talk through with Tom before any code:
+
+- Scope: which teacher senders / how often does this happen / how many events are typically inside one of these PDFs. Tom to surface a concrete recent example before scoping.
+- Approach: PDF text extraction inside `scripts/process_events.py` (e.g. `pypdf` / `pdfplumber`) feeding the extracted text into the same agent prompt path, vs. a separate extraction codepath, vs. punt as not-worth-it. Image-only / scanned PDFs (OCR) are a separate question — likely out of scope for v1.
+- Interaction with existing items: dedupe (#21), incremental cache (#4), and the source-date directive (#31) all need to behave sensibly when the "source" is a PDF inside an email rather than the email body itself.
+
+No commits, no design note, no `[~]` flip until Tom and the next agent discuss.
 
 
 ## Descoped / on hold
