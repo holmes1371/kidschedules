@@ -874,45 +874,45 @@ def test_render_html_css_hides_ignore_sender_btn_on_ignored_card():
 def test_render_html_completed_card_has_class_and_chip():
     """#32: a completed event renders with the `completed` class on its
     event-card div and a `<span class="completed-badge">` chip inline
-    with the event name."""
+    with the event name. Slice walks from the card opening to the next
+    card or end-of-section so the chip (which lives in event-name, after
+    the action row) is captured — naive `</div>` walks stop at the
+    actions-top closer."""
     html, by_name = _render_ignored_fixture(completed_names=("Active With Sender",))
     ev = by_name["Active With Sender"]
     start = html.find(f'data-event-id="{ev["id"]}"')
     assert start != -1
-    card = html[html.rfind("<div", 0, start):html.find("</div>", start) + 200]
-    assert "event-card completed" in card or "event-card  completed" in card
+    card_open = html.rfind("<div", 0, start)
+    next_card = html.find('<div class="event-card', start + 1)
+    section_end = html.find("</section>", start)
+    candidates = [c for c in (next_card, section_end) if c != -1]
+    card_end = min(candidates) if candidates else len(html)
+    card = html[card_open:card_end]
+    assert "event-card completed" in card
     assert '<span class="completed-badge">Completed</span>' in card
 
 
-def test_render_html_uncompleted_card_has_no_completed_class():
-    """Control: no completed_names → card lacks the `completed` class.
-    The chip element IS in the DOM (CSS-gated via `.completed-badge
-    { display: none }` default + `.event-card.completed .completed-badge
-    { display: inline-block }` override) — that's the always-render-CSS-
-    gate pattern from the design note's Q7. Just pin the class here."""
+def test_render_html_uncompleted_card_has_no_chip_and_no_completed_class():
+    """Control: no completed_names → card lacks the `completed` class
+    and the chip span is not in the DOM. Server emits the chip only
+    when is_completed; the JS setCompleted helper injects/removes it
+    on user toggle. The `<span class="completed-badge">` substring
+    appearing on uncompleted cards would flag a regression that
+    would break NEW-badge substring assertions in adjacent tests."""
     html, by_name = _render_ignored_fixture()
     ev = by_name["Active With Sender"]
     start = html.find(f'data-event-id="{ev["id"]}"')
-    card = html[html.rfind("<div", 0, start):html.find("</div>", start) + 200]
-    # The class attribute on the card must NOT contain `completed`.
+    # Walk to next card or section close so the slice covers the full card.
+    card_open = html.rfind("<div", 0, start)
+    next_card = html.find('<div class="event-card', start + 1)
+    section_end = html.find("</section>", start)
+    candidates = [c for c in (next_card, section_end) if c != -1]
+    card_end = min(candidates) if candidates else len(html)
+    card = html[card_open:card_end]
     open_div = card[:card.find(">")]
     class_match = open_div.split('class="', 1)[1].split('"', 1)[0]
     assert "completed" not in class_match.split()
-
-
-def test_render_html_completed_badge_default_hidden_via_css():
-    """The chip is rendered on every card; the default CSS hides it
-    until the card picks up `.completed`. Pin both the default rule
-    and the .event-card.completed override so a future CSS rewrite
-    that drops either fails CI."""
-    html, _ = _render_ignored_fixture()
-    # Default: hidden.
-    idx = html.find(".completed-badge")
-    assert idx != -1
-    block = html[idx:idx + 200]
-    assert "display: none" in block
-    # Override: shown when card has `completed` class.
-    assert ".event-card.completed .completed-badge" in html
+    assert '<span class="completed-badge">' not in card
 
 
 def test_render_html_completed_checkbox_renders_checked():
@@ -1023,13 +1023,17 @@ def test_render_html_undated_completed_card_renders_chip_and_class():
     """#32: undated cards mirror dated cards' completed affordance.
     Same fixture has 'Undated With Sender' as a date='' entry."""
     html, _ = _render_ignored_fixture(completed_names=("Undated With Sender",))
-    # Find the undated card by its name attribute on the checkbox.
     name_attr = 'data-event-name="Undated With Sender"'
     pos = html.find(name_attr)
     assert pos != -1
-    # Walk back to the card opening div.
+    # Walk back to the card opening div, forward to the next event-card
+    # or section close. The chip lives in event-name (well past the
+    # action-row's </div>), so a naive </div> walk wouldn't reach it.
     card_start = html.rfind('<div class="event-card undated', 0, pos)
-    card_end = html.find("</div>", pos) + 200
+    next_card = html.find('<div class="event-card', pos)
+    section_end = html.find("</section>", pos)
+    candidates = [c for c in (next_card, section_end) if c != -1]
+    card_end = min(candidates) if candidates else len(html)
     card = html[card_start:card_end]
     assert "event-card undated" in card
     assert " completed" in card
@@ -1116,10 +1120,18 @@ def _render_cr() -> tuple[str, list[dict]]:
     return html, display
 
 
-def _card_slice(html: str, needle: str, width: int = 1200) -> str:
+def _card_slice(html: str, needle: str, width: int = 1500) -> str:
     """Return a single card's HTML by walking back from an event-name
     occurrence to the nearest `<div class="event-card`. Keeps asserts
-    from bleeding between cards when substrings are common."""
+    from bleeding between cards when substrings are common.
+
+    Width was bumped from 1200 → 1500 in #32 — the always-rendered
+    completed-checkbox label-wrap adds ~250 bytes to every card's
+    action-row, eating the margin the location/URL assertions
+    relied on. Bumping the default recovers that margin without
+    risking cross-card bleed (cards are well-separated by section
+    breaks, and existing assertions all probe well within the first
+    1500 bytes)."""
     idx = html.find(needle)
     assert idx != -1, f"expected to find {needle!r} in render"
     open_idx = html.rfind('<div class="event-card', 0, idx)

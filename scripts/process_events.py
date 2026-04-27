@@ -1095,11 +1095,14 @@ def render_html(today: dt.date,
             f'                 data-event-name="{ev["name"]}" data-event-date="{ev["date"]}"{checked_attr}>\n'
             f'          Completed</label>'
         )
-        # Chip is rendered on every card; .event-card.completed unhides it
-        # via CSS. Same "always in DOM, CSS-gated" pattern that hides the
-        # checkbox on ignored cards (#32 Q7) — keeps the JS toggle to a
-        # single classList op per click.
-        completed_badge_html = '<span class="completed-badge">Completed</span>'
+        # Chip rendered only when is_completed. The client setCompleted
+        # helper creates/destroys this span on toggle so the DOM matches
+        # the server-rendered state across reloads. Conditional render
+        # (rather than always-in-DOM + CSS gate) keeps the chip out of
+        # the event-name substring contract that NEW-badge tests pin.
+        completed_badge_html = (
+            '<span class="completed-badge">Completed</span>' if is_completed else ""
+        )
         # `sender_domain` remains the registrable-domain identity (used
         # for grouping / display). The `sender_block_key` is what the
         # Ignore-sender button submits: full address for freemail
@@ -1221,11 +1224,14 @@ def render_html(today: dt.date,
             f'                 data-event-name="{ev["name"]}" data-event-date="{ev["date"]}"{checked_attr}>\n'
             f'          Completed</label>'
         )
-        # Chip is rendered on every card; .event-card.completed unhides it
-        # via CSS. Same "always in DOM, CSS-gated" pattern that hides the
-        # checkbox on ignored cards (#32 Q7) — keeps the JS toggle to a
-        # single classList op per click.
-        completed_badge_html = '<span class="completed-badge">Completed</span>'
+        # Chip rendered only when is_completed. The client setCompleted
+        # helper creates/destroys this span on toggle so the DOM matches
+        # the server-rendered state across reloads. Conditional render
+        # (rather than always-in-DOM + CSS gate) keeps the chip out of
+        # the event-name substring contract that NEW-badge tests pin.
+        completed_badge_html = (
+            '<span class="completed-badge">Completed</span>' if is_completed else ""
+        )
         new_badge_html = (
             '<span class="new-badge">NEW</span>' if ev["id"] in _new_ids else ""
         )
@@ -1614,13 +1620,15 @@ def render_html(today: dt.date,
       margin-left: 0.4rem;
       vertical-align: middle;
     }}
-    /* #32: chip is rendered on every card but hidden by default; the
-       .event-card.completed override below reveals it. Mirrors .new-badge
-       weight (so the two read as a matched pair when both are present)
-       but uses the same green family as the Unignore-button accent for
-       visual consistency with the completed background. */
+    /* #32: chip rendered conditionally — server emits the span only
+       when is_completed=True, and the JS setCompleted helper creates
+       or removes the span on user-driven toggles so the DOM stays in
+       sync with the card's completion state. Mirrors .new-badge weight
+       (so the two read as a matched pair when both are present); uses
+       the same green family as the Unignore-button accent for visual
+       consistency with the completed background. */
     .completed-badge {{
-      display: none;
+      display: inline-block;
       background: #1e8e3e;
       color: white;
       padding: 0.05rem 0.45rem;
@@ -1631,9 +1639,6 @@ def render_html(today: dt.date,
       letter-spacing: 0.3px;
       margin-left: 0.4rem;
       vertical-align: middle;
-    }}
-    .event-card.completed .completed-badge {{
-      display: inline-block;
     }}
     .complete-checkbox-wrap {{
       display: inline-flex;
@@ -1785,8 +1790,8 @@ def render_html(today: dt.date,
   <script>
     (function () {{
       var WEBHOOK_URL = {json.dumps(webhook_url)};
-      var STORAGE_KEY           = "kids_schedule_ignored_ids";
-      var SENDERS_STORAGE_KEY   = "kids_schedule_ignored_senders";
+      var STORAGE_KEY = "kids_schedule_ignored_ids";
+      var SENDERS_STORAGE_KEY = "kids_schedule_ignored_senders";
       var COMPLETED_STORAGE_KEY = "kids_schedule_completed_ids";
 
       function loadIgnored() {{
@@ -1957,8 +1962,17 @@ def render_html(today: dt.date,
       function setCompleted(card, on) {{
         if (on) {{
           card.classList.add("completed");
+          var nameEl = card.querySelector(".event-name");
+          if (nameEl && !nameEl.querySelector(".completed-badge")) {{
+            var chip = document.createElement("span");
+            chip.className = "completed-badge";
+            chip.textContent = "Completed";
+            nameEl.appendChild(chip);
+          }}
         }} else {{
           card.classList.remove("completed");
+          var existingChip = card.querySelector(".completed-badge");
+          if (existingChip) existingChip.remove();
         }}
         var box = card.querySelector(".complete-checkbox");
         if (box) box.checked = !!on;
