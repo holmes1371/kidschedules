@@ -1053,3 +1053,12 @@ def test_step2b_thread_dedup_collapses_dance_studio_pattern(capsys):
     assert "Collected 7 stub(s) across 5 queries" in out
     assert "Unique messageIds: 6" in out
     assert "After thread dedup: 3" in out
+    # Each per-message log line includes the messageId alongside the
+    # subject so a workflow-log reader can copy the ID directly into
+    # the workflow_dispatch `reextract` input. The `_stub` helper sets
+    # Subject == messageId so the rendered log line is "<id>  <id>"
+    # — pin both halves on one line so the id-then-subject visual
+    # scan order is locked.
+    assert "[1/3] recital4  recital4" in out
+    assert "[2/3] laes1  laes1" in out
+    assert "[3/3] swim1  swim1" in out

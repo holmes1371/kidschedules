@@ -395,7 +395,12 @@ def step2b_read_promising(
     full_emails: list[dict[str, Any]] = []
     for i, msg in enumerate(emails_to_read, 1):
         subject = msg.get("headers", {}).get("Subject", "(no subject)")
-        print(f"  [{i}/{len(emails_to_read)}] {subject[:70]}")
+        # Include the Gmail messageId in the log line so a reader of the
+        # workflow log can copy it directly into the workflow_dispatch
+        # `reextract` input to flush a cached extraction. Permanent UX
+        # for the cache-eviction loop — same line shape on every run.
+        msg_id = msg.get("messageId", "")
+        print(f"  [{i}/{len(emails_to_read)}] {msg_id}  {subject[:70]}")
         try:
             full = gmail.read_message(msg["messageId"])
             full_emails.append({

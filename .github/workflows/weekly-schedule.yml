@@ -38,6 +38,10 @@ on:
         required: false
         type: boolean
         default: false
+      reextract:
+        description: "Reextract: paste a Gmail messageId to evict from cache before this run (find IDs in events_state.json on state branch, or in the per-message log line of any prior workflow run)"
+        required: false
+        default: ""
 
 permissions:
   contents: write   # needed to push events_state.json to the state branch
@@ -238,6 +242,9 @@ jobs:
           fi
           if [ "${{ github.event.inputs.test_output }}" == "true" ]; then
             ARGS="$ARGS --test-output"
+          fi
+          if [ -n "${{ github.event.inputs.reextract }}" ]; then
+            ARGS="$ARGS --reextract ${{ github.event.inputs.reextract }}"
           fi
           python main.py $ARGS
 
