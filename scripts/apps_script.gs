@@ -67,10 +67,16 @@
 //     {"id": "<12-hex>"}  →  delete every Completed Events row matching
 //     id. Idempotent: returns 'ok' even if no row matched.
 //
-// GET  /exec?secret=... — read route. Gated by READ_SECRET.
-//   (default) or ?kind=ignored          → Ignored Events JSON
-//   ?kind=ignored_senders               → Ignored Senders JSON
-//   ?kind=completed                     → Completed Events JSON  (#32)
+// GET  /exec — read route. The three list-shape kinds enumerated below
+//   are unauthenticated (ROADMAP #34) so the schedule page's client-side
+//   refresh sync can fetch them without exposing READ_SECRET in page JS.
+//   Each row carries only (event_id, name, date) — the same metadata
+//   already public on the rendered Pages page, so dropping the secret
+//   on read costs nothing in confidentiality. Any kind NOT in this list
+//   still requires `?secret=$READ_SECRET`.
+//   (default) or ?kind=ignored          → Ignored Events JSON   (public)
+//   ?kind=ignored_senders               → Ignored Senders JSON  (public)
+//   ?kind=completed                     → Completed Events JSON (public, #32)
 
 const IGNORED_EVENTS_SHEET_NAME   = 'Ignored Events';
 const IGNORED_SENDERS_SHEET_NAME  = 'Ignored Senders';
@@ -100,10 +106,23 @@ function doPost(e) {
 }
 
 function doGet(e) {
-  if (!e.parameter || e.parameter.secret !== READ_SECRET) {
-    return _text('unauthorized');
+  // ROADMAP #34: the three list-shape reads are unauthenticated. Each
+  // row is just (event_id, name, date) — the same metadata already
+  // public on the rendered Pages page — so dropping the secret on read
+  // costs nothing in confidentiality and lets the client-side refresh
+  // sync (which can't carry a secret without leaking it in page JS)
+  // pull state directly. POSTs and any future GET kinds keep the
+  // existing secret gate; the early-allow only covers the specific
+  // kinds enumerated below. Existing CI cron callers that still pass
+  // `&secret=...` continue to work — the param is simply ignored
+  // along the public path.
+  const kind = String((e.parameter && e.parameter.kind) || 'ignored');
+  const PUBLIC_KINDS = ['ignored', 'ignored_senders', 'completed'];
+  if (PUBLIC_KINDS.indexOf(kind) === -1) {
+    if (!e.parameter || e.parameter.secret !== READ_SECRET) {
+      return _text('unauthorized');
+    }
   }
-  const kind = String(e.parameter.kind || 'ignored');
   if (kind === 'ignored')         return _listIgnoredEvents();
   if (kind === 'ignored_senders') return _listIgnoredSenders();
   if (kind === 'completed')       return _listCompletedEvents();
