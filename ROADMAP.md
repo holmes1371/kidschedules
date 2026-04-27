@@ -171,6 +171,11 @@ Implementation questions to settle in the design note (not blockers — engineer
 - Storage: where does the completed-events list live so `process_events.py` can consume it during the next cron rebuild and re-render the green/labeled state? Mirror whatever the ignore flow does (likely a JSON blob the workflow pulls in).
 - Test fixtures: extend `tests/` per the standing rule that any `process_events.py` change extends the pytest fixtures in step.
 
+### 33. [] reading pdf newsletters inside of enails from teachers? 
+
+I'm adding this manually as im thinking of it so i dont forget - next agent can pick it up and we can talk through it. 
+
+
 ## Descoped / on hold
 
 Items parked here aren't dead — they're off the active queue but preserved in case priorities shift. Revive by moving the full prose back under "Backlog" at the original number and flipping `[-]` → `[ ]`.
