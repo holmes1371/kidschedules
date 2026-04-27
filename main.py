@@ -45,6 +45,10 @@ if _SCRIPTS_DIR not in sys.path:
     sys.path.insert(0, _SCRIPTS_DIR)
 
 from freemail_domains import load_freemail_domains  # noqa: E402
+from pdf_sender_domains import (  # noqa: E402
+    is_pdf_sender,
+    load_pdf_sender_domains,
+)
 
 
 PAGES_OUTPUT_DIR = os.path.join(PROJECT_ROOT, "docs")
@@ -66,6 +70,7 @@ AUTO_BLOCKLIST_STATE_PATH = os.path.join(PROJECT_ROOT, "blocklist_auto_state.jso
 IGNORED_SENDERS_PATH = os.path.join(PROJECT_ROOT, "ignored_senders.json")
 PROTECTED_SENDERS_PATH = os.path.join(PROJECT_ROOT, "protected_senders.txt")
 FREEMAIL_DOMAINS_PATH = os.path.join(PROJECT_ROOT, "freemail_domains.txt")
+PDF_SENDER_DOMAINS_PATH = os.path.join(PROJECT_ROOT, "pdf_sender_domains.txt")
 PRIOR_EVENTS_PATH = os.path.join(PROJECT_ROOT, "prior_events.json")
 SENDER_STATS_PATH = os.path.join(PROJECT_ROOT, "sender_stats.json")
 
@@ -399,12 +404,61 @@ def step2b_read_promising(
                 "date_sent": full["headers"].get("Date", ""),
                 "subject": full["headers"].get("Subject", ""),
                 "body": full["body"][:10000],
+                # ROADMAP #33. Always-present field (empty list when no
+                # PDFs); gmail_client.read_message guarantees this.
+                # main()'s _gate_pdfs_by_sender step drops the bytes for
+                # non-school senders before the agent ever sees them.
+                "pdfs": full.get("pdfs", []),
             })
         except Exception as e:
             print(f"    WARNING: Failed to read message {msg['messageId']}: {e}")
 
     print(f"  Successfully read: {len(full_emails)} messages")
     return full_emails
+
+
+def _gate_pdfs_by_sender(
+    emails: list[dict[str, Any]],
+    patterns: list[str],
+) -> int:
+    """ROADMAP #33: drop the ``pdfs`` list on emails whose sender
+    domain isn't in the PDF-eligible list.
+
+    Mutates each email dict in place; returns the count of emails
+    whose ``pdfs`` list was non-empty before the gate dropped it
+    (for log visibility). Emails already carrying ``pdfs == []``
+    pass through unchanged.
+
+    An empty ``patterns`` list means no senders qualify — every PDF
+    is dropped. This is the safe-default behavior when
+    ``pdf_sender_domains.txt`` is missing or accidentally empty.
+
+    The realistic happy path: a teacher email from
+    ``mlrohde@fcps.edu`` keeps its ``pdfs``; a Costco-receipt PDF
+    in a personal email has its ``pdfs`` reset to ``[]``. The
+    agent's content-block builder treats ``pdfs == []`` as
+    "no document blocks" and falls back to the string-content path,
+    so a gated email never costs more API tokens than today's
+    body-only extraction.
+    """
+    dropped = 0
+    for em in emails:
+        if not em.get("pdfs"):
+            continue
+        if not patterns:
+            em["pdfs"] = []
+            dropped += 1
+            continue
+        # Gmail From headers commonly arrive in named form
+        # ("Meredith Rohde <mlrohde@fcps.edu>"). is_pdf_sender's
+        # underlying matcher expects a bare address, so parse first
+        # and fall back to the raw header on parse failure (the
+        # matcher tolerates malformed input by returning False).
+        _, addr = email.utils.parseaddr(em.get("from_", "") or "")
+        if not is_pdf_sender(addr or em.get("from_", ""), patterns):
+            em["pdfs"] = []
+            dropped += 1
+    return dropped
 
 
 def _now_iso() -> str:
@@ -1070,6 +1124,22 @@ def main() -> int:
 
     # Step 2b: Read promising messages
     full_emails = step2b_read_promising(gmail, search_results)
+
+    # ROADMAP #33. Drop PDF attachments from non-school senders so
+    # token spend is bounded to legitimate teacher/school PDFs. Runs
+    # AFTER step2b's fetch so the bytes are already cheap to discard;
+    # runs BEFORE step2c so the cache decision sees emails with the
+    # right `pdfs` content (cache key is messageId-only, but downstream
+    # extraction needs the gated state). Empty patterns list means
+    # the file is missing/empty — defensively drop all PDFs in that
+    # case rather than silently sending them to the agent.
+    pdf_patterns = load_pdf_sender_domains(PDF_SENDER_DOMAINS_PATH)
+    pdfs_dropped = _gate_pdfs_by_sender(full_emails, pdf_patterns)
+    pdfs_kept = sum(1 for em in full_emails if em.get("pdfs"))
+    print(
+        f"  PDF gating: {pdfs_kept} email(s) with eligible PDF(s); "
+        f"{pdfs_dropped} non-school sender PDF(s) dropped"
+    )
 
     # Step 2c: Load event cache + GC + filter out already-processed messages.
     # Runs even when full_emails is empty so GC still happens and cached

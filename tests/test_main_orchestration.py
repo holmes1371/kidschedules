@@ -615,3 +615,98 @@ def test_step4_default_still_passes_prior_events_and_ics(monkeypatch):
     # Default webhook stays whatever _load_webhook_url returned.
     idx = args.index("--webhook-url")
     assert args[idx + 1] == "https://script.google.com/REAL"
+
+
+# ─── ROADMAP #33: _gate_pdfs_by_sender ───────────────────────────────────
+
+
+def _em(mid: str, sender: str, pdfs: list[bytes] | None = None) -> dict:
+    """Minimal email dict for gating-helper tests. The shape mirrors
+    what step2b_read_promising builds — only the fields the gate
+    inspects (`from_`, `pdfs`) actually matter; others present to
+    keep the dict realistic."""
+    return {
+        "messageId": mid,
+        "from_": sender,
+        "date_sent": "",
+        "subject": "",
+        "body": "",
+        "pdfs": list(pdfs) if pdfs is not None else [],
+    }
+
+
+def test_gate_pdfs_keeps_school_sender_drops_personal():
+    """The realistic mixed batch: a teacher's PDF flows through; a
+    personal-account PDF gets dropped to []. Pin the count returned
+    matches the number of emails whose pdfs were actually mutated."""
+    pdf = b"%PDF-1.4\n"
+    emails = [
+        _em("m1", "mlrohde@fcps.edu", pdfs=[pdf]),
+        _em("m2", "shopper@gmail.com", pdfs=[pdf]),
+        _em("m3", "teacher@elementary.fcps.edu", pdfs=[pdf]),
+    ]
+    dropped = main._gate_pdfs_by_sender(emails, ["fcps.edu"])
+    assert dropped == 1
+    assert emails[0]["pdfs"] == [pdf]                 # FCPS — kept
+    assert emails[1]["pdfs"] == []                    # gmail — dropped
+    assert emails[2]["pdfs"] == [pdf]                 # subdomain — kept
+
+
+def test_gate_pdfs_empty_patterns_drops_everything():
+    """Empty pattern list (file missing or accidentally empty) means
+    no senders qualify; every email's pdfs is reset to []. Safe-default
+    behavior — zero token spend on a missing config file."""
+    emails = [
+        _em("m1", "mlrohde@fcps.edu", pdfs=[b"%PDF-1.4"]),
+        _em("m2", "anyone@anywhere.org", pdfs=[b"%PDF-1.4"]),
+    ]
+    dropped = main._gate_pdfs_by_sender(emails, [])
+    assert dropped == 2
+    assert all(em["pdfs"] == [] for em in emails)
+
+
+def test_gate_pdfs_already_empty_pdfs_does_not_count_as_dropped():
+    """An email arriving with `pdfs: []` (no attachments at all) is a
+    no-op for the gate — count returned excludes those. Pin so the
+    log line in main() never overstates how many were dropped."""
+    emails = [
+        _em("m1", "regular@x.com", pdfs=[]),
+        _em("m2", "regular@x.com"),  # default empty
+    ]
+    dropped = main._gate_pdfs_by_sender(emails, ["fcps.edu"])
+    assert dropped == 0
+    assert all(em["pdfs"] == [] for em in emails)
+
+
+def test_gate_pdfs_preserves_multiple_pdfs_on_school_sender():
+    """An email with two PDFs from a school sender keeps BOTH. The
+    list itself is preserved by reference — the gate doesn't
+    re-create a list, just leaves it alone."""
+    pdfs = [b"%PDF-1.4\nA", b"%PDF-1.4\nB"]
+    emails = [_em("m1", "mlrohde@fcps.edu", pdfs=list(pdfs))]
+    dropped = main._gate_pdfs_by_sender(emails, ["fcps.edu"])
+    assert dropped == 0
+    assert emails[0]["pdfs"] == pdfs
+
+
+def test_gate_pdfs_address_sender_with_subdomain_match():
+    """The realistic FCPS address shape — `mlrohde@fcps.edu` — is the
+    case that matters most. Mirror it explicitly here so a regression
+    in the underlying `is_protected` matcher (e.g. someone breaks the
+    address-vs-domain branch) fails the #33 gate-level test alongside
+    its own."""
+    emails = [_em("m1", "Meredith Rohde <mlrohde@fcps.edu>", pdfs=[b"x"])]
+    dropped = main._gate_pdfs_by_sender(emails, ["fcps.edu"])
+    assert dropped == 0
+    assert emails[0]["pdfs"] == [b"x"]
+
+
+def test_gate_pdfs_missing_from_header_drops_pdfs():
+    """Defensive: a malformed email (no From header at all, or empty
+    string) can't be matched against the gate. Drop its pdfs — the
+    safe direction is to skip extraction rather than send to the
+    agent without sender attribution."""
+    emails = [_em("m1", "", pdfs=[b"%PDF-1.4"])]
+    dropped = main._gate_pdfs_by_sender(emails, ["fcps.edu"])
+    assert dropped == 1
+    assert emails[0]["pdfs"] == []
