@@ -21,10 +21,9 @@ Strict rules for writing it:
 **2026-04-25**
 
 - Items 27 and 28 closed `[x]` after Tom's prod verification (commit aa20b4b moved full prose to `COMPLETED.md`).
-- Item 29 in flight `[~]` — six commits so far: 8606610, 6cd0f74, 4467aba, 43b4621, 5052b1f, 3fbdf8c (source line + Location: prefix + URL linkification + www reachability + long-URL truncation/wrapping).
-- Item 30 filed and code-complete `[~]` (this commit) — agent prompt strengthened to preserve URLs verbatim in the `location` field instead of summarizing them as `(PandaDoc link)` / `(Google Form)` parenthetical descriptions. Caught during #29 verification: a DanceOne waiver card showed `Online (PandaDoc link)` with no clickable URL because the agent didn't pass the URL through. One-paragraph prompt addition with 5 GOOD/BAD examples; new test pins the directive's key phrases.
-- Test delta vs main: +23 passing on Linux/CI (11 unit tests + 12 render-integration). The 12 #29 render tests still fail on Windows with the unrelated `%-d` strftime issue.
-- Nothing else in flight. Next session moves items 29 + 30 prose to `COMPLETED.md` once Tom verifies on the live page.
+- Item 29 closed `[x]` after Tom's prod verification (source line + Location: prefix + URL linkification + www reachability + long-URL truncation all working). Full prose moved to `COMPLETED.md`; one-line stub at the original numeric slot.
+- Item 30 code-complete `[~]` (commit d3dd5fa) — agent prompt strengthened to preserve URLs verbatim in the `location` field instead of summarizing them as `(PandaDoc link)` / `(Google Form)` parenthetical descriptions. Awaiting live verification across one or two cron cycles.
+- Tom flagged a new diagnostic question post-#29 close: 5 NEW-badged events from old emails (Mar 15 / Mar 22 / Apr 19, all from LAES PTA Sunbeam, all dated Jun 26) suddenly appeared on today's render. Tom's clue: they all have signup deadlines DUE TODAY. Investigation in progress; not yet a ROADMAP item — could be a graduation-window edge case (Jun 26 just crossed into the 60-day display window) or a same-day reminder-email re-extraction artifact. To be filed if it represents a real bug.
 
 ## For future agents
 
@@ -121,27 +120,7 @@ Design-note questions to resolve before coding:
 
 28\. [x] Bug: Ignore-sender button renders for protected address-form senders — 0446ed9 — see COMPLETED.md
 
-### 29. [~] Event-card source line + Location: prefix
-
-Filed 2026-04-25 from Tom: event cards lacked any source attribution despite every event dict carrying a `source` field (the agent's curated label, e.g. *"LAES newsletter (Apr 6)"*). The card markup never rendered it — only the digest email did. Tom asked: add a `From:` line to the card so it's clear where each event came from, and while we're at it add a `Location:` prefix to the location for visual consistency with the existing `For:` line, **except** when the location is already a fully-formed street address (which is self-evidently a location).
-
-**Source line.** New `<div class="event-source">From: {ev["source"]}</div>` rendered between the audience (`For:`) line and the location line on both dated and undated cards. Truncated at 80 characters with CSS ellipsis; full string lives in the `title=` tooltip so a long label stays inspectable on hover. Always rendered when `source` is non-empty (the agent's default fallback is `"unknown source"`, so practically every card gets a line).
-
-**Location prefix.** Plain venues now render as `Location: School Gym`, `Location: Online`, `Location: Mr. Patel's Classroom`. Fully-formed addresses (`Fredericksburg Convention Center, 2371 Carlson Way`, `Tysons Pediatrics, 8350 Greensboro Dr`) skip the prefix because the address is already self-evidently a location. Detection heuristic is a single regex matching a digit-prefixed token followed anywhere by a US street-suffix word (`Way` | `St` | `Street` | `Ave` | `Avenue` | `Rd` | `Road` | `Blvd` | `Boulevard` | `Dr` | `Drive` | `Ln` | `Lane` | `Pkwy` | `Parkway` | `Cir` | `Circle` | `Ct` | `Court` | `Ter` | `Terrace` | `Pl` | `Place` | `Hwy` | `Highway`), case-insensitive. False-friend cases handled correctly: "Way Cool Studio" (no leading digit), "Park Lane" (no digit), "Bldg A, Room 215" (no street suffix word) all keep the prefix.
-
-**Tests.** 6 pure-function unit tests for `_is_address_like` (full addresses match; venue-only / room-only / suffix-without-digit don't; case-insensitive; empty/whitespace handled). 5 render-integration tests exercising both dated and undated cards: source line rendered, source truncation + title preserves full string, location prefix added for plain venue, prefix omitted for address-shape location. The render-integration tests fail on Windows + Python 3.14 with the same pre-existing `%-d` strftime issue that takes down the other render tests in this file; CI (Linux) runs them green.
-
-**Source date enforcement deferred.** Tom asked *"even better if it can add the date from which it was sourced."* The agent already includes dates in most source labels (`(Apr 6)` etc.) per its existing prompt. Strict per-source date enforcement would be a 1-paragraph prompt change; held as a follow-up if production data shows enough date-less labels to bother.
-
-**Location URL linkification (v2 follow-up, this session).** Tom's second ask: *"if the location is a website - can it be presented as a hyperlink so Ellen can just click on the link from the event?"* and follow-up *"even for something like this: Location: MySchoolBucks (myschoolbucks.com)..."* — both URL-only locations and URLs embedded inside location text now render as clickable `<a href>` anchors with `target="_blank"` and `rel="noopener noreferrer"`. The linkifier (`_linkify_inline_urls`) detects http(s)://-shaped URLs and bare domains alike via a single regex. URL-only locations were previously suppressed entirely by `_is_suppressible_location` — that branch is removed; URL-only locations now render as a single anchor inside the `event-location` div with the `Location:` prefix (URL-only is not address-like). False-friend pins prevent "Mt. Vernon High School", "Dr. Smith's office", and "version 1.0" from being mis-detected.
-
-**Bare-domain `www.` reachability (v3 follow-up).** `myschoolbucks.com` was getting a `https://myschoolbucks.com` href and Tom hit "refused to connect" — the site only serves at `www.myschoolbucks.com`. Helper `_href_for_bare_domain` now adds `www.` for fully bare domains (one-dot `label.tld` shape, no scheme, no leading `www.`). Already-subdomained URLs (`camps.fcps.edu` = 2 dots) and explicit-scheme URLs are NOT modified — those are intentional references where prepending `www` would break routing or override the source. Visible link text always preserves what the agent emitted; only the `href` is modified for reachability. Limitation: dot-counting heuristic doesn't distinguish multi-segment TLDs (`example.co.uk` would be miscoded as already-subdomained). Acceptable for the codebase's US-centric use case; revisit if a `.co.uk`-style bare domain ever shows up.
-
-**Link styling.** CSS for `.event-location a` ships traditional dark-theme link blue (`#58a6ff`, GitHub-dark style) so the link is unambiguous against the muted location text. Hover bumps a shade brighter (`#79b8ff`) for affordance.
-
-**Long-URL wrapping (v4 follow-up).** Google Forms / instantseats / DocuSign URLs ran past 100 characters and blew out the card layout when rendered in full. Two-pronged fix: (a) visible link text is now capped at `_URL_DISPLAY_CAP=70` chars in the linkifier with ellipsis on overflow — full URL stays in `href` (click works) and `title=` (hover surfaces it); (b) `.event-location` CSS gains `overflow-wrap: anywhere` as a narrow-screen / very-long-fragment safety net so even after truncation the line breaks cleanly instead of overflowing the card width.
-
-Item stays `[~]` pending Tom's live verification post-deploy: load the page, confirm (a) a `From: ...` line under each card, (b) `Location:` prefix on plain venues but not on full street addresses, (c) URLs (full and bare-domain) render as clickable underlined links, (d) long URLs are visibly truncated with ellipsis but still click through to the full destination.
+29\. [x] Event-card source line + Location: prefix + URL linkification — 8606610 / 6cd0f74 / 4467aba / 43b4621 / 5052b1f / 3fbdf8c — see COMPLETED.md
 
 ### 30. [~] Agent should preserve URLs verbatim in event location
 
