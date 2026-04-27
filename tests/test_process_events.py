@@ -884,14 +884,35 @@ def test_render_html_completed_card_has_class_and_chip():
     assert '<span class="completed-badge">Completed</span>' in card
 
 
-def test_render_html_uncompleted_card_has_no_chip_and_no_completed_class():
-    """Control: no completed_names → no chip, no `completed` class on any card."""
+def test_render_html_uncompleted_card_has_no_completed_class():
+    """Control: no completed_names → card lacks the `completed` class.
+    The chip element IS in the DOM (CSS-gated via `.completed-badge
+    { display: none }` default + `.event-card.completed .completed-badge
+    { display: inline-block }` override) — that's the always-render-CSS-
+    gate pattern from the design note's Q7. Just pin the class here."""
     html, by_name = _render_ignored_fixture()
     ev = by_name["Active With Sender"]
     start = html.find(f'data-event-id="{ev["id"]}"')
     card = html[html.rfind("<div", 0, start):html.find("</div>", start) + 200]
-    assert "completed-badge" not in card
-    assert " completed" not in card.split('"')[1]  # class attr only
+    # The class attribute on the card must NOT contain `completed`.
+    open_div = card[:card.find(">")]
+    class_match = open_div.split('class="', 1)[1].split('"', 1)[0]
+    assert "completed" not in class_match.split()
+
+
+def test_render_html_completed_badge_default_hidden_via_css():
+    """The chip is rendered on every card; the default CSS hides it
+    until the card picks up `.completed`. Pin both the default rule
+    and the .event-card.completed override so a future CSS rewrite
+    that drops either fails CI."""
+    html, _ = _render_ignored_fixture()
+    # Default: hidden.
+    idx = html.find(".completed-badge")
+    assert idx != -1
+    block = html[idx:idx + 200]
+    assert "display: none" in block
+    # Override: shown when card has `completed` class.
+    assert ".event-card.completed .completed-badge" in html
 
 
 def test_render_html_completed_checkbox_renders_checked():
@@ -952,6 +973,50 @@ def test_render_html_completed_card_has_green_tint_css_rule():
     assert ".event-card.completed" in html
     assert "background: #e6f4ea" in html  # light mode
     assert "background: #1e3526" in html  # dark mode
+
+
+def test_render_html_js_complete_storage_key_present():
+    """#32: pin the localStorage key for completed ids. Mirrors the
+    ignore-flow storage-key tests."""
+    html, _ = _render_ignored_fixture()
+    assert '"kids_schedule_completed_ids"' in html
+
+
+def test_render_html_js_complete_action_posted_on_check():
+    """#32: the change handler issues postAction({action:'complete', ...})
+    on a fresh check. Pin the action name + the id/name/date payload keys."""
+    html, _ = _render_ignored_fixture()
+    assert 'action: "complete"' in html
+    assert "id: id, name: name, date: date" in html
+
+
+def test_render_html_js_uncomplete_action_posted_on_uncheck():
+    """#32: unchecking POSTs {action:'uncomplete', id}. Pin both the
+    action name and that the id-only payload (no name/date) is used."""
+    html, _ = _render_ignored_fixture()
+    assert 'action: "uncomplete", id: id' in html
+
+
+def test_render_html_js_complete_optimistic_with_rollback():
+    """#32: on POST failure the change handler reverts the card state
+    AND the localStorage entry. Pin the rollback-toast string + the
+    setCompleted(card, false) revert call so a future client rewrite
+    that drops the rollback fails CI."""
+    html, _ = _render_ignored_fixture()
+    assert 'showToast("Complete failed — try again")' in html
+    assert 'showToast("Uncomplete failed — try again")' in html
+    # setCompleted is the toggle helper used in both directions.
+    assert "function setCompleted(card, on)" in html
+
+
+def test_render_html_js_complete_hydrates_from_localstorage():
+    """#32: on initial load, walk localStorage for completed ids and
+    flip matching cards to .completed (the server-rendered state from
+    completed_events.json wins where it disagrees, but localStorage
+    layers on for optimistic flips that haven't round-tripped yet)."""
+    html, _ = _render_ignored_fixture()
+    assert "var localCompleted = loadCompleted();" in html
+    assert "setCompleted(card, true);" in html
 
 
 def test_render_html_undated_completed_card_renders_chip_and_class():

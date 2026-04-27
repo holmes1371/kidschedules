@@ -1095,9 +1095,11 @@ def render_html(today: dt.date,
             f'                 data-event-name="{ev["name"]}" data-event-date="{ev["date"]}"{checked_attr}>\n'
             f'          Completed</label>'
         )
-        completed_badge_html = (
-            '<span class="completed-badge">Completed</span>' if is_completed else ""
-        )
+        # Chip is rendered on every card; .event-card.completed unhides it
+        # via CSS. Same "always in DOM, CSS-gated" pattern that hides the
+        # checkbox on ignored cards (#32 Q7) — keeps the JS toggle to a
+        # single classList op per click.
+        completed_badge_html = '<span class="completed-badge">Completed</span>'
         # `sender_domain` remains the registrable-domain identity (used
         # for grouping / display). The `sender_block_key` is what the
         # Ignore-sender button submits: full address for freemail
@@ -1219,9 +1221,11 @@ def render_html(today: dt.date,
             f'                 data-event-name="{ev["name"]}" data-event-date="{ev["date"]}"{checked_attr}>\n'
             f'          Completed</label>'
         )
-        completed_badge_html = (
-            '<span class="completed-badge">Completed</span>' if is_completed else ""
-        )
+        # Chip is rendered on every card; .event-card.completed unhides it
+        # via CSS. Same "always in DOM, CSS-gated" pattern that hides the
+        # checkbox on ignored cards (#32 Q7) — keeps the JS toggle to a
+        # single classList op per click.
+        completed_badge_html = '<span class="completed-badge">Completed</span>'
         new_badge_html = (
             '<span class="new-badge">NEW</span>' if ev["id"] in _new_ids else ""
         )
@@ -1610,13 +1614,13 @@ def render_html(today: dt.date,
       margin-left: 0.4rem;
       vertical-align: middle;
     }}
-    /* #32: chip rendered next to the event name when is_completed=True.
-       Mirrors .new-badge weight (so the two read as a matched pair when
-       both are present) but uses the same green family as the
-       Unignore-button accent for visual consistency with the completed
-       background. */
+    /* #32: chip is rendered on every card but hidden by default; the
+       .event-card.completed override below reveals it. Mirrors .new-badge
+       weight (so the two read as a matched pair when both are present)
+       but uses the same green family as the Unignore-button accent for
+       visual consistency with the completed background. */
     .completed-badge {{
-      display: inline-block;
+      display: none;
       background: #1e8e3e;
       color: white;
       padding: 0.05rem 0.45rem;
@@ -1627,6 +1631,9 @@ def render_html(today: dt.date,
       letter-spacing: 0.3px;
       margin-left: 0.4rem;
       vertical-align: middle;
+    }}
+    .event-card.completed .completed-badge {{
+      display: inline-block;
     }}
     .complete-checkbox-wrap {{
       display: inline-flex;
@@ -1778,8 +1785,9 @@ def render_html(today: dt.date,
   <script>
     (function () {{
       var WEBHOOK_URL = {json.dumps(webhook_url)};
-      var STORAGE_KEY         = "kids_schedule_ignored_ids";
-      var SENDERS_STORAGE_KEY = "kids_schedule_ignored_senders";
+      var STORAGE_KEY           = "kids_schedule_ignored_ids";
+      var SENDERS_STORAGE_KEY   = "kids_schedule_ignored_senders";
+      var COMPLETED_STORAGE_KEY = "kids_schedule_completed_ids";
 
       function loadIgnored() {{
         try {{
@@ -1804,6 +1812,19 @@ def render_html(today: dt.date,
       }}
       function saveIgnoredSenders(domains) {{
         try {{ localStorage.setItem(SENDERS_STORAGE_KEY, JSON.stringify(domains)); }}
+        catch (e) {{ /* storage unavailable */ }}
+      }}
+
+      function loadCompleted() {{
+        try {{
+          var raw = localStorage.getItem(COMPLETED_STORAGE_KEY);
+          return raw ? JSON.parse(raw) : [];
+        }} catch (e) {{
+          return [];
+        }}
+      }}
+      function saveCompleted(ids) {{
+        try {{ localStorage.setItem(COMPLETED_STORAGE_KEY, JSON.stringify(ids)); }}
         catch (e) {{ /* storage unavailable */ }}
       }}
 
@@ -1926,6 +1947,30 @@ def render_html(today: dt.date,
         // is the surfaced affordance.
         setIgnored(card, "event");
       }});
+
+      // ── #32 Completed state ───────────────────────────────
+      // Server-rendered is_completed (sourced from completed_events.json,
+      // which is regenerated from the Apps Script "Completed Events"
+      // sheet on every cron run) is the authoritative starting state.
+      // localStorage layers on top to preserve optimistic flips that
+      // haven't round-tripped through the next cron yet.
+      function setCompleted(card, on) {{
+        if (on) {{
+          card.classList.add("completed");
+        }} else {{
+          card.classList.remove("completed");
+        }}
+        var box = card.querySelector(".complete-checkbox");
+        if (box) box.checked = !!on;
+      }}
+      var localCompleted = loadCompleted();
+      if (localCompleted.length) {{
+        document.querySelectorAll(".event-card[data-event-id]").forEach(function (card) {{
+          var id = card.getAttribute("data-event-id");
+          if (localCompleted.indexOf(id) === -1) return;
+          setCompleted(card, true);
+        }});
+      }}
 
       // ── Per-kid filter chips (#12) ────────────────────────
       // Ephemeral view filter — no localStorage, no persistence. Clicking
@@ -2117,6 +2162,47 @@ def render_html(today: dt.date,
             showToast("Unignore failed — try again");
           }});
           return;
+        }}
+      }});
+
+      // ── #32 Completed checkbox change router ──────────────
+      // Separate `change` listener (not the click delegator above) so
+      // we read the checkbox's NEW checked state without depending on
+      // browser event ordering. Optimistic flip + rollback on POST
+      // failure, mirroring the ignore-flow pattern.
+      document.addEventListener("change", function (e) {{
+        var t = e.target;
+        if (!t || !t.classList || !t.classList.contains("complete-checkbox")) return;
+        var card = t.closest(".event-card");
+        if (!card) return;
+        var id = card.getAttribute("data-event-id");
+        var name = t.getAttribute("data-event-name") || "";
+        var date = t.getAttribute("data-event-date") || "";
+        var checking = !!t.checked;
+        if (checking) {{
+          setCompleted(card, true);
+          var current = loadCompleted();
+          if (current.indexOf(id) === -1) current.push(id);
+          saveCompleted(current);
+          postAction({{
+            action: "complete", id: id, name: name, date: date
+          }}).catch(function () {{
+            setCompleted(card, false);
+            var rolled = loadCompleted().filter(function (x) {{ return x !== id; }});
+            saveCompleted(rolled);
+            showToast("Complete failed — try again");
+          }});
+        }} else {{
+          setCompleted(card, false);
+          var remaining = loadCompleted().filter(function (x) {{ return x !== id; }});
+          saveCompleted(remaining);
+          postAction({{ action: "uncomplete", id: id }}).catch(function () {{
+            setCompleted(card, true);
+            var restored = loadCompleted();
+            if (restored.indexOf(id) === -1) restored.push(id);
+            saveCompleted(restored);
+            showToast("Uncomplete failed — try again");
+          }});
         }}
       }});
     }})();
