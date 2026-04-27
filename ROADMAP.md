@@ -22,7 +22,8 @@ Strict rules for writing it:
 
 - Items 27 and 28 closed `[x]` after Tom's prod verification (commit aa20b4b moved full prose to `COMPLETED.md`).
 - Item 29 closed `[x]` after Tom's prod verification.
-- Items 30 + 31 are a paired agent-prompt strengthening: #30 (commit d3dd5fa) requires URLs verbatim in the `location` field instead of summarized parentheticals like `(PandaDoc link)`; #31 (this commit) clarifies that `source` date must be the actual email's "Date sent:" header, not a date mentioned inside the email body. #31 was filed in direct response to a confusing live-page case: 5 NEW-badged events from a single "last day to register" reminder email today showed source labels like "(Mar 15)" because the agent attributed them to the originally-referenced newsletter date rather than today's email. Both items stay `[~]` and Tom signs off on them together after the next live cron cycle.
+- Items 30 + 31 are a paired agent-prompt strengthening: #30 (commit d3dd5fa) requires URLs verbatim in the `location` field instead of summarized parentheticals like `(PandaDoc link)`; #31 (commit b586331) clarifies that `source` date must be the actual email's "Date sent:" header, not a date mentioned inside the email body.
+- **Verification scope: NEW cards only.** Pipeline caches events keyed on Gmail `messageId` (item #4); cached entries don't re-process unless explicitly evicted. So #30 and #31 fix only events extracted from emails arriving AFTER the prompt push — pre-existing cards on the live page keep their old labels indefinitely. A `--reextract-all` bulk-flush was considered (2026-04-25) and rejected to preserve far-future events extracted from 60–120-day-old "save the date" emails outside the search window.
 - Test delta vs main: +24 passing on Linux/CI (12 unit tests + 12 render-integration). The 12 #29 render tests still fail on Windows with the unrelated `%-d` strftime issue.
 - Nothing else in flight.
 
@@ -131,7 +132,9 @@ Filed 2026-04-25 from Tom — caught during item-29 verification: a DanceOne wai
 
 **Tests.** New `test_extraction_prompt_preserves_urls_in_location_directive` in `tests/test_agent.py` — pins the directive's key phrases (`URL VERBATIM`, `PandaDoc`, `Google Form`, `GOOD:`, `BAD:`) so a future prompt edit that accidentally drops the directive fails CI. Modeled on the existing roster-prose pin pattern.
 
-Item stays `[~]` pending Tom's live verification post-deploy across one or two cron cycles: confirm that URLs from signup-form / e-signature / Google Form emails now appear as clickable links in the location field instead of being summarized as parentheticals.
+**No retroactive fix.** The pipeline caches extracted events in `events_state.json` keyed on Gmail `messageId` (item #4); cached entries are NEVER re-processed unless explicitly evicted via `--reextract <MESSAGE_ID>`. So events extracted *before* this prompt change keep their old `location` strings (`"Online (PandaDoc link)"` etc.) — only events extracted from *new* emails benefit from the directive. A `--reextract-all` bulk-flush utility was considered (2026-04-25) and explicitly rejected: the cache holds events up to 120 days old via `processed_messages`, but Gmail search is bounded to the 60-day lookback, so a bulk flush would lose far-future events extracted from 60–120-day-old "save the date" emails. Slow-phase-in is the right trade.
+
+Item stays `[~]` pending Tom's live verification post-deploy on **newly-arrived** signup-form / e-signature / Google Form emails (NOT existing cards on the live page — those keep their old labels). Confirm that the next reminder/announcement email with a URL produces a card whose `Location:` line shows the URL itself rendered as a clickable link.
 
 ### 31. [~] Agent should source-date events to the email's actual sent date, not a referenced date
 
@@ -143,7 +146,7 @@ Diagnosis: today's email was a "last day to register" reminder rolling up multip
 
 **Tests.** New `test_extraction_prompt_pins_source_date_to_email_sent_date` in `tests/test_agent.py` — pins single-line phrases ("Date sent:", "the date THIS specific", "rolls up an older newsletter", and both halves of the GOOD/BAD pair) so a future prompt edit dropping the directive fails CI. Modeled on the #30 pin pattern.
 
-**Bundled with #30 for verification.** Both items are agent-prompt strengthenings landed in the same session (#30: preserve URL strings verbatim; #31: source-date the email's actual send date). They live as separate commits but Tom verifies them together on the next post-deploy cron cycle: pull up an event card and confirm (a) URLs appear as clickable links in the location, (b) the source-line date matches when Ellen actually received the email in her inbox.
+**Bundled with #30 for verification.** Both items are agent-prompt strengthenings landed in the same session (#30: preserve URL strings verbatim; #31: source-date the email's actual send date). They live as separate commits but Tom verifies them together on the next post-deploy cron cycle: pull up a **newly-arrived** event card (NOT a pre-existing one — see #30's "No retroactive fix" callout for why) and confirm (a) URLs appear as clickable links in the location, (b) the source-line date matches when Ellen actually received the email in her inbox.
 
 Item stays `[~]` pending live verification.
 
