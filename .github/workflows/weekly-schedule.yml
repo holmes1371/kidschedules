@@ -33,6 +33,11 @@ on:
         required: false
         type: boolean
         default: false
+      test_output:
+        description: "Test output (write docs/testpage.html only; preserve prod /index.html; no state writes)"
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write   # needed to push events_state.json to the state branch
@@ -231,10 +236,13 @@ jobs:
           if [ "${{ github.event.inputs.intentional_failure }}" == "true" ]; then
             ARGS="$ARGS --intentional-failure"
           fi
+          if [ "${{ github.event.inputs.test_output }}" == "true" ]; then
+            ARGS="$ARGS --test-output"
+          fi
           python main.py $ARGS
 
       - name: Save persistent state back to state branch
-        if: ${{ github.event.inputs.dry_run != 'true' }}
+        if: ${{ github.event.inputs.dry_run != 'true' && github.event.inputs.test_output != 'true' }}
         run: |
           if [ ! -f .filter_audit.json ] \
              && [ ! -f blocklist_auto.txt ] \
@@ -298,6 +306,56 @@ jobs:
             git push origin HEAD:state
             echo "Pushed persistent state updates to state branch."
           fi
+
+      - name: Preserve production page for test_output run
+        # ROADMAP #23. Test runs write only docs/testpage.html — they do
+        # NOT write docs/index.html. actions/deploy-pages does a full-
+        # replace deploy of the uploaded artifact, so without this step
+        # Ellen's prod /index.html would disappear from the live site
+        # until the next cron tick rebuilt it. Curl the live prod page
+        # (and any ICS files it links to) into docs/ so the artifact
+        # ships both the preserved prod page and the new testpage.
+        # Best-effort: a fetch failure is logged and the run continues
+        # — the test page still deploys, prod briefly 404s, next cron
+        # heals it. See design/test-landing-page.md Q1–Q3.
+        if: ${{ github.event.inputs.test_output == 'true' && github.event.inputs.dry_run != 'true' }}
+        run: |
+          PAGES_URL=$(cat pages_url.txt 2>/dev/null || true)
+          if [ -z "$PAGES_URL" ]; then
+            echo "WARNING: pages_url.txt empty/missing — cannot preserve prod page."
+            exit 0
+          fi
+          # Strip any trailing slash so we can append /index.html cleanly.
+          PAGES_URL="${PAGES_URL%/}"
+          if curl -sSL --fail --max-time 30 -o docs/index.html "$PAGES_URL/index.html"; then
+            echo "Preserved $PAGES_URL/index.html → docs/index.html ($(wc -c < docs/index.html) bytes)."
+          else
+            echo "WARNING: curl of $PAGES_URL/index.html failed; skipping prod preservation."
+            rm -f docs/index.html
+            exit 0
+          fi
+          # Scrape ICS hrefs from the just-fetched prod page and curl each
+          # one so the preserved page's "Add to calendar" links still work.
+          mkdir -p docs/ics
+          ICS_PATHS=$(grep -oE 'href="ics/[^"]+\.ics"' docs/index.html | sed 's/href="//; s/"$//' | sort -u || true)
+          if [ -z "$ICS_PATHS" ]; then
+            echo "No ICS hrefs found in prod page — nothing to preserve under docs/ics/."
+            exit 0
+          fi
+          ICS_OK=0
+          ICS_FAIL=0
+          while IFS= read -r path; do
+            [ -z "$path" ] && continue
+            url="$PAGES_URL/$path"
+            out="docs/$path"
+            if curl -sSL --fail --max-time 30 -o "$out" "$url"; then
+              ICS_OK=$((ICS_OK + 1))
+            else
+              ICS_FAIL=$((ICS_FAIL + 1))
+              echo "  WARNING: curl failed for $url"
+            fi
+          done <<< "$ICS_PATHS"
+          echo "Preserved $ICS_OK ICS file(s) from prod ($ICS_FAIL failure(s))."
 
       - name: Upload Pages artifact
         if: ${{ github.event.inputs.dry_run != 'true' }}

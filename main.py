@@ -97,9 +97,14 @@ def should_create_draft(args) -> bool:
 
     Default is no-draft. Explicit opt-in required via --create-draft or
     the CREATE_DRAFT=1 env var (used by the scheduled workflow trigger).
-    --dry-run always suppresses. This is the only place the decision lives.
+    --dry-run always suppresses. --test-output also always suppresses
+    (ROADMAP #23: a test run must not put a draft in Ellen's mailbox,
+    even if --create-draft / CREATE_DRAFT=1 are set in the same call).
+    This is the only place the decision lives.
     """
     if args.dry_run:
+        return False
+    if getattr(args, "test_output", False):
         return False
     if args.create_draft:
         return True
@@ -770,6 +775,7 @@ def step4_process_events(
     dry_run: bool = False,
     outlier_alerts: list[dict[str, Any]] | None = None,
     lookback_days: int = 60,
+    test_output: bool = False,
 ) -> tuple[str, str, dict, str, str]:
     """Run process_events.py and return (html, body_text, meta,
     digest_text, digest_html).
@@ -787,6 +793,14 @@ def step4_process_events(
     page header ("{N} day lookback") reflects the actual Gmail-search
     window main() used upstream. Default 60 matches the workflow's
     default; only the `--lookback-days` dispatch-input path overrides it.
+
+    `test_output` (ROADMAP #23) forwards `--output-target test` to
+    process_events.py so the rendered page gets a banner, forces the
+    embedded webhook URL to empty (so Ignore/Complete buttons are
+    inert), and omits the `--prior-events` and `--ics-out-dir` args
+    so the prior-events manifest and the per-event .ics files are
+    not mutated by a test run. The HTML is still rendered and
+    returned to the caller (step5 routes it to docs/testpage.html).
     """
     print("\n" + "=" * 60)
     print("STEP 4: Processing events (filter, dedupe, sort, render)")
@@ -822,7 +836,15 @@ def step4_process_events(
             alerts_path = f.name
 
     try:
-        webhook_url = _load_webhook_url()
+        # Test-output mode (#23): force the rendered page's webhook URL
+        # to empty so Ignore/Complete buttons + #34 refresh-fetches all
+        # short-circuit at process_events.py's existing dev/preview gate
+        # (no new code path). Skip --prior-events so the NEW-badge
+        # baseline is not mutated by a test run, and skip --ics-out-dir
+        # so the production docs/ics/ tree is not overwritten by test
+        # event IDs. The page's "Add to calendar" links won't resolve
+        # on the test page — acceptable; banner says buttons are inert.
+        webhook_url = "" if test_output else _load_webhook_url()
         script_args = [
             "--candidates", candidates_path,
             "--body-out", body_path,
@@ -837,13 +859,18 @@ def step4_process_events(
             "--ignored", IGNORED_EVENTS_PATH,
             "--completed", COMPLETED_EVENTS_PATH,
             "--protected-senders", PROTECTED_SENDERS_PATH,
-            "--prior-events", PRIOR_EVENTS_PATH,
         ]
+        if not test_output:
+            script_args += ["--prior-events", PRIOR_EVENTS_PATH]
+        if test_output:
+            script_args += ["--output-target", "test"]
         if alerts_path:
             script_args += ["--outlier-alerts", alerts_path]
         # Per-event .ics files land in docs/ics/ for the Pages artifact to
-        # pick up; skipped on dry-run to avoid churning the publish dir.
-        if not dry_run:
+        # pick up; skipped on dry-run to avoid churning the publish dir,
+        # and skipped on test-output to avoid mutating the production
+        # docs/ics/ tree the curl-prod step preserves at deploy time.
+        if not dry_run and not test_output:
             script_args += ["--ics-out-dir", os.path.join(PAGES_OUTPUT_DIR, "ics")]
         run_script("process_events.py", script_args)
 
@@ -882,8 +909,15 @@ def step4_process_events(
                 pass
 
 
-def step5_publish(html: str, meta: dict, dry_run: bool) -> None:
-    """Write index.html to docs/ for the workflow to upload as a Pages artifact."""
+def step5_publish(html: str, meta: dict, dry_run: bool, test_output: bool = False) -> None:
+    """Write the rendered HTML to docs/ for the workflow to upload as a
+    Pages artifact.
+
+    Production runs write `docs/index.html`. ROADMAP #23 test runs
+    write `docs/testpage.html` instead — the workflow's curl-prod step
+    drops the live `index.html` into the artifact alongside it so
+    Ellen's prod page is preserved by the deploy.
+    """
     print("\n" + "=" * 60)
     print("STEP 5: Publishing to GitHub Pages")
     print("=" * 60)
@@ -895,10 +929,11 @@ def step5_publish(html: str, meta: dict, dry_run: bool) -> None:
 
     os.makedirs(PAGES_OUTPUT_DIR, exist_ok=True)
 
-    index_path = os.path.join(PAGES_OUTPUT_DIR, "index.html")
+    out_filename = "testpage.html" if test_output else "index.html"
+    index_path = os.path.join(PAGES_OUTPUT_DIR, out_filename)
     with open(index_path, "w", encoding="utf-8") as f:
         f.write(html)
-    print(f"  Wrote docs/index.html ({len(html)} chars)")
+    print(f"  Wrote docs/{out_filename} ({len(html)} chars)")
 
     # .nojekyll so GitHub Pages serves raw HTML (harmless with Actions-based
     # deploy, preserved in case the deploy source is ever switched back).
@@ -981,6 +1016,17 @@ def main() -> int:
              "scheduled workflow run passes CREATE_DRAFT=1 to flip this on."
     )
     parser.add_argument(
+        "--test-output", action="store_true",
+        help="ROADMAP #23. Sandbox the run: write docs/testpage.html "
+             "instead of docs/index.html, render a banner, force the "
+             "rendered page's webhook URL to empty (Ignore/Complete "
+             "buttons inert), and skip every persistent state write "
+             "(events_state.json, prior_events.json, sender_stats.json, "
+             "auto-blocklist files, .filter_audit stamp, Gmail draft). "
+             "Workflow gates the state-branch push step so test runs "
+             "leave nothing behind. See design/test-landing-page.md."
+    )
+    parser.add_argument(
         "--reextract", type=str, default=None, metavar="MESSAGE_ID",
         help="Evict a Gmail message ID from events_state.json before the "
              "Gmail fetch so the next run re-extracts it. Use when the "
@@ -1008,7 +1054,16 @@ def main() -> int:
     gmail = GmailClient()
     profile = gmail.get_profile()
     print(f"  Authenticated as: {profile.get('emailAddress')}")
-    config = step1b_filter_audit(gmail, config, args.model, args.lookback_days)
+    if args.test_output:
+        # ROADMAP #23. The audit stamps `.filter_audit.json` and may
+        # spend Anthropic API budget on the stripped-message review.
+        # Test runs are non-mutating, so skip the whole step — the
+        # audit will still run on the next non-test trigger if due.
+        print("\n  (test-output: skipping filter audit)")
+    else:
+        config = step1b_filter_audit(
+            gmail, config, args.model, args.lookback_days,
+        )
 
     # Step 2: Search Gmail
     search_results = step2_search_gmail(gmail, config)
@@ -1057,13 +1112,22 @@ def main() -> int:
 
     # Persist cache. `last_updated_iso` reflects this run even when no new
     # emails were extracted — useful for observing GC-only runs.
-    es.save_state(EVENTS_STATE_PATH, state, now_iso)
+    # ROADMAP #23: test runs MUST NOT save the cache — newly-extracted
+    # events would otherwise be marked processed, and the next prod cron
+    # would skip those messages without ever rendering them on the live
+    # page. Same logic for sender_stats below.
+    if args.test_output:
+        print("\n  (test-output: skipping events_state save)")
+    else:
+        es.save_state(EVENTS_STATE_PATH, state, now_iso)
 
     # Step 3b: Feed agent-flagged senders into the auto-blocklist.
-    if not args.dry_run:
-        step3b_update_auto_blocklist(irrelevant_senders)
-    else:
+    if args.dry_run:
         print("\n  (dry-run: skipping auto-blocklist update)")
+    elif args.test_output:
+        print("\n  (test-output: skipping auto-blocklist update)")
+    else:
+        step3b_update_auto_blocklist(irrelevant_senders)
 
     # Step 3c: Fold this run into sender_stats, compute outlier alerts,
     # and print the alerts banner. Alerts are computed BEFORE the stats
@@ -1079,6 +1143,8 @@ def main() -> int:
         ns.classify_senders(sender_stats)
         if args.dry_run:
             print("\n  (dry-run: skipping sender_stats save)")
+        elif args.test_output:
+            print("\n  (test-output: skipping sender_stats save)")
         else:
             ns.save_stats(SENDER_STATS_PATH, sender_stats, now_iso)
     _print_outlier_alerts(alerts)
@@ -1094,10 +1160,11 @@ def main() -> int:
         dry_run=args.dry_run,
         outlier_alerts=alerts,
         lookback_days=args.lookback_days,
+        test_output=args.test_output,
     )
 
     # Step 5: Publish
-    step5_publish(html, meta, args.dry_run)
+    step5_publish(html, meta, args.dry_run, test_output=args.test_output)
 
     # Step 6: Weekly Gmail digest draft (heavily gated — see should_create_draft)
     step6_create_draft(

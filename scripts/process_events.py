@@ -2693,6 +2693,14 @@ def main() -> int:
                         "title; the manifest is overwritten with the current "
                         "render set after HTML is written. Missing/malformed "
                         "file → no badges (first-run graceful degradation).")
+    p.add_argument("--output-target", default="prod", choices=("prod", "test"),
+                   help="ROADMAP #23. 'test' renders a visible banner at "
+                        "the top of the page so a manual workflow_dispatch "
+                        "QA build cannot be mistaken for live data. "
+                        "'prod' (default) is the unmodified production "
+                        "render. Banner rendering lands in a later commit; "
+                        "this arg is currently accepted as a no-op for "
+                        "main.py forward-compatibility.")
     p.add_argument("--outlier-alerts", default="",
                    help="Path to a JSON list of outlier-alert dicts produced "
                         "by newsletter_stats.outlier_alerts. When non-empty, "

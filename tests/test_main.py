@@ -34,8 +34,10 @@ import events_state as es  # noqa: E402
 import main  # noqa: E402
 
 
-def _args(dry_run: bool, create_draft: bool) -> SimpleNamespace:
-    return SimpleNamespace(dry_run=dry_run, create_draft=create_draft)
+def _args(dry_run: bool, create_draft: bool, test_output: bool = False) -> SimpleNamespace:
+    return SimpleNamespace(
+        dry_run=dry_run, create_draft=create_draft, test_output=test_output,
+    )
 
 
 @pytest.fixture(autouse=True)
@@ -83,6 +85,34 @@ def test_env_var_other_values_do_not_opt_in(monkeypatch, env_value):
 def test_default_is_no_draft():
     # No env var, no flag, no dry-run.
     assert main.should_create_draft(_args(dry_run=False, create_draft=False)) is False
+
+
+# ── test_output always wins (ROADMAP #23) ──────────────────────────────
+
+
+@pytest.mark.parametrize("create_draft", [True, False])
+@pytest.mark.parametrize("env_value", [None, "", "0", "1", "true"])
+def test_test_output_always_suppresses(monkeypatch, create_draft, env_value):
+    """ROADMAP #23. test_output sandboxes the run — Gmail draft creation
+    must be suppressed even when --create-draft or CREATE_DRAFT=1 are
+    set in the same call. A test run that puts a draft in Ellen's
+    mailbox defeats the sandboxing intent."""
+    if env_value is not None:
+        monkeypatch.setenv("CREATE_DRAFT", env_value)
+    assert main.should_create_draft(
+        _args(dry_run=False, create_draft=create_draft, test_output=True)
+    ) is False
+
+
+def test_should_create_draft_tolerates_args_without_test_output_field():
+    """The earlier test_main tests build a SimpleNamespace without a
+    `test_output` attribute (still compatible after the helper was
+    extended). Pin that getattr-with-default keeps the old call sites
+    working — defense against a refactor that switches to direct
+    attribute access."""
+    # Build a SimpleNamespace WITHOUT the field at all.
+    legacy_args = SimpleNamespace(dry_run=False, create_draft=True)
+    assert main.should_create_draft(legacy_args) is True
 
 
 # ── step2c cache filter (zero-new-messages short-circuit) ──────────────────

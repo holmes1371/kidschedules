@@ -452,3 +452,166 @@ def test_step3b_cleans_up_tempfile_on_run_script_failure(monkeypatch):
     # The finally: os.unlink removed the tempfile before the exception
     # propagated.
     assert not os.path.exists(captured_path["path"])
+
+
+# ── step5_publish + test_output ─────────────────────────────────────────
+
+
+def test_step5_publish_test_output_writes_testpage(monkeypatch, tmp_path):
+    """ROADMAP #23. With test_output=True the rendered HTML lands at
+    docs/testpage.html, NOT docs/index.html. The workflow's curl-prod
+    step is responsible for populating docs/index.html separately."""
+    out_dir = tmp_path / "docs"
+    monkeypatch.setattr(main, "PAGES_OUTPUT_DIR", str(out_dir))
+    main.step5_publish("<html>test</html>", {"subject": "Weekly"},
+                       dry_run=False, test_output=True)
+    assert (out_dir / "testpage.html").read_text() == "<html>test</html>"
+    assert not (out_dir / "index.html").exists(), (
+        "test_output run wrote docs/index.html — would clobber Ellen's "
+        "prod page when the artifact is uploaded."
+    )
+
+
+def test_step5_publish_default_keeps_index_filename(monkeypatch, tmp_path):
+    """Default (test_output=False) still writes index.html. Pin it so a
+    refactor of the new branch can't accidentally flip the default."""
+    out_dir = tmp_path / "docs"
+    monkeypatch.setattr(main, "PAGES_OUTPUT_DIR", str(out_dir))
+    main.step5_publish("<html>prod</html>", {"subject": "Weekly"},
+                       dry_run=False)
+    assert (out_dir / "index.html").read_text() == "<html>prod</html>"
+    assert not (out_dir / "testpage.html").exists()
+
+
+# ── step4_process_events + test_output ──────────────────────────────────
+
+
+def _stub_step4_run(captured_args: dict):
+    """Build a fake run_script that satisfies step4_process_events's
+    file-read contract: write minimal content to every output path
+    process_events.py would normally produce, and capture the args
+    list for inspection."""
+    def fake_run(script, args):
+        captured_args["script"] = script
+        captured_args["args"] = list(args)
+        # Mirror the output-file paths step4 builds and reads back.
+        body_path = args[args.index("--body-out") + 1]
+        html_path = args[args.index("--html-out") + 1]
+        meta_path = args[args.index("--meta-out") + 1]
+        digest_text_path = args[args.index("--digest-text-out") + 1]
+        digest_html_path = args[args.index("--digest-html-out") + 1]
+        Path(body_path).write_text("body")
+        Path(html_path).write_text("<html></html>")
+        Path(digest_text_path).write_text("digest")
+        Path(digest_html_path).write_text("<p>digest</p>")
+        Path(meta_path).write_text(json.dumps({
+            "subject": "Weekly",
+            "today_iso": "2026-04-27",
+            "counts": {
+                "candidates_in": 0, "future_dated": 0, "undated": 0,
+                "dropped_past": 0, "banked_far_future": 0,
+                "dropped_ignored": 0,
+            },
+            "warnings": [],
+            "has_events": False,
+            "digest": {"subject": "Weekly digest", "this_week_count": 0},
+        }))
+        return ""
+    return fake_run
+
+
+def test_step4_test_output_passes_output_target_test(monkeypatch):
+    """ROADMAP #23. test_output=True must add `--output-target test`
+    to the process_events.py invocation so the banner renders."""
+    captured = {}
+    monkeypatch.setattr(main, "run_script", _stub_step4_run(captured))
+    monkeypatch.setattr(main, "_load_webhook_url", lambda: "https://example.com/wh")
+    main.step4_process_events(
+        candidates=[], pages_url="https://example.com/",
+        dry_run=False, lookback_days=60, test_output=True,
+    )
+    args = captured["args"]
+    idx = args.index("--output-target")
+    assert args[idx + 1] == "test"
+
+
+def test_step4_test_output_forces_empty_webhook(monkeypatch):
+    """ROADMAP #23. test_output=True must override webhook_url to "" so
+    the rendered page's Ignore/Complete buttons + #34 refresh fetches
+    all hit the existing dev/preview no-op gate. Pin that this happens
+    even when ignore_webhook_url.txt is populated."""
+    captured = {}
+    monkeypatch.setattr(main, "run_script", _stub_step4_run(captured))
+    monkeypatch.setattr(main, "_load_webhook_url",
+                        lambda: "https://script.google.com/REAL")
+    main.step4_process_events(
+        candidates=[], pages_url="",
+        dry_run=False, lookback_days=60, test_output=True,
+    )
+    args = captured["args"]
+    idx = args.index("--webhook-url")
+    assert args[idx + 1] == "", (
+        "test_output run forwarded a non-empty webhook URL — Ignore/"
+        "Complete buttons on the test page would POST to the live "
+        "Apps Script and mutate Ellen's sheets."
+    )
+
+
+def test_step4_test_output_omits_prior_events(monkeypatch):
+    """ROADMAP #23. test_output=True must NOT pass `--prior-events`,
+    because process_events.py overwrites that file after a successful
+    HTML write — a test run mutating the NEW-badge baseline would
+    then suppress badges on the next prod cron tick."""
+    captured = {}
+    monkeypatch.setattr(main, "run_script", _stub_step4_run(captured))
+    monkeypatch.setattr(main, "_load_webhook_url", lambda: "")
+    main.step4_process_events(
+        candidates=[], pages_url="",
+        dry_run=False, lookback_days=60, test_output=True,
+    )
+    assert "--prior-events" not in captured["args"], (
+        "test_output run included --prior-events; this would mutate "
+        "the NEW-badge baseline and suppress badges on the next prod run."
+    )
+
+
+def test_step4_test_output_omits_ics_out_dir(monkeypatch):
+    """ROADMAP #23. test_output=True must NOT pass `--ics-out-dir`,
+    because process_events.py wipes and rewrites that directory. A
+    test run rewriting docs/ics/ would replace prod's ICS files with
+    test-event ICS files — Ellen's preserved prod page would link to
+    test ICS files until the next cron tick rebuilt the prod set."""
+    captured = {}
+    monkeypatch.setattr(main, "run_script", _stub_step4_run(captured))
+    monkeypatch.setattr(main, "_load_webhook_url", lambda: "")
+    main.step4_process_events(
+        candidates=[], pages_url="",
+        dry_run=False, lookback_days=60, test_output=True,
+    )
+    assert "--ics-out-dir" not in captured["args"], (
+        "test_output run included --ics-out-dir; would clobber prod ICS."
+    )
+
+
+def test_step4_default_still_passes_prior_events_and_ics(monkeypatch):
+    """Pin the default (test_output=False, dry_run=False) behavior —
+    --prior-events and --ics-out-dir MUST still flow through. A
+    refactor of the test-output branch can't accidentally drop them
+    on the prod path."""
+    captured = {}
+    monkeypatch.setattr(main, "run_script", _stub_step4_run(captured))
+    monkeypatch.setattr(main, "_load_webhook_url",
+                        lambda: "https://script.google.com/REAL")
+    main.step4_process_events(
+        candidates=[], pages_url="",
+        dry_run=False, lookback_days=60, test_output=False,
+    )
+    args = captured["args"]
+    assert "--prior-events" in args
+    assert "--ics-out-dir" in args
+    assert "--output-target" not in args, (
+        "Default mode passed --output-target; only test mode should."
+    )
+    # Default webhook stays whatever _load_webhook_url returned.
+    idx = args.index("--webhook-url")
+    assert args[idx + 1] == "https://script.google.com/REAL"
