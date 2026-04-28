@@ -42,20 +42,6 @@
       "source_message_id": "19cf4b7054b58927",
       "time": "9:00 AM – 2:00 PM"
     },
-    "074c52465654": {
-      "category": "Academic Due Date",
-      "child": "Isla",
-      "date": "2026-04-27",
-      "first_seen_iso": "2026-04-27T20:19:04-04:00",
-      "id": "074c52465654",
-      "location": "https://www.myschoolbucks.com",
-      "name": "Frying Pan Park Field Trip Payment — Isla",
-      "sender_block_key": "myschoolbucks.com",
-      "sender_domain": "myschoolbucks.com",
-      "source": "MySchoolBucks Order Confirmation (Apr 27)",
-      "source_message_id": "19dd10d5be75729e",
-      "time": "All day (deadline)"
-    },
     "09ba480f8257": {
       "category": "School Activity",
       "child": "Rising 7th & 8th graders",
@@ -2351,7 +2337,7 @@
       "time": "All day"
     }
   },
-  "last_updated_iso": "2026-04-27T20:19:04-04:00",
+  "last_updated_iso": "2026-04-27T20:36:32-04:00",
   "processed_messages": {
     "19a0da1d7445f787": "2026-04-17T18:51:22-04:00",
     "19a1784ff2f26474": "2026-04-17T18:51:22-04:00",
