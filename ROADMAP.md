@@ -20,10 +20,11 @@ Strict rules for writing it:
 
 **2026-04-28**
 
-- #37 code complete `[~]` — 3 commits (3bd0cae design+flip / 1f8e8d8 Tier 1 / 228b082 Tier 2). 815 → 872 tests green. Tier 1 lazy filter ships in both Python sync helpers; Tier 2 `gcPastDatedRows` lands in `apps_script.gs` pending Tom's manual redeploy + daily-trigger setup (ritual is in the function comment).
-- Verified out of session: "Show ignored (N)" counter is correct as events naturally retire — `ignored_n` is computed from rendered events, not sheet rows, so past-dated events drop out of the count once `events_state.gc_state` GCs them. #37 is sheet-hygiene + GET-payload only.
-- #33 still code complete `[~]` — same 4 SHAs (37aa60f / 51c8a54 / a9ffee7 / 63e86df). Pending Tom's live verification on the next real teacher PDF email.
+- #37 closed `[x]` — Tom verified live (manual `gcPastDatedRows` run after the Date-coercion fix in 018942e); full prose archived in `COMPLETED.md`. 5 commits, 815 → 872 tests green.
+- Verified out of session: "Show ignored (N)" counter is correct as events naturally retire — `ignored_n` is computed from rendered events, not sheet rows.
+- #33 still code complete `[~]` — 4 SHAs (37aa60f / 51c8a54 / a9ffee7 / 63e86df). Pending Tom's live verification on the next real teacher PDF email.
 - Items 30 + 31 still `[~]` pending Tom's live verification on newly-arrived emails.
+- #35 / #36 still `[ ]` placeholders.
 
 ## For future agents
 
@@ -185,18 +186,7 @@ Open for the next session to talk through with Tom before any code:
 
 No commits, no design note, no `[~]` flip until Tom and the next agent discuss.
 
-### 37. [~] Auto-GC the Ignored Events + Completed Events sheets — drop past-dated rows — 3bd0cae / 1f8e8d8 / 228b082
-
-Filed 2026-04-27. Plan approved 2026-04-28; design note `design/auto-gc-sheets.md`. Code complete 2026-04-28 (3 commits). Pending Tom's manual redeploy of `apps_script.gs` + Tier 2 daily-trigger setup; Tier 1 was active from the moment 1f8e8d8 hit the cron runner.
-
-Both Apps Script-backed sheets ("Ignored Events" #6/#7, "Completed Events" #32) grow monotonically today — there is no cleanup path. Once an event's date passes, it GCs out of `events_state.json` daily (per `events_state.gc_state`'s past-dated rule), so the matching row in either sheet is dead weight: it can never match an event again, but it still ships in the next cron's GET response and the page's localStorage hydration. At realistic cadence (a few flips per week) the bloat is tolerable for years; auto-cleanup is preventive maintenance so Tom never has to manually purge rows later.
-
-The on-page "Show ignored (N)" counter is **not** affected by stale rows — `ignored_n` is computed from rendered events (`weeks` + `undated`), so past-dated rows are invisible to it as soon as their event GCs from `events_state.json`. Verified 2026-04-28; this is sheet-hygiene + GET-payload only.
-
-- **Tier 1 (lazy filter at sync time).** `scripts/sync_ignored_events.py` (new — promoted from the inline workflow bash step in the same commit, modeled on `sync_completed_events.py` / `sync_ignored_senders.py`) and `scripts/sync_completed_events.py` (#32) drop rows whose `date` parses as ISO-8601 and is strictly before today. Defensive default: rows with empty / malformed / any unparseable `date` pass through (they may be undated events that legitimately have no date — same posture as `events_state.gc_state` for undated events). Pure-Python change in two helpers; no Apps Script work required for Tier 1.
-- **Tier 2 (server-side GC).** `apps_script.gs` grows a `gcPastDatedRows()` function that walks "Ignored Events" + "Completed Events" bottom-up and deletes rows whose `date` column parses and is strictly before today. **Does NOT touch "Ignored Senders"** — senders aren't date-bound; an ignore decision is intentionally permanent. Bind to a daily time-based trigger (3-click setup in the Apps Script editor UI; comment block in the function names the steps). Deploys with the existing manual-redeploy ritual (same as #34's `?secret=` patch).
-
-No retroactive bulk purge — daily trigger catches up over a few days; less destructive, smaller blast radius.
+37\. [x] Auto-GC the Ignored Events + Completed Events sheets — 3bd0cae / 1f8e8d8 / 228b082 / 6b48b67 / 018942e — see COMPLETED.md
 
 
 ## Descoped / on hold
