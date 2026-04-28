@@ -18,14 +18,13 @@ Strict rules for writing it:
 4. **No cross-session carry-overs.** If something is still broken session-to-session, file it as a numbered ROADMAP item instead of repeating it here.
 5. **Replace in place.** Do not append a new block and archive the old one below.
 
-**2026-04-27**
+**2026-04-28**
 
-- #33 code complete `[~]` — 4 commits (37aa60f / 51c8a54 / a9ffee7 / 63e86df). 754 → 815 tests green. Approach: Anthropic native PDF (`document` content block), FCPS-only sender gate via `pdf_sender_domains.txt`, 8MB cap, batch-of-1 for PDF-bearing emails, #31 source-date directive extended to pin PDF edition labels are NOT the source date. Pending Tom's live verification on the next real teacher PDF email; verification checklist in #33's body.
-- #23 closed `[x]` — Tom verified live; full prose archived in `COMPLETED.md`. 4 commits.
-- Soft-delete convention retired (commit fd6c1b9) — `rm` works on the local mount now.
+- #37 in flight `[~]` — design note `design/auto-gc-sheets.md`. Plan approved: ship Tier 1 (Python lazy filter at sync time) + Tier 2 (Apps Script daily-trigger GC) together, manual redeploy of `apps_script.gs` after both land.
+- Verified out of session: "Show ignored (N)" counter is correct as events naturally retire — `ignored_n` is computed from rendered events, not sheet rows, so past-dated events drop out of the count once `events_state.gc_state` GCs them. #37 is sheet-hygiene + GET-payload only.
+- #33 code complete `[~]` — 4 commits (37aa60f / 51c8a54 / a9ffee7 / 63e86df). 815 tests green. Pending Tom's live verification on the next real teacher PDF email; checklist in #33's body.
 - Items 30 + 31 still `[~]` pending Tom's live verification on newly-arrived emails.
-- #35 / #36 / #37 still `[ ]` placeholders. #37 (auto-GC the ignored + completed sheets) filed 2026-04-27; Tom pre-approved Tier 1 + Tier 2 in one go to avoid future manual maintenance.
-- Pre-push protocol: full `pytest tests/ -q` (now 815) green before any push.
+- Pre-push protocol: full `pytest tests/ -q` (815 → growing with #37 Tier 1) green before any push.
 
 ## For future agents
 
@@ -107,6 +106,7 @@ Status legend:
 
 26\. [x] Auto-blocklist must never block parents' personal addresses — c829e2a / 437fa6b / 9a3940c / cb64dd6 / 39c48b6 — see COMPLETED.md
 
+
 27\. [x] Auto-blocklist hardening: one errant agent flag shouldn't permanently block a sender — 6bea35a / e5772cc / 6b8c62a / 87d18f5 / ee90951 / 5d914dc / 4ba172b — see COMPLETED.md
 
 28\. [x] Bug: Ignore-sender button renders for protected address-form senders — 0446ed9 — see COMPLETED.md
@@ -186,22 +186,18 @@ Open for the next session to talk through with Tom before any code:
 
 No commits, no design note, no `[~]` flip until Tom and the next agent discuss.
 
-### 37. [ ] Auto-GC the Ignored Events + Completed Events sheets — drop past-dated rows
+### 37. [~] Auto-GC the Ignored Events + Completed Events sheets — drop past-dated rows
 
-Filed 2026-04-27 from Tom as a placeholder. Both Apps Script-backed sheets ("Ignored Events" #6/#7, "Completed Events" #32) grow monotonically today — there is no cleanup path. Once an event's date passes, it GCs out of `events_state.json` daily (per `events_state.gc_state`'s past-dated rule), so the matching row in either sheet is dead weight: it can never match an event again, but it still ships in the next cron's GET response and the page's localStorage hydration. At realistic cadence (a few flips per week) the bloat is tolerable for years; auto-cleanup is preventive maintenance so Tom never has to manually purge rows later.
+Filed 2026-04-27. Plan approved 2026-04-28; design note `design/auto-gc-sheets.md`. Ship Tier 1 + Tier 2 together; manual `apps_script.gs` redeploy after both land.
 
-**Tom approved both tiers in one go (2026-04-27).** Ship Tier 1 + Tier 2 together — Tier 1 alone solves the runtime concern but leaves the sheets growing at the source; Tier 2 keeps the sheets tidy too so this is a one-and-done.
+Both Apps Script-backed sheets ("Ignored Events" #6/#7, "Completed Events" #32) grow monotonically today — there is no cleanup path. Once an event's date passes, it GCs out of `events_state.json` daily (per `events_state.gc_state`'s past-dated rule), so the matching row in either sheet is dead weight: it can never match an event again, but it still ships in the next cron's GET response and the page's localStorage hydration. At realistic cadence (a few flips per week) the bloat is tolerable for years; auto-cleanup is preventive maintenance so Tom never has to manually purge rows later.
 
-- **Tier 1 (lazy filter at sync time).** `scripts/sync_ignored_events.py` (currently inline in the workflow) and `scripts/sync_completed_events.py` (#32) drop rows whose `date` is in the past before writing the runner's local cache. Pure-Python change in two helpers; no Apps Script work required. Defensive default: rows with empty / unparseable `date` columns pass through (they may be undated events that legitimately have no date — same posture as `events_state.gc_state` for undated events).
-- **Tier 2 (server-side GC).** `apps_script.gs` grows a function that walks each sheet and deletes rows whose `date` column is strictly before today. Bind it to a daily time-based trigger (3-click setup in the Apps Script editor UI). Deploys with the existing manual-redeploy ritual (same as #34's `?secret=` patch). Keeps the sheets tidy at the source — no monotonic growth.
+The on-page "Show ignored (N)" counter is **not** affected by stale rows — `ignored_n` is computed from rendered events (`weeks` + `undated`), so past-dated rows are invisible to it as soon as their event GCs from `events_state.json`. Verified 2026-04-28; this is sheet-hygiene + GET-payload only.
 
-Open for the next session to confirm before coding:
+- **Tier 1 (lazy filter at sync time).** `scripts/sync_ignored_events.py` (new — promoted from the inline workflow bash step in the same commit, modeled on `sync_completed_events.py` / `sync_ignored_senders.py`) and `scripts/sync_completed_events.py` (#32) drop rows whose `date` parses as ISO-8601 and is strictly before today. Defensive default: rows with empty / malformed / any unparseable `date` pass through (they may be undated events that legitimately have no date — same posture as `events_state.gc_state` for undated events). Pure-Python change in two helpers; no Apps Script work required for Tier 1.
+- **Tier 2 (server-side GC).** `apps_script.gs` grows a `gcPastDatedRows()` function that walks "Ignored Events" + "Completed Events" bottom-up and deletes rows whose `date` column parses and is strictly before today. **Does NOT touch "Ignored Senders"** — senders aren't date-bound; an ignore decision is intentionally permanent. Bind to a daily time-based trigger (3-click setup in the Apps Script editor UI; comment block in the function names the steps). Deploys with the existing manual-redeploy ritual (same as #34's `?secret=` patch).
 
-- Whether the Tier-2 daily trigger should also clean the **Ignored Senders** sheet (#7). Probably no — senders aren't date-bound, and the user would re-encounter a sender's emails forever, so an "ignore" decision is intentionally permanent. But worth flagging explicitly.
-- Whether to add a one-time "purge everything past-dated right now" workflow run as part of the deployment, or just let the daily trigger catch up over a few days. Prefer the latter — less destructive, smaller blast radius.
-- Tests: pin the lazy filter for both Python helpers (past-dated dropped, today-dated kept, undated kept, malformed-date-string kept defensively). Apps Script changes have no automated test (matches the project's standing posture).
-
-No commits, no design note, no `[~]` flip until Tom and the next agent discuss.
+No retroactive bulk purge — daily trigger catches up over a few days; less destructive, smaller blast radius.
 
 
 ## Descoped / on hold
