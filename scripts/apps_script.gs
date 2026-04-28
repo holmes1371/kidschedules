@@ -279,6 +279,81 @@ function _listCompletedEvents() {
   return _json(Object.keys(seen).map(function (k) { return seen[k]; }));
 }
 
+// ─── ROADMAP #37: server-side GC ──────────────────────────────────────────
+
+// Walks "Ignored Events" + "Completed Events" bottom-up and deletes rows
+// whose date column (column 4, 0-indexed 3) parses as a valid date and
+// is strictly before midnight-local today. Rows with empty / unparseable
+// date pass through defensively — they may be undated events legitimately
+// ignored / completed (same posture as events_state.gc_state and the
+// sync_*.py _drop_past_dated helpers).
+//
+// Does NOT touch "Ignored Senders" — senders aren't date-bound; an
+// "ignore sender" decision is intentionally permanent.
+//
+// Trigger setup (3-click, manual, one-time):
+//   1. Apps Script editor → ⏰ Triggers (left sidebar) → Add Trigger.
+//   2. Function: gcPastDatedRows
+//      Event source: Time-driven
+//      Type: Day timer
+//      Time: 02:00–03:00 (any window before the 06:15 ET workflow cron).
+//   3. Save. Google will prompt for re-authorization the first time.
+//
+// No automated test (matches the project's standing posture for Apps
+// Script). Failure modes (sheet missing, deleteRow error) surface in the
+// Apps Script execution log and don't affect prod render — the Python
+// _drop_past_dated lazy filter still strips past-dated rows from the
+// runner's local cache regardless.
+function gcPastDatedRows() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const ignoredDeleted   = _gcSheetPastDated(_getIgnoredEventsSheet(), today);
+  const completedDeleted = _gcSheetPastDated(_getCompletedEventsSheet(), today);
+  Logger.log(
+    'gcPastDatedRows: deleted ' + ignoredDeleted +
+    ' past-dated row(s) from Ignored Events, ' + completedDeleted +
+    ' from Completed Events.'
+  );
+}
+
+function _gcSheetPastDated(sheet, today) {
+  const data = sheet.getDataRange().getValues();
+  let deleted = 0;
+  // Iterate bottom-up so row indices don't shift as we delete.
+  // Sheet rows are 1-indexed; data array is 0-indexed. Column 4
+  // (data[i][3]) holds the event date for both sheets.
+  for (let i = data.length - 1; i >= 0; i--) {
+    const raw = String(data[i][3] || '').trim();
+    const eventDate = _parseLocalDate(raw);
+    if (!eventDate) continue;  // empty / malformed — defensive pass-through
+    if (eventDate.getTime() < today.getTime()) {
+      sheet.deleteRow(i + 1);
+      deleted++;
+    }
+  }
+  return deleted;
+}
+
+// Strict YYYY-MM-DD parse, returning a local-midnight Date or null. We
+// avoid Date.parse() / new Date(str) because JS parses ISO date-only
+// strings as UTC midnight — in any timezone west of UTC that renders
+// as the *previous* local date, which would off-by-one-delete today's
+// rows. Mirrors the Python helper's dt.date.fromisoformat strictness.
+function _parseLocalDate(raw) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(raw);
+  if (!m) return null;
+  const y = Number(m[1]), mo = Number(m[2]), d = Number(m[3]);
+  const out = new Date(y, mo - 1, d);
+  // Guard against JS Date's silent rollover (e.g. month=13 → +1 year,
+  // day=31 in April → May 1). fromisoformat raises ValueError; we
+  // return null so the row stays defensively.
+  if (out.getFullYear() !== y || out.getMonth() !== mo - 1 ||
+      out.getDate() !== d) {
+    return null;
+  }
+  return out;
+}
+
 // ─── helpers ──────────────────────────────────────────────────────────────
 
 function _getIgnoredEventsSheet() {
