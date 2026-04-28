@@ -20,11 +20,10 @@ Strict rules for writing it:
 
 **2026-04-28**
 
-- #37 in flight `[~]` — design note `design/auto-gc-sheets.md`. Plan approved: ship Tier 1 (Python lazy filter at sync time) + Tier 2 (Apps Script daily-trigger GC) together, manual redeploy of `apps_script.gs` after both land.
+- #37 code complete `[~]` — 3 commits (3bd0cae design+flip / 1f8e8d8 Tier 1 / 228b082 Tier 2). 815 → 872 tests green. Tier 1 lazy filter ships in both Python sync helpers; Tier 2 `gcPastDatedRows` lands in `apps_script.gs` pending Tom's manual redeploy + daily-trigger setup (ritual is in the function comment).
 - Verified out of session: "Show ignored (N)" counter is correct as events naturally retire — `ignored_n` is computed from rendered events, not sheet rows, so past-dated events drop out of the count once `events_state.gc_state` GCs them. #37 is sheet-hygiene + GET-payload only.
-- #33 code complete `[~]` — 4 commits (37aa60f / 51c8a54 / a9ffee7 / 63e86df). 815 tests green. Pending Tom's live verification on the next real teacher PDF email; checklist in #33's body.
+- #33 still code complete `[~]` — same 4 SHAs (37aa60f / 51c8a54 / a9ffee7 / 63e86df). Pending Tom's live verification on the next real teacher PDF email.
 - Items 30 + 31 still `[~]` pending Tom's live verification on newly-arrived emails.
-- Pre-push protocol: full `pytest tests/ -q` (815 → growing with #37 Tier 1) green before any push.
 
 ## For future agents
 
@@ -186,9 +185,9 @@ Open for the next session to talk through with Tom before any code:
 
 No commits, no design note, no `[~]` flip until Tom and the next agent discuss.
 
-### 37. [~] Auto-GC the Ignored Events + Completed Events sheets — drop past-dated rows
+### 37. [~] Auto-GC the Ignored Events + Completed Events sheets — drop past-dated rows — 3bd0cae / 1f8e8d8 / 228b082
 
-Filed 2026-04-27. Plan approved 2026-04-28; design note `design/auto-gc-sheets.md`. Ship Tier 1 + Tier 2 together; manual `apps_script.gs` redeploy after both land.
+Filed 2026-04-27. Plan approved 2026-04-28; design note `design/auto-gc-sheets.md`. Code complete 2026-04-28 (3 commits). Pending Tom's manual redeploy of `apps_script.gs` + Tier 2 daily-trigger setup; Tier 1 was active from the moment 1f8e8d8 hit the cron runner.
 
 Both Apps Script-backed sheets ("Ignored Events" #6/#7, "Completed Events" #32) grow monotonically today — there is no cleanup path. Once an event's date passes, it GCs out of `events_state.json` daily (per `events_state.gc_state`'s past-dated rule), so the matching row in either sheet is dead weight: it can never match an event again, but it still ships in the next cron's GET response and the page's localStorage hydration. At realistic cadence (a few flips per week) the bloat is tolerable for years; auto-cleanup is preventive maintenance so Tom never has to manually purge rows later.
 
