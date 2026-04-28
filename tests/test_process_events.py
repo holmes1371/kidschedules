@@ -297,6 +297,181 @@ def test_dedupe_undated_skip_fuzzy_pass():
     assert names == {"ASL Club", "ASL Club Meeting"}
 
 
+def _ev(**kwargs) -> dict:
+    """Build a complete event dict with sensible defaults so each
+    same-location dedup test can override only the fields it cares
+    about. Default date is within [TODAY, HORIZON] so classify()
+    keeps the event in the display bucket."""
+    base = {
+        "name": "Event",
+        "date": "2026-06-01",
+        "time": "All day",
+        "location": "",
+        "category": "School Activity",
+        "child": "",
+        "source": "src",
+    }
+    base.update(kwargs)
+    return base
+
+
+def test_dedupe_same_location_and_time_merges_newsletter_edition_pattern():
+    """The realistic case Tom flagged: two editions of the same PTA
+    bulletin describe the same event with slightly different wording
+    (so neither token signature is a subset of the other) but share
+    the same date, signup URL, and All-Day status. Pre-#dedupe-tighten
+    these rendered as two cards on Ellen's page; now they collapse
+    to one with the more complete entry winning."""
+    ev_a = _ev(
+        name="Oakton High School Junior Dance Camp — Registration Deadline (for t-shirt)",
+        location="bit.ly/ohsjuniordancecamp2026",
+        child="Everly",
+        source="LAES PTA Sunbeam (Apr 26)",
+    )
+    ev_b = _ev(
+        name="Oakton Junior Dance Camp Registration Deadline (for t-shirt inclusion)",
+        location="bit.ly/ohsjuniordancecamp2026",
+        child="All LAES students",
+        source="LAES PTA Sunbeam (Apr 19)",
+    )
+    display, _, _, _, _, _ = pe.classify(
+        [ev_a, ev_b], cutoff=TODAY, horizon=HORIZON,
+    )
+    merged = pe.dedupe(display)
+    assert len(merged) == 1, (
+        f"Expected the two newsletter editions to collapse via the "
+        f"same-location+time signal; got {[e['name'] for e in merged]!r}"
+    )
+
+
+def test_dedupe_same_location_different_time_does_not_merge():
+    """Realistic over-merge guard: two distinct classes at the same
+    venue on the same date with different times stay separate. This
+    is the swim-class case (Ages 3–5 at 5pm vs Ages 6–8 at 6pm both
+    at HTM Pool) made explicit — without the time-equality guard,
+    every same-day same-pool class would collapse into one."""
+    ev_a = _ev(
+        name="Swim — Toddlers", date="2026-05-04", time="3:00 PM",
+        location="HTM Pool",
+    )
+    ev_b = _ev(
+        name="Swim — Teens", date="2026-05-04", time="6:00 PM",
+        location="HTM Pool",
+    )
+    display, _, _, _, _, _ = pe.classify(
+        [ev_a, ev_b], cutoff=TODAY, horizon=HORIZON,
+    )
+    merged = pe.dedupe(display)
+    assert len(merged) == 2, (
+        f"Different times at the same location must NOT merge; got "
+        f"{[e['name'] for e in merged]!r}"
+    )
+
+
+def test_dedupe_same_location_different_date_does_not_merge():
+    """Defense-in-depth: even when name + location + time all match,
+    two events on different dates are categorically distinct (a
+    weekly recurring class on the same day-of-week comes through as
+    two separate cards by design — the cron expands recurring patterns
+    upstream into per-date events)."""
+    ev_a = _ev(
+        name="ASL Club", date="2026-05-04",
+        time="3:30 PM", location="LAES Room 204",
+    )
+    ev_b = _ev(
+        name="ASL Club", date="2026-05-11",
+        time="3:30 PM", location="LAES Room 204",
+    )
+    display, _, _, _, _, _ = pe.classify(
+        [ev_a, ev_b], cutoff=TODAY, horizon=HORIZON,
+    )
+    merged = pe.dedupe(display)
+    assert len(merged) == 2
+
+
+def test_dedupe_empty_location_does_not_match_anything():
+    """An empty location is "no signal" — it must not match any other
+    empty-location event. Without this guard, every undecorated event
+    on a given date would collapse into one mush. The same-location
+    branch returns False on either side being empty."""
+    ev_a = _ev(
+        name="Yearbook Photo Submission Deadline",
+        date="2026-05-15", location="",
+    )
+    ev_b = _ev(
+        name="Spring Concert", date="2026-05-15", location="",
+    )
+    display, _, _, _, _, _ = pe.classify(
+        [ev_a, ev_b], cutoff=TODAY, horizon=HORIZON,
+    )
+    merged = pe.dedupe(display)
+    assert len(merged) == 2
+
+
+def test_dedupe_same_location_picks_more_complete():
+    """When two events merge on location+time, the existing
+    completeness scoring picks the winner. Pin: an entry with more
+    fields filled (richer source, child set) wins over a sparser
+    sibling whose name happened to be slightly different."""
+    sparse = _ev(
+        name="Junior Dance Camp Registration",
+        location="bit.ly/ohsjuniordancecamp2026",
+        # source defaults to "src" — short, low completeness
+    )
+    rich = _ev(
+        name="Oakton Junior Dance Camp — Registration Deadline (for t-shirt inclusion)",
+        location="bit.ly/ohsjuniordancecamp2026",
+        child="All LAES students",
+        source="LAES PTA Sunbeam (Apr 19)",
+    )
+    display, _, _, _, _, _ = pe.classify(
+        [sparse, rich], cutoff=TODAY, horizon=HORIZON,
+    )
+    merged = pe.dedupe(display)
+    assert len(merged) == 1
+    kept = merged[0]
+    assert kept["child"] == "All LAES students"
+    assert kept["source"] == "LAES PTA Sunbeam (Apr 19)"
+
+
+def test_dedupe_same_location_normalization_is_case_insensitive():
+    """Normalized comparison: "HTM Pool" matches "htm pool" (and
+    surrounding whitespace) so casing inconsistencies between
+    newsletter editions don't defeat the merge. Pin via _norm
+    semantics — same lowercase trim should cause a merge."""
+    ev_a = _ev(
+        name="Spring Picture Day",
+        date="2026-05-04", time="All day",
+        location="  LAES Cafeteria  ",
+    )
+    ev_b = _ev(
+        name="Picture Day Make-Up",
+        date="2026-05-04", time="All day",
+        location="laes cafeteria",
+    )
+    display, _, _, _, _, _ = pe.classify(
+        [ev_a, ev_b], cutoff=TODAY, horizon=HORIZON,
+    )
+    merged = pe.dedupe(display)
+    assert len(merged) == 1
+
+
+def test_dedupe_same_location_both_all_day_merges():
+    """All-day events sharing a location merge — this is the
+    realistic deadline pattern (no specific time, two editions of
+    a newsletter both list the same all-day deadline). Pin so the
+    guard doesn't reject all-day matches by accident."""
+    ev_a = _ev(name="Form A Due", date="2026-05-04",
+               time="All day", location="online.example.com/form")
+    ev_b = _ev(name="Form A Submission Deadline", date="2026-05-04",
+               time="All day", location="online.example.com/form")
+    display, _, _, _, _, _ = pe.classify(
+        [ev_a, ev_b], cutoff=TODAY, horizon=HORIZON,
+    )
+    merged = pe.dedupe(display)
+    assert len(merged) == 1
+
+
 # ─── group_by_week ────────────────────────────────────────────────────────
 
 

@@ -569,19 +569,63 @@ def _name_signature(name: str) -> frozenset[str]:
     )
 
 
+def _same_location_and_time(a: dict[str, Any], b: dict[str, Any]) -> bool:
+    """Return True when both events have the same non-empty location
+    AND the same time.
+
+    The dedupe Pass-2 union-find uses this OR'd with the name-subset
+    check: two events on the same date that share a non-empty
+    normalized `location` string AND the same time are considered
+    duplicates even when their names diverge enough that neither
+    token-signature is a subset of the other (the realistic
+    newsletter-edition pattern — two editions of the same PTA
+    bulletin describing the same event with slightly different
+    wording but the same signup URL or venue text).
+
+    Time-equality is the guard that prevents the realistic
+    over-merge case: two distinct classes at the same venue on the
+    same day with different times (e.g. "Swim — Ages 3–5" at 5pm
+    and "Swim — Ages 6–8" at 6pm both at HTM Pool). Without this,
+    every same-day same-pool class would collapse into one.
+
+    Empty/missing location on either side returns False — empty
+    means "no signal", and we don't want every undecorated event on
+    a given day to collapse with every other undecorated event.
+    Empty/missing time on BOTH sides is fine (both all-day events
+    at the same venue are likely the same event).
+    """
+    la = _norm(a.get("location") or "")
+    lb = _norm(b.get("location") or "")
+    if not la or not lb or la != lb:
+        return False
+    return _norm(a.get("time") or "") == _norm(b.get("time") or "")
+
+
 def dedupe(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Two-pass dedupe.
 
     Pass 1 (exact): collapse events with identical (normalized name, date),
     keeping the most complete.
 
-    Pass 2 (fuzzy): within each same-date bucket, collapse events whose
-    significant-token signatures are in a subset relationship — e.g.
-    "ASL Club" ({asl, club}) and "ASL Club Meeting" ({asl, club, meeting}).
-    Union-find handles transitive chains ("ASL Club" links
-    "ASL Club Meeting" and "ASL Club — 6th grade" even though the outer
-    pair has no direct subset relation). Undated events skip the fuzzy
-    pass since we can't confirm same-day.
+    Pass 2 (fuzzy): within each same-date bucket, collapse events when
+    EITHER (a) their significant-token signatures are in a subset
+    relationship — "ASL Club" ({asl, club}) and "ASL Club Meeting"
+    ({asl, club, meeting}) — OR (b) they share a non-empty normalized
+    `location` AND the same time. The location-and-time signal catches
+    the realistic newsletter-edition pattern: two editions of the
+    same PTA bulletin describing the same event with slightly
+    different wording (so neither token set is a subset of the
+    other) but the same signup URL or venue text. The time-equality
+    guard prevents over-merge of distinct classes at the same
+    same-day venue (e.g. swim Ages 3–5 at 5pm and Ages 6–8 at 6pm
+    both at HTM Pool — same date, same location, different times,
+    correctly stay separate).
+
+    Union-find handles transitive chains across both signals — three
+    near-dup cards ABC where A↔B share a token-subset and B↔C share
+    a location all collapse into one even with no direct A↔C link.
+    Undated events skip the fuzzy pass since we can't confirm
+    same-day.
     """
     def completeness(ev: dict[str, Any]) -> int:
         score = 0
@@ -628,10 +672,18 @@ def dedupe(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
             return x
 
         for i in range(len(bucket)):
-            if not sigs[i]:
-                continue
             for j in range(i + 1, len(bucket)):
-                if sigs[j] and (sigs[i] <= sigs[j] or sigs[j] <= sigs[i]):
+                # Two ways to merge: (a) name-token subset/superset, or
+                # (b) same non-empty normalized location AND same time.
+                # Empty signature short-circuits the (a) branch only —
+                # an event with an empty signature can still merge via
+                # the location-time branch.
+                same_loc_time = _same_location_and_time(bucket[i], bucket[j])
+                subset = (
+                    sigs[i] and sigs[j]
+                    and (sigs[i] <= sigs[j] or sigs[j] <= sigs[i])
+                )
+                if subset or same_loc_time:
                     ri, rj = find(i), find(j)
                     if ri != rj:
                         parent[ri] = rj
