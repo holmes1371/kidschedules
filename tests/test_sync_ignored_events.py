@@ -1,9 +1,10 @@
-"""Pytest suite for scripts/sync_completed_events.py.
+"""Pytest suite for scripts/sync_ignored_events.py.
 
-Mirrors test_sync_ignored_senders.py one-for-one — the two helpers are
-structurally identical apart from validation key (id vs domain) and the
-GET kind parameter (completed vs ignored_senders). Behaviour-level pins
-keep them aligned.
+Mirrors test_sync_completed_events.py one-for-one — the two helpers are
+structurally identical apart from the GET kind parameter (ignored vs
+completed) and the field surface (ignored_at vs completed_at). Behaviour-
+level pins keep them aligned. Adds the ROADMAP #37 _drop_past_dated cases
+that also live in test_sync_completed_events.py.
 """
 from __future__ import annotations
 
@@ -14,7 +15,7 @@ import sys
 
 import pytest
 
-import sync_completed_events as sce
+import sync_ignored_events as sie
 
 
 # ─── normalize_rows ──────────────────────────────────────────────────────
@@ -22,10 +23,10 @@ import sync_completed_events as sce
 
 def test_normalize_lowercases_and_trims_id():
     rows = [{"id": "  ABC123ABC123  ", "name": "Foo", "date": "2026-04-25",
-             "completed_at": "t0"}]
-    out = sce.normalize_rows(rows)
+             "ignored_at": "t0"}]
+    out = sie.normalize_rows(rows)
     assert out == [{"id": "abc123abc123", "name": "Foo",
-                    "date": "2026-04-25", "completed_at": "t0"}]
+                    "date": "2026-04-25", "ignored_at": "t0"}]
 
 
 @pytest.mark.parametrize("bad", [
@@ -38,7 +39,7 @@ def test_normalize_lowercases_and_trims_id():
     "not a hex id",            # spaces
 ])
 def test_normalize_drops_invalid_id(bad):
-    out = sce.normalize_rows([{"id": bad, "name": "x", "date": "y"}])
+    out = sie.normalize_rows([{"id": bad, "name": "x", "date": "y"}])
     assert out == []
 
 
@@ -49,21 +50,21 @@ def test_normalize_drops_rows_missing_id_key():
         {"id": 42, "name": "non-string id"},                   # non-string
         {"id": "abcdefabcdef", "name": "good"},                # ok
     ]
-    out = sce.normalize_rows(rows)
+    out = sie.normalize_rows(rows)
     assert [r["id"] for r in out] == ["abcdefabcdef"]
 
 
 def test_normalize_dedups_first_wins_on_same_id_after_lowercase():
     rows = [
-        {"id": "ABCDEFabcdef", "name": "first",  "completed_at": "t1"},
-        {"id": "abcdefabcdef", "name": "second", "completed_at": "t2"},
-        {"id": "AbCdEfAbCdEf", "name": "third",  "completed_at": "t3"},
+        {"id": "ABCDEFabcdef", "name": "first",  "ignored_at": "t1"},
+        {"id": "abcdefabcdef", "name": "second", "ignored_at": "t2"},
+        {"id": "AbCdEfAbCdEf", "name": "third",  "ignored_at": "t3"},
     ]
-    out = sce.normalize_rows(rows)
+    out = sie.normalize_rows(rows)
     assert len(out) == 1
     assert out[0]["id"] == "abcdefabcdef"
     assert out[0]["name"] == "first"
-    assert out[0]["completed_at"] == "t1"
+    assert out[0]["ignored_at"] == "t1"
 
 
 def test_normalize_sorts_by_id():
@@ -72,7 +73,7 @@ def test_normalize_sorts_by_id():
         {"id": "000000000000", "name": "a"},
         {"id": "888888888888", "name": "m"},
     ]
-    out = sce.normalize_rows(rows)
+    out = sie.normalize_rows(rows)
     assert [r["id"] for r in out] == [
         "000000000000", "888888888888", "ffffffffffff"
     ]
@@ -81,23 +82,23 @@ def test_normalize_sorts_by_id():
 def test_normalize_passthrough_and_default_missing_fields():
     rows = [
         {"id": "abcdefabcdef", "name": "Full",
-         "date": "2026-04-25", "completed_at": "2026-04-26T00:00:00Z"},
-        {"id": "111111111111"},  # no name, no date, no completed_at
+         "date": "2026-04-25", "ignored_at": "2026-04-26T00:00:00Z"},
+        {"id": "111111111111"},  # no name, no date, no ignored_at
     ]
-    out = sce.normalize_rows(rows)
+    out = sie.normalize_rows(rows)
     by_id = {r["id"]: r for r in out}
     assert by_id["abcdefabcdef"] == {
         "id": "abcdefabcdef", "name": "Full",
-        "date": "2026-04-25", "completed_at": "2026-04-26T00:00:00Z",
+        "date": "2026-04-25", "ignored_at": "2026-04-26T00:00:00Z",
     }
     assert by_id["111111111111"] == {
-        "id": "111111111111", "name": "", "date": "", "completed_at": "",
+        "id": "111111111111", "name": "", "date": "", "ignored_at": "",
     }
 
 
 def test_normalize_ignores_non_dict_items():
     rows = ["just a string", 42, None, {"id": "abcdefabcdef"}]
-    out = sce.normalize_rows(rows)
+    out = sie.normalize_rows(rows)
     assert [r["id"] for r in out] == ["abcdefabcdef"]
 
 
@@ -108,27 +109,27 @@ _TODAY = dt.date(2026, 4, 28)
 
 
 def _row(date_str: str, eid: str = "abcdefabcdef") -> dict:
-    return {"id": eid, "name": "n", "date": date_str, "completed_at": ""}
+    return {"id": eid, "name": "n", "date": date_str, "ignored_at": ""}
 
 
 def test_drop_past_dated_drops_strictly_before_today():
     rows = [_row("2026-04-27"), _row("2025-12-31"), _row("1999-01-01")]
-    assert sce._drop_past_dated(rows, _TODAY) == []
+    assert sie._drop_past_dated(rows, _TODAY) == []
 
 
 def test_drop_past_dated_keeps_today():
     rows = [_row("2026-04-28")]
-    assert sce._drop_past_dated(rows, _TODAY) == rows
+    assert sie._drop_past_dated(rows, _TODAY) == rows
 
 
 def test_drop_past_dated_keeps_future():
     rows = [_row("2026-04-29"), _row("2030-01-01")]
-    assert sce._drop_past_dated(rows, _TODAY) == rows
+    assert sie._drop_past_dated(rows, _TODAY) == rows
 
 
 def test_drop_past_dated_keeps_empty_date_defensively():
     rows = [_row("")]
-    assert sce._drop_past_dated(rows, _TODAY) == rows
+    assert sie._drop_past_dated(rows, _TODAY) == rows
 
 
 def test_drop_past_dated_keeps_malformed_date_defensively():
@@ -139,12 +140,12 @@ def test_drop_past_dated_keeps_malformed_date_defensively():
         _row("2026-13-01"),    # bad month
         _row("2026-04-31"),    # bad day for april
     ]
-    assert sce._drop_past_dated(rows, _TODAY) == rows
+    assert sie._drop_past_dated(rows, _TODAY) == rows
 
 
 def test_drop_past_dated_strips_whitespace_before_parse():
     rows = [_row("  2026-04-27  "), _row("  2026-04-29  ")]
-    out = sce._drop_past_dated(rows, _TODAY)
+    out = sie._drop_past_dated(rows, _TODAY)
     assert [r["date"] for r in out] == ["  2026-04-29  "]
 
 
@@ -156,7 +157,7 @@ def test_drop_past_dated_mixed_bag_realistic():
         _row("",           "444444444444"),  # empty, keep defensively
         _row("garbage",    "555555555555"),  # malformed, keep defensively
     ]
-    out = sce._drop_past_dated(rows, _TODAY)
+    out = sie._drop_past_dated(rows, _TODAY)
     assert [r["id"] for r in out] == [
         "222222222222", "333333333333", "444444444444", "555555555555"
     ]
@@ -166,39 +167,39 @@ def test_drop_past_dated_mixed_bag_realistic():
 
 
 def test_write_if_changed_writes_when_file_absent(tmp_path):
-    path = tmp_path / "completed_events.json"
-    rows = [{"id": "abcdefabcdef", "name": "x", "date": "", "completed_at": ""}]
-    wrote = sce.write_if_changed(str(path), rows)
+    path = tmp_path / "ignored_events.json"
+    rows = [{"id": "abcdefabcdef", "name": "x", "date": "", "ignored_at": ""}]
+    wrote = sie.write_if_changed(str(path), rows)
     assert wrote is True
     assert path.exists()
     assert json.loads(path.read_text(encoding="utf-8")) == rows
 
 
 def test_write_if_changed_writes_when_content_differs(tmp_path):
-    path = tmp_path / "completed_events.json"
+    path = tmp_path / "ignored_events.json"
     path.write_text('[{"id":"oldoldoldold"}]\n', encoding="utf-8")
     new_rows = [{"id": "abcdefabcdef", "name": "n",
-                 "date": "", "completed_at": ""}]
-    wrote = sce.write_if_changed(str(path), new_rows)
+                 "date": "", "ignored_at": ""}]
+    wrote = sie.write_if_changed(str(path), new_rows)
     assert wrote is True
     assert json.loads(path.read_text(encoding="utf-8")) == new_rows
 
 
 def test_write_if_changed_returns_false_when_identical(tmp_path):
-    path = tmp_path / "completed_events.json"
+    path = tmp_path / "ignored_events.json"
     rows = [{"id": "abcdefabcdef", "name": "n",
-             "date": "", "completed_at": ""}]
-    assert sce.write_if_changed(str(path), rows) is True
+             "date": "", "ignored_at": ""}]
+    assert sie.write_if_changed(str(path), rows) is True
     first_bytes = path.read_bytes()
-    assert sce.write_if_changed(str(path), rows) is False
+    assert sie.write_if_changed(str(path), rows) is False
     assert path.read_bytes() == first_bytes
 
 
 def test_write_if_changed_uses_2_space_indent_and_trailing_newline(tmp_path):
-    path = tmp_path / "completed_events.json"
+    path = tmp_path / "ignored_events.json"
     rows = [{"id": "abcdefabcdef", "name": "n",
-             "date": "", "completed_at": ""}]
-    sce.write_if_changed(str(path), rows)
+             "date": "", "ignored_at": ""}]
+    sie.write_if_changed(str(path), rows)
     text = path.read_text(encoding="utf-8")
     assert text.endswith("\n")
     assert '\n    "id"' in text
@@ -223,7 +224,7 @@ class _FakeResponse:
 
 def test_fetch_happy_path_returns_list(monkeypatch):
     """Valid JSON list response → returned verbatim. The secret and
-    kind=completed params are appended to the URL query string."""
+    kind=ignored params are appended to the URL query string."""
     captured = {}
 
     def fake_urlopen(url, timeout):
@@ -231,12 +232,12 @@ def test_fetch_happy_path_returns_list(monkeypatch):
         captured["timeout"] = timeout
         return _FakeResponse(json.dumps([{"id": "abcdefabcdef"}]))
 
-    monkeypatch.setattr(sce.urllib.request, "urlopen", fake_urlopen)
-    result = sce._fetch("https://exec.example/", secret="s3cret", timeout=5.0)
+    monkeypatch.setattr(sie.urllib.request, "urlopen", fake_urlopen)
+    result = sie._fetch("https://exec.example/", secret="s3cret", timeout=5.0)
 
     assert result == [{"id": "abcdefabcdef"}]
     assert "secret=s3cret" in captured["url"]
-    assert "kind=completed" in captured["url"]
+    assert "kind=ignored" in captured["url"]
     assert captured["timeout"] == 5.0
 
 
@@ -247,8 +248,8 @@ def test_fetch_url_with_existing_query_uses_ampersand(monkeypatch):
         captured["url"] = url
         return _FakeResponse("[]")
 
-    monkeypatch.setattr(sce.urllib.request, "urlopen", fake_urlopen)
-    sce._fetch("https://exec.example/?debug=1", secret="s", timeout=1.0)
+    monkeypatch.setattr(sie.urllib.request, "urlopen", fake_urlopen)
+    sie._fetch("https://exec.example/?debug=1", secret="s", timeout=1.0)
 
     assert "?debug=1&" in captured["url"]
     assert captured["url"].count("?") == 1
@@ -258,8 +259,8 @@ def test_fetch_returns_none_on_network_error(monkeypatch, capsys):
     def boom(*_a, **_k):
         raise ConnectionError("dns died")
 
-    monkeypatch.setattr(sce.urllib.request, "urlopen", boom)
-    assert sce._fetch("https://x/", secret="s", timeout=1.0) is None
+    monkeypatch.setattr(sie.urllib.request, "urlopen", boom)
+    assert sie._fetch("https://x/", secret="s", timeout=1.0) is None
     err = capsys.readouterr().err
     assert "fetch failed" in err
     assert "dns died" in err
@@ -269,8 +270,8 @@ def test_fetch_returns_none_on_non_list_response(monkeypatch, capsys):
     def fake_urlopen(url, timeout):
         return _FakeResponse(json.dumps({"error": "nope"}))
 
-    monkeypatch.setattr(sce.urllib.request, "urlopen", fake_urlopen)
-    assert sce._fetch("https://x/", secret="s", timeout=1.0) is None
+    monkeypatch.setattr(sie.urllib.request, "urlopen", fake_urlopen)
+    assert sie._fetch("https://x/", secret="s", timeout=1.0) is None
     assert "response was not a JSON list" in capsys.readouterr().err
 
 
@@ -278,12 +279,18 @@ def test_fetch_returns_none_on_non_json_body(monkeypatch, capsys):
     def fake_urlopen(url, timeout):
         return _FakeResponse("this is html, not json")
 
-    monkeypatch.setattr(sce.urllib.request, "urlopen", fake_urlopen)
-    assert sce._fetch("https://x/", secret="s", timeout=1.0) is None
+    monkeypatch.setattr(sie.urllib.request, "urlopen", fake_urlopen)
+    assert sie._fetch("https://x/", secret="s", timeout=1.0) is None
     assert "fetch failed" in capsys.readouterr().err
 
 
 # ─── main() CLI ──────────────────────────────────────────────────────────
+
+
+class _FrozenDate(dt.date):
+    """Subclass so monkeypatching sie.dt.date affects sie.dt.date.today()
+    without breaking other dt.date methods inside the module."""
+    pass
 
 
 def _freeze_today(monkeypatch, today: dt.date):
@@ -291,7 +298,7 @@ def _freeze_today(monkeypatch, today: dt.date):
         @classmethod
         def today(cls):
             return today
-    monkeypatch.setattr(sce.dt, "date", _D)
+    monkeypatch.setattr(sie.dt, "date", _D)
 
 
 def _run_main(monkeypatch, argv, fetch_result, *, capture_err=False,
@@ -304,7 +311,7 @@ def _run_main(monkeypatch, argv, fetch_result, *, capture_err=False,
         return fetch_result
 
     fake_fetch.calls = []
-    monkeypatch.setattr(sce, "_fetch", fake_fetch)
+    monkeypatch.setattr(sie, "_fetch", fake_fetch)
     monkeypatch.setattr(sys, "argv", argv)
 
     stdout_buf = io.StringIO()
@@ -313,22 +320,22 @@ def _run_main(monkeypatch, argv, fetch_result, *, capture_err=False,
     if capture_err:
         monkeypatch.setattr(sys, "stderr", stderr_buf)
 
-    rc = sce.main()
+    rc = sie.main()
     out = stdout_buf.getvalue()
     err = stderr_buf.getvalue() if capture_err else None
     return rc, out, err, fake_fetch.calls
 
 
 def test_main_happy_path_writes_and_reports_count(monkeypatch, tmp_path):
-    out_path = tmp_path / "completed_events.json"
+    out_path = tmp_path / "ignored_events.json"
     rows = [
         {"id": "abcdefabcdef", "name": "Foo", "date": "2026-04-29",
-         "completed_at": "t1"},
+         "ignored_at": "t1"},
         {"id": "111111111111", "name": "Bar", "date": "2026-04-30",
-         "completed_at": "t2"},
+         "ignored_at": "t2"},
     ]
     rc, stdout, _err, calls = _run_main(monkeypatch, [
-        "sync_completed_events.py",
+        "sync_ignored_events.py",
         "--url", "https://exec.example/",
         "--secret", "s3cret",
         "--out", str(out_path),
@@ -341,25 +348,25 @@ def test_main_happy_path_writes_and_reports_count(monkeypatch, tmp_path):
     payload = json.loads(out_path.read_text(encoding="utf-8"))
     # Sorted by id: 111... < abc...
     assert [r["id"] for r in payload] == ["111111111111", "abcdefabcdef"]
-    assert "Synced 2 completed event(s)" in stdout
+    assert "Synced 2 ignored event(s)" in stdout
 
 
 def test_main_drops_past_dated_before_write(monkeypatch, tmp_path):
     """ROADMAP #37 Tier 1 integration: past-dated rows from the GET
     response are filtered out before write_if_changed sees them."""
-    out_path = tmp_path / "completed_events.json"
+    out_path = tmp_path / "ignored_events.json"
     rows = [
         {"id": "111111111111", "name": "stale",
-         "date": "2026-04-27", "completed_at": "t1"},  # past, drop
+         "date": "2026-04-27", "ignored_at": "t1"},  # past, drop
         {"id": "222222222222", "name": "today",
-         "date": "2026-04-28", "completed_at": "t2"},  # today, keep
+         "date": "2026-04-28", "ignored_at": "t2"},  # today, keep
         {"id": "333333333333", "name": "future",
-         "date": "2026-05-15", "completed_at": "t3"},  # future, keep
+         "date": "2026-05-15", "ignored_at": "t3"},  # future, keep
         {"id": "444444444444", "name": "undated",
-         "date": "", "completed_at": "t4"},            # undated, keep
+         "date": "", "ignored_at": "t4"},            # undated, keep
     ]
     rc, stdout, _err, _calls = _run_main(monkeypatch, [
-        "sync_completed_events.py",
+        "sync_ignored_events.py",
         "--url", "https://x/",
         "--secret", "s",
         "--out", str(out_path),
@@ -370,18 +377,18 @@ def test_main_drops_past_dated_before_write(monkeypatch, tmp_path):
     assert [r["id"] for r in payload] == [
         "222222222222", "333333333333", "444444444444"
     ]
-    assert "Synced 3 completed event(s)" in stdout
+    assert "Synced 3 ignored event(s)" in stdout
     assert "1 past-dated dropped" in stdout
 
 
 def test_main_no_past_dated_omits_drop_suffix(monkeypatch, tmp_path):
     """When nothing is dropped, the count suffix stays clean — no
     '(0 past-dated dropped)' noise in the cron log."""
-    out_path = tmp_path / "completed_events.json"
+    out_path = tmp_path / "ignored_events.json"
     rows = [{"id": "abcdefabcdef", "name": "n",
-             "date": "2026-05-01", "completed_at": ""}]
+             "date": "2026-05-01", "ignored_at": ""}]
     rc, stdout, _err, _calls = _run_main(monkeypatch, [
-        "sync_completed_events.py",
+        "sync_ignored_events.py",
         "--url", "https://x/",
         "--secret", "s",
         "--out", str(out_path),
@@ -392,12 +399,12 @@ def test_main_no_past_dated_omits_drop_suffix(monkeypatch, tmp_path):
 
 
 def test_main_fetch_failure_leaves_cache_untouched(monkeypatch, tmp_path):
-    out_path = tmp_path / "completed_events.json"
+    out_path = tmp_path / "ignored_events.json"
     out_path.write_text(json.dumps([{"id": "abcdefabcdef"}]))
     prior = out_path.read_bytes()
 
     rc, _out, _err, _calls = _run_main(monkeypatch, [
-        "sync_completed_events.py",
+        "sync_ignored_events.py",
         "--url", "https://exec.example/",
         "--secret", "s",
         "--out", str(out_path),
@@ -408,13 +415,13 @@ def test_main_fetch_failure_leaves_cache_untouched(monkeypatch, tmp_path):
 
 
 def test_main_reports_no_changes_when_write_is_noop(monkeypatch, tmp_path):
-    out_path = tmp_path / "completed_events.json"
+    out_path = tmp_path / "ignored_events.json"
     rows = [{"id": "abcdefabcdef", "name": "",
-             "date": "2026-05-01", "completed_at": ""}]
-    out_path.write_text(sce._serialize(rows), encoding="utf-8")
+             "date": "2026-05-01", "ignored_at": ""}]
+    out_path.write_text(sie._serialize(rows), encoding="utf-8")
 
     rc, stdout, _err, _calls = _run_main(monkeypatch, [
-        "sync_completed_events.py",
+        "sync_ignored_events.py",
         "--url", "https://x/",
         "--secret", "s",
         "--out", str(out_path),
@@ -426,9 +433,9 @@ def test_main_reports_no_changes_when_write_is_noop(monkeypatch, tmp_path):
 
 
 def test_main_custom_timeout_threaded_into_fetch(monkeypatch, tmp_path):
-    out_path = tmp_path / "completed_events.json"
+    out_path = tmp_path / "ignored_events.json"
     rc, _out, _err, calls = _run_main(monkeypatch, [
-        "sync_completed_events.py",
+        "sync_ignored_events.py",
         "--url", "https://x/",
         "--secret", "s",
         "--out", str(out_path),

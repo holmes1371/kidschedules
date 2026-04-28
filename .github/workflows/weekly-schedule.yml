@@ -161,20 +161,14 @@ jobs:
             echo "No webhook URL or IGNORE_READ_SECRET configured — skipping sync."
             exit 0
           fi
-          TMP=$(mktemp)
-          if curl -sSL --fail -o "$TMP" "${URL}?secret=${IGNORE_READ_SECRET}"; then
-            if python -c "import json,sys; d=json.load(open('$TMP')); assert isinstance(d, list)" 2>/dev/null; then
-              mv "$TMP" ignored_events.json
-              COUNT=$(python -c "import json; print(len(json.load(open('ignored_events.json'))))")
-              echo "Synced $COUNT ignored event(s) from Apps Script."
-            else
-              echo "Apps Script response was not a valid JSON list — keeping existing ignored_events.json."
-              rm -f "$TMP"
-            fi
-          else
-            echo "Fetch failed — keeping existing ignored_events.json."
-            rm -f "$TMP"
-          fi
+          # ROADMAP #37: promoted from inline bash to a Python helper so the
+          # past-dated lazy filter is unit-testable. Same graceful-degrade
+          # posture as the two sibling syncs — exits 0 with cache untouched
+          # on fetch failure.
+          python scripts/sync_ignored_events.py \
+            --url "$URL" \
+            --secret "$IGNORE_READ_SECRET" \
+            --out ignored_events.json
 
       - name: Sync ignored senders from Apps Script
         env:
