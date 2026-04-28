@@ -323,8 +323,7 @@ function _gcSheetPastDated(sheet, today) {
   // Sheet rows are 1-indexed; data array is 0-indexed. Column 4
   // (data[i][3]) holds the event date for both sheets.
   for (let i = data.length - 1; i >= 0; i--) {
-    const raw = String(data[i][3] || '').trim();
-    const eventDate = _parseLocalDate(raw);
+    const eventDate = _coerceLocalDate(data[i][3]);
     if (!eventDate) continue;  // empty / malformed — defensive pass-through
     if (eventDate.getTime() < today.getTime()) {
       sheet.deleteRow(i + 1);
@@ -334,12 +333,30 @@ function _gcSheetPastDated(sheet, today) {
   return deleted;
 }
 
-// Strict YYYY-MM-DD parse, returning a local-midnight Date or null. We
-// avoid Date.parse() / new Date(str) because JS parses ISO date-only
-// strings as UTC midnight — in any timezone west of UTC that renders
-// as the *previous* local date, which would off-by-one-delete today's
-// rows. Mirrors the Python helper's dt.date.fromisoformat strictness.
-function _parseLocalDate(raw) {
+// Coerces a sheet cell value into a local-midnight Date, or null when
+// the value is empty / unparseable.
+//
+// The cell may come back as either:
+//   (a) a native Date object — Google Sheets auto-detects the YYYY-MM-DD
+//       text written by appendRow() and converts the cell to a date
+//       value on insert. getValues() then yields a Date.
+//   (b) a YYYY-MM-DD string — pre-existing rows where auto-detection
+//       didn't fire, or rows manually pasted as plain text.
+//
+// Both paths normalize to local midnight on the event's calendar date.
+// We do NOT use Date.parse('YYYY-MM-DD') / new Date(str) on string
+// inputs, because JS parses ISO date-only strings as UTC midnight —
+// in any timezone west of UTC that renders as the *previous* local
+// date, which would off-by-one-delete today's rows.
+function _coerceLocalDate(value) {
+  if (value instanceof Date && !isNaN(value.getTime())) {
+    // Sheet stores the cell as midnight in the spreadsheet's timezone;
+    // GAS surfaces it via the script's effective timezone. Either way
+    // the relevant comparison is the calendar date itself, not time of
+    // day, so we rebuild a local-midnight Date from y/m/d.
+    return new Date(value.getFullYear(), value.getMonth(), value.getDate());
+  }
+  const raw = String(value || '').trim();
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(raw);
   if (!m) return null;
   const y = Number(m[1]), mo = Number(m[2]), d = Number(m[3]);
