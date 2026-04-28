@@ -546,8 +546,18 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-04-27",
+  "last_updated_iso": "2026-04-28",
   "pending": {
+    "cindy@virginiahousekeepers.com": {
+      "first_flagged_iso": "2026-04-28",
+      "flagged_message_ids": [
+        "19dce8f1034ed07f"
+      ],
+      "last_flagged_iso": "2026-04-28",
+      "reason_samples": [
+        "House cleaning service scheduling — adult home services, no kids' events"
+      ]
+    },
     "info@cupshe.com": {
       "first_flagged_iso": "2026-04-27",
       "flagged_message_ids": [
@@ -566,6 +576,16 @@
       "last_flagged_iso": "2026-04-26",
       "reason_samples": [
         "Email contained only a receipt attachment notice with no extractable event details"
+      ]
+    },
+    "website@mg.virginiahousekeepers.com": {
+      "first_flagged_iso": "2026-04-28",
+      "flagged_message_ids": [
+        "19dce28822da7fd3"
+      ],
+      "last_flagged_iso": "2026-04-28",
+      "reason_samples": [
+        "House cleaning service automated notification — adult home services, no kids' events"
       ]
     }
   },
