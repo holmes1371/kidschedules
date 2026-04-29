@@ -546,7 +546,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-04-28",
+  "last_updated_iso": "2026-04-29",
   "pending": {
     "cindy@virginiahousekeepers.com": {
       "first_flagged_iso": "2026-04-28",
@@ -566,6 +566,26 @@
       "last_flagged_iso": "2026-04-27",
       "reason_samples": [
         "Retail/promotional email from clothing brand, no kids' events content"
+      ]
+    },
+    "kelsey@hiitburn.com": {
+      "first_flagged_iso": "2026-04-29",
+      "flagged_message_ids": [
+        "19dd5a8267a2e235"
+      ],
+      "last_flagged_iso": "2026-04-29",
+      "reason_samples": [
+        "Adult fitness/workout newsletter with no kids' content"
+      ]
+    },
+    "support5@info.myloancare.com": {
+      "first_flagged_iso": "2026-04-29",
+      "flagged_message_ids": [
+        "19dd59c2bdfc5f33"
+      ],
+      "last_flagged_iso": "2026-04-29",
+      "reason_samples": [
+        "Mortgage/loan payment notification — adult financial content only"
       ]
     },
     "viennarecreation@rectrac.com": {
