@@ -2212,24 +2212,57 @@ def render_html(today: dt.date,
       }}
 
       // ── localStorage hydration ────────────────────────────
+      // #39: hydration honors the same REFRESH_GRACE_MS timestamp window
+      // that the post-fetch reconcile uses. Stale local entries (older
+      // than the grace window) are NOT applied during hydration — they'd
+      // briefly hide a card that the reconcile pass would un-hide ~1-2s
+      // later when the Apps Script GET returns, producing a visible
+      // disappear/reappear flicker. By gating on age, only just-flipped
+      // entries (in-flight POSTs) layer on optimistically; stale entries
+      // wait for reconcile to confirm them against the sheet, and the
+      // reconcile-persist step drops them on the same refresh.
+      // NaN-safe: an entry with empty / malformed flipped_at_iso reads
+      // age=NaN, the `!(age < REFRESH_GRACE_MS)` test is true, and the
+      // entry is treated as stale (correct — pre-#34 bare entries had
+      // no timestamp).
+      //
       // Apply sender-swept state first, then individually-ignored ids.
       // Ids take precedence because the event-level ignore is a deliberate
       // per-card user choice that should win over a bulk sender sweep.
-      var localSenders = loadIgnoredSenders();
-      if (localSenders.length) {{
+      var hydrationNow = Date.now();
+      var localSenderEntries = loadIgnoredSendersEntries();
+      if (localSenderEntries.length) {{
+        var senderAgeMap = {{}};
+        for (var s = 0; s < localSenderEntries.length; s++) {{
+          senderAgeMap[localSenderEntries[s].domain] =
+            localSenderEntries[s].flipped_at_iso || "";
+        }}
         document.querySelectorAll(".event-card[data-sender]").forEach(function (card) {{
-          if (localSenders.indexOf(card.getAttribute("data-sender")) === -1) return;
+          var domain = card.getAttribute("data-sender");
+          if (!(domain in senderAgeMap)) return;
           if (card.getAttribute("data-ignored") === "1") return;
+          var sAge = hydrationNow - new Date(senderAgeMap[domain] || 0).getTime();
+          if (!(sAge < REFRESH_GRACE_MS)) return;  // stale; let reconcile decide
           setIgnored(card, "sender");
         }});
       }}
-      var localIds = loadIgnored();
-      document.querySelectorAll(".event-card[data-event-id]").forEach(function (card) {{
-        if (localIds.indexOf(card.getAttribute("data-event-id")) === -1) return;
-        // If already sender-ignored, upgrade to reason=event so Unignore-event
-        // is the surfaced affordance.
-        setIgnored(card, "event");
-      }});
+      var localIdEntries = loadIgnoredEntries();
+      if (localIdEntries.length) {{
+        var idAgeMap = {{}};
+        for (var ii = 0; ii < localIdEntries.length; ii++) {{
+          idAgeMap[localIdEntries[ii].id] =
+            localIdEntries[ii].flipped_at_iso || "";
+        }}
+        document.querySelectorAll(".event-card[data-event-id]").forEach(function (card) {{
+          var id = card.getAttribute("data-event-id");
+          if (!(id in idAgeMap)) return;
+          var iAge = hydrationNow - new Date(idAgeMap[id] || 0).getTime();
+          if (!(iAge < REFRESH_GRACE_MS)) return;  // stale; let reconcile decide
+          // If already sender-ignored, upgrade to reason=event so Unignore-event
+          // is the surfaced affordance.
+          setIgnored(card, "event");
+        }});
+      }}
 
       // ── #32 Completed state ───────────────────────────────
       // Server-rendered is_completed (sourced from completed_events.json,
@@ -2255,11 +2288,23 @@ def render_html(today: dt.date,
         var box = card.querySelector(".complete-checkbox");
         if (box) box.checked = !!on;
       }}
-      var localCompleted = loadCompleted();
-      if (localCompleted.length) {{
+      // #39: same age-gate as the ignored hydration above. Completed
+      // hydration's flicker is less visible than ignore-flicker (no
+      // display:none — just a tinted strikethrough that briefly appears
+      // and then unsets) but the timestamp asymmetry is the same bug
+      // pattern, so the fix is symmetric.
+      var localCompletedEntries = loadCompletedEntries();
+      if (localCompletedEntries.length) {{
+        var completedAgeMap = {{}};
+        for (var ci = 0; ci < localCompletedEntries.length; ci++) {{
+          completedAgeMap[localCompletedEntries[ci].id] =
+            localCompletedEntries[ci].flipped_at_iso || "";
+        }}
         document.querySelectorAll(".event-card[data-event-id]").forEach(function (card) {{
           var id = card.getAttribute("data-event-id");
-          if (localCompleted.indexOf(id) === -1) return;
+          if (!(id in completedAgeMap)) return;
+          var cAge = hydrationNow - new Date(completedAgeMap[id] || 0).getTime();
+          if (!(cAge < REFRESH_GRACE_MS)) return;  // stale; let reconcile decide
           setCompleted(card, true);
         }});
       }}

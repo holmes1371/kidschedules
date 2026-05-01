@@ -1188,9 +1188,13 @@ def test_render_html_js_complete_hydrates_from_localstorage():
     """#32: on initial load, walk localStorage for completed ids and
     flip matching cards to .completed (the server-rendered state from
     completed_events.json wins where it disagrees, but localStorage
-    layers on for optimistic flips that haven't round-tripped yet)."""
+    layers on for optimistic flips that haven't round-tripped yet).
+
+    #39 update: hydration now reads the *Entries* form so it can age-
+    gate stale entries against REFRESH_GRACE_MS — pinned in the
+    dedicated #39 tests below."""
     html, _ = _render_ignored_fixture()
-    assert "var localCompleted = loadCompleted();" in html
+    assert "var localCompletedEntries = loadCompletedEntries();" in html
     assert "setCompleted(card, true);" in html
 
 
@@ -1382,6 +1386,86 @@ def test_render_html_js_hydration_reads_both_stores():
     assert "loadIgnoredSenders()" in html
     assert 'setIgnored(card, "sender")' in html
     assert 'setIgnored(card, "event")' in html
+
+
+# ─── ROADMAP #39: hydration is timestamp-aware to avoid flicker ──────────
+#
+# The post-fetch reconcile pass already gates local entries on
+# REFRESH_GRACE_MS (#34). Hydration was NOT, so a stale local entry got
+# applied immediately on page load, the card got display:none for ~1-2s,
+# then reconcile undid it when the Apps Script GET returned. Disappear /
+# reappear flicker. These tests pin the symmetric age-gate in all three
+# hydration paths (event-ignore, sender-ignore, completed).
+
+
+def test_render_html_js_hydration_event_ignore_uses_entries_form():
+    """#39: event-ignore hydration switched from `loadIgnored()` (bare
+    ids, no timestamps) to `loadIgnoredEntries()` so the timestamp on
+    each entry is in scope for the age check."""
+    html, _ = _render_ignored_fixture(ignored_names=())
+    assert "var localIdEntries = loadIgnoredEntries();" in html
+
+
+def test_render_html_js_hydration_event_ignore_age_gate():
+    """#39: event-ignore hydration only applies setIgnored when the
+    entry's age is under REFRESH_GRACE_MS. Stale entries are NOT
+    applied during hydration; the reconcile pass decides them.
+
+    Pin the negation form `if (!(age < REFRESH_GRACE_MS)) return;`
+    rather than the positive form because the negation is what makes
+    the test fail loudly if a future edit drops the gate."""
+    html, _ = _render_ignored_fixture(ignored_names=())
+    # Locate the event-ignore hydration block by its loop.
+    start = html.find("var localIdEntries = loadIgnoredEntries();")
+    assert start != -1
+    end = html.find("var localCompletedEntries", start)
+    assert end != -1
+    block = html[start:end]
+    assert "if (!(iAge < REFRESH_GRACE_MS)) return;" in block, (
+        "stale local-id entries must skip setIgnored during hydration; "
+        "the reconcile pass will decide them once the GET returns"
+    )
+
+
+def test_render_html_js_hydration_sender_ignore_age_gate():
+    """#39: sender-ignore hydration mirrors the event-ignore age-gate.
+    Stale local sender entries don't apply setIgnored during hydration;
+    reconcile decides."""
+    html, _ = _render_ignored_fixture(ignored_names=())
+    start = html.find("var localSenderEntries = loadIgnoredSendersEntries();")
+    assert start != -1
+    end = html.find("var localIdEntries", start)
+    assert end != -1
+    block = html[start:end]
+    assert "if (!(sAge < REFRESH_GRACE_MS)) return;" in block
+
+
+def test_render_html_js_hydration_completed_age_gate():
+    """#39: completed hydration mirrors the event-ignore age-gate. The
+    flicker is less visible (no display:none — just brief strikethrough)
+    but the asymmetry is the same bug pattern, so the fix is symmetric."""
+    html, _ = _render_ignored_fixture(ignored_names=())
+    start = html.find("var localCompletedEntries = loadCompletedEntries();")
+    assert start != -1
+    # Find the end of the hydration block (next major comment).
+    end = html.find("// ── Per-kid filter chips", start)
+    assert end != -1
+    block = html[start:end]
+    assert "if (!(cAge < REFRESH_GRACE_MS)) return;" in block
+
+
+def test_render_html_js_hydration_uses_single_now_timestamp():
+    """#39: all three hydration age checks share a single `hydrationNow`
+    timestamp captured once, so a slow forEach loop can't race the
+    age-gate boundary across cards. Pin the single capture and the
+    three uses."""
+    html, _ = _render_ignored_fixture(ignored_names=())
+    # Single Date.now() captured.
+    assert "var hydrationNow = Date.now();" in html
+    # Each age subtraction uses it.
+    assert "hydrationNow - new Date(senderAgeMap[domain]" in html
+    assert "hydrationNow - new Date(idAgeMap[id]" in html
+    assert "hydrationNow - new Date(completedAgeMap[id]" in html
 
 
 # ─── card redesign (Layout A) ────────────────────────────────────────────
