@@ -20,11 +20,11 @@ Strict rules for writing it:
 
 **2026-05-01**
 
-- #38 + #39 in flight `[~]` — both bugs caught by Tom on the live page; root-cause analysis in chat (location-link bugs in `_linkify_inline_urls`, hydration flicker in the SSR hydration step). Plan approved: 2 commits, no design note (single-function fixes, surgical scope).
-- #37 closed last session — 5 SHAs preserved at the stub.
+- #38 code complete `[~]` — d4581af (linkifier email + trailing-char fix). Pending Tom's live verification on the next reminder email containing an email address (mailto:) and any SparkPost-shape tracking URL.
+- #39 code complete `[~]` — 3c4da6a (hydration timestamp gate). Pending Tom's live verification — refresh the Field Trip card he reported, the disappear/reappear flicker should be gone.
+- 872 → 884 tests green across the two commits (12 net new).
 - #33 still code complete `[~]` — 4 SHAs (37aa60f / 51c8a54 / a9ffee7 / 63e86df). Pending Tom's live verification on the next real teacher PDF email.
 - Items 30 + 31 still `[~]` pending Tom's live verification on newly-arrived emails.
-- #35 / #36 still `[ ]` placeholders.
 
 ## For future agents
 
@@ -188,7 +188,7 @@ No commits, no design note, no `[~]` flip until Tom and the next agent discuss.
 
 37\. [x] Auto-GC the Ignored Events + Completed Events sheets — 3bd0cae / 1f8e8d8 / 228b082 / 6b48b67 / 018942e — see COMPLETED.md
 
-### 38. [~] Bug: location linkifier mis-handles email addresses and trailing URL characters
+### 38. [~] Bug: location linkifier mis-handles email addresses and trailing URL characters — d4581af
 
 Filed 2026-05-01 from Tom — caught on the live page. Two related defects in `scripts/process_events.py::_linkify_inline_urls` (the location URL linkifier from #29):
 
@@ -205,7 +205,7 @@ Filed 2026-05-01 from Tom — caught on the live page. Two related defects in `s
 
 No retroactive fix needed — both classes of error are ephemeral render-time decisions, not cached state. Next cron rebuild fixes existing cards.
 
-### 39. [~] Bug: card briefly disappears on refresh due to hydration vs reconcile asymmetry
+### 39. [~] Bug: card briefly disappears on refresh due to hydration vs reconcile asymmetry — 3c4da6a
 
 Filed 2026-05-01 from Tom — caught on the Field Trip card on the live page: refresh, card disappears for ~1–2s, reappears. Root cause: the SSR hydration step ([process_events.py:2162-2168](scripts/process_events.py#L2162)) applies localStorage `setIgnored(card)` unconditionally for any id present in storage, without checking the `flipped_at_iso` timestamp. The post-fetch reconcile pass IS timestamp-aware (only honors entries within `REFRESH_GRACE_MS`), but it runs after the Apps Script GET round-trip — so a stale localStorage entry produces a 1–2s window where hydration has hidden the card and reconcile hasn't yet restored it.
 
