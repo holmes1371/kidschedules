@@ -877,15 +877,41 @@ def _is_suppressible_location(loc: str) -> bool:
 # 2-to-6 alphabetic characters with no surrounding whitespace — keeps
 # common false-friends like "Mt. Vernon High School", "Dr. Smith's
 # office", and "v1.0" from being mis-detected.
-_INLINE_URL_RE = re.compile(
-    r"\b("                                # group 1 = the full match
+# #38: alternation of email-shape and URL-shape, scanned left-to-right.
+# Email is listed first so an address like "swimteam@hmsrc.org" is consumed
+# as one match before the URL engine can start mid-address (the `\b`
+# between `@` and `h` would otherwise let the URL pattern match `hmsrc.org`
+# alone, leaving `swimteam@` as plain text).
+#
+# The URL pattern intentionally has NO trailing `\b`. A trailing word-
+# boundary anchor backtracks past trailing non-word characters like `~`
+# (e.g. SparkPost tracking URLs that legitimately end in `~~`) to find a
+# position where the boundary can match — that strips real URL characters
+# from the href. Sentence-ending punctuation (`.`, `,`, etc.) is handled
+# by the post-match `_TRAILING_URL_PUNCT` strip in `_linkify_inline_urls`,
+# which only catches the small whitelist of characters that are typically
+# attached as prose punctuation rather than meaningful URL tail.
+_EMAIL_OR_URL_RE = re.compile(
+    r"(?P<email>"
+    r"\b[a-z0-9._%+-]+@(?:[a-z0-9-]+\.)+[a-z]{2,6}\b"
+    r")"
+    r"|"
+    r"(?P<url>"
+    r"\b"
     r"(?:https?://)?"                     # optional scheme
     r"(?:[a-z0-9-]+\.)+"                  # one or more `label.` segments
     r"[a-z]{2,6}"                         # final TLD (alpha, 2-6 chars)
     r"(?:/[^\s)\]]*)?"                    # optional path/query/fragment
-    r")\b",
+    r")",
     re.IGNORECASE,
 )
+
+# #38: trailing characters stripped from URL matches before the anchor is
+# emitted. Limited to common sentence-punctuation that's typically prose
+# rather than URL — `~`, `=`, `&`, `+`, `#`, `/`, etc. are all kept since
+# they're real URL characters in practice (SparkPost uses `~~`; base64
+# padding uses `==`; query strings use `&`; fragments use `#`).
+_TRAILING_URL_PUNCT = ".,;:!?)]}"
 
 
 # Visible-text cap for linkified URLs. Long URLs (especially Google
@@ -929,8 +955,8 @@ def _href_for_bare_domain(url_text: str) -> str:
 
 
 def _linkify_inline_urls(loc: str) -> str:
-    """Return *loc* with embedded URLs/bare-domains wrapped as
-    ``<a href=...>`` anchors.
+    """Return *loc* with embedded URLs / bare-domains / email addresses
+    wrapped as ``<a href=...>`` anchors.
 
     Plain-text segments pass through verbatim — matches the existing
     escape-nothing posture in render_html for event names, source
@@ -938,22 +964,60 @@ def _linkify_inline_urls(loc: str) -> str:
     HTML-escaped, so a query-string ``&`` (which would otherwise
     break out of the attribute) is rendered as ``&amp;``.
 
+    Email addresses (``user@host.tld``) become ``mailto:`` anchors
+    with the full address as both visible text and href (#38). The
+    email pattern is scanned ahead of the URL pattern in
+    :data:`_EMAIL_OR_URL_RE`, so an address like
+    ``swimteam@hmsrc.org`` is consumed as a single email match and
+    the URL pattern can't kick in mid-address.
+
     Bare domains are linked with an implicit ``https://`` scheme via
     :func:`_href_for_bare_domain`, which also prepends ``www.`` for
     fully bare domains so apex-only sites like ``myschoolbucks.com``
     are reachable. Visible link text always preserves what the agent
     emitted; only the ``href`` is modified for reachability.
+
+    URL matches have trailing characters in :data:`_TRAILING_URL_PUNCT`
+    stripped after the regex match (#38) so a location like
+    ``Visit foo.com.`` doesn't pull the period into the href, while
+    URLs with meaningful trailing characters like ``~~`` (SparkPost
+    tracking) keep them. The strip set is intentionally tiny —
+    everything else stays inside the URL.
+
     Anchors carry ``target="_blank"`` and ``rel="noopener noreferrer"``
     so the click opens a new tab without leaking the host page's
     session via window.opener.
     """
     parts: list[str] = []
     last_end = 0
-    for m in _INLINE_URL_RE.finditer(loc):
+    for m in _EMAIL_OR_URL_RE.finditer(loc):
         start, end = m.start(), m.end()
+        if m.group("email"):
+            if last_end < start:
+                parts.append(loc[last_end:start])
+            email = m.group("email")
+            href = "mailto:" + email
+            parts.append(
+                f'<a href="{_html.escape(href, quote=True)}" '
+                f'target="_blank" rel="noopener noreferrer">'
+                f'{_html.escape(email)}</a>'
+            )
+            last_end = end
+            continue
+        # URL branch.
+        url_text = m.group("url")
+        # Strip trailing prose punctuation so "Visit foo.com." doesn't
+        # eat the period into the href. Tilde / equals / ampersand /
+        # hash / slash all stay (they're real URL characters).
+        while url_text and url_text[-1] in _TRAILING_URL_PUNCT:
+            url_text = url_text[:-1]
+            end -= 1
+        if not url_text:
+            # All-punctuation match (shouldn't happen given the regex
+            # requires alpha TLD, but defensive).
+            continue
         if last_end < start:
             parts.append(loc[last_end:start])
-        url_text = m.group(0)
         if url_text.lower().startswith(("http://", "https://")):
             href = url_text
         else:
@@ -1089,7 +1153,7 @@ def render_html(today: dt.date,
             # — Ellen can tap straight through.
             base = (
                 _linkify_inline_urls(loc_raw)
-                if _INLINE_URL_RE.search(loc_raw)
+                if _EMAIL_OR_URL_RE.search(loc_raw)
                 else loc_raw
             )
             loc_display = base if _is_address_like(loc_raw) else f"Location: {base}"
@@ -1227,7 +1291,7 @@ def render_html(today: dt.date,
             # string.
             base = (
                 _linkify_inline_urls(loc_raw)
-                if _INLINE_URL_RE.search(loc_raw)
+                if _EMAIL_OR_URL_RE.search(loc_raw)
                 else loc_raw
             )
             loc_display = base if _is_address_like(loc_raw) else f"Location: {base}"

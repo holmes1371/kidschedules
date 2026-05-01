@@ -3130,6 +3130,133 @@ def test_event_card_address_like_location_with_url_still_linkifies_no_prefix():
     assert 'href="https://www.tysonspeds.com"' in html
 
 
+# ─── ROADMAP #38: email + trailing-char linkifier fixes ──────────────────
+
+
+def test_linkify_email_renders_as_mailto_anchor():
+    """#38 bug 1: an email address in the location text renders as a
+    `mailto:` anchor with the FULL address as both visible text and
+    href. Prior to #38 the regex had no email pattern, so the URL
+    pattern would match the bare-domain part (`hmsrc.org`) and leave
+    `swimteam@` as plain text — useless for Ellen because the bare
+    domain doesn't take you to the right place."""
+    out = pe._linkify_inline_urls("Submit to swimteam@hmsrc.org")
+    # Full email is the visible text AND the mailto target.
+    assert 'href="mailto:swimteam@hmsrc.org"' in out
+    assert ">swimteam@hmsrc.org</a>" in out
+    # `target="_blank"` so the click opens in the mail client without
+    # nuking the schedule page.
+    assert 'target="_blank"' in out
+    # The fragment "swimteam@" must NOT survive as plain text — that
+    # was the pre-#38 failure mode.
+    assert "swimteam@<a" not in out
+    # Surrounding prose stays plain.
+    assert out.startswith("Submit to <a")
+
+
+def test_linkify_email_in_event_card_renders_mailto():
+    """End-to-end: an event whose location includes an email renders
+    a clickable mailto: anchor in the rendered card. Real-world
+    regression case: HTM Sharks T-Shirt Design Contest with
+    "Submit to swimteam@hmsrc.org" location."""
+    event = {
+        "id": "email_evt",
+        "name": "T-Shirt Design Contest",
+        "date": "2026-05-15",
+        "_date_obj": dt.date(2026, 5, 15),
+        "time": "All day",
+        "location": "Submit to swimteam@hmsrc.org",
+        "category": "Sports & Extracurriculars",
+        "child": "Kid",
+        "source": "Sharks (May 1)",
+        "sender_domain": "hmsrc.org",
+        "sender_block_key": "hmsrc.org",
+    }
+    weeks = [(dt.date(2026, 5, 15), [event])]
+    html = pe.render_html(
+        today=TODAY, weeks=weeks, undated=[],
+        total_future=1, lookback_days=60, webhook_url="",
+    )
+    assert 'href="mailto:swimteam@hmsrc.org"' in html
+    # No bare-domain anchor pointing at hmsrc.org — the email pattern
+    # is matched ahead of the URL pattern, consuming the address.
+    assert 'href="https://www.hmsrc.org"' not in html
+    assert 'href="https://hmsrc.org"' not in html
+
+
+def test_linkify_preserves_trailing_tildes_in_sparkpost_url():
+    """#38 bug 2: a URL ending in `~~` (SparkPost tracking, etc.)
+    keeps the trailing tildes inside the href. Pre-#38 the regex's
+    trailing `\\b` couldn't anchor after a non-word char, so the
+    engine backtracked past the `~~` to find a word boundary —
+    stripping real URL characters. SparkPost's redirect requires
+    the exact path; the truncated href landed on a generic page."""
+    url = "https://go.sparkpostmail.com/f/a/abc123~~/AAQOhBA~/Ahxyz~~"
+    out = pe._linkify_inline_urls(f"schedule at {url}")
+    # The full URL — including trailing ~~ — is in href.
+    assert f'href="{url}"' in out
+    # And in title= for hover.
+    assert f'title="{url}"' in out
+    # No trailing `~~` outside the closing </a> (which would be the
+    # pre-#38 failure mode).
+    assert "</a>~~" not in out
+    assert "</a>~" not in out
+
+
+def test_linkify_strips_trailing_sentence_punctuation():
+    """#38: the trailing-`\\b` removal is paired with a small
+    `_TRAILING_URL_PUNCT` post-strip so prose punctuation like
+    `.` `,` `;` `!` `?` `)` `]` `}` doesn't get pulled into the
+    href. The strip set is intentionally small — `~`, `=`, `&`,
+    `#`, `/` all stay."""
+    cases = [
+        ("Visit foo.com.", 'href="https://www.foo.com"', "</a>."),
+        ("See bar.com,", 'href="https://www.bar.com"', "</a>,"),
+        ("baz.com!", 'href="https://www.baz.com"', "</a>!"),
+        ("(qux.com)", 'href="https://www.qux.com"', "</a>)"),
+    ]
+    for loc, href_expect, tail_expect in cases:
+        out = pe._linkify_inline_urls(loc)
+        assert href_expect in out, f"href wrong for {loc!r}: {out!r}"
+        assert tail_expect in out, (
+            f"trailing punct should fall outside anchor for {loc!r}: {out!r}"
+        )
+
+
+def test_linkify_keeps_trailing_equals_in_query_string():
+    """#38: `=` is a real URL character (base64 padding, query
+    args), NOT in `_TRAILING_URL_PUNCT`. A URL like
+    `?token=YWJj==` keeps the trailing `==` inside the href."""
+    url = "https://foo.com/?token=YWJj=="
+    out = pe._linkify_inline_urls(url)
+    assert f'href="{url}"' in out
+    assert "</a>=" not in out
+
+
+def test_linkify_mixed_email_and_url_in_one_location():
+    """#38: a location with BOTH an email and a URL renders each as
+    its right anchor type. The non-overlapping iteration handles
+    this without any extra plumbing — left-to-right, email first
+    by alternation."""
+    out = pe._linkify_inline_urls("Email a@b.com or visit c.com")
+    assert 'href="mailto:a@b.com"' in out
+    assert 'href="https://www.c.com"' in out
+    assert ">a@b.com</a>" in out
+    assert ">c.com</a>" in out
+
+
+def test_linkify_email_does_not_double_match_as_bare_domain():
+    """#38: regression pin — `swimteam@hmsrc.org` must NOT produce
+    BOTH a mailto anchor AND a separate bare-domain anchor for
+    `hmsrc.org`. The alternation regex is non-overlapping; the
+    email match consumes the whole substring."""
+    out = pe._linkify_inline_urls("swimteam@hmsrc.org")
+    # Exactly one anchor in the output.
+    assert out.count("<a ") == 1
+    assert out.count("</a>") == 1
+    assert 'href="mailto:swimteam@hmsrc.org"' in out
+
+
 # ─── ROADMAP #23: --output-target test (banner + title) ──────────────────
 
 
