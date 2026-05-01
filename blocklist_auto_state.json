@@ -546,8 +546,18 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-04-29",
+  "last_updated_iso": "2026-05-01",
   "pending": {
+    "ae@notifications.ae.com": {
+      "first_flagged_iso": "2026-05-01",
+      "flagged_message_ids": [
+        "19dde8baec0243f6"
+      ],
+      "last_flagged_iso": "2026-05-01",
+      "reason_samples": [
+        "Adult clothing retailer order/return confirmation — no kids' events"
+      ]
+    },
     "cindy@virginiahousekeepers.com": {
       "first_flagged_iso": "2026-04-28",
       "flagged_message_ids": [
@@ -578,6 +588,46 @@
         "Adult fitness/workout newsletter with no kids' content"
       ]
     },
+    "newsletter@mail.coinbase.com": {
+      "first_flagged_iso": "2026-05-01",
+      "flagged_message_ids": [
+        "19ddb59ad0d7af33"
+      ],
+      "last_flagged_iso": "2026-05-01",
+      "reason_samples": [
+        "Adult cryptocurrency newsletter — no kids' events"
+      ]
+    },
+    "noreply@email.myvalottery.com": {
+      "first_flagged_iso": "2026-05-01",
+      "flagged_message_ids": [
+        "19dd97ecef2f99e8"
+      ],
+      "last_flagged_iso": "2026-05-01",
+      "reason_samples": [
+        "Virginia Lottery adult newsletter — no kids' events"
+      ]
+    },
+    "rei_email@email.rei.com": {
+      "first_flagged_iso": "2026-05-01",
+      "flagged_message_ids": [
+        "19ddeb30ed410a61"
+      ],
+      "last_flagged_iso": "2026-05-01",
+      "reason_samples": [
+        "Adult outdoor retail membership newsletter — no kids' events"
+      ]
+    },
+    "reply@rs.email.nextdoor.com": {
+      "first_flagged_iso": "2026-05-01",
+      "flagged_message_ids": [
+        "19dda8a0f87fe6c6"
+      ],
+      "last_flagged_iso": "2026-05-01",
+      "reason_samples": [
+        "Nextdoor neighborhood trending posts — adult community discussion, no kids' events"
+      ]
+    },
     "support5@info.myloancare.com": {
       "first_flagged_iso": "2026-04-29",
       "flagged_message_ids": [
@@ -606,6 +656,16 @@
       "last_flagged_iso": "2026-04-28",
       "reason_samples": [
         "House cleaning service automated notification — adult home services, no kids' events"
+      ]
+    },
+    "whitehouseblackmarket@orders.whitehouseblackmarket.com": {
+      "first_flagged_iso": "2026-05-01",
+      "flagged_message_ids": [
+        "19ddc3ecf58a1055"
+      ],
+      "last_flagged_iso": "2026-05-01",
+      "reason_samples": [
+        "Adult women's clothing retailer shipping notification — no kids' events"
       ]
     }
   },

@@ -1,5 +1,5 @@
 {
-  "last_updated_iso": "2026-04-29T07:55:23-04:00",
+  "last_updated_iso": "2026-05-01T19:50:05-04:00",
   "schema_version": 1,
   "senders": {
     "23andmedatasettlement@e.emailksa.com": {
@@ -41,6 +41,16 @@
       "messages_seen": 2,
       "per_message_counts": [
         0,
+        0
+      ],
+      "total_events": 0
+    },
+    "ae@notifications.ae.com": {
+      "first_seen_iso": "2026-05-01T19:50:05-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-05-01T19:50:05-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
         0
       ],
       "total_events": 0
@@ -204,11 +214,10 @@
     "donotreply@email.teamsnap.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-04-24T20:01:41-04:00",
-      "messages_seen": 22,
+      "last_seen_iso": "2026-05-01T19:50:05-04:00",
+      "messages_seen": 23,
       "per_message_counts": [
         2,
-        2,
         1,
         1,
         1,
@@ -216,9 +225,10 @@
         1,
         1,
         1,
-        3
+        3,
+        1
       ],
-      "total_events": 34
+      "total_events": 35
     },
     "donotreply@inova.org": {
       "first_seen_iso": "2026-04-24T20:01:41-04:00",
@@ -259,10 +269,9 @@
     "ellen.n.holmes@gmail.com": {
       "first_seen_iso": "2026-04-24T21:16:59-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-04-29T07:55:23-04:00",
-      "messages_seen": 19,
+      "last_seen_iso": "2026-05-01T19:50:05-04:00",
+      "messages_seen": 20,
       "per_message_counts": [
-        0,
         0,
         5,
         0,
@@ -271,7 +280,8 @@
         0,
         5,
         0,
-        1
+        1,
+        0
       ],
       "total_events": 116
     },
@@ -438,6 +448,16 @@
       ],
       "total_events": 0
     },
+    "info@signupgenius.com": {
+      "first_seen_iso": "2026-05-01T19:50:05-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-05-01T19:50:05-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        1
+      ],
+      "total_events": 1
+    },
     "info@viennadentalarts.com": {
       "first_seen_iso": "2026-04-17T17:12:56-04:00",
       "is_newsletter": false,
@@ -481,17 +501,19 @@
     "lifetouch@m.lifetouch.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-04-27T20:19:04-04:00",
-      "messages_seen": 6,
+      "last_seen_iso": "2026-05-01T19:50:05-04:00",
+      "messages_seen": 8,
       "per_message_counts": [
         1,
         0,
         0,
         0,
         1,
+        0,
+        1,
         0
       ],
-      "total_events": 2
+      "total_events": 3
     },
     "mashafer@gmail.com": {
       "first_seen_iso": "2026-04-17T18:36:12-04:00",
@@ -546,12 +568,13 @@
     "mlrohde@fcps.edu": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-04-26T20:06:52-04:00",
-      "messages_seen": 3,
+      "last_seen_iso": "2026-05-01T19:50:05-04:00",
+      "messages_seen": 4,
       "per_message_counts": [
         1,
         4,
-        3
+        3,
+        0
       ],
       "total_events": 8
     },
@@ -569,6 +592,16 @@
       "first_seen_iso": "2026-04-17T17:12:56-04:00",
       "is_newsletter": false,
       "last_seen_iso": "2026-04-17T17:12:56-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
+    "newsletter@mail.coinbase.com": {
+      "first_seen_iso": "2026-05-01T19:50:05-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-05-01T19:50:05-04:00",
       "messages_seen": 1,
       "per_message_counts": [
         0
@@ -666,6 +699,16 @@
       ],
       "total_events": 2
     },
+    "noreply@email.myvalottery.com": {
+      "first_seen_iso": "2026-05-01T19:50:05-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-05-01T19:50:05-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
     "noreply@everbridge.net": {
       "first_seen_iso": "2026-04-17T17:12:56-04:00",
       "is_newsletter": false,
@@ -700,8 +743,8 @@
     "noreply@jackrabbittech.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-04-22T08:44:22-04:00",
-      "messages_seen": 8,
+      "last_seen_iso": "2026-05-01T19:50:05-04:00",
+      "messages_seen": 9,
       "per_message_counts": [
         1,
         1,
@@ -710,9 +753,10 @@
         0,
         1,
         0,
-        2
+        2,
+        1
       ],
-      "total_events": 5
+      "total_events": 6
     },
     "noreply@opera.upscalebychoice.com": {
       "first_seen_iso": "2026-04-17T17:12:56-04:00",
@@ -760,6 +804,26 @@
       "first_seen_iso": "2026-04-24T20:01:41-04:00",
       "is_newsletter": false,
       "last_seen_iso": "2026-04-24T20:01:41-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
+    "rei_email@email.rei.com": {
+      "first_seen_iso": "2026-05-01T19:50:05-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-05-01T19:50:05-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
+    "reply@rs.email.nextdoor.com": {
+      "first_seen_iso": "2026-05-01T19:50:05-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-05-01T19:50:05-04:00",
       "messages_seen": 1,
       "per_message_counts": [
         0
@@ -1016,6 +1080,17 @@
       "last_seen_iso": "2026-04-27T20:19:04-04:00",
       "messages_seen": 1,
       "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
+    "whitehouseblackmarket@orders.whitehouseblackmarket.com": {
+      "first_seen_iso": "2026-05-01T19:50:05-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-05-01T19:50:05-04:00",
+      "messages_seen": 2,
+      "per_message_counts": [
+        0,
         0
       ],
       "total_events": 0

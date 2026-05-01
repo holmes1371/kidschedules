@@ -120,6 +120,20 @@
       "source_message_id": "19d1873576a3c28d",
       "time": "9:00 AM - 4:00 PM"
     },
+    "140b59f6d3ed": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-05-05",
+      "first_seen_iso": "2026-05-01T19:50:05-04:00",
+      "id": "140b59f6d3ed",
+      "location": "Ms. Dini's room",
+      "name": "Costume Fitting for The Wizard of Oz (Glinda) — Everly",
+      "sender_block_key": "signupgenius.com",
+      "sender_domain": "signupgenius.com",
+      "source": "SignUpGenius confirmation (Apr 29)",
+      "source_message_id": "19dda4123a36e111",
+      "time": "4:15 PM – 5:00 PM"
+    },
     "160a24b53547": {
       "category": "School Activity",
       "child": "Rising 7th & 8th graders",
@@ -588,6 +602,20 @@
       "source_message_id": "19d840f6654b6048",
       "time": "All day"
     },
+    "5668cc5dbc1a": {
+      "category": "Academic Due Date",
+      "child": "Isla",
+      "date": "2026-04-30",
+      "first_seen_iso": "2026-05-01T19:50:05-04:00",
+      "id": "5668cc5dbc1a",
+      "location": "",
+      "name": "Isla Spring School Photography — 24% Off Sitewide Ends Today",
+      "sender_block_key": "lifetouch.com",
+      "sender_domain": "lifetouch.com",
+      "source": "Lifetouch School Photography (Apr 30)",
+      "source_message_id": "19dddea0c8887f04",
+      "time": "All day (deadline)"
+    },
     "5845d30a4ed3": {
       "category": "Sports & Extracurriculars",
       "child": "",
@@ -626,20 +654,6 @@
       "name": "Chess Camp at LAES (Session 1 End)",
       "source": "LAES PTA Sunbeam (Mar 15)",
       "time": "9:00 AM - 4:00 PM"
-    },
-    "5cf198cfcd2b": {
-      "category": "Academic Due Date",
-      "child": "",
-      "date": "2026-04-30",
-      "first_seen_iso": "2026-04-17T17:04:04-04:00",
-      "id": "5cf198cfcd2b",
-      "location": "swimteam@hmsrc.org",
-      "name": "HTM Sharks 2026 Team T-Shirt Design Contest Submission Deadline",
-      "sender_block_key": "gomotionapp.com",
-      "sender_domain": "gomotionapp.com",
-      "source": "HTM Sharks via SportsEngine Motion (Apr 12)",
-      "source_message_id": "19d840f6654b6048",
-      "time": "11:59 PM"
     },
     "5d1523b3667e": {
       "category": "School Activity",
@@ -867,19 +881,19 @@
       "source": "LAES PTA Sunbeam (Mar 15)",
       "time": "9:00 AM - 2:00 PM"
     },
-    "7007816137f7": {
-      "category": "School Activity",
-      "child": "Isla",
-      "date": "2026-04-28",
-      "first_seen_iso": "2026-04-29T07:55:23-04:00",
-      "id": "7007816137f7",
-      "location": "Louise Archer Elementary School",
-      "name": "Isla Absent — Sick",
-      "sender_block_key": "ellen.n.holmes@gmail.com",
-      "sender_domain": "gmail.com",
-      "source": "Ellen Holmes (Apr 28)",
-      "source_message_id": "19dd3f3ae37e33a1",
-      "time": "All day"
+    "6d80127a1039": {
+      "category": "Sports & Extracurriculars",
+      "child": "Everly",
+      "date": "2026-05-02",
+      "first_seen_iso": "2026-05-01T19:50:05-04:00",
+      "id": "6d80127a1039",
+      "location": "Fredericksburg Convention Center (2371 Carl D Silver Pkwy, Fredericksburg, VA 22401)",
+      "name": "StarQuest Regional Dance Competition",
+      "sender_block_key": "teamsnap.com",
+      "sender_domain": "teamsnap.com",
+      "source": "B2D - IGNITE Team via TeamSnap (Apr 30)",
+      "source_message_id": "19de07e90b536099",
+      "time": "5:34 PM (Arrival 3:35 PM)"
     },
     "7080e0b37934": {
       "category": "Sports & Extracurriculars",
@@ -1353,6 +1367,20 @@
       "source": "LAES PTA Sunbeam (Mar 22)",
       "time": "9:00 AM – 2:00 PM"
     },
+    "a4793c417e3a": {
+      "category": "Academic Due Date",
+      "child": "Isla",
+      "date": "2026-05-02",
+      "first_seen_iso": "2026-05-01T19:50:05-04:00",
+      "id": "a4793c417e3a",
+      "location": "Cuppett Performing Arts Center",
+      "name": "Cuppett Peter Pan T-Shirt Order Deadline",
+      "sender_block_key": "jackrabbittech.com",
+      "sender_domain": "jackrabbittech.com",
+      "source": "Cuppett Performing Arts Center (Apr 30)",
+      "source_message_id": "19ddf6ffd4451c1b",
+      "time": "All day (deadline)"
+    },
     "a6a25e12ba88": {
       "category": "School Activity",
       "child": "Everly",
@@ -1598,20 +1626,6 @@
       "source": "Susan Anspach / PTA updates (Apr 16)",
       "source_message_id": "19d97dc3ddcf82b5",
       "time": "School hours"
-    },
-    "bb30b1159670": {
-      "category": "Academic Due Date",
-      "child": "Everly",
-      "date": "2026-04-28",
-      "first_seen_iso": "2026-04-29T07:55:23-04:00",
-      "id": "bb30b1159670",
-      "location": "https://docs.google.com/forms/d/e/1FAIpQLScWwrmOnQnZsyRM82axwMVsnagwWxhB-KhTY4qxitFwJlSA2g/viewform?usp=mail_form_link",
-      "name": "7th Grade Algebra 1 Honors Opt-Out Form Submitted — Everly enrolled in Pre-Algebra",
-      "sender_block_key": "thomas.holmes1371@gmail.com",
-      "sender_domain": "gmail.com",
-      "source": "Tom Holmes / FCPS Form Receipt (Apr 28)",
-      "source_message_id": "19dd5585ad3a7dca",
-      "time": "All day (deadline)"
     },
     "bbb465d7f670": {
       "category": "Appointment",
@@ -2141,20 +2155,6 @@
       "source_message_id": "19db627fb28c14ad",
       "time": "All day"
     },
-    "e4498d0a199e": {
-      "category": "Sports & Extracurriculars",
-      "child": "Hunter Mill Sharks swimmers",
-      "date": "2026-04-30",
-      "first_seen_iso": "2026-04-24T21:16:59-04:00",
-      "id": "e4498d0a199e",
-      "location": "Submit to swimteam@hmsrc.org",
-      "name": "HTM Sharks T-Shirt Design Contest Deadline",
-      "sender_block_key": "ellen.n.holmes@gmail.com",
-      "sender_domain": "gmail.com",
-      "source": "Kids' Schedule — April 13, 2026 (Apr 16)",
-      "source_message_id": "19d95ef9b0561898",
-      "time": "11:59 PM"
-    },
     "e602d6bbc9d5": {
       "category": "Sports & Extracurriculars",
       "child": "Everly",
@@ -2379,7 +2379,7 @@
       "time": "All day"
     }
   },
-  "last_updated_iso": "2026-04-29T07:55:23-04:00",
+  "last_updated_iso": "2026-05-01T19:50:05-04:00",
   "processed_messages": {
     "19a0da1d7445f787": "2026-04-17T18:51:22-04:00",
     "19a1784ff2f26474": "2026-04-17T18:51:22-04:00",
@@ -2583,7 +2583,21 @@
     "19dd5585ad3a7dca": "2026-04-29T07:55:23-04:00",
     "19dd586b34ad254c": "2026-04-29T07:55:23-04:00",
     "19dd59c2bdfc5f33": "2026-04-29T07:55:23-04:00",
-    "19dd5a8267a2e235": "2026-04-29T07:55:23-04:00"
+    "19dd5a8267a2e235": "2026-04-29T07:55:23-04:00",
+    "19dd97ecef2f99e8": "2026-05-01T19:50:05-04:00",
+    "19dd9947b5e1a97b": "2026-05-01T19:50:05-04:00",
+    "19dda034aa3ff1e7": "2026-05-01T19:50:05-04:00",
+    "19dda4123a36e111": "2026-05-01T19:50:05-04:00",
+    "19dda8a0f87fe6c6": "2026-05-01T19:50:05-04:00",
+    "19ddb59ad0d7af33": "2026-05-01T19:50:05-04:00",
+    "19ddb64d46bf4fbe": "2026-05-01T19:50:05-04:00",
+    "19ddc3ecf58a1055": "2026-05-01T19:50:05-04:00",
+    "19dddea0c8887f04": "2026-05-01T19:50:05-04:00",
+    "19dde7437abac77b": "2026-05-01T19:50:05-04:00",
+    "19dde8baec0243f6": "2026-05-01T19:50:05-04:00",
+    "19ddeb30ed410a61": "2026-05-01T19:50:05-04:00",
+    "19ddf6ffd4451c1b": "2026-05-01T19:50:05-04:00",
+    "19de07e90b536099": "2026-05-01T19:50:05-04:00"
   },
   "schema_version": 3
 }
