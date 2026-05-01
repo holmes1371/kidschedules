@@ -20,11 +20,11 @@ Strict rules for writing it:
 
 **2026-05-01**
 
-- #38 code complete `[~]` — d4581af (linkifier email + trailing-char fix). Pending Tom's live verification on the next reminder email containing an email address (mailto:) and any SparkPost-shape tracking URL.
-- #39 code complete `[~]` — 3c4da6a (hydration timestamp gate). Pending Tom's live verification — refresh the Field Trip card he reported, the disappear/reappear flicker should be gone.
-- 872 → 884 tests green across the two commits (12 net new).
+- #38 + #39 closed `[x]` — Tom verified live after a workflow_dispatch rebuild; full prose archived in `COMPLETED.md`. 872 → 884 tests green (12 net new).
+- #38 caveat: the SparkPost tracking URL Tom flagged still 404s when clicked, but `curl -I` confirmed SparkPost's server itself responds with `Location: https://www.google.com/?!=!` — Advanced Pediatrics' email vendor configured the tracking URL to a malformed destination, nothing the pipeline can fix on our side.
 - #33 still code complete `[~]` — 4 SHAs (37aa60f / 51c8a54 / a9ffee7 / 63e86df). Pending Tom's live verification on the next real teacher PDF email.
 - Items 30 + 31 still `[~]` pending Tom's live verification on newly-arrived emails.
+- #35 / #36 still `[ ]` placeholders.
 
 ## For future agents
 
@@ -188,38 +188,9 @@ No commits, no design note, no `[~]` flip until Tom and the next agent discuss.
 
 37\. [x] Auto-GC the Ignored Events + Completed Events sheets — 3bd0cae / 1f8e8d8 / 228b082 / 6b48b67 / 018942e — see COMPLETED.md
 
-### 38. [~] Bug: location linkifier mis-handles email addresses and trailing URL characters — d4581af
+38\. [x] Bug: location linkifier mis-handles email addresses and trailing URL characters — d4581af — see COMPLETED.md
 
-Filed 2026-05-01 from Tom — caught on the live page. Two related defects in `scripts/process_events.py::_linkify_inline_urls` (the location URL linkifier from #29):
-
-- **Email addresses linkify as bare-domain URLs.** A location like `Submit to swimteam@hmsrc.org` renders the `hmsrc.org` segment as `<a href="https://www.hmsrc.org">hmsrc.org</a>`, leaving `swimteam@` as plain text. The agent emitted the address correctly; the linkifier's regex (`_INLINE_URL_RE`, with leading `\b`) doesn't have an email pattern at all, so the `\b` word boundary between `@` and `h` lets the URL pattern start mid-address. The fix is a `mailto:` anchor for the full email when an email pattern matches.
-- **URLs ending in non-word characters lose their trailing characters.** A SparkPost tracking URL like `https://go.sparkpostmail.com/.../Ah~~` renders with the trailing `~~` outside the anchor — the regex's trailing `\b` can't anchor after a `~` (non-word), so the engine backtracks past the tildes to find a word boundary. SparkPost's redirect needs the exact path; the truncated href lands on a generic fallback page. Same class of bug would bite trailing `=` (base64 padding), `&`, `+`, etc. Verified in a Python repl against a synthetic SparkPost-shaped URL.
-
-**Fix.** Single function rewrite. Replace `_INLINE_URL_RE` with `_EMAIL_OR_URL_RE` — alternation of an email pattern and the URL pattern (URL pattern with the trailing `\b` dropped). Email-first ordering ensures `swimteam@hmsrc.org` is consumed as one match before the URL engine can start mid-address. Add a `_TRAILING_URL_PUNCT = ".,;:!?)]}"` post-strip on URL matches so `Visit foo.com.` still drops the trailing period into plain text — sentence-punctuation hygiene preserved without the trailing-`\b` regex idiom.
-
-**Tests.** New cases in `tests/test_process_events.py`:
-- Email becomes `mailto:` anchor with full address as visible text + href; surrounding text stays plain. Concrete `swimteam@hmsrc.org` regression case.
-- SparkPost-shape URL with trailing `~~` keeps the tildes inside the href.
-- `Visit foo.com.` still drops the trailing period (preserve sentence-punctuation pass-through).
-- Mixed `email@x.com` + `https://y.com` in one location renders both as their right anchor types.
-
-No retroactive fix needed — both classes of error are ephemeral render-time decisions, not cached state. Next cron rebuild fixes existing cards.
-
-### 39. [~] Bug: card briefly disappears on refresh due to hydration vs reconcile asymmetry — 3c4da6a
-
-Filed 2026-05-01 from Tom — caught on the Field Trip card on the live page: refresh, card disappears for ~1–2s, reappears. Root cause: the SSR hydration step ([process_events.py:2162-2168](scripts/process_events.py#L2162)) applies localStorage `setIgnored(card)` unconditionally for any id present in storage, without checking the `flipped_at_iso` timestamp. The post-fetch reconcile pass IS timestamp-aware (only honors entries within `REFRESH_GRACE_MS`), but it runs after the Apps Script GET round-trip — so a stale localStorage entry produces a 1–2s window where hydration has hidden the card and reconcile hasn't yet restored it.
-
-`setIgnored` does `card.style.display = "none"`, which is the only state flag that visually hides a card; the same hydration asymmetry exists for sender-ignore and completed hydration but those don't `display:none`, so their flicker is less visible (briefly tinted strikethrough then untinted, etc.).
-
-**Fix.** Make hydration timestamp-aware to mirror reconcile. For any local entry where the SSR didn't already mark the card as flipped, only apply the local state if the entry's `flipped_at_iso` is within `REFRESH_GRACE_MS` (recent flip → optimistic-keep semantics, POST may be in flight). Stale entries become invisible to hydration; reconcile's persist step still drops them on the same refresh, so subsequent refreshes are clean. NaN-safe via `if (!(age < REFRESH_GRACE_MS)) return` so empty / malformed `flipped_at_iso` falls into "stale" bucket.
-
-Apply the same idiom in three places: event-ignore, sender-ignore, completed.
-
-**Tests.** New JS-substring pins in `tests/test_process_events.py`:
-- `test_render_html_js_hydration_skips_stale_ignore_entry` — pins the new age check on the event-ignore hydration.
-- Same pin shape for sender-ignore and completed hydration.
-
-No retroactive fix needed — once hydration honors timestamps, the next refresh on any device with stale localStorage stops flickering and the reconcile-persist step (already in place) cleans the stale entry.
+39\. [x] Bug: card briefly disappears on refresh due to hydration vs reconcile asymmetry — 3c4da6a — see COMPLETED.md
 
 ## Descoped / on hold
 
