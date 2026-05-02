@@ -1,4 +1,4 @@
-"""Coverage for main.py orchestration helpers listed in ROADMAP.md
+"""Coverage for main.py orchestration helpers listed in COMPLETED.md
 'Test coverage gaps' (medium-risk tier).
 
 `test_main.py` already pins `should_create_draft`,
