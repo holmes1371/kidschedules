@@ -111,3 +111,4 @@ info@mailva.evite.com  # auto 2026-04-25: Cancellation notice for a child's birt
 do_not_reply@lightspeedsystems.com  # auto 2026-04-25: automated web filter portal weekly report — no kids' events content
 eservice@harlandclarke.com  # auto 2026-04-25: Check/banking order delivery notifications — adult financial services, no childr
 salesforce@myworkday.com  # auto 2026-04-25: Adult job interview scheduling/recruiting — no children's events
+kelsey@hiitburn.com  # auto 2026-05-02: Adult health/wellness marketing email about menopause hormone therapy; no child-
