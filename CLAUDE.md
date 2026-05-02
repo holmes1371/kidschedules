@@ -55,7 +55,7 @@ The Windows-native gh.exe is NOT on the Bash tool's PATH; always invoke via the 
 - Project number: `2`
 - Project node ID: `PVT_kwHOAmwjSM4BWa16`
 - Status field ID: `PVTSSF_lAHOAmwjSM4BWa16zhRvUOU`
-- Status options: Todo `f75ad846`, In Progress `47fc9ee4`, Done `98236657`
+- Status options: Todo `f75ad846`, In Progress `47fc9ee4`, Done `98236657`, Descoped `ab890376`
 
 **Common one-liners:**
 
