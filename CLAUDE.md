@@ -11,7 +11,7 @@ This file auto-loads at session start. Read it in full before responding when To
 
 - **Active backlog:** GitHub Issues at https://github.com/holmes1371/kidschedules/issues
 - **Project board (Kanban):** https://github.com/users/holmes1371/projects/2 (KidsToDo) — Status column tracks Todo / In Progress / Done
-- **Closed-item history:** `COMPLETED.md` in repo root (full post-mortem prose for items 1–39 that closed before the migration)
+- **Closed-item history:** `COMPLETED.md` in repo root (full post-mortem prose for the original 1–39 numbered items that closed before the migration; post-migration close-outs reference GitHub issue numbers instead)
 - **Per-feature design notes:** `design/{feature-name}.md`
 - **Source code:** `scripts/`, `main.py`, `agent.py`, `gmail_client.py`, `events_state.py`, `apps_script.gs` (under `scripts/`)
 - **Tests:** `tests/` — runs on every push + PR via `.github/workflows/tests.yml`. A red test check blocks merge; don't mark a feature done with tests failing.
@@ -19,7 +19,9 @@ This file auto-loads at session start. Read it in full before responding when To
 
 ## Item-number convention
 
-Items have stable numbers preserved in issue titles as `Item N: <title>`. **Original numbers never renumber** — when work resumes on item N years later, the number is still N. GitHub issue numbers are independent and not aligned to item numbers (e.g. Item 33 is GH issue #7). Reference items as "Item 33" in commit messages and design notes; use the GH `#N` form only when linking to a specific GitHub artifact.
+**GitHub issue numbers are the canonical identifier.** Reference items as `#7`, `#33`, etc. in commit messages, design notes, and chat. GitHub auto-links the `#N` form to the issue page, so cross-references are clickable. Issue numbers are inherently stable — GitHub never reuses them within a repo.
+
+Pre-migration history in `COMPLETED.md` uses an older "Item N" numbering (1–39) that doesn't align to current GitHub issue numbers (the migration filed the open backlog as new issues #3–#9). When citing a closed-pre-migration item, write `COMPLETED.md item N` to disambiguate from a current GitHub issue. Do NOT renumber `COMPLETED.md` — those numbers are the keys for the historical commit message trail.
 
 The auto-load `MEMORY.md` under `~/.claude/projects/.../memory/` has two pre-migration notes (git commit identity, pre-push pytest rule) that this file supersedes — they're left in place as cross-session backstops; this CLAUDE.md is the canonical source.
 
@@ -60,8 +62,8 @@ The Windows-native gh.exe is NOT on the Bash tool's PATH; always invoke via the 
 **Common one-liners:**
 
 ```bash
-# File a new item
-"$GH" issue create --title "Item N: <title>" --label "queued" --body-file <body.md>
+# File a new item (use a plain title; GitHub assigns the issue number)
+"$GH" issue create --title "<short descriptive title>" --label "queued" --body-file <body.md>
 
 # Move issue to In Progress (find item-id via item-list)
 "$GH" project item-list 2 --owner holmes1371 --format json --limit 50
@@ -89,6 +91,6 @@ Single block, ≤5 bullets, replaced in place each session. Only what is open, i
 
 **2026-05-02**
 
-- ROADMAP.md migration to GitHub Issues + KidsToDo project board complete. 7 open items filed (Items 14, 15, 30, 31, 33, 35, 36); descoped Items 14 + 15 closed as not-planned but preserved with the `descoped` label; Items 30/31/33 sit in "In Progress" on the board pending Tom's live verification on newly-arrived emails / next teacher PDF email.
-- ROADMAP.md deleted in this commit. Closed Items 1–39 history stays in `COMPLETED.md`; pre-migration commit messages still resolve item numbers.
+- ROADMAP.md migration to GitHub Issues + KidsToDo project board complete. 7 issues now exist: #3 + #4 (descoped, closed not-planned), #5 + #6 + #7 (in-progress, pending Tom's live verification), #8 + #9 (queued placeholders).
+- "Item N" prefix dropped from issue titles in a follow-up — GitHub issue numbers are now the canonical identifier. Pre-migration `COMPLETED.md` numbering stays intact for the historical commit-message trail.
 - CLAUDE.md (this file) introduced as the auto-load briefing. Memory entries `feedback_git_commit_identity.md` + `feedback_pre_push_full_render_suite.md` left in place as backstops.
