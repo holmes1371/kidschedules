@@ -145,6 +145,20 @@
       "source_message_id": "19dcb92548731780",
       "time": "School hours"
     },
+    "17aeab6e4595": {
+      "category": "Sports & Extracurriculars",
+      "child": "Everly",
+      "date": "2026-05-10",
+      "first_seen_iso": "2026-05-03T11:23:36-04:00",
+      "id": "17aeab6e4595",
+      "location": "Forest Park High School, 15721 Forest Park Dr, Woodbridge, VA 22193 — schedule at https://docs.google.com/spreadsheets/d/1G3RP7VrajyUbWJzuWgOW5b9HCQr2PnRLVfy8GZhvJWY/edit?usp=sharing",
+      "name": "ID Dance Comp (B2D) — Day 3",
+      "sender_block_key": "teamsnap.com",
+      "sender_domain": "teamsnap.com",
+      "source": "B2D TeamSnap - Rami Shalan (May 2)",
+      "source_message_id": "19de9ad801b823d4",
+      "time": "All day"
+    },
     "1af8fba60479": {
       "category": "Sports & Extracurriculars",
       "child": "Girls on the Run participant at Louise Archer",
@@ -867,20 +881,6 @@
       "source": "LAES PTA Sunbeam (Mar 15)",
       "time": "9:00 AM - 2:00 PM"
     },
-    "6d80127a1039": {
-      "category": "Sports & Extracurriculars",
-      "child": "Everly",
-      "date": "2026-05-02",
-      "first_seen_iso": "2026-05-01T19:50:05-04:00",
-      "id": "6d80127a1039",
-      "location": "Fredericksburg Convention Center (2371 Carl D Silver Pkwy, Fredericksburg, VA 22401)",
-      "name": "StarQuest Regional Dance Competition",
-      "sender_block_key": "teamsnap.com",
-      "sender_domain": "teamsnap.com",
-      "source": "B2D - IGNITE Team via TeamSnap (Apr 30)",
-      "source_message_id": "19de07e90b536099",
-      "time": "5:34 PM (Arrival 3:35 PM)"
-    },
     "7080e0b37934": {
       "category": "Sports & Extracurriculars",
       "child": "Everly",
@@ -1272,6 +1272,20 @@
       "source": "HTM Sharks / Carly Reiley via SportsEngine Motion (Mar 4)",
       "time": "9:00 AM – 12:00 PM"
     },
+    "924c5a168bac": {
+      "category": "Sports & Extracurriculars",
+      "child": "Everly",
+      "date": "2026-05-08",
+      "first_seen_iso": "2026-05-03T11:23:36-04:00",
+      "id": "924c5a168bac",
+      "location": "Forest Park High School, 15721 Forest Park Dr, Woodbridge, VA 22193 — schedule at https://docs.google.com/spreadsheets/d/1G3RP7VrajyUbWJzuWgOW5b9HCQr2PnRLVfy8GZhvJWY/edit?usp=sharing",
+      "name": "ID Dance Comp (B2D) — Day 1",
+      "sender_block_key": "teamsnap.com",
+      "sender_domain": "teamsnap.com",
+      "source": "B2D TeamSnap - Rami Shalan (May 2)",
+      "source_message_id": "19de9ad801b823d4",
+      "time": "All day"
+    },
     "951165eb1a3c": {
       "category": "School Activity",
       "child": "Isla",
@@ -1338,20 +1352,6 @@
       "name": "Sports Camp at LAES — Session 2",
       "source": "LAES PTA Sunbeam (Mar 22)",
       "time": "9:00 AM – 2:00 PM"
-    },
-    "a4793c417e3a": {
-      "category": "Academic Due Date",
-      "child": "Isla",
-      "date": "2026-05-02",
-      "first_seen_iso": "2026-05-01T19:50:05-04:00",
-      "id": "a4793c417e3a",
-      "location": "Cuppett Performing Arts Center",
-      "name": "Cuppett Peter Pan T-Shirt Order Deadline",
-      "sender_block_key": "jackrabbittech.com",
-      "sender_domain": "jackrabbittech.com",
-      "source": "Cuppett Performing Arts Center (Apr 30)",
-      "source_message_id": "19ddf6ffd4451c1b",
-      "time": "All day (deadline)"
     },
     "a6a25e12ba88": {
       "category": "School Activity",
@@ -1543,20 +1543,6 @@
       "source_message_id": "19dc0becff6647d8",
       "time": "All day (deadline)"
     },
-    "b38da5da41f5": {
-      "category": "Sports & Extracurriculars",
-      "child": "Everly",
-      "date": "2026-05-02",
-      "first_seen_iso": "2026-04-24T20:01:41-04:00",
-      "id": "b38da5da41f5",
-      "location": "Fredericksburg Convention Center, 2371 Carl D Silver Pkwy, Fredericksburg, VA 22401",
-      "name": "StarQuest Regional Dance Competition — ECHO Team Performance",
-      "sender_block_key": "teamsnap.com",
-      "sender_domain": "teamsnap.com",
-      "source": "B2D Team Coordinator via TeamSnap (Apr 22)",
-      "source_message_id": "19db6af60288a5a3",
-      "time": "6:13 PM (Arrival: 4:15 PM)"
-    },
     "b6e31d298623": {
       "category": "Sports & Extracurriculars",
       "child": "3rd–6th grade LAES students",
@@ -1697,20 +1683,6 @@
       "source_message_id": "19da909fe35cca68",
       "time": "9:00 AM - 2:00 PM"
     },
-    "c4163621ff6d": {
-      "category": "Sports & Extracurriculars",
-      "child": "Everly",
-      "date": "2026-05-02",
-      "first_seen_iso": "2026-04-24T20:01:41-04:00",
-      "id": "c4163621ff6d",
-      "location": "Fredericksburg Convention Center, 2371 Carl D Silver Pkwy, Fredericksburg, VA 22401",
-      "name": "StarQuest Regional Dance Competition — IGNITE Team Performance",
-      "sender_block_key": "teamsnap.com",
-      "sender_domain": "teamsnap.com",
-      "source": "B2D Team Coordinator via TeamSnap (Apr 22)",
-      "source_message_id": "19db6b8fe9cd6f14",
-      "time": "5:34 PM (Arrival: 3:35 PM)"
-    },
     "c58a8e6473ad": {
       "category": "School Activity",
       "child": "",
@@ -1827,6 +1799,20 @@
       "name": "HTM Sharks NVSL A Meet — AWAY: Hunter Mill @ Fairfax Station Swim & Tennis (FS)",
       "source": "HTM Sharks / Carly Reiley via SportsEngine Motion (Mar 4)",
       "time": "9:00 AM – 12:00 PM"
+    },
+    "d1380d16dbb2": {
+      "category": "Sports & Extracurriculars",
+      "child": "Everly",
+      "date": "2026-05-09",
+      "first_seen_iso": "2026-05-03T11:23:36-04:00",
+      "id": "d1380d16dbb2",
+      "location": "Forest Park High School, 15721 Forest Park Dr, Woodbridge, VA 22193 — schedule at https://docs.google.com/spreadsheets/d/1G3RP7VrajyUbWJzuWgOW5b9HCQr2PnRLVfy8GZhvJWY/edit?usp=sharing",
+      "name": "ID Dance Comp (B2D) — Day 2",
+      "sender_block_key": "teamsnap.com",
+      "sender_domain": "teamsnap.com",
+      "source": "B2D TeamSnap - Rami Shalan (May 2)",
+      "source_message_id": "19de9ad801b823d4",
+      "time": "All day"
     },
     "d2105b0d9b6f": {
       "category": "Sports & Extracurriculars",
@@ -2085,20 +2071,6 @@
       "source_message_id": "19d86af203b31fdc",
       "time": ""
     },
-    "e377fbbd0893": {
-      "category": "Sports & Extracurriculars",
-      "child": "Everly",
-      "date": "2026-05-02",
-      "first_seen_iso": "2026-04-24T20:01:41-04:00",
-      "id": "e377fbbd0893",
-      "location": "Fredericksburg Expo & Conference Center, 2371 Carl D. Silver Parkway, Fredericksburg, VA 22401",
-      "name": "StarQuest Regional Dance Competition — B2D (Full Weekend)",
-      "sender_block_key": "teamsnap.com",
-      "sender_domain": "teamsnap.com",
-      "source": "B2D Team Coordinator via TeamSnap (Apr 22)",
-      "source_message_id": "19db627fb28c14ad",
-      "time": "All day"
-    },
     "e602d6bbc9d5": {
       "category": "Sports & Extracurriculars",
       "child": "Everly",
@@ -2337,7 +2309,7 @@
       "time": "All day"
     }
   },
-  "last_updated_iso": "2026-05-02T07:07:13-04:00",
+  "last_updated_iso": "2026-05-03T11:23:36-04:00",
   "processed_messages": {
     "19a0da1d7445f787": "2026-04-17T18:51:22-04:00",
     "19a1784ff2f26474": "2026-04-17T18:51:22-04:00",
@@ -2559,7 +2531,9 @@
     "19de0e2e59bb74d8": "2026-05-02T07:07:13-04:00",
     "19de17c1ae197380": "2026-05-02T07:07:13-04:00",
     "19de35b491f375c7": "2026-05-02T07:07:13-04:00",
-    "19de48039f5aae42": "2026-05-02T07:07:13-04:00"
+    "19de48039f5aae42": "2026-05-02T07:07:13-04:00",
+    "19de75405ba54476": "2026-05-03T11:23:36-04:00",
+    "19de9ad801b823d4": "2026-05-03T11:23:36-04:00"
   },
   "schema_version": 3
 }
