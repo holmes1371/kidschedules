@@ -91,9 +91,10 @@ open('scripts/process_events.py', 'w', encoding='utf-8').write(
 
 Single block, ≤5 bullets, replaced in place each session. Only what is open, in-flight, or just-filed.
 
-**2026-05-02**
+**2026-05-03**
 
-- ROADMAP.md migration to GitHub Issues + KidsToDo project board complete. 7 issues now exist: #3 + #4 (descoped, closed not-planned), #5 + #6 + #7 (in-progress, pending Tom's live verification), #8 + #9 (queued placeholders).
-- "Item N" prefix dropped from issue titles in a follow-up — GitHub issue numbers are now the canonical identifier. Pre-migration `COMPLETED.md` numbering stays intact for the historical commit-message trail.
-- Manual-verification checklist convention codified in CLAUDE.md (heading: `## Manual verification`). Two operational rules attached: only Tom ticks manual-verification boxes (never the agent — his audit trail), and `gh issue edit` always fetches the live body first via `gh issue view --json body --jq '.body'` before pushing back, so a UI tick between agent edits doesn't get silently un-ticked. Existing in-flight issues #5 / #6 / #7 use the older `## Verification` heading — same intent, same rules apply; they'll get renamed when next touched.
-- CLAUDE.md (this file) introduced as the auto-load briefing. Memory entries `feedback_git_commit_identity.md` + `feedback_pre_push_full_render_suite.md` left in place as backstops.
+- Refresh-time layout-shift root-caused: cron-built page (Sat) gets stale across the weekend; reconcile-after-fetch (#34) hides cards SSR-rendered as visible but in the sheet's ignored list. Tom approved (a) fade-out animation on reconcile-driven hides and (b) daily cron cadence (incremental-extraction cache means agent-API spend stays the same for the same email volume).
+- Fade-out: new `applyIgnoredWithFade(card, reason)` helper wraps reconcile applyFn for both event + sender ignore; reuses the existing `.fading` opacity transition + 300ms setTimeout the user-click flow uses. Cards already `.ignored` skip the fade (idempotent re-apply). Companion fade-IN on reconcile un-hides skipped — surgical changes, no SSR-hidden-but-not-in-sheet cards exist today.
+- Daily cron: schedule changed from `15 10 * * 1` + `15 10 * * 3,6` to `15 10 * * 1` + `15 10 * * 0,2,3,4,5,6`. Two-line split preserved so Monday CREATE_DRAFT gate literal still matches. Test suite extended with `test_schedule_covers_every_day_of_week` to catch a future edit dropping a day.
+- 884 → 889 tests green (4 fade-pin tests + 1 daily-cadence pin).
+- Counter-sync caveat: the "Show ignored (N)" header counter is server-rendered from SSR's `is_ignored` count and is NOT updated by reconcile. After a stale-cron weekend with N user ignores, the counter under-counts by N until the next cron rebuild. Not addressed here — surgical scope; file as a separate issue if it becomes annoying.

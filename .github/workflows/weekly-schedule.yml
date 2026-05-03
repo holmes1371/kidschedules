@@ -1,15 +1,21 @@
 name: Kids Schedule Weekly
 
 on:
-  # Monday, Wednesday, and Saturday at 6:15 AM Eastern (10:15 UTC).
-  # Cron runs in UTC and ignores DST, so summer (EDT) hits 6:15 AM on the
-  # dot and winter (EST) runs an hour early at 5:15 AM — acceptable drift.
+  # Daily at 6:15 AM Eastern (10:15 UTC). Cron runs in UTC and ignores DST,
+  # so summer (EDT) hits 6:15 AM on the dot and winter (EST) runs an hour
+  # early at 5:15 AM — acceptable drift.
+  #
   # Split into two entries so the CREATE_DRAFT gate below can branch on the
-  # exact cron string — Monday runs create a Gmail digest draft, Wed/Sat
-  # runs do not. If you change either time, update the gate expression too.
+  # exact cron string — Monday runs create a Gmail digest draft, every other
+  # day does not. If you change either time, update the gate expression too.
+  # Daily cadence keeps the rendered page in sync with the live Apps Script
+  # sheet within ~24h instead of the prior ~48h Sat→Mon gap; the
+  # incremental-extraction cache (events_state.json keyed on Gmail
+  # messageId) means the agent only sees genuinely new emails, so daily
+  # vs M/W/Sa is the same agent-API spend over the same email volume.
   schedule:
-    - cron: "15 10 * * 1"
-    - cron: "15 10 * * 3,6"
+    - cron: "15 10 * * 1"             # Monday — triggers CREATE_DRAFT
+    - cron: "15 10 * * 0,2,3,4,5,6"   # Sun + Tue–Sat — no draft
 
   # Allow manual trigger from GitHub UI
   workflow_dispatch:
