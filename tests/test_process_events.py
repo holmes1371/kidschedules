@@ -1468,6 +1468,75 @@ def test_render_html_js_hydration_uses_single_now_timestamp():
     assert "hydrationNow - new Date(completedAgeMap[id]" in html
 
 
+# ─── reconcile-driven hides fade out (smooths post-fetch layout shift) ──
+#
+# The post-fetch reconcile pass can hide cards that the cron-built SSR
+# rendered as visible — happens when the user ignored events between
+# cron rebuilds. Pre-fade, those cards snapped to display:none, causing
+# a visible layout shift ~1-2s after page load. The fade reuses the
+# 0.25s opacity transition the user-click handler already uses, so a
+# cross-device-driven hide looks the same as a local-click hide.
+
+
+def test_render_html_js_apply_ignored_with_fade_helper_defined():
+    """A single applyIgnoredWithFade helper wraps setIgnored with the
+    .fading class + 300ms setTimeout pattern. Reused for both the
+    ignored-event reconcile applyFn and the sender reconcile inline
+    apply."""
+    html, _ = _render_ignored_fixture(ignored_names=())
+    assert "function applyIgnoredWithFade(card, reason)" in html
+    # The fade animation: add .fading class, wait 300ms (matches existing
+    # user-click flow's setTimeout), then setIgnored + remove .fading.
+    assert 'card.classList.add("fading");' in html
+    assert "setIgnored(card, reason);" in html
+    assert "}}, 300);" in html or "}, 300);" in html
+
+
+def test_render_html_js_apply_ignored_with_fade_skips_already_hidden():
+    """Cards already marked .ignored skip the fade — fading a hidden
+    card is a no-op visually and would just delay the idempotent
+    re-apply by 300ms. The helper short-circuits to setIgnored
+    directly in that case."""
+    html, _ = _render_ignored_fixture(ignored_names=())
+    start = html.find("function applyIgnoredWithFade")
+    assert start != -1
+    end = html.find("function ", start + 30)
+    block = html[start:end]
+    assert 'card.classList.contains("ignored")' in block
+    # In the already-hidden branch, setIgnored is called WITHOUT a
+    # surrounding setTimeout (idempotent re-apply).
+    assert "setIgnored(card, reason);  // idempotent re-apply" in block
+
+
+def test_render_html_js_reconcile_event_ignore_uses_fade_apply():
+    """The ignored-event reconcile applyFn routes through
+    applyIgnoredWithFade rather than setIgnored directly, so a card
+    that was SSR-visible but is in the sheet's ignored list fades out
+    smoothly when reconcile fires post-fetch."""
+    html, _ = _render_ignored_fixture(ignored_names=())
+    # The applyFn passed into _reconcileEventFlag for ignored.
+    assert 'function (card) { applyIgnoredWithFade(card, "event"); }' in html
+    # And the bare-setIgnored applyFn must NOT exist for ignored —
+    # would mean the fade was bypassed.
+    assert 'function (card) { setIgnored(card, "event"); }' not in html
+
+
+def test_render_html_js_reconcile_sender_ignore_uses_fade_apply():
+    """The sender reconcile's inline apply uses the same fade helper.
+    The event-ignore guard (don't downgrade an event-ignored card to
+    sender-ignored) is preserved."""
+    html, _ = _render_ignored_fixture(ignored_names=())
+    assert 'applyIgnoredWithFade(card, "sender")' in html
+    # The bare setIgnored sender call should be gone.
+    sender_block_start = html.find("function _reconcileSenderFlag")
+    assert sender_block_start != -1
+    sender_block_end = html.find("function refreshSyncFromSheet", sender_block_start)
+    sender_block = html[sender_block_start:sender_block_end]
+    assert 'setIgnored(card, "sender");' not in sender_block, (
+        "sender reconcile should fade-apply, not bare-setIgnored"
+    )
+
+
 # ─── card redesign (Layout A) ────────────────────────────────────────────
 
 

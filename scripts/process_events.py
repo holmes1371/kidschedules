@@ -2171,6 +2171,22 @@ def render_html(today: dt.date,
           btn.disabled = false;
         }}
       }}
+      // Reuses the .fading class + 0.25s opacity transition the user-click
+      // handler already uses, so a cross-device-driven hide looks the same as
+      // a local-click hide. Skips the fade for cards that are already
+      // .ignored — fading a hidden card is a no-op and just delays the
+      // setIgnored idempotent re-apply by 300ms.
+      function applyIgnoredWithFade(card, reason) {{
+        if (card.classList.contains("ignored")) {{
+          setIgnored(card, reason);  // idempotent re-apply, no visual change
+          return;
+        }}
+        card.classList.add("fading");
+        setTimeout(function () {{
+          setIgnored(card, reason);
+          card.classList.remove("fading");
+        }}, 300);
+      }}
 
       // ── Show-ignored toggle counter ────────────────────────
       // Server renders the toggle only when ignored_n > 0 at build time.
@@ -2609,7 +2625,7 @@ def render_html(today: dt.date,
           // sender-reason cards are subject to sender reconciliation.
           var reason = card.getAttribute("data-ignored-reason") || "";
           if (fetchedSet[domain]) {{
-            if (reason !== "event") setIgnored(card, "sender");
+            if (reason !== "event") applyIgnoredWithFade(card, "sender");
             return;
           }}
           if (domain in localMap) {{
@@ -2652,7 +2668,7 @@ def render_html(today: dt.date,
               try {{ localStorage.setItem(STORAGE_KEY, JSON.stringify(entries)); }}
               catch (e) {{ /* storage unavailable */ }}
             }},
-            function (card) {{ setIgnored(card, "event"); }},
+            function (card) {{ applyIgnoredWithFade(card, "event"); }},
             function (card) {{ setActive(card); }}
           );
         }}).catch(function (err) {{
