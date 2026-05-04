@@ -245,6 +245,20 @@
       "source": "LAES PTA Sunbeam (Mar 15)",
       "time": "9:00 AM - 2:00 PM"
     },
+    "220323292d02": {
+      "category": "Sports & Extracurriculars",
+      "child": "",
+      "date": "2026-05-03",
+      "first_seen_iso": "2026-05-04T08:04:59-04:00",
+      "id": "220323292d02",
+      "location": "Hunter Mill Swim & Racquet Club, 10339 Brittenford Dr, Vienna, VA 22182",
+      "name": "Sharks Swim Team Interest Meeting",
+      "sender_block_key": "hmsrc.org",
+      "sender_domain": "hmsrc.org",
+      "source": "Hunter Mill Swim & Racquet Club (May 3)",
+      "source_message_id": "19dee8a051c58fc6",
+      "time": "Tonight"
+    },
     "22dd1c99cae0": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -365,19 +379,19 @@
       "source_message_id": "19de48039f5aae42",
       "time": "All day"
     },
-    "309307aab69f": {
+    "338adc9f689d": {
       "category": "School Activity",
       "child": "All LAES students",
-      "date": "2026-05-03",
-      "first_seen_iso": "2026-04-17T17:04:04-04:00",
-      "id": "309307aab69f",
-      "location": "Louise Archer Elementary School sidewalks",
-      "name": "Teacher Appreciation Week — Chalk the Walk",
-      "sender_block_key": "susan.anspach@gmail.com",
+      "date": "2026-05-07",
+      "first_seen_iso": "2026-05-04T08:04:59-04:00",
+      "id": "338adc9f689d",
+      "location": "Louise Archer Elementary School",
+      "name": "Teacher Appreciation Week — Words from the Heart & Flowers from the Garden (students bring notes/flowers for teachers)",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
       "sender_domain": "gmail.com",
-      "source": "Susan Anspach / PTA updates (Apr 16)",
-      "source_message_id": "19d97dc3ddcf82b5",
-      "time": "5:00 PM - 6:00 PM"
+      "source": "Ellen Holmes (May 3)",
+      "source_message_id": "19dee6d1ab1693b5",
+      "time": "School hours"
     },
     "3569f0d19b56": {
       "category": "Academic Due Date",
@@ -602,6 +616,20 @@
       "source_message_id": "19d926296f346c39",
       "time": "All day (deadline)"
     },
+    "52f1bd736a08": {
+      "category": "School Activity",
+      "child": "All LAES students",
+      "date": "",
+      "first_seen_iso": "2026-05-04T08:04:59-04:00",
+      "id": "52f1bd736a08",
+      "location": "Louise Archer Elementary School",
+      "name": "Louise Archer Elementary Spring Picture Day",
+      "sender_block_key": "lifetouch.com",
+      "sender_domain": "lifetouch.com",
+      "source": "Lifetouch School Photography (May 3)",
+      "source_message_id": "19def611cdcf1978",
+      "time": "School hours"
+    },
     "54dfd94aafe8": {
       "category": "Sports & Extracurriculars",
       "child": "",
@@ -654,20 +682,6 @@
       "name": "Chess Camp at LAES (Session 1 End)",
       "source": "LAES PTA Sunbeam (Mar 15)",
       "time": "9:00 AM - 4:00 PM"
-    },
-    "5d1523b3667e": {
-      "category": "School Activity",
-      "child": "All LAES students",
-      "date": "2026-05-03",
-      "first_seen_iso": "2026-04-17T17:04:04-04:00",
-      "id": "5d1523b3667e",
-      "location": "Louise Archer Elementary School (sidewalks)",
-      "name": "Teacher Appreciation Week – Chalk the Walk",
-      "sender_block_key": "louisearcherpta.org",
-      "sender_domain": "louisearcherpta.org",
-      "source": "LAES PTA Vice President (Apr 13)",
-      "source_message_id": "19d88762e96ed4d4",
-      "time": ""
     },
     "5d45bce072ba": {
       "category": "School Activity",
@@ -764,6 +778,20 @@
       "source_message_id": "19dccf5b656488ec",
       "time": "9:00 AM - 2:00 PM"
     },
+    "632ea0969af0": {
+      "category": "School Activity",
+      "child": "All LAES students",
+      "date": "2026-05-06",
+      "first_seen_iso": "2026-05-04T08:04:59-04:00",
+      "id": "632ea0969af0",
+      "location": "Louise Archer Elementary School",
+      "name": "Teacher Appreciation Week — PTA provides lunch for teachers and staff",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Ellen Holmes (May 3)",
+      "source_message_id": "19dee6d1ab1693b5",
+      "time": "School hours"
+    },
     "65db8d85fd1c": {
       "category": "Sports & Extracurriculars",
       "child": "TBD",
@@ -841,20 +869,6 @@
       "name": "Summer Sports Camp — Session 2 (ends)",
       "source": "LAES PTA Sunbeam (Mar 22)",
       "time": "9:00 AM - 2:00 PM"
-    },
-    "6b7fff527f99": {
-      "category": "Sports & Extracurriculars",
-      "child": "Hunter Mill Sharks swimmers",
-      "date": "2026-05-03",
-      "first_seen_iso": "2026-04-24T21:16:59-04:00",
-      "id": "6b7fff527f99",
-      "location": "Hunter Mill, 10339 Brittenford Dr, Vienna, VA 22182",
-      "name": "HTM Sharks Kick-Off Meeting (Suit Try-On Available)",
-      "sender_block_key": "ellen.n.holmes@gmail.com",
-      "sender_domain": "gmail.com",
-      "source": "Kids' Schedule — April 13, 2026 (Apr 16)",
-      "source_message_id": "19d95ef9b0561898",
-      "time": ""
     },
     "6ca7c401d35a": {
       "category": "School Activity",
@@ -1219,6 +1233,20 @@
       "source_message_id": "19d3f0d72e52bba6",
       "time": ""
     },
+    "8df6abd14920": {
+      "category": "School Activity",
+      "child": "All LAES students",
+      "date": "2026-05-03",
+      "first_seen_iso": "2026-05-04T08:04:59-04:00",
+      "id": "8df6abd14920",
+      "location": "Louise Archer Elementary School sidewalks",
+      "name": "Chalk the Walk — Teacher Appreciation Week",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Ellen Holmes (May 3)",
+      "source_message_id": "19dee6d1ab1693b5",
+      "time": "5:00 PM – 6:00 PM"
+    },
     "8fabe4c5690c": {
       "category": "Academic Due Date",
       "child": "",
@@ -1394,20 +1422,6 @@
       "source": "Susan Anspach / PTA updates (Apr 16)",
       "source_message_id": "19d97dc3ddcf82b5",
       "time": "School hours"
-    },
-    "a9b6a4af91ea": {
-      "category": "School Activity",
-      "child": "All LAES students",
-      "date": "2026-05-03",
-      "first_seen_iso": "2026-04-17T17:04:04-04:00",
-      "id": "a9b6a4af91ea",
-      "location": "Louise Archer Elementary School",
-      "name": "Teacher Appreciation Week",
-      "sender_block_key": "susan.anspach@gmail.com",
-      "sender_domain": "gmail.com",
-      "source": "Susan Anspach / PTA updates (Apr 16)",
-      "source_message_id": "19d97dc3ddcf82b5",
-      "time": "All day"
     },
     "ab9f2b4829ba": {
       "category": "School Activity",
@@ -2029,20 +2043,6 @@
       "source": "LAES PTA Sunbeam (Mar 22)",
       "time": "9:00 AM - 2:00 PM"
     },
-    "e00e26cf6fc6": {
-      "category": "Sports & Extracurriculars",
-      "child": "Everly",
-      "date": "2026-05-03",
-      "first_seen_iso": "2026-04-24T20:01:41-04:00",
-      "id": "e00e26cf6fc6",
-      "location": "Fredericksburg Expo & Conference Center, 2371 Carl D. Silver Parkway, Fredericksburg, VA 22401",
-      "name": "StarQuest Regional Dance Competition — B2D (Full Weekend)",
-      "sender_block_key": "teamsnap.com",
-      "sender_domain": "teamsnap.com",
-      "source": "B2D Team Coordinator via TeamSnap (Apr 22)",
-      "source_message_id": "19db627fb28c14ad",
-      "time": "All day"
-    },
     "e10850590201": {
       "category": "Academic Due Date",
       "child": "All LAES students",
@@ -2124,6 +2124,20 @@
       "source_message_id": "19dc12b4401d6066",
       "time": "8:00 AM - 9:00 AM"
     },
+    "edf01ea7c6e2": {
+      "category": "Academic Due Date",
+      "child": "Isla",
+      "date": "2026-05-01",
+      "first_seen_iso": "2026-05-04T08:04:59-04:00",
+      "id": "edf01ea7c6e2",
+      "location": "",
+      "name": "Gift Card Bingo — Classroom Fund Contribution Deadline",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Ellen Holmes (May 3)",
+      "source_message_id": "19dee78a8c2e53af",
+      "time": "All day (deadline)"
+    },
     "ef85fab607ae": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -2147,20 +2161,6 @@
       "location": "Glasgow Middle School, 4101 Fairfax Pkwy, Lincolnia, VA 22312",
       "name": "VIP Summer Camp — NO CAMP",
       "source": "FCPS News You Choose — VIP Camp (Apr 10)",
-      "time": "All day"
-    },
-    "efdf1e1ce7a8": {
-      "category": "Sports & Extracurriculars",
-      "child": "",
-      "date": "2026-05-03",
-      "first_seen_iso": "2026-04-17T17:04:04-04:00",
-      "id": "efdf1e1ce7a8",
-      "location": "",
-      "name": "HTM Sharks Kick-Off Meeting",
-      "sender_block_key": "gomotionapp.com",
-      "sender_domain": "gomotionapp.com",
-      "source": "HTM Sharks via SportsEngine Motion (Apr 12)",
-      "source_message_id": "19d840f6654b6048",
       "time": "All day"
     },
     "f13e463b9f27": {
@@ -2309,7 +2309,7 @@
       "time": "All day"
     }
   },
-  "last_updated_iso": "2026-05-03T11:23:36-04:00",
+  "last_updated_iso": "2026-05-04T08:04:59-04:00",
   "processed_messages": {
     "19a0da1d7445f787": "2026-04-17T18:51:22-04:00",
     "19a1784ff2f26474": "2026-04-17T18:51:22-04:00",
@@ -2533,7 +2533,11 @@
     "19de35b491f375c7": "2026-05-02T07:07:13-04:00",
     "19de48039f5aae42": "2026-05-02T07:07:13-04:00",
     "19de75405ba54476": "2026-05-03T11:23:36-04:00",
-    "19de9ad801b823d4": "2026-05-03T11:23:36-04:00"
+    "19de9ad801b823d4": "2026-05-03T11:23:36-04:00",
+    "19dee6d1ab1693b5": "2026-05-04T08:04:59-04:00",
+    "19dee78a8c2e53af": "2026-05-04T08:04:59-04:00",
+    "19dee8a051c58fc6": "2026-05-04T08:04:59-04:00",
+    "19def611cdcf1978": "2026-05-04T08:04:59-04:00"
   },
   "schema_version": 3
 }

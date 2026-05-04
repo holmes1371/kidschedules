@@ -1,5 +1,5 @@
 {
-  "last_updated_iso": "2026-05-03T11:23:36-04:00",
+  "last_updated_iso": "2026-05-04T08:04:59-04:00",
   "schema_version": 1,
   "senders": {
     "23andmedatasettlement@e.emailksa.com": {
@@ -269,11 +269,9 @@
     "ellen.n.holmes@gmail.com": {
       "first_seen_iso": "2026-04-24T21:16:59-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-05-01T19:50:05-04:00",
-      "messages_seen": 20,
+      "last_seen_iso": "2026-05-04T08:04:59-04:00",
+      "messages_seen": 22,
       "per_message_counts": [
-        0,
-        5,
         0,
         11,
         0,
@@ -281,9 +279,11 @@
         5,
         0,
         1,
-        0
+        0,
+        6,
+        1
       ],
-      "total_events": 116
+      "total_events": 123
     },
     "eservice@harlandclarke.com": {
       "first_seen_iso": "2026-04-24T21:16:59-04:00",
@@ -502,8 +502,8 @@
     "lifetouch@m.lifetouch.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-05-02T07:07:13-04:00",
-      "messages_seen": 9,
+      "last_seen_iso": "2026-05-04T08:04:59-04:00",
+      "messages_seen": 10,
       "per_message_counts": [
         1,
         0,
@@ -513,9 +513,10 @@
         0,
         1,
         0,
-        0
+        0,
+        1
       ],
-      "total_events": 3
+      "total_events": 4
     },
     "mashafer@gmail.com": {
       "first_seen_iso": "2026-04-17T18:36:12-04:00",
@@ -996,13 +997,14 @@
     "swimteam@hmsrc.org": {
       "first_seen_iso": "2026-04-22T08:44:22-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-04-24T20:01:41-04:00",
-      "messages_seen": 2,
+      "last_seen_iso": "2026-05-04T08:04:59-04:00",
+      "messages_seen": 3,
       "per_message_counts": [
+        1,
         1,
         1
       ],
-      "total_events": 2
+      "total_events": 3
     },
     "team@email.rocketlawyer.com": {
       "first_seen_iso": "2026-04-17T17:12:56-04:00",
