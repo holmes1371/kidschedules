@@ -551,7 +551,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-05-04",
+  "last_updated_iso": "2026-05-05",
   "pending": {
     "ae@notifications.ae.com": {
       "first_flagged_iso": "2026-05-01",
@@ -573,6 +573,26 @@
         "House cleaning service scheduling — adult home services, no kids' events"
       ]
     },
+    "donotreply@nextech.com": {
+      "first_flagged_iso": "2026-05-05",
+      "flagged_message_ids": [
+        "19df3135b6812dc6"
+      ],
+      "last_flagged_iso": "2026-05-05",
+      "reason_samples": [
+        "appointment confirmation system with no visible content — appears to be an adult medical/scheduling platform with no child-related context"
+      ]
+    },
+    "ellen.holmes@bhp.com": {
+      "first_flagged_iso": "2026-05-05",
+      "flagged_message_ids": [
+        "19df49fb6d3fb489"
+      ],
+      "last_flagged_iso": "2026-05-05",
+      "reason_samples": [
+        "internal corporate email from BHP (adult work communication — legal/compliance topic)"
+      ]
+    },
     "info@cupshe.com": {
       "first_flagged_iso": "2026-04-27",
       "flagged_message_ids": [
@@ -581,6 +601,16 @@
       "last_flagged_iso": "2026-04-27",
       "reason_samples": [
         "Retail/promotional email from clothing brand, no kids' events content"
+      ]
+    },
+    "mail@info.gotickets.com": {
+      "first_flagged_iso": "2026-05-05",
+      "flagged_message_ids": [
+        "19df3c9e338a3694"
+      ],
+      "last_flagged_iso": "2026-05-05",
+      "reason_samples": [
+        "adult entertainment ticket marketing email — concerts and sports events with no kids' programming"
       ]
     },
     "membership@m.dcbar.org": {
@@ -611,6 +641,16 @@
       "last_flagged_iso": "2026-05-01",
       "reason_samples": [
         "Virginia Lottery adult newsletter — no kids' events"
+      ]
+    },
+    "noreply@mypatientvisit.com": {
+      "first_flagged_iso": "2026-05-05",
+      "flagged_message_ids": [
+        "19df30e98bda6741"
+      ],
+      "last_flagged_iso": "2026-05-05",
+      "reason_samples": [
+        "adult patient visit appointment review notification with no child-related content"
       ]
     },
     "rei_email@email.rei.com": {
