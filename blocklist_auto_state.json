@@ -551,7 +551,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-05-05",
+  "last_updated_iso": "2026-05-06",
   "pending": {
     "ae@notifications.ae.com": {
       "first_flagged_iso": "2026-05-01",
@@ -631,6 +631,16 @@
       "last_flagged_iso": "2026-05-01",
       "reason_samples": [
         "Adult cryptocurrency newsletter — no kids' events"
+      ]
+    },
+    "no-reply@doordash.com": {
+      "first_flagged_iso": "2026-05-06",
+      "flagged_message_ids": [
+        "19dfa011e1a9e021"
+      ],
+      "last_flagged_iso": "2026-05-06",
+      "reason_samples": [
+        "Food delivery order confirmation for adult — no kids' events or activities"
       ]
     },
     "noreply@email.myvalottery.com": {
