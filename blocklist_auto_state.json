@@ -551,7 +551,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-05-06",
+  "last_updated_iso": "2026-05-07",
   "pending": {
     "ae@notifications.ae.com": {
       "first_flagged_iso": "2026-05-01",
@@ -593,6 +593,16 @@
         "internal corporate email from BHP (adult work communication — legal/compliance topic)"
       ]
     },
+    "hello-us@newsletter.emailbenefithub.com": {
+      "first_flagged_iso": "2026-05-07",
+      "flagged_message_ids": [
+        "19dfe97ff93f479f"
+      ],
+      "last_flagged_iso": "2026-05-07",
+      "reason_samples": [
+        "Adult employee benefits/discount newsletter, no connection to children"
+      ]
+    },
     "info@cupshe.com": {
       "first_flagged_iso": "2026-04-27",
       "flagged_message_ids": [
@@ -601,6 +611,16 @@
       "last_flagged_iso": "2026-04-27",
       "reason_samples": [
         "Retail/promotional email from clothing brand, no kids' events content"
+      ]
+    },
+    "info@healemedical.com": {
+      "first_flagged_iso": "2026-05-07",
+      "flagged_message_ids": [
+        "19dff13282bca3c0"
+      ],
+      "last_flagged_iso": "2026-05-07",
+      "reason_samples": [
+        "Adult medical weight loss promotion, no connection to children"
       ]
     },
     "mail@info.gotickets.com": {
