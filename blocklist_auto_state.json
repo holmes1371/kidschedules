@@ -551,7 +551,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-05-07",
+  "last_updated_iso": "2026-05-08",
   "pending": {
     "ae@notifications.ae.com": {
       "first_flagged_iso": "2026-05-01",
@@ -581,6 +581,16 @@
       "last_flagged_iso": "2026-05-05",
       "reason_samples": [
         "appointment confirmation system with no visible content — appears to be an adult medical/scheduling platform with no child-related context"
+      ]
+    },
+    "eleanor_lunger@hotmail.com": {
+      "first_flagged_iso": "2026-05-08",
+      "flagged_message_ids": [
+        "19e04d1f9a98401f"
+      ],
+      "last_flagged_iso": "2026-05-08",
+      "reason_samples": [
+        "neighborhood email thread about arborist recommendations — entirely adult/home maintenance topic, no kids' events"
       ]
     },
     "ellen.holmes@bhp.com": {
@@ -661,6 +671,16 @@
       "last_flagged_iso": "2026-05-06",
       "reason_samples": [
         "Food delivery order confirmation for adult — no kids' events or activities"
+      ]
+    },
+    "no-reply@excellenceresorts.com": {
+      "first_flagged_iso": "2026-05-08",
+      "flagged_message_ids": [
+        "19e030ecc7cb7640"
+      ],
+      "last_flagged_iso": "2026-05-08",
+      "reason_samples": [
+        "adult resort reservation confirmation for parents-only trip — no children involved"
       ]
     },
     "noreply@email.myvalottery.com": {

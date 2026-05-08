@@ -92,6 +92,34 @@
       "source_message_id": "19d97400ede1ed0d",
       "time": "All day"
     },
+    "0f0f2c32b740": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-05-04",
+      "first_seen_iso": "2026-05-08T07:47:32-04:00",
+      "id": "0f0f2c32b740",
+      "location": "Louise Archer Elementary School",
+      "name": "Math 7 SOL Review — Go Over SOL Practice Assignments; CW: Volumes of Cylinders 8.4",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Sahai, Anita (May 7)",
+      "source_message_id": "19e038254e9104cf",
+      "time": "School hours"
+    },
+    "103a7b158006": {
+      "category": "Academic Due Date",
+      "child": "Everly",
+      "date": "2026-05-13",
+      "first_seen_iso": "2026-05-08T07:47:32-04:00",
+      "id": "103a7b158006",
+      "location": "",
+      "name": "Performance Matters Unit 8 Post Assessment Due (9 questions)",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Sahai, Anita (May 7)",
+      "source_message_id": "19e038254e9104cf",
+      "time": "All day (deadline)"
+    },
     "13dce15d2106": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -145,20 +173,6 @@
       "source_message_id": "19de9ad801b823d4",
       "time": "All day"
     },
-    "196c3def5b98": {
-      "category": "School Activity",
-      "child": "Everly",
-      "date": "2026-05-06",
-      "first_seen_iso": "2026-05-07T08:11:59-04:00",
-      "id": "196c3def5b98",
-      "location": "",
-      "name": "Lifetouch School Photos Available — Everly",
-      "sender_block_key": "lifetouch.com",
-      "sender_domain": "lifetouch.com",
-      "source": "Lifetouch School Photography (May 6)",
-      "source_message_id": "19dfdac89cd6d93f",
-      "time": "All day"
-    },
     "1af8fba60479": {
       "category": "Sports & Extracurriculars",
       "child": "Girls on the Run participant at Louise Archer",
@@ -205,6 +219,34 @@
       "name": "Sports Camp at LAES — Session 1 Last Day",
       "source": "LAES PTA Sunbeam (Mar 22)",
       "time": "9:00 AM – 2:00 PM"
+    },
+    "1deb2306c810": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-05-15",
+      "first_seen_iso": "2026-05-08T07:47:32-04:00",
+      "id": "1deb2306c810",
+      "location": "Louise Archer Elementary School",
+      "name": "Math 7 SOL Review — CW: Math 7 Released SOL Spring 2014 Practice",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Sahai, Anita (May 7)",
+      "source_message_id": "19e038254e9104cf",
+      "time": "School hours"
+    },
+    "20411d6ebc12": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-05-13",
+      "first_seen_iso": "2026-05-08T07:47:32-04:00",
+      "id": "20411d6ebc12",
+      "location": "Louise Archer Elementary School",
+      "name": "Early Release Day — No Blocks",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Sahai, Anita (May 7)",
+      "source_message_id": "19e038254e9104cf",
+      "time": "Early release"
     },
     "21b494b4a788": {
       "category": "School Activity",
@@ -323,19 +365,19 @@
       "source_message_id": "19de48039f5aae42",
       "time": "All day"
     },
-    "338adc9f689d": {
-      "category": "School Activity",
-      "child": "All LAES students",
-      "date": "2026-05-07",
-      "first_seen_iso": "2026-05-04T08:04:59-04:00",
-      "id": "338adc9f689d",
-      "location": "Louise Archer Elementary School",
-      "name": "Teacher Appreciation Week — Words from the Heart & Flowers from the Garden (students bring notes/flowers for teachers)",
-      "sender_block_key": "ellen.n.holmes@gmail.com",
-      "sender_domain": "gmail.com",
-      "source": "Ellen Holmes (May 3)",
-      "source_message_id": "19dee6d1ab1693b5",
-      "time": "School hours"
+    "3247fe1ade38": {
+      "category": "Academic Due Date",
+      "child": "Everly",
+      "date": "2026-05-11",
+      "first_seen_iso": "2026-05-08T07:47:32-04:00",
+      "id": "3247fe1ade38",
+      "location": "",
+      "name": "Performance Matters Unit 6 Post Assessment Due (10 questions)",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Sahai, Anita (May 7)",
+      "source_message_id": "19e038254e9104cf",
+      "time": "All day (deadline)"
     },
     "3569f0d19b56": {
       "category": "Academic Due Date",
@@ -363,6 +405,20 @@
       "sender_domain": "louisearcherpta.org",
       "source": "LAES PTA Sunbeam (Apr 19)",
       "source_message_id": "19da909fe35cca68",
+      "time": "All day (deadline)"
+    },
+    "374d10fa0391": {
+      "category": "Academic Due Date",
+      "child": "Everly",
+      "date": "2026-05-05",
+      "first_seen_iso": "2026-05-08T07:47:32-04:00",
+      "id": "374d10fa0391",
+      "location": "",
+      "name": "Performance Matters Unit 2 Post Assessment Due (20 questions)",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Sahai, Anita (May 7)",
+      "source_message_id": "19e038254e9104cf",
       "time": "All day (deadline)"
     },
     "37be43b5f3a7": {
@@ -428,6 +484,20 @@
       "source": "LAES PTA Sunbeam (May 3)",
       "source_message_id": "19df118b46bc994c",
       "time": "All day (deadline)"
+    },
+    "40b4e7442c99": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-05-06",
+      "first_seen_iso": "2026-05-08T07:47:32-04:00",
+      "id": "40b4e7442c99",
+      "location": "Louise Archer Elementary School",
+      "name": "Math 7 SOL Review — CW: Unit 8 Test Open Discussion/Notes; Continue TestNav Q1–25",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Sahai, Anita (May 7)",
+      "source_message_id": "19e038254e9104cf",
+      "time": "School hours"
     },
     "44331c2a522e": {
       "category": "School Activity",
@@ -524,6 +594,20 @@
       "source_message_id": "19da909fe35cca68",
       "time": "9:00 AM - 2:00 PM"
     },
+    "4c9e4d31ed87": {
+      "category": "Academic Due Date",
+      "child": "",
+      "date": "",
+      "first_seen_iso": "2026-05-08T07:47:32-04:00",
+      "id": "4c9e4d31ed87",
+      "location": "https://mailchi.mp/7b84bc6a3f9f/welcome-to-the-2024-season-at-hunter-mill-swim-racquet-club-19885830?e=54a9a63381",
+      "name": "HTM Swim Team Registration Deadline",
+      "sender_block_key": "hmsrc.org",
+      "sender_domain": "hmsrc.org",
+      "source": "Hunter Mill Swim & Racquet Club (May 7)",
+      "source_message_id": "19dffc1bd81d5159",
+      "time": "All day (deadline)"
+    },
     "50bc54922f4c": {
       "category": "Sports & Extracurriculars",
       "child": "All LAES students",
@@ -545,20 +629,6 @@
       "name": "Dental Appointment — Isla and Everly",
       "source": "Children's Dentistry of Oakton (Apr 6)",
       "time": "8:30 AM"
-    },
-    "52318123c150": {
-      "category": "Academic Due Date",
-      "child": "All LAES students",
-      "date": "2026-05-07",
-      "first_seen_iso": "2026-05-05T07:40:09-04:00",
-      "id": "52318123c150",
-      "location": "louisearcherspiritwear.com",
-      "name": "Spirit Wear Free Shipping Promotion Ends",
-      "sender_block_key": "louisearcherpta.org",
-      "sender_domain": "louisearcherpta.org",
-      "source": "LAES PTA Sunbeam (May 3)",
-      "source_message_id": "19df118b46bc994c",
-      "time": "All day (deadline)"
     },
     "52bf32068e72": {
       "category": "Appointment",
@@ -668,6 +738,20 @@
       "source": "LAES PTA Sunbeam (May 3)",
       "source_message_id": "19df118b46bc994c",
       "time": "9:00 AM – 2:00 PM"
+    },
+    "5d150d84c744": {
+      "category": "Academic Due Date",
+      "child": "Everly",
+      "date": "2026-05-08",
+      "first_seen_iso": "2026-05-08T07:47:32-04:00",
+      "id": "5d150d84c744",
+      "location": "",
+      "name": "Performance Matters Unit 5 Post Assessment Due (14 questions)",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Sahai, Anita (May 7)",
+      "source_message_id": "19e038254e9104cf",
+      "time": "All day (deadline)"
     },
     "5d225fbc8ce8": {
       "category": "Sports & Extracurriculars",
@@ -895,6 +979,20 @@
       "source_message_id": "19dccf5b656488ec",
       "time": "9:00 AM - 2:00 PM"
     },
+    "709cb3982c54": {
+      "category": "Academic Due Date",
+      "child": "Everly",
+      "date": "2026-05-04",
+      "first_seen_iso": "2026-05-08T07:47:32-04:00",
+      "id": "709cb3982c54",
+      "location": "",
+      "name": "Performance Matters Unit 1 Post Assessment Due (18 questions)",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Sahai, Anita (May 7)",
+      "source_message_id": "19e038254e9104cf",
+      "time": "All day (deadline)"
+    },
     "71264c4f4da8": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -962,20 +1060,6 @@
       "source_message_id": "19d6e2fcbf50fdf5",
       "time": "All day (deadline)"
     },
-    "77b405519694": {
-      "category": "School Activity",
-      "child": "All LAES students",
-      "date": "2026-05-07",
-      "first_seen_iso": "2026-04-22T08:44:22-04:00",
-      "id": "77b405519694",
-      "location": "Louise Archer Elementary School",
-      "name": "Teacher Appreciation Week — Words from the Heart & Flowers from the Garden (students bring notes/flowers)",
-      "sender_block_key": "louisearcherpta.org",
-      "sender_domain": "louisearcherpta.org",
-      "source": "LAES PTA Sunbeam (Apr 19)",
-      "source_message_id": "19da909fe35cca68",
-      "time": "School hours"
-    },
     "77fe174b17de": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -1000,6 +1084,20 @@
       "source": "LAES PTA Sunbeam (Apr 19)",
       "source_message_id": "19da909fe35cca68",
       "time": "9:00 AM - 2:00 PM"
+    },
+    "78c4ac1799c4": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-05-05",
+      "first_seen_iso": "2026-05-08T07:47:32-04:00",
+      "id": "78c4ac1799c4",
+      "location": "Louise Archer Elementary School",
+      "name": "Math 7 SOL Review — Quick Review: Diagonals, Symmetry; CW: TestNav Questions Q1–25",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Sahai, Anita (May 7)",
+      "source_message_id": "19e038254e9104cf",
+      "time": "School hours"
     },
     "78d0d09386e2": {
       "category": "Academic Due Date",
@@ -1138,6 +1236,20 @@
       "source_message_id": "19d3f0d72e52bba6",
       "time": ""
     },
+    "8632193cd24d": {
+      "category": "Academic Due Date",
+      "child": "Everly",
+      "date": "2026-05-07",
+      "first_seen_iso": "2026-05-08T07:47:32-04:00",
+      "id": "8632193cd24d",
+      "location": "",
+      "name": "Performance Matters Unit 4 Post Assessment Due (11 questions)",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Sahai, Anita (May 7)",
+      "source_message_id": "19e038254e9104cf",
+      "time": "All day (deadline)"
+    },
     "86736f8d99ff": {
       "category": "Academic Due Date",
       "child": "All LAES students",
@@ -1251,14 +1363,14 @@
       "category": "School Activity",
       "child": "Everly",
       "date": "2026-05-07",
-      "first_seen_iso": "2026-04-24T20:01:41-04:00",
+      "first_seen_iso": "2026-05-08T07:47:32-04:00",
       "id": "9061e5c1d07c",
       "location": "Louise Archer Elementary School",
       "name": "Reading SOL Test",
       "sender_block_key": "fcps.edu",
       "sender_domain": "fcps.edu",
-      "source": "Sahai, Anita - 6 AAP May Newsletter (Apr 24)",
-      "source_message_id": "19dc0becff6647d8",
+      "source": "Sahai, Anita (May 7)",
+      "source_message_id": "19e038254e9104cf",
       "time": "School hours"
     },
     "9119e910789d": {
@@ -1300,6 +1412,48 @@
       "source_message_id": "19de9ad801b823d4",
       "time": "All day"
     },
+    "93e1f8b5dfd8": {
+      "category": "Academic Due Date",
+      "child": "Everly",
+      "date": "2026-05-15",
+      "first_seen_iso": "2026-05-08T07:47:32-04:00",
+      "id": "93e1f8b5dfd8",
+      "location": "",
+      "name": "Performance Matters Unit 10 Post Assessment Due (14 questions)",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Sahai, Anita (May 7)",
+      "source_message_id": "19e038254e9104cf",
+      "time": "All day (deadline)"
+    },
+    "9428b7fb7b54": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-05-11",
+      "first_seen_iso": "2026-05-08T07:47:32-04:00",
+      "id": "9428b7fb7b54",
+      "location": "Louise Archer Elementary School",
+      "name": "Math 7 SOL Review — CW: 2013 Grade 7 Performance Analysis",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Sahai, Anita (May 7)",
+      "source_message_id": "19e038254e9104cf",
+      "time": "School hours"
+    },
+    "947ae8dd0bd2": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-05-12",
+      "first_seen_iso": "2026-05-08T07:47:32-04:00",
+      "id": "947ae8dd0bd2",
+      "location": "Louise Archer Elementary School",
+      "name": "Math 7 SOL Review — CW: Math 7 Challenge EOY 2019",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Sahai, Anita (May 7)",
+      "source_message_id": "19e038254e9104cf",
+      "time": "School hours"
+    },
     "979872abeb6f": {
       "category": "Sports & Extracurriculars",
       "child": "Isla",
@@ -1314,6 +1468,20 @@
       "source_message_id": "19df386ad36213aa",
       "time": ""
     },
+    "97ed86805919": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-05-14",
+      "first_seen_iso": "2026-05-08T07:47:32-04:00",
+      "id": "97ed86805919",
+      "location": "Louise Archer Elementary School",
+      "name": "Math 7 SOL Review — CW: Start 2019 Grade 7 Performance Analysis",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Sahai, Anita (May 7)",
+      "source_message_id": "19e038254e9104cf",
+      "time": "School hours"
+    },
     "98e16a3752e5": {
       "category": "Sports & Extracurriculars",
       "child": "All LAES students",
@@ -1327,20 +1495,6 @@
       "source": "LAES PTA Sunbeam (May 3)",
       "source_message_id": "19df118b46bc994c",
       "time": "9:00 AM – 2:00 PM"
-    },
-    "98fd877de8ac": {
-      "category": "School Activity",
-      "child": "Isla",
-      "date": "2026-05-06",
-      "first_seen_iso": "2026-05-07T08:11:59-04:00",
-      "id": "98fd877de8ac",
-      "location": "",
-      "name": "Lifetouch School Photos Available — Isla",
-      "sender_block_key": "lifetouch.com",
-      "sender_domain": "lifetouch.com",
-      "source": "Lifetouch School Photography (May 6)",
-      "source_message_id": "19dfdac97c1b7264",
-      "time": "All day"
     },
     "9aef9f7e7781": {
       "category": "School Activity",
@@ -1380,6 +1534,34 @@
       "name": "Sports Camp at LAES — Session 2",
       "source": "LAES PTA Sunbeam (Mar 22)",
       "time": "9:00 AM – 2:00 PM"
+    },
+    "a37f2c8ea176": {
+      "category": "Academic Due Date",
+      "child": "Everly",
+      "date": "2026-05-06",
+      "first_seen_iso": "2026-05-08T07:47:32-04:00",
+      "id": "a37f2c8ea176",
+      "location": "",
+      "name": "Performance Matters Unit 3 Post Assessment Due (13 questions)",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Sahai, Anita (May 7)",
+      "source_message_id": "19e038254e9104cf",
+      "time": "All day (deadline)"
+    },
+    "a44f53c43661": {
+      "category": "Sports & Extracurriculars",
+      "child": "Everly",
+      "date": "2026-05-09",
+      "first_seen_iso": "2026-05-08T07:47:32-04:00",
+      "id": "a44f53c43661",
+      "location": "Bethesda North Marriott Hotel & Conference Center, 5701 Marinelli Rd Rockville, MD",
+      "name": "ID Dance Comp — B2D ECHO Team (updated location: Bethesda North Marriott)",
+      "sender_block_key": "teamsnap.com",
+      "sender_domain": "teamsnap.com",
+      "source": "TeamSnap Updated B2D ECHO Event (May 7)",
+      "source_message_id": "19e0495b48b7ab1f",
+      "time": "2:30 PM (Arrival 12:30 PM)"
     },
     "a6a25e12ba88": {
       "category": "School Activity",
@@ -1462,6 +1644,20 @@
       "source_message_id": "19de48039f5aae42",
       "time": "1:00 PM - 2:00 PM"
     },
+    "afc2af7ce5f5": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-05-22",
+      "first_seen_iso": "2026-05-08T07:47:32-04:00",
+      "id": "afc2af7ce5f5",
+      "location": "Louise Archer Elementary School",
+      "name": "Math MAP Testing (Sahai/Monroe → Sahai; Pinkman → Crenshaw)",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Sahai, Anita (May 7)",
+      "source_message_id": "19e038254e9104cf",
+      "time": "School hours"
+    },
     "b0acc99912d7": {
       "category": "Sports & Extracurriculars",
       "child": "TBD",
@@ -1487,20 +1683,6 @@
       "source_message_id": "19d1873576a3c28d",
       "time": "9:00 AM - 2:00 PM"
     },
-    "b2360e9dbf7d": {
-      "category": "Sports & Extracurriculars",
-      "child": "Everly",
-      "date": "2026-05-07",
-      "first_seen_iso": "2026-04-24T21:16:59-04:00",
-      "id": "b2360e9dbf7d",
-      "location": "",
-      "name": "Everly Volleyball",
-      "sender_block_key": "ellen.n.holmes@gmail.com",
-      "sender_domain": "gmail.com",
-      "source": "Ellen Holmes self-note (Apr 24)",
-      "source_message_id": "19dc12b4401d6066",
-      "time": "8:00 AM - 9:00 AM"
-    },
     "b25d1223f145": {
       "category": "Sports & Extracurriculars",
       "child": "Everly",
@@ -1514,6 +1696,20 @@
       "source": "B2D TeamSnap - Rami Shalan (Apr 8)",
       "source_message_id": "19d6e2fcbf50fdf5",
       "time": ""
+    },
+    "b356015c5d5e": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-05-08",
+      "first_seen_iso": "2026-05-08T07:47:32-04:00",
+      "id": "b356015c5d5e",
+      "location": "Louise Archer Elementary School",
+      "name": "Math 7 SOL Review — CW: Continue 2012 Performance Analysis / Finish TestNav",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Sahai, Anita (May 7)",
+      "source_message_id": "19e038254e9104cf",
+      "time": "School hours"
     },
     "b37a1b050726": {
       "category": "Academic Due Date",
@@ -1722,6 +1918,20 @@
       "source": "LAES PTA Sunbeam (Mar 22)",
       "time": "9:00 AM - 4:00 PM"
     },
+    "cbac62da6fd1": {
+      "category": "Academic Due Date",
+      "child": "Everly",
+      "date": "2026-05-14",
+      "first_seen_iso": "2026-05-08T07:47:32-04:00",
+      "id": "cbac62da6fd1",
+      "location": "",
+      "name": "Performance Matters Unit 9 Post Assessment Due (5 questions)",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Sahai, Anita (May 7)",
+      "source_message_id": "19e038254e9104cf",
+      "time": "All day (deadline)"
+    },
     "cc1505bdf456": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -1777,6 +1987,20 @@
       "source": "LAES PTA Sunbeam (Mar 22)",
       "source_message_id": "19d1873576a3c28d",
       "time": "9:00 AM - 4:00 PM"
+    },
+    "cdd68953598f": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-05-18",
+      "first_seen_iso": "2026-05-08T07:47:32-04:00",
+      "id": "cdd68953598f",
+      "location": "Louise Archer Elementary School",
+      "name": "Math 7 SOL Review — Sahai: Practice Questions & Finish Math 7 Released SOL 2014; Quarter 2 Review Slide Deck",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Sahai, Anita (May 7)",
+      "source_message_id": "19e038254e9104cf",
+      "time": "School hours"
     },
     "cf2b003ea771": {
       "category": "Sports & Extracurriculars",
@@ -1990,20 +2214,6 @@
       "source_message_id": "19da909fe35cca68",
       "time": "8:30 AM - 12:30 PM"
     },
-    "dd16e609dc6f": {
-      "category": "School Activity",
-      "child": "All LAES students",
-      "date": "2026-05-07",
-      "first_seen_iso": "2026-04-17T17:04:04-04:00",
-      "id": "dd16e609dc6f",
-      "location": "Louise Archer Elementary School",
-      "name": "Teacher Appreciation Week – Words from the Heart & Flowers from the Garden",
-      "sender_block_key": "louisearcherpta.org",
-      "sender_domain": "louisearcherpta.org",
-      "source": "LAES PTA Vice President (Apr 13)",
-      "source_message_id": "19d88762e96ed4d4",
-      "time": "School hours"
-    },
     "dd1f9be25dc0": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -2085,6 +2295,20 @@
       "source_message_id": "19d86af203b31fdc",
       "time": ""
     },
+    "e415f123650f": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-05-19",
+      "first_seen_iso": "2026-05-08T07:47:32-04:00",
+      "id": "e415f123650f",
+      "location": "Louise Archer Elementary School",
+      "name": "Math 7 SOL Review — Extra Review #1 (CW)",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Sahai, Anita (May 7)",
+      "source_message_id": "19e038254e9104cf",
+      "time": "School hours"
+    },
     "e756aa65a220": {
       "category": "Sports & Extracurriculars",
       "child": "Everly",
@@ -2109,6 +2333,20 @@
       "name": "VIP Summer Camp — Last Day",
       "source": "FCPS News You Choose — VIP Camp (Apr 10)",
       "time": "9:00 AM – 4:00 PM"
+    },
+    "e9014bee6cd7": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-05-21",
+      "first_seen_iso": "2026-05-08T07:47:32-04:00",
+      "id": "e9014bee6cd7",
+      "location": "Louise Archer Elementary School",
+      "name": "Math MAP Testing (Sahai/Monroe → Crenshaw; Pinkman → Sahai)",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Sahai, Anita (May 7)",
+      "source_message_id": "19e038254e9104cf",
+      "time": "School hours"
     },
     "ea32d4015e4f": {
       "category": "Sports & Extracurriculars",
@@ -2188,20 +2426,6 @@
       "source_message_id": "19cbba1549285194",
       "time": "9:00 AM – 12:00 PM"
     },
-    "f5e565a344ea": {
-      "category": "School Activity",
-      "child": "All LAES students",
-      "date": "2026-05-07",
-      "first_seen_iso": "2026-04-17T17:04:04-04:00",
-      "id": "f5e565a344ea",
-      "location": "Louise Archer Elementary School",
-      "name": "Teacher Appreciation Week — Words from the Heart & Flowers from the Garden",
-      "sender_block_key": "susan.anspach@gmail.com",
-      "sender_domain": "gmail.com",
-      "source": "Susan Anspach / PTA updates (Apr 16)",
-      "source_message_id": "19d97dc3ddcf82b5",
-      "time": "School hours"
-    },
     "f67e3d91085b": {
       "category": "Sports & Extracurriculars",
       "child": "Everly",
@@ -2227,6 +2451,20 @@
       "source_message_id": "19de48039f5aae42",
       "time": "4:30 PM - 5:30 PM"
     },
+    "f8019c3e4674": {
+      "category": "Sports & Extracurriculars",
+      "child": "Everly",
+      "date": "2026-05-09",
+      "first_seen_iso": "2026-05-08T07:47:32-04:00",
+      "id": "f8019c3e4674",
+      "location": "Bethesda North Marriott Hotel & Conference Center, 5701 Marinelli Rd Rockville, MD",
+      "name": "ID Dance Comp — B2D IGNITE Team (updated location: Bethesda North Marriott)",
+      "sender_block_key": "teamsnap.com",
+      "sender_domain": "teamsnap.com",
+      "source": "TeamSnap Updated B2D IGNITE Event (May 7)",
+      "source_message_id": "19e0498e869568fc",
+      "time": "3:07 PM (Arrival 1:05 PM)"
+    },
     "f991394d30ee": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -2237,6 +2475,20 @@
       "name": "Summer Sports Camp — Session 3",
       "source": "LAES PTA Sunbeam (Mar 22)",
       "time": "9:00 AM - 2:00 PM"
+    },
+    "fa1c3982d8df": {
+      "category": "Academic Due Date",
+      "child": "Everly",
+      "date": "2026-05-12",
+      "first_seen_iso": "2026-05-08T07:47:32-04:00",
+      "id": "fa1c3982d8df",
+      "location": "",
+      "name": "Performance Matters Unit 7 Post Assessment Due (7 questions)",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Sahai, Anita (May 7)",
+      "source_message_id": "19e038254e9104cf",
+      "time": "All day (deadline)"
     },
     "fb4a89c2b6c7": {
       "category": "Sports & Extracurriculars",
@@ -2266,22 +2518,22 @@
       "source_message_id": "19d1ac06f155fe9f",
       "time": ""
     },
-    "fe84bd46853b": {
+    "fe6ea1cbd11d": {
       "category": "School Activity",
-      "child": "All LAES students",
+      "child": "Everly",
       "date": "2026-05-07",
-      "first_seen_iso": "2026-04-27T20:19:04-04:00",
-      "id": "fe84bd46853b",
+      "first_seen_iso": "2026-05-08T07:47:32-04:00",
+      "id": "fe6ea1cbd11d",
       "location": "Louise Archer Elementary School",
-      "name": "Teacher Appreciation Week — Words from the Heart & Flowers from the Garden (bring notes/flowers for teachers)",
-      "sender_block_key": "louisearcherpta.org",
-      "sender_domain": "louisearcherpta.org",
-      "source": "LAES PTA Sunbeam (Apr 26)",
-      "source_message_id": "19dccf5b656488ec",
-      "time": "All day"
+      "name": "Reading SOL & Chorus Day — Stay in Homeroom; CW: TestNav Questions Q26–49",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Sahai, Anita (May 7)",
+      "source_message_id": "19e038254e9104cf",
+      "time": "School hours"
     }
   },
-  "last_updated_iso": "2026-05-07T08:11:59-04:00",
+  "last_updated_iso": "2026-05-08T07:47:32-04:00",
   "processed_messages": {
     "19a0da1d7445f787": "2026-04-17T18:51:22-04:00",
     "19a1784ff2f26474": "2026-04-17T18:51:22-04:00",
@@ -2529,7 +2781,15 @@
     "19dfe1c6b8bc6ef7": "2026-05-07T08:11:59-04:00",
     "19dfe97ff93f479f": "2026-05-07T08:11:59-04:00",
     "19dfedc96044dfed": "2026-05-07T08:11:59-04:00",
-    "19dff13282bca3c0": "2026-05-07T08:11:59-04:00"
+    "19dff13282bca3c0": "2026-05-07T08:11:59-04:00",
+    "19dffc1bd81d5159": "2026-05-08T07:47:32-04:00",
+    "19e030ecc7cb7640": "2026-05-08T07:47:32-04:00",
+    "19e038254e9104cf": "2026-05-08T07:47:32-04:00",
+    "19e0420a42e2258a": "2026-05-08T07:47:32-04:00",
+    "19e0424244167d74": "2026-05-08T07:47:32-04:00",
+    "19e0495b48b7ab1f": "2026-05-08T07:47:32-04:00",
+    "19e0498e869568fc": "2026-05-08T07:47:32-04:00",
+    "19e04d1f9a98401f": "2026-05-08T07:47:32-04:00"
   },
   "schema_version": 3
 }
