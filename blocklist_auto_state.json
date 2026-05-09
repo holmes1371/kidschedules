@@ -551,7 +551,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-05-08",
+  "last_updated_iso": "2026-05-09",
   "pending": {
     "ae@notifications.ae.com": {
       "first_flagged_iso": "2026-05-01",
@@ -631,6 +631,16 @@
       "last_flagged_iso": "2026-05-07",
       "reason_samples": [
         "Adult medical weight loss promotion, no connection to children"
+      ]
+    },
+    "larroude@larroude.com": {
+      "first_flagged_iso": "2026-05-09",
+      "flagged_message_ids": [
+        "19e0502a9cd29b8a"
+      ],
+      "last_flagged_iso": "2026-05-09",
+      "reason_samples": [
+        "adult women's shoe retailer marketing email — no children or school content"
       ]
     },
     "mail@info.gotickets.com": {
@@ -733,6 +743,16 @@
         "Mortgage/loan payment notification — adult financial content only"
       ]
     },
+    "support@s.usa.experian.com": {
+      "first_flagged_iso": "2026-05-09",
+      "flagged_message_ids": [
+        "19e0866aad58598c"
+      ],
+      "last_flagged_iso": "2026-05-09",
+      "reason_samples": [
+        "adult personal credit monitoring service — no children or school content"
+      ]
+    },
     "viennarecreation@rectrac.com": {
       "first_flagged_iso": "2026-04-26",
       "flagged_message_ids": [
@@ -761,6 +781,16 @@
       "last_flagged_iso": "2026-05-01",
       "reason_samples": [
         "Adult women's clothing retailer shipping notification — no kids' events"
+      ]
+    },
+    "yingjin920@gmail.com": {
+      "first_flagged_iso": "2026-05-09",
+      "flagged_message_ids": [
+        "19e08309b4f3c584"
+      ],
+      "last_flagged_iso": "2026-05-09",
+      "reason_samples": [
+        "neighborhood email thread about arborist recommendations — no children or school content"
       ]
     }
   },
