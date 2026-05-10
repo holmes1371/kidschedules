@@ -551,7 +551,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-05-09",
+  "last_updated_iso": "2026-05-10",
   "pending": {
     "ae@notifications.ae.com": {
       "first_flagged_iso": "2026-05-01",
@@ -571,6 +571,16 @@
       "last_flagged_iso": "2026-04-28",
       "reason_samples": [
         "House cleaning service scheduling — adult home services, no kids' events"
+      ]
+    },
+    "do-not-reply@ottooptics.io": {
+      "first_flagged_iso": "2026-05-10",
+      "flagged_message_ids": [
+        "19e0b8a0b535f241"
+      ],
+      "last_flagged_iso": "2026-05-10",
+      "reason_samples": [
+        "contact lens refill marketing email, adult optical/vision product promotion, no children's events"
       ]
     },
     "donotreply@nextech.com": {
