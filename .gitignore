@@ -14,6 +14,10 @@ venv/
 /tmp/
 *.log
 
+# Ephemeral scratch dir for gh-CLI body files etc (per CLAUDE.md convention:
+# prefer a repo-local .migration-tmp/ over MSYS /tmp, and gitignore it)
+.migration-tmp/
+
 # Dev sandbox output (not published, just for local UI iteration)
 docs/dev_preview.html
 docs/dev_preview-meta.json
