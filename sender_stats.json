@@ -1,5 +1,5 @@
 {
-  "last_updated_iso": "2026-05-10T07:15:54-04:00",
+  "last_updated_iso": "2026-05-11T08:50:07-04:00",
   "schema_version": 1,
   "senders": {
     "23andmedatasettlement@e.emailksa.com": {
@@ -595,10 +595,9 @@
     "lifetouch@m.lifetouch.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-05-07T08:11:59-04:00",
-      "messages_seen": 14,
+      "last_seen_iso": "2026-05-11T08:50:07-04:00",
+      "messages_seen": 15,
       "per_message_counts": [
-        1,
         0,
         1,
         0,
@@ -607,7 +606,8 @@
         1,
         1,
         1,
-        1
+        1,
+        0
       ],
       "total_events": 8
     },
@@ -684,15 +684,16 @@
     "mlrohde@fcps.edu": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-05-01T19:50:05-04:00",
-      "messages_seen": 4,
+      "last_seen_iso": "2026-05-11T08:50:07-04:00",
+      "messages_seen": 5,
       "per_message_counts": [
         1,
         4,
         3,
-        0
+        0,
+        3
       ],
-      "total_events": 8
+      "total_events": 11
     },
     "mmmcgrath@fcps.edu": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
@@ -777,12 +778,14 @@
     "no-reply@ottosportmail.ai": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-04-17T17:04:04-04:00",
-      "messages_seen": 1,
+      "last_seen_iso": "2026-05-11T08:50:07-04:00",
+      "messages_seen": 3,
       "per_message_counts": [
-        0
+        0,
+        2,
+        2
       ],
-      "total_events": 0
+      "total_events": 4
     },
     "no-reply@r.sofi.com": {
       "first_seen_iso": "2026-04-24T20:42:56-04:00",
