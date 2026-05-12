@@ -112,3 +112,4 @@ do_not_reply@lightspeedsystems.com  # auto 2026-04-25: automated web filter port
 eservice@harlandclarke.com  # auto 2026-04-25: Check/banking order delivery notifications — adult financial services, no childr
 salesforce@myworkday.com  # auto 2026-04-25: Adult job interview scheduling/recruiting — no children's events
 kelsey@hiitburn.com  # auto 2026-05-02: Adult health/wellness marketing email about menopause hormone therapy; no child-
+larroude@larroude.com  # auto 2026-05-12: Adult fashion/shoe retailer promotional email, no kids' content

@@ -235,6 +235,11 @@
       "last_flagged_iso": "2026-04-26",
       "reason": "legacy entry seeded post-deploy"
     },
+    "larroude@larroude.com": {
+      "added_iso": "2026-05-12",
+      "last_flagged_iso": "2026-05-12",
+      "reason": "Adult fashion/shoe retailer promotional email, no kids' content"
+    },
     "loyalty@loyalty.ms.aa.com": {
       "added_iso": "2026-04-26",
       "last_flagged_iso": "2026-04-26",
@@ -551,7 +556,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-05-11",
+  "last_updated_iso": "2026-05-12",
   "pending": {
     "ae@notifications.ae.com": {
       "first_flagged_iso": "2026-05-01",
@@ -641,16 +646,6 @@
       "last_flagged_iso": "2026-05-07",
       "reason_samples": [
         "Adult medical weight loss promotion, no connection to children"
-      ]
-    },
-    "larroude@larroude.com": {
-      "first_flagged_iso": "2026-05-09",
-      "flagged_message_ids": [
-        "19e0502a9cd29b8a"
-      ],
-      "last_flagged_iso": "2026-05-09",
-      "reason_samples": [
-        "adult women's shoe retailer marketing email — no children or school content"
       ]
     },
     "mail@info.gotickets.com": {
