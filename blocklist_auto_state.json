@@ -65,6 +65,11 @@
       "last_flagged_iso": "2026-04-26",
       "reason": "legacy entry seeded post-deploy"
     },
+    "cindy@virginiahousekeepers.com": {
+      "added_iso": "2026-05-13",
+      "last_flagged_iso": "2026-05-13",
+      "reason": "House cleaning service scheduling — adult home services, no children involved"
+    },
     "claudine.czerny@rtx.com": {
       "added_iso": "2026-04-26",
       "last_flagged_iso": "2026-04-26",
@@ -556,7 +561,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-05-12",
+  "last_updated_iso": "2026-05-13",
   "pending": {
     "ae@notifications.ae.com": {
       "first_flagged_iso": "2026-05-01",
@@ -566,16 +571,6 @@
       "last_flagged_iso": "2026-05-01",
       "reason_samples": [
         "Adult clothing retailer order/return confirmation — no kids' events"
-      ]
-    },
-    "cindy@virginiahousekeepers.com": {
-      "first_flagged_iso": "2026-04-28",
-      "flagged_message_ids": [
-        "19dce8f1034ed07f"
-      ],
-      "last_flagged_iso": "2026-04-28",
-      "reason_samples": [
-        "House cleaning service scheduling — adult home services, no kids' events"
       ]
     },
     "do-not-reply@ottooptics.io": {
@@ -718,6 +713,16 @@
         "adult patient visit appointment review notification with no child-related content"
       ]
     },
+    "opportunities@mail.hiive.com": {
+      "first_flagged_iso": "2026-05-13",
+      "flagged_message_ids": [
+        "19e1d75453d412dc"
+      ],
+      "last_flagged_iso": "2026-05-13",
+      "reason_samples": [
+        "Adult investment/financial opportunity email — no kids' content"
+      ]
+    },
     "rei_email@email.rei.com": {
       "first_flagged_iso": "2026-05-01",
       "flagged_message_ids": [
@@ -766,6 +771,16 @@
       "last_flagged_iso": "2026-04-26",
       "reason_samples": [
         "Email contained only a receipt attachment notice with no extractable event details"
+      ]
+    },
+    "volcor@cake4kids.org": {
+      "first_flagged_iso": "2026-05-13",
+      "flagged_message_ids": [
+        "19e1e0300b435e6f"
+      ],
+      "last_flagged_iso": "2026-05-13",
+      "reason_samples": [
+        "Volunteer organization newsletter for adult bakers — no events relevant to this family's children"
       ]
     },
     "website@mg.virginiahousekeepers.com": {
