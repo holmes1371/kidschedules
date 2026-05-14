@@ -370,6 +370,11 @@
       "last_flagged_iso": "2026-04-26",
       "reason": "legacy entry seeded post-deploy"
     },
+    "noreply@email.myvalottery.com": {
+      "added_iso": "2026-05-14",
+      "last_flagged_iso": "2026-05-14",
+      "reason": "Virginia Lottery promotional email, adult gambling content only"
+    },
     "noreply@everbridge.net": {
       "added_iso": "2026-04-26",
       "last_flagged_iso": "2026-04-26",
@@ -561,7 +566,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-05-13",
+  "last_updated_iso": "2026-05-14",
   "pending": {
     "ae@notifications.ae.com": {
       "first_flagged_iso": "2026-05-01",
@@ -623,6 +628,16 @@
         "Adult employee benefits/discount newsletter, no connection to children"
       ]
     },
+    "hello@hellowisp.com": {
+      "first_flagged_iso": "2026-05-14",
+      "flagged_message_ids": [
+        "19e238455f272164"
+      ],
+      "last_flagged_iso": "2026-05-14",
+      "reason_samples": [
+        "Adult longevity/health supplement marketing email, no kids' content"
+      ]
+    },
     "info@cupshe.com": {
       "first_flagged_iso": "2026-04-27",
       "flagged_message_ids": [
@@ -641,6 +656,16 @@
       "last_flagged_iso": "2026-05-07",
       "reason_samples": [
         "Adult medical weight loss promotion, no connection to children"
+      ]
+    },
+    "info@revivalrugs.com": {
+      "first_flagged_iso": "2026-05-14",
+      "flagged_message_ids": [
+        "19e21b1cf8cce374"
+      ],
+      "last_flagged_iso": "2026-05-14",
+      "reason_samples": [
+        "Rug retailer marketing; the kids design contest is a one-off promotional item unlikely to recur"
       ]
     },
     "mail@info.gotickets.com": {
@@ -691,16 +716,6 @@
       "last_flagged_iso": "2026-05-08",
       "reason_samples": [
         "adult resort reservation confirmation for parents-only trip — no children involved"
-      ]
-    },
-    "noreply@email.myvalottery.com": {
-      "first_flagged_iso": "2026-05-01",
-      "flagged_message_ids": [
-        "19dd97ecef2f99e8"
-      ],
-      "last_flagged_iso": "2026-05-01",
-      "reason_samples": [
-        "Virginia Lottery adult newsletter — no kids' events"
       ]
     },
     "noreply@mypatientvisit.com": {
@@ -781,6 +796,16 @@
       "last_flagged_iso": "2026-05-13",
       "reason_samples": [
         "Volunteer organization newsletter for adult bakers — no events relevant to this family's children"
+      ]
+    },
+    "vzwmail@ecrmemail.verizonwireless.com": {
+      "first_flagged_iso": "2026-05-14",
+      "flagged_message_ids": [
+        "19e2105fc5583d90"
+      ],
+      "last_flagged_iso": "2026-05-14",
+      "reason_samples": [
+        "Verizon Wireless adult account/travel notification, no kids' content"
       ]
     },
     "website@mg.virginiahousekeepers.com": {
