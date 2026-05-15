@@ -566,7 +566,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-05-14",
+  "last_updated_iso": "2026-05-15",
   "pending": {
     "ae@notifications.ae.com": {
       "first_flagged_iso": "2026-05-01",
