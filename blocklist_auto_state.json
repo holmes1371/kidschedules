@@ -566,7 +566,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-05-15",
+  "last_updated_iso": "2026-05-16",
   "pending": {
     "ae@notifications.ae.com": {
       "first_flagged_iso": "2026-05-01",
@@ -756,6 +756,16 @@
       "last_flagged_iso": "2026-05-01",
       "reason_samples": [
         "Nextdoor neighborhood trending posts — adult community discussion, no kids' events"
+      ]
+    },
+    "subscriptions@message.bloomberg.com": {
+      "first_flagged_iso": "2026-05-16",
+      "flagged_message_ids": [
+        "19e2ce4e8552f736"
+      ],
+      "last_flagged_iso": "2026-05-16",
+      "reason_samples": [
+        "Adult news/finance newsletter with no kids' content"
       ]
     },
     "support5@info.myloancare.com": {
