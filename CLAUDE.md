@@ -91,10 +91,10 @@ open('scripts/process_events.py', 'w', encoding='utf-8').write(
 
 Single block, ≤5 bullets, replaced in place each session. Only what is open, in-flight, or just-filed.
 
-**2026-05-03**
+**2026-05-17**
 
-- Refresh-time layout-shift root-caused: cron-built page (Sat) gets stale across the weekend; reconcile-after-fetch (#34) hides cards SSR-rendered as visible but in the sheet's ignored list. Tom approved (a) fade-out animation on reconcile-driven hides and (b) daily cron cadence (incremental-extraction cache means agent-API spend stays the same for the same email volume).
-- Fade-out: new `applyIgnoredWithFade(card, reason)` helper wraps reconcile applyFn for both event + sender ignore; reuses the existing `.fading` opacity transition + 300ms setTimeout the user-click flow uses. Cards already `.ignored` skip the fade (idempotent re-apply). Companion fade-IN on reconcile un-hides skipped — surgical changes, no SSR-hidden-but-not-in-sheet cards exist today.
-- Daily cron: schedule changed from `15 10 * * 1` + `15 10 * * 3,6` to `15 10 * * 1` + `15 10 * * 0,2,3,4,5,6`. Two-line split preserved so Monday CREATE_DRAFT gate literal still matches. Test suite extended with `test_schedule_covers_every_day_of_week` to catch a future edit dropping a day.
-- 884 → 889 tests green (4 fade-pin tests + 1 daily-cadence pin).
-- Counter-sync caveat: the "Show ignored (N)" header counter is server-rendered from SSR's `is_ignored` count and is NOT updated by reconcile. After a stale-cron weekend with N user ignores, the counter under-counts by N until the next cron rebuild. Not addressed here — surgical scope; file as a separate issue if it becomes annoying.
+- #13 filed + In Progress: two Jun 12 "School Supply Kits" cards rendered side-by-side; both fuzzy branches missed (non-subset disjuncts `order/year` vs `purchase`; locations differed by punctuation `_norm` doesn't strip).
+- Pass-2 branch (c) added: same date + same time (or both all-day) + name-token overlap ≥ `_NAME_TOKEN_OVERLAP_THRESHOLD` (= 4). Screenshot pair shares 6 tokens (`school, supply, kits, deadline, 2026, 2027`); the realistic Parent-Teacher Conference per-kid counter-case shares 3 and stays separate. Time-equality guard mirrors `_same_location_and_time` to prevent over-merge of distinct same-day events with shared name fragments.
+- New helper `_name_token_overlap(a, b)` lives alongside `_same_location_and_time`; threshold is a module-level constant so a tighten-to-5 is a one-line edit if false positives surface in practice. Design note: [design/dedupe-token-overlap.md](design/dedupe-token-overlap.md).
+- 889 → 893 tests green (3 dedup pins + 1 helper-arithmetic pin); commit `ef6ed77` on the worktree branch, awaiting Tom's live-page verification post next cron rebuild before close. Not pushed.
+- Out-of-scope-but-noted: Tom's adjacent observation about grade-mismatch filtering — that's roster-stage noise (`roster_match`), not a dedupe concern. Filing a separate issue is appropriate if roster filtering is in fact letting through events for wrong-grade kids.

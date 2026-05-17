@@ -40,6 +40,14 @@ _SLUG_TO_NAME = {kid.lower(): kid for kid in _ROSTER}
 # matching on filler like "no", "a", "of", "to".
 _NAME_TOKEN_SPLIT = re.compile(r"[^a-z0-9]+")
 
+# Pass-2 dedupe branch (c): two same-date, same-time events whose
+# significant-token sets intersect in at least this many tokens are
+# treated as duplicates. Set to 4 after #13 — the screenshot pair
+# shares 6 tokens, the realistic below-threshold counter-case
+# (Parent-Teacher Conference per kid) shares 3. See
+# design/dedupe-token-overlap.md for the full calibration.
+_NAME_TOKEN_OVERLAP_THRESHOLD = 4
+
 
 VALID_CATEGORIES = {
     "School Activity",
@@ -601,6 +609,21 @@ def _same_location_and_time(a: dict[str, Any], b: dict[str, Any]) -> bool:
     return _norm(a.get("time") or "") == _norm(b.get("time") or "")
 
 
+def _name_token_overlap(a: dict[str, Any], b: dict[str, Any]) -> int:
+    """Count significant tokens shared between two event names.
+
+    Reuses :func:`_name_signature` (≥3-char alpha tokens plus
+    standalone digits). Used by dedupe Pass-2 branch (c) — two
+    same-date, same-time events whose names overlap in at least
+    ``_NAME_TOKEN_OVERLAP_THRESHOLD`` significant tokens are
+    merged. Catches the newsletter-rewrite pattern where neither
+    name is a subset of the other and the location strings differ
+    enough that the location-time branch also misses (see #13).
+    """
+    return len(_name_signature(a.get("name") or "")
+               & _name_signature(b.get("name") or ""))
+
+
 def dedupe(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Two-pass dedupe.
 
@@ -608,23 +631,24 @@ def dedupe(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
     keeping the most complete.
 
     Pass 2 (fuzzy): within each same-date bucket, collapse events when
-    EITHER (a) their significant-token signatures are in a subset
+    ANY of (a) their significant-token signatures are in a subset
     relationship — "ASL Club" ({asl, club}) and "ASL Club Meeting"
     ({asl, club, meeting}) — OR (b) they share a non-empty normalized
-    `location` AND the same time. The location-and-time signal catches
-    the realistic newsletter-edition pattern: two editions of the
-    same PTA bulletin describing the same event with slightly
-    different wording (so neither token set is a subset of the
-    other) but the same signup URL or venue text. The time-equality
-    guard prevents over-merge of distinct classes at the same
-    same-day venue (e.g. swim Ages 3–5 at 5pm and Ages 6–8 at 6pm
-    both at HTM Pool — same date, same location, different times,
-    correctly stay separate).
+    `location` AND the same time OR (c) their name-token signatures
+    overlap in at least ``_NAME_TOKEN_OVERLAP_THRESHOLD`` significant
+    tokens AND they share the same time. Branch (c) catches the
+    newsletter-rewrite pattern where neither name is a subset of the
+    other and the location strings differ enough (often by punctuation
+    `_norm` doesn't strip) that branch (b) also misses. The
+    time-equality guard on branches (b) and (c) prevents over-merge
+    of distinct same-day events with shared name fragments (e.g.
+    swim Ages 3–5 at 5pm and Ages 6–8 at 6pm both at HTM Pool —
+    different times, correctly stay separate).
 
-    Union-find handles transitive chains across both signals — three
-    near-dup cards ABC where A↔B share a token-subset and B↔C share
-    a location all collapse into one even with no direct A↔C link.
-    Undated events skip the fuzzy pass since we can't confirm
+    Union-find handles transitive chains across all three signals —
+    three near-dup cards ABC where A↔B share a token-subset and B↔C
+    share a location all collapse into one even with no direct A↔C
+    link. Undated events skip the fuzzy pass since we can't confirm
     same-day.
     """
     def completeness(ev: dict[str, Any]) -> int:
@@ -673,17 +697,23 @@ def dedupe(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
         for i in range(len(bucket)):
             for j in range(i + 1, len(bucket)):
-                # Two ways to merge: (a) name-token subset/superset, or
-                # (b) same non-empty normalized location AND same time.
-                # Empty signature short-circuits the (a) branch only —
-                # an event with an empty signature can still merge via
-                # the location-time branch.
+                # Three ways to merge: (a) name-token subset/superset,
+                # (b) same non-empty normalized location AND same time,
+                # or (c) name-token overlap ≥ threshold AND same time.
+                # Empty signature short-circuits the (a) and (c) branches
+                # only — an event with an empty signature can still
+                # merge via the location-time branch.
                 same_loc_time = _same_location_and_time(bucket[i], bucket[j])
                 subset = (
                     sigs[i] and sigs[j]
                     and (sigs[i] <= sigs[j] or sigs[j] <= sigs[i])
                 )
-                if subset or same_loc_time:
+                high_overlap = (
+                    len(sigs[i] & sigs[j]) >= _NAME_TOKEN_OVERLAP_THRESHOLD
+                    and _norm(bucket[i].get("time") or "")
+                    == _norm(bucket[j].get("time") or "")
+                )
+                if subset or same_loc_time or high_overlap:
                     ri, rj = find(i), find(j)
                     if ri != rj:
                         parent[ri] = rj
