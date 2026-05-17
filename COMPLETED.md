@@ -1,6 +1,8 @@
 # Kids Schedule — Completed Backlog
 
-Archive of closed `[x]` items from `ROADMAP.md`. Entries keep their original numbers so past session summaries and commit messages that reference `#5`, `#16`, etc. still resolve. Close-out rule: when Tom signs off a `[~]` item, the next session moves its full entry here and leaves a one-line stub at the original position in `ROADMAP.md`.
+> **Legacy archive.** Post-migration close-outs (anything closed after 2026-05-17) live at `completed/<issue-number>.md` per closed issue — search both side-by-side: `grep -r 'pattern' completed/ COMPLETED.md`. The 39 entries below are pre-migration "Item N" items from before the per-file convention; they stay here until a separate migration ships. See `completed/2026-05-17-per-file-conventions.md` for rationale.
+
+Archive of closed `[x]` items from `ROADMAP.md`. Entries keep their original numbers so past session summaries and commit messages that reference `#5`, `#16`, etc. still resolve. Close-out rule (legacy): when Tom signed off a `[~]` item, the next session moved its full entry here and left a one-line stub at the original position in `ROADMAP.md`.
 
 ### 1. [x] Failure notifications via GitHub mobile app — c3d2e5b
 
