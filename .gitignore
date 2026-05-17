@@ -50,3 +50,4 @@ blocklist_auto_audit.jsonl
 
 # IDEs
 .idea/
+.claude/settings.local.json
