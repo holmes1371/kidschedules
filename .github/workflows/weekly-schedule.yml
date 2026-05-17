@@ -223,9 +223,9 @@ jobs:
           GMAIL_REFRESH_TOKEN: ${{ secrets.GMAIL_REFRESH_TOKEN }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           # Only the Monday cron — or an explicit manual opt-in — creates
-          # a Gmail digest draft. Wed/Sat scheduled runs and every other
-          # trigger leave this as "0" so testing/debug runs and the
-          # mid-week refresh cadence cannot spam Ellen's drafts folder.
+          # a Gmail digest draft. The other six daily scheduled runs and
+          # every other trigger leave this as "0" so testing/debug runs
+          # and the daily refresh cadence cannot spam Ellen's drafts folder.
           # The '15 10 * * 1' literal must match the Monday schedule entry
           # above; if the Monday cron time is ever edited, update it here.
           CREATE_DRAFT: ${{ (github.event.schedule == '15 10 * * 1' || github.event.inputs.create_draft == 'true') && '1' || '0' }}
