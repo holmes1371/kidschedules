@@ -472,6 +472,105 @@ def test_dedupe_same_location_both_all_day_merges():
     assert len(merged) == 1
 
 
+def test_dedupe_high_name_token_overlap_merges_screenshot_pair():
+    """Issue #13 / 2026-05-17: two LAES PTA editions describing the
+    same Jun 12 supply-kits deadline rendered as separate cards.
+    Neither name signature is a subset of the other (one has
+    `order, year`, the other has `purchase`), and the location
+    strings differ only by punctuation that `_norm` doesn't strip
+    (`school ID 93768` vs `School ID: 93768`), so the existing two
+    fuzzy branches both miss. The new (c) branch — same date, same
+    time (both all-day here), name-token overlap ≥ threshold —
+    catches it. Six-token overlap (school, supply, kits, deadline,
+    2026, 2027) sits comfortably above the threshold."""
+    ev_a = _ev(
+        name="School Supply Kits Order Deadline (2026-2027 School Year)",
+        date="2026-06-12", time="All day",
+        location="www.shopttkits.com (school ID 93768)",
+        child="All LAES students",
+        source="LAES PTA Sunbeam (Apr 19)",
+    )
+    ev_b = _ev(
+        name="School Supply Kits Purchase Deadline (2026-2027)",
+        date="2026-06-12", time="All day",
+        location="www.shopttkits.com (School ID: 93768)",
+        child="All LAES students",
+        source="LAES PTA Vice President (May 11)",
+    )
+    display, _, _, _, _, _ = pe.classify(
+        [ev_a, ev_b], cutoff=TODAY, horizon=HORIZON,
+    )
+    merged = pe.dedupe(display)
+    assert len(merged) == 1, (
+        f"Expected the two School Supply Kits cards to collapse via "
+        f"name-token overlap; got {[e['name'] for e in merged]!r}"
+    )
+
+
+def test_dedupe_low_name_token_overlap_stays_separate():
+    """Below-threshold counter-case: two distinct same-day events
+    that share a few common tokens but not enough to clear the
+    overlap threshold must stay separate. Parent-Teacher Conference
+    for two different kids at the same time is the realistic shape;
+    the only shared significant tokens are {parent, teacher,
+    conference} (three), below the threshold of 4."""
+    ev_a = _ev(
+        name="Parent-Teacher Conference - Anna",
+        date="2026-05-04", time="3:00 PM",
+    )
+    ev_b = _ev(
+        name="Parent-Teacher Conference - Ben",
+        date="2026-05-04", time="3:00 PM",
+    )
+    display, _, _, _, _, _ = pe.classify(
+        [ev_a, ev_b], cutoff=TODAY, horizon=HORIZON,
+    )
+    merged = pe.dedupe(display)
+    assert len(merged) == 2, (
+        f"Three-token overlap is below threshold and these must stay "
+        f"separate; got {[e['name'] for e in merged]!r}"
+    )
+
+
+def test_dedupe_high_overlap_different_times_stays_separate():
+    """Time-equality guard: even with a high name-token overlap, two
+    same-day events at different times must stay separate. This is
+    the protection against over-merging concurrent same-school
+    activities that share formulaic naming (recurring after-school
+    programs at adjacent time slots, for example)."""
+    ev_a = _ev(
+        name="School Supply Kits Order Deadline 2026 2027",
+        date="2026-06-12", time="9:00 AM",
+    )
+    ev_b = _ev(
+        name="School Supply Kits Purchase Deadline 2026 2027",
+        date="2026-06-12", time="3:00 PM",
+    )
+    display, _, _, _, _, _ = pe.classify(
+        [ev_a, ev_b], cutoff=TODAY, horizon=HORIZON,
+    )
+    merged = pe.dedupe(display)
+    assert len(merged) == 2, (
+        f"Different times must block the high-overlap merge; got "
+        f"{[e['name'] for e in merged]!r}"
+    )
+
+
+def test_name_token_overlap_helper_returns_expected_count():
+    """Defends the threshold constant from accidental tightening.
+    The screenshot pair shares six significant tokens; if a future
+    edit to _name_signature lowers this count, the pair could fall
+    below the threshold without any test failing at the dedupe
+    level."""
+    ev_a = {
+        "name": "School Supply Kits Order Deadline (2026-2027 School Year)",
+    }
+    ev_b = {
+        "name": "School Supply Kits Purchase Deadline (2026-2027)",
+    }
+    assert pe._name_token_overlap(ev_a, ev_b) == 6
+
+
 # ─── group_by_week ────────────────────────────────────────────────────────
 
 
