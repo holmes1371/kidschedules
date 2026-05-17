@@ -36,7 +36,7 @@ blocklist.txt            — sender domains excluded from searches
 docs/
   index.html             — generated schedule page (served by GitHub Pages)
 .github/workflows/
-  weekly-schedule.yml    — cron workflow (Mon/Wed/Sat 6:15 AM Eastern)
+  weekly-schedule.yml    — cron workflow (daily 6:15 AM Eastern)
   tests.yml              — pytest on push + PR
 tests/                   — pytest suite covering process_events.py
 design/                  — per-feature design notes

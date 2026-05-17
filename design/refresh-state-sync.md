@@ -2,8 +2,8 @@
 
 ROADMAP item #34. Closes the UX gap exposed by #32 + the existing
 ignore-flow: state changes propagate to the Sheet immediately on click,
-but to OTHER devices only after the next cron tick (Mon / Wed / Sat
-6:15 ET). Concretely: Ellen ignores or completes an event on her phone,
+but to OTHER devices only after the next cron tick (daily 6:15 ET;
+previously Mon/Wed/Sat). Concretely: Ellen ignores or completes an event on her phone,
 Tom opens the page on his tablet between cron ticks, he still sees the
 old state for hours.
 

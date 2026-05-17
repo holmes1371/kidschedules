@@ -2,7 +2,7 @@
 
 ## Problem
 
-The site is republished every Mon/Wed/Sat. Ellen scans the page looking
+The site is republished daily (originally Mon/Wed/Sat). Ellen scans the page looking
 for anything she hasn't already internalised — but with 60-day lookback
 and ~30–60 rendered cards, fresh extractions blend into the wall of
 already-known events. She's asked for a visible marker on cards that

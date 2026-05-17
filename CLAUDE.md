@@ -15,7 +15,7 @@ This file auto-loads at session start. Read it in full before responding when To
 - **Per-feature design notes:** `design/{feature-name}.md`
 - **Source code:** `scripts/`, `main.py`, `agent.py`, `gmail_client.py`, `events_state.py`, `apps_script.gs` (under `scripts/`)
 - **Tests:** `tests/` — runs on every push + PR via `.github/workflows/tests.yml`. A red test check blocks merge; don't mark a feature done with tests failing.
-- **Live site:** https://holmes1371.github.io/kidschedules/ — built by the Mon/Wed/Sat 6:15 ET cron in `.github/workflows/weekly-schedule.yml`
+- **Live site:** https://holmes1371.github.io/kidschedules/ — built by the daily 6:15 ET cron in `.github/workflows/weekly-schedule.yml`
 
 ## Item-number convention
 
