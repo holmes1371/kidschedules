@@ -566,7 +566,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-05-16",
+  "last_updated_iso": "2026-05-17",
   "pending": {
     "ae@notifications.ae.com": {
       "first_flagged_iso": "2026-05-01",
@@ -616,6 +616,16 @@
       "last_flagged_iso": "2026-05-05",
       "reason_samples": [
         "internal corporate email from BHP (adult work communication — legal/compliance topic)"
+      ]
+    },
+    "email@campaigns.stjude.org": {
+      "first_flagged_iso": "2026-05-17",
+      "flagged_message_ids": [
+        "19e32d9c91fc177c"
+      ],
+      "last_flagged_iso": "2026-05-17",
+      "reason_samples": [
+        "Charity fundraising/donor newsletter with no kids' events for this family"
       ]
     },
     "hello-us@newsletter.emailbenefithub.com": {
