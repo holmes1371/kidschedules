@@ -4,7 +4,7 @@ Searches Ellen's Gmail for upcoming kids' activities (school events, appointment
 
 ## For future agents
 
-Before touching anything, read `CLAUDE.md` at the repo root — it auto-loads at session start and holds the session-discipline rules, project map, and tooling references. The active backlog lives as GitHub Issues (https://github.com/holmes1371/kidschedules/issues), tracked on the KidsToDo project board (https://github.com/users/holmes1371/projects/2). Closed-item history with commit SHAs lives in `COMPLETED.md`. Feature design notes live under `design/`.
+Before touching anything, read `CLAUDE.md` at the repo root — it auto-loads at session start and holds the session-discipline rules, project map, and tooling references. The active backlog lives as GitHub Issues (https://github.com/holmes1371/kidschedules/issues), tracked on the KidsToDo project board (https://github.com/users/holmes1371/projects/2). Closed-item history with commit SHAs lives at `completed/<issue-number>.md` (one file per closed issue; legacy pre-migration "Item N" entries at `completed/legacy-NN-<slug>.md`). Feature design notes live under `design/`.
 
 ## Local development
 

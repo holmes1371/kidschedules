@@ -1,0 +1,13 @@
+# 22. Bug: page header "N day lookback" ignores `--lookback-days` CLI value — 563827d
+
+Filed and closed 2026-04-17. Tom ran the workflow via `workflow_dispatch` with `lookback_days=120`; the Gmail searches correctly used the 120-day window and extra events surfaced, but the rendered header on `docs/index.html` still read "60 day lookback" (screenshot: "32 events / 60 day lookback" under "Updated April 17, 2026 @ 5:14PM"). The page was lying about how wide a window it was built from — the kind of data-vs-display-copy drift that eventually leads to the wrong call on "is this event old enough to still trust".
+
+**Root cause: one missing argument pass-through.** `main.py::step4_process_events` invoked `scripts/process_events.py` with `"--display-window-days", "60"` hardcoded and never forwarded `args.lookback_days` as `--lookback-days`. `process_events.py`'s argparse defaulted `--lookback-days` to 60, so the value rendered into the `"{lookback_days} day lookback"` template and the no-events fallback paragraph was always 60 regardless of what the workflow was triggered with.
+
+**Fix: pure pass-through.** Added `lookback_days: int = 60` as a keyword param on `step4_process_events`; threaded `args.lookback_days` at the single caller in `main()`; appended `["--lookback-days", str(lookback_days)]` to the `script_args` list alongside the unchanged `"--display-window-days", "60"` hardcode. The two knobs stay orthogonal — `--display-window-days` is "60 days forward of today" (future horizon for the published page) and stays pinned; `--lookback-days` is "how far back in Gmail we looked" and now matches what the run actually used. No changes to `scripts/process_events.py` — the flag was already defined and already rendered into the header template and the no-events fallback.
+
+**Test.** `test_step4_process_events_forwards_lookback_days` in `tests/test_main.py` mocks `run_script`, calls `step4_process_events([], pages_url="", dry_run=True, lookback_days=120)`, and asserts `--lookback-days` carries `"120"` via the same `[::2]/[1::2]` kv-dict pattern the existing step4-bridge tests (`test_step4_process_events_forwards_outlier_alerts_tempfile` / `..._cleans_up_alerts_tempfile`) use — adjacency and value pinned in one line. Suite 458 → 459.
+
+**Accepted non-goal.** Weekly cron runs without an override still default to 60, so the page continues to read "60 day lookback" on the common path. Intentional — the bug was only visible when Tom overrode the window manually via dispatch input.
+
+**Live verification.** Post-merge dispatch run with `lookback_days=120` rendered "120 day lookback" in the page header; Tom confirmed 2026-04-17.

@@ -1,5 +1,5 @@
-"""Coverage for main.py orchestration helpers listed in COMPLETED.md
-'Test coverage gaps' (medium-risk tier).
+"""Coverage for main.py orchestration helpers listed in
+design/test-coverage-gaps.md (medium-risk tier).
 
 `test_main.py` already pins `should_create_draft`,
 `step2c_load_cache_and_filter`, `_attach_sender_domains` /
