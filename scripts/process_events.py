@@ -1954,7 +1954,7 @@ def render_html(today: dt.date,
 {undated_html}
   </div>
   <div class="footer">
-    Auto-generated from Gmail &middot; Updated Mon, Wed, and Sat
+    Auto-generated from Gmail &middot; Updated daily
   </div>
   <script>
     (function () {{
