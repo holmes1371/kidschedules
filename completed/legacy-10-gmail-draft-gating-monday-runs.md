@@ -1,0 +1,3 @@
+# 10. Gmail draft gating: Monday runs only — 65c86f3
+
+Picked option (b) from the original note: split the cron into two entries (`15 10 * * 1` and `15 10 * * 3,6`) and gate `CREATE_DRAFT` on `github.event.schedule == '15 10 * * 1'`. All logic stays declarative in the `env:` expression; no shell-date math. Manual `workflow_dispatch` opt-in via `inputs.create_draft` is preserved through the OR branch. Python `should_create_draft` unchanged — already exhaustively unit-tested. Workflow comment flags the cron-string/gate coupling so a future time edit doesn't silently drop drafts. Design note at `design/monday-only-draft-gating.md`. 224 tests still pass.
