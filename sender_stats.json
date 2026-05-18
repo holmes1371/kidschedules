@@ -1,5 +1,5 @@
 {
-  "last_updated_iso": "2026-05-17T07:34:24-04:00",
+  "last_updated_iso": "2026-05-18T10:00:05-04:00",
   "schema_version": 1,
   "senders": {
     "23andmedatasettlement@e.emailksa.com": {
@@ -411,6 +411,16 @@
       ],
       "total_events": 2
     },
+    "googlehome.noreply@google.com": {
+      "first_seen_iso": "2026-05-18T10:00:05-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-05-18T10:00:05-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
     "guptamonikausa23@gmail.com": {
       "first_seen_iso": "2026-04-24T21:16:59-04:00",
       "is_newsletter": false,
@@ -650,10 +660,9 @@
     "lifetouch@m.lifetouch.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-05-16T07:19:00-04:00",
-      "messages_seen": 18,
+      "last_seen_iso": "2026-05-18T10:00:05-04:00",
+      "messages_seen": 19,
       "per_message_counts": [
-        0,
         1,
         1,
         1,
@@ -662,6 +671,7 @@
         0,
         1,
         1,
+        0,
         0
       ],
       "total_events": 10
@@ -1017,6 +1027,16 @@
       ],
       "total_events": 0
     },
+    "noreply@qemailserver.com": {
+      "first_seen_iso": "2026-05-18T10:00:05-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-05-18T10:00:05-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
     "notifications+recnvhm@gomotionapp.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": true,
@@ -1129,6 +1149,16 @@
         1
       ],
       "total_events": 1
+    },
+    "sales@darbycreektrading.com": {
+      "first_seen_iso": "2026-05-18T10:00:05-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-05-18T10:00:05-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
     },
     "scheduler@goodtime.io": {
       "first_seen_iso": "2026-04-18T07:00:01-04:00",
@@ -1308,16 +1338,16 @@
     "thomas.holmes1371@gmail.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-05-12T08:19:20-04:00",
-      "messages_seen": 11,
+      "last_seen_iso": "2026-05-18T10:00:05-04:00",
+      "messages_seen": 12,
       "per_message_counts": [
-        0,
         0,
         5,
         1,
         0,
         0,
         1,
+        0,
         0,
         0,
         0

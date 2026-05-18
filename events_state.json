@@ -70,20 +70,6 @@
       "source_message_id": "19e151f325e69e74",
       "time": "9:00 AM – 2:00 PM"
     },
-    "09a95662e5d0": {
-      "category": "Sports & Extracurriculars",
-      "child": "Everly",
-      "date": "2026-05-17",
-      "first_seen_iso": "2026-05-16T07:19:00-04:00",
-      "id": "09a95662e5d0",
-      "location": "Born 2 Dance Studio (262 Cedar Ln SE, Vienna, VA 22180)",
-      "name": "B2D ECHO Team Weekly Rehearsal",
-      "sender_block_key": "teamsnap.com",
-      "sender_domain": "teamsnap.com",
-      "source": "B2D - ECHO Team via TeamSnap (May 15)",
-      "source_message_id": "19e2d4ce8f640f3b",
-      "time": "2:45 PM – 4:45 PM"
-    },
     "09ba480f8257": {
       "category": "School Activity",
       "child": "Rising 7th & 8th graders",
@@ -599,20 +585,6 @@
       "source_message_id": "19df118b46bc994c",
       "time": "9:00 AM – 2:00 PM"
     },
-    "5b82807ef847": {
-      "category": "Academic Due Date",
-      "child": "Everly",
-      "date": "2026-05-17",
-      "first_seen_iso": "2026-05-16T07:19:00-04:00",
-      "id": "5b82807ef847",
-      "location": "https://spirithero.com/collections/louise-archer-elementary-grad-signs-2026",
-      "name": "6th Grade Celebration Yard Sign Purchase Deadline",
-      "sender_block_key": "shannon.n.aimone@gmail.com",
-      "sender_domain": "gmail.com",
-      "source": "Shannon Aimone / LAES 6th Grade Celebration (May 15)",
-      "source_message_id": "19e2b8046454118c",
-      "time": "11:59 PM (deadline)"
-    },
     "5d225fbc8ce8": {
       "category": "Sports & Extracurriculars",
       "child": "All LAES students",
@@ -922,20 +894,6 @@
       "source": "LAES PTA Sunbeam (Apr 26)",
       "source_message_id": "19dccf5b656488ec",
       "time": "9:00 AM - 2:00 PM"
-    },
-    "7139372efbfc": {
-      "category": "Sports & Extracurriculars",
-      "child": "Isla",
-      "date": "2026-05-17",
-      "first_seen_iso": "2026-05-16T07:19:00-04:00",
-      "id": "7139372efbfc",
-      "location": "https://us06web.zoom.us/j/84192672728?pwd=pVJaX4HszJgVWdCKVnMbuNbdfmY2dj.1",
-      "name": "Mini Cuppett Dance Company (CDC) Interest Meeting — Zoom",
-      "sender_block_key": "cuppettpacdance@gmail.com",
-      "sender_domain": "gmail.com",
-      "source": "Cuppett Performing Arts Center (May 15)",
-      "source_message_id": "19e2b83ea8178df4",
-      "time": "4:00 PM"
     },
     "71811f88fd1f": {
       "category": "School Activity",
@@ -1948,20 +1906,6 @@
       "source_message_id": "19da585c1a38aca6",
       "time": "School hours"
     },
-    "dc5226f7c4b3": {
-      "category": "Sports & Extracurriculars",
-      "child": "Isla",
-      "date": "2026-05-17",
-      "first_seen_iso": "2026-04-17T17:04:04-04:00",
-      "id": "dc5226f7c4b3",
-      "location": "Cuppett Performing Arts Center",
-      "name": "Mini Cuppett Dance Company Interest Meeting",
-      "sender_block_key": "jackrabbittech.com",
-      "sender_domain": "jackrabbittech.com",
-      "source": "Cuppett Performing Arts Center (Apr 16)",
-      "source_message_id": "19d980d04944af0d",
-      "time": "4:00 PM"
-    },
     "dcb861999aae": {
       "category": "Academic Due Date",
       "child": "Everly",
@@ -2239,7 +2183,7 @@
       "time": ""
     }
   },
-  "last_updated_iso": "2026-05-17T11:47:30-04:00",
+  "last_updated_iso": "2026-05-18T10:00:05-04:00",
   "processed_messages": {
     "19a0da1d7445f787": "2026-04-17T18:51:22-04:00",
     "19a1784ff2f26474": "2026-04-17T18:51:22-04:00",
@@ -2546,7 +2490,12 @@
     "19e2cf2bbc4ee112": "2026-05-16T07:19:00-04:00",
     "19e2d4ce8f640f3b": "2026-05-16T07:19:00-04:00",
     "19e323f1cb7df16b": "2026-05-17T07:34:24-04:00",
-    "19e32d9c91fc177c": "2026-05-17T07:34:24-04:00"
+    "19e32d9c91fc177c": "2026-05-17T07:34:24-04:00",
+    "19e33b871218b1ce": "2026-05-18T10:00:05-04:00",
+    "19e35970ccf20105": "2026-05-18T10:00:05-04:00",
+    "19e364d05264d7e9": "2026-05-18T10:00:05-04:00",
+    "19e36ad4e2c30c62": "2026-05-18T10:00:05-04:00",
+    "19e379ff7ba2af12": "2026-05-18T10:00:05-04:00"
   },
   "schema_version": 3
 }

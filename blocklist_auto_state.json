@@ -566,7 +566,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-05-17",
+  "last_updated_iso": "2026-05-18",
   "pending": {
     "ae@notifications.ae.com": {
       "first_flagged_iso": "2026-05-01",
@@ -626,6 +626,16 @@
       "last_flagged_iso": "2026-05-17",
       "reason_samples": [
         "Charity fundraising/donor newsletter with no kids' events for this family"
+      ]
+    },
+    "googlehome.noreply@google.com": {
+      "first_flagged_iso": "2026-05-18",
+      "flagged_message_ids": [
+        "19e36ad4e2c30c62"
+      ],
+      "last_flagged_iso": "2026-05-18",
+      "reason_samples": [
+        "Google Home device invitation, unrelated to children's activities"
       ]
     },
     "hello-us@newsletter.emailbenefithub.com": {
@@ -738,6 +748,16 @@
         "adult patient visit appointment review notification with no child-related content"
       ]
     },
+    "noreply@qemailserver.com": {
+      "first_flagged_iso": "2026-05-18",
+      "flagged_message_ids": [
+        "19e36ad4e2c30c62"
+      ],
+      "last_flagged_iso": "2026-05-18",
+      "reason_samples": [
+        "Salesforce recruiting feedback survey for adult job candidate, no children's events"
+      ]
+    },
     "opportunities@mail.hiive.com": {
       "first_flagged_iso": "2026-05-13",
       "flagged_message_ids": [
@@ -766,6 +786,16 @@
       "last_flagged_iso": "2026-05-01",
       "reason_samples": [
         "Nextdoor neighborhood trending posts — adult community discussion, no kids' events"
+      ]
+    },
+    "sales@darbycreektrading.com": {
+      "first_flagged_iso": "2026-05-18",
+      "flagged_message_ids": [
+        "19e379ff7ba2af12"
+      ],
+      "last_flagged_iso": "2026-05-18",
+      "reason_samples": [
+        "Adult home decor retail promotional email, no children's events"
       ]
     },
     "subscriptions@message.bloomberg.com": {
