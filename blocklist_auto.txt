@@ -115,3 +115,4 @@ kelsey@hiitburn.com  # auto 2026-05-02: Adult health/wellness marketing email ab
 larroude@larroude.com  # auto 2026-05-12: Adult fashion/shoe retailer promotional email, no kids' content
 cindy@virginiahousekeepers.com  # auto 2026-05-13: House cleaning service scheduling — adult home services, no children involved
 noreply@email.myvalottery.com  # auto 2026-05-14: Virginia Lottery promotional email, adult gambling content only
+mail@info.gotickets.com  # auto 2026-05-19: Adult concert/sports ticket promotional email with no kids' content

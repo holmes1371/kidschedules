@@ -250,6 +250,11 @@
       "last_flagged_iso": "2026-04-26",
       "reason": "legacy entry seeded post-deploy"
     },
+    "mail@info.gotickets.com": {
+      "added_iso": "2026-05-19",
+      "last_flagged_iso": "2026-05-19",
+      "reason": "Adult concert/sports ticket promotional email with no kids' content"
+    },
     "mail@serviceautopilot.com": {
       "added_iso": "2026-04-26",
       "last_flagged_iso": "2026-04-26",
@@ -566,7 +571,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-05-18",
+  "last_updated_iso": "2026-05-19",
   "pending": {
     "ae@notifications.ae.com": {
       "first_flagged_iso": "2026-05-01",
@@ -658,6 +663,16 @@
         "Adult longevity/health supplement marketing email, no kids' content"
       ]
     },
+    "help@goodamerican.com": {
+      "first_flagged_iso": "2026-05-19",
+      "flagged_message_ids": [
+        "19e3c15e8c1369d6"
+      ],
+      "last_flagged_iso": "2026-05-19",
+      "reason_samples": [
+        "Adult fashion/retail promotional email with no kids' content"
+      ]
+    },
     "info@cupshe.com": {
       "first_flagged_iso": "2026-04-27",
       "flagged_message_ids": [
@@ -686,16 +701,6 @@
       "last_flagged_iso": "2026-05-14",
       "reason_samples": [
         "Rug retailer marketing; the kids design contest is a one-off promotional item unlikely to recur"
-      ]
-    },
-    "mail@info.gotickets.com": {
-      "first_flagged_iso": "2026-05-05",
-      "flagged_message_ids": [
-        "19df3c9e338a3694"
-      ],
-      "last_flagged_iso": "2026-05-05",
-      "reason_samples": [
-        "adult entertainment ticket marketing email — concerts and sports events with no kids' programming"
       ]
     },
     "membership@m.dcbar.org": {
@@ -736,6 +741,16 @@
       "last_flagged_iso": "2026-05-08",
       "reason_samples": [
         "adult resort reservation confirmation for parents-only trip — no children involved"
+      ]
+    },
+    "no-reply@info.email.aa.com": {
+      "first_flagged_iso": "2026-05-19",
+      "flagged_message_ids": [
+        "19e3b0d14e2af45b"
+      ],
+      "last_flagged_iso": "2026-05-19",
+      "reason_samples": [
+        "Adult airline trip confirmation with no children's event content"
       ]
     },
     "noreply@mypatientvisit.com": {
