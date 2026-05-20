@@ -1,11 +1,21 @@
 {
-  "last_updated_iso": "2026-05-19T09:33:32-04:00",
+  "last_updated_iso": "2026-05-20T08:40:08-04:00",
   "schema_version": 1,
   "senders": {
     "23andmedatasettlement@e.emailksa.com": {
       "first_seen_iso": "2026-04-17T17:12:56-04:00",
       "is_newsletter": false,
       "last_seen_iso": "2026-04-17T17:12:56-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
+    "acuvue@m.helloworldemail.com": {
+      "first_seen_iso": "2026-05-20T08:40:08-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-05-20T08:40:08-04:00",
       "messages_seen": 1,
       "per_message_counts": [
         0
@@ -647,6 +657,16 @@
       ],
       "total_events": 0
     },
+    "justa_schmidt@yahoo.com": {
+      "first_seen_iso": "2026-05-20T08:40:08-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-05-20T08:40:08-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        2
+      ],
+      "total_events": 2
+    },
     "kelsey@hiitburn.com": {
       "first_seen_iso": "2026-04-29T07:55:23-04:00",
       "is_newsletter": false,
@@ -1282,12 +1302,13 @@
     "summercamp@born2dancestudio.com": {
       "first_seen_iso": "2026-05-19T09:33:32-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-05-19T09:33:32-04:00",
-      "messages_seen": 1,
+      "last_seen_iso": "2026-05-20T08:40:08-04:00",
+      "messages_seen": 2,
       "per_message_counts": [
-        2
+        2,
+        3
       ],
-      "total_events": 2
+      "total_events": 5
     },
     "sunbeam@louisearcherpta.org": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
@@ -1351,6 +1372,16 @@
       "first_seen_iso": "2026-05-09T07:12:44-04:00",
       "is_newsletter": false,
       "last_seen_iso": "2026-05-09T07:12:44-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
+    "support@thatgirlconcept.com": {
+      "first_seen_iso": "2026-05-20T08:40:08-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-05-20T08:40:08-04:00",
       "messages_seen": 1,
       "per_message_counts": [
         0

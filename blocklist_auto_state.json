@@ -571,8 +571,18 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-05-19",
+  "last_updated_iso": "2026-05-20",
   "pending": {
+    "acuvue@m.helloworldemail.com": {
+      "first_flagged_iso": "2026-05-20",
+      "flagged_message_ids": [
+        "19e41ffa49a16eea"
+      ],
+      "last_flagged_iso": "2026-05-20",
+      "reason_samples": [
+        "Adult contact lens rewards program — terms and conditions update, no kids' content"
+      ]
+    },
     "ae@notifications.ae.com": {
       "first_flagged_iso": "2026-05-01",
       "flagged_message_ids": [
@@ -841,6 +851,16 @@
       "last_flagged_iso": "2026-05-09",
       "reason_samples": [
         "adult personal credit monitoring service — no children or school content"
+      ]
+    },
+    "support@thatgirlconcept.com": {
+      "first_flagged_iso": "2026-05-20",
+      "flagged_message_ids": [
+        "19e4067908a790bf"
+      ],
+      "last_flagged_iso": "2026-05-20",
+      "reason_samples": [
+        "Adult online guide/product order fulfillment — no kids' content"
       ]
     },
     "viennarecreation@rectrac.com": {
