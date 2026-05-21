@@ -1,11 +1,21 @@
 {
-  "last_updated_iso": "2026-05-20T08:40:08-04:00",
+  "last_updated_iso": "2026-05-21T09:33:37-04:00",
   "schema_version": 1,
   "senders": {
     "23andmedatasettlement@e.emailksa.com": {
       "first_seen_iso": "2026-04-17T17:12:56-04:00",
       "is_newsletter": false,
       "last_seen_iso": "2026-04-17T17:12:56-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
+    "aclobalbo@gmail.com": {
+      "first_seen_iso": "2026-05-21T09:33:37-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-05-21T09:33:37-04:00",
       "messages_seen": 1,
       "per_message_counts": [
         0
@@ -99,6 +109,17 @@
         23
       ],
       "total_events": 72
+    },
+    "automated@airbnb.com": {
+      "first_seen_iso": "2026-05-21T09:33:37-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-05-21T09:33:37-04:00",
+      "messages_seen": 2,
+      "per_message_counts": [
+        1,
+        0
+      ],
+      "total_events": 1
     },
     "bca22181@gmail.com": {
       "first_seen_iso": "2026-04-22T08:44:22-04:00",
@@ -259,8 +280,8 @@
     "donotreply@email.teamsnap.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-05-19T09:33:32-04:00",
-      "messages_seen": 41,
+      "last_seen_iso": "2026-05-21T09:33:37-04:00",
+      "messages_seen": 43,
       "per_message_counts": [
         1,
         1,
@@ -269,11 +290,11 @@
         1,
         1,
         1,
+        8,
         1,
-        1,
-        8
+        1
       ],
-      "total_events": 62
+      "total_events": 64
     },
     "donotreply@inova.org": {
       "first_seen_iso": "2026-04-24T20:01:41-04:00",
@@ -309,8 +330,8 @@
     "e-notify@fcps.edu": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-05-14T08:08:14-04:00",
-      "messages_seen": 8,
+      "last_seen_iso": "2026-05-21T09:33:37-04:00",
+      "messages_seen": 9,
       "per_message_counts": [
         1,
         1,
@@ -319,9 +340,10 @@
         1,
         1,
         3,
-        0
+        0,
+        1
       ],
-      "total_events": 9
+      "total_events": 10
     },
     "eleanor_lunger@hotmail.com": {
       "first_seen_iso": "2026-05-08T07:47:32-04:00",
@@ -366,6 +388,16 @@
       "first_seen_iso": "2026-05-17T07:34:24-04:00",
       "is_newsletter": false,
       "last_seen_iso": "2026-05-17T07:34:24-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
+    "email@email.etsy.com": {
+      "first_seen_iso": "2026-05-21T09:33:37-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-05-21T09:33:37-04:00",
       "messages_seen": 1,
       "per_message_counts": [
         0
@@ -721,12 +753,13 @@
     "lynnliying2011@gmail.com": {
       "first_seen_iso": "2026-05-14T08:08:14-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-05-19T09:33:32-04:00",
-      "messages_seen": 3,
+      "last_seen_iso": "2026-05-21T09:33:37-04:00",
+      "messages_seen": 4,
       "per_message_counts": [
         0,
         0,
-        2
+        2,
+        0
       ],
       "total_events": 2
     },
@@ -896,6 +929,16 @@
         0
       ],
       "total_events": 0
+    },
+    "no-reply@account.etsy.com": {
+      "first_seen_iso": "2026-05-21T09:33:37-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-05-21T09:33:37-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        1
+      ],
+      "total_events": 1
     },
     "no-reply@business.amazon.com": {
       "first_seen_iso": "2026-04-24T20:42:56-04:00",
@@ -1164,6 +1207,16 @@
       ],
       "total_events": 1
     },
+    "receipts@united.com": {
+      "first_seen_iso": "2026-05-21T09:33:37-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-05-21T09:33:37-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
     "rei_email@email.rei.com": {
       "first_seen_iso": "2026-05-01T19:50:05-04:00",
       "is_newsletter": false,
@@ -1239,9 +1292,10 @@
     "scheduling@viennabraces.com": {
       "first_seen_iso": "2026-04-24T20:42:56-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-04-24T20:42:56-04:00",
-      "messages_seen": 1,
+      "last_seen_iso": "2026-05-21T09:33:37-04:00",
+      "messages_seen": 2,
       "per_message_counts": [
+        0,
         0
       ],
       "total_events": 0
@@ -1249,12 +1303,13 @@
     "shannon.n.aimone@gmail.com": {
       "first_seen_iso": "2026-05-16T07:19:00-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-05-16T07:19:00-04:00",
-      "messages_seen": 1,
+      "last_seen_iso": "2026-05-21T09:33:37-04:00",
+      "messages_seen": 2,
       "per_message_counts": [
-        7
+        7,
+        5
       ],
-      "total_events": 7
+      "total_events": 12
     },
     "silverlining@synoviasolutions.com": {
       "first_seen_iso": "2026-04-24T20:42:56-04:00",

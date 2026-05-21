@@ -571,7 +571,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-05-20",
+  "last_updated_iso": "2026-05-21",
   "pending": {
     "acuvue@m.helloworldemail.com": {
       "first_flagged_iso": "2026-05-20",
@@ -591,6 +591,16 @@
       "last_flagged_iso": "2026-05-01",
       "reason_samples": [
         "Adult clothing retailer order/return confirmation — no kids' events"
+      ]
+    },
+    "automated@airbnb.com": {
+      "first_flagged_iso": "2026-05-21",
+      "flagged_message_ids": [
+        "19e463e1b490df25"
+      ],
+      "last_flagged_iso": "2026-05-21",
+      "reason_samples": [
+        "Airbnb reservation cancellation and refund notification — adult travel booking"
       ]
     },
     "do-not-reply@ottooptics.io": {
@@ -641,6 +651,16 @@
       "last_flagged_iso": "2026-05-17",
       "reason_samples": [
         "Charity fundraising/donor newsletter with no kids' events for this family"
+      ]
+    },
+    "email@email.etsy.com": {
+      "first_flagged_iso": "2026-05-21",
+      "flagged_message_ids": [
+        "19e47317fe67844d"
+      ],
+      "last_flagged_iso": "2026-05-21",
+      "reason_samples": [
+        "Etsy order shipping notification for adult purchase (class reunion decorations shipped to a third party address)"
       ]
     },
     "googlehome.noreply@google.com": {
@@ -733,6 +753,16 @@
         "Adult cryptocurrency newsletter — no kids' events"
       ]
     },
+    "no-reply@account.etsy.com": {
+      "first_flagged_iso": "2026-05-21",
+      "flagged_message_ids": [
+        "19e4709573a23283"
+      ],
+      "last_flagged_iso": "2026-05-21",
+      "reason_samples": [
+        "Etsy order shipped notification for adult purchase (class reunion decorations)"
+      ]
+    },
     "no-reply@doordash.com": {
       "first_flagged_iso": "2026-05-06",
       "flagged_message_ids": [
@@ -791,6 +821,16 @@
       "last_flagged_iso": "2026-05-13",
       "reason_samples": [
         "Adult investment/financial opportunity email — no kids' content"
+      ]
+    },
+    "receipts@united.com": {
+      "first_flagged_iso": "2026-05-21",
+      "flagged_message_ids": [
+        "19e46505a5a83ee9"
+      ],
+      "last_flagged_iso": "2026-05-21",
+      "reason_samples": [
+        "Adult airline travel receipt with no children's events or activities mentioned"
       ]
     },
     "rei_email@email.rei.com": {
