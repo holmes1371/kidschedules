@@ -571,7 +571,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-05-21",
+  "last_updated_iso": "2026-05-22",
   "pending": {
     "acuvue@m.helloworldemail.com": {
       "first_flagged_iso": "2026-05-20",
@@ -593,6 +593,16 @@
         "Adult clothing retailer order/return confirmation — no kids' events"
       ]
     },
+    "americanairlines@info.ms.aa.com": {
+      "first_flagged_iso": "2026-05-22",
+      "flagged_message_ids": [
+        "19e4bfad0e6da66a"
+      ],
+      "last_flagged_iso": "2026-05-22",
+      "reason_samples": [
+        "Adult travel booking confirmation — no children's events"
+      ]
+    },
     "automated@airbnb.com": {
       "first_flagged_iso": "2026-05-21",
       "flagged_message_ids": [
@@ -601,6 +611,16 @@
       "last_flagged_iso": "2026-05-21",
       "reason_samples": [
         "Airbnb reservation cancellation and refund notification — adult travel booking"
+      ]
+    },
+    "conversations@mail.etsy.com": {
+      "first_flagged_iso": "2026-05-22",
+      "flagged_message_ids": [
+        "19e4a68c40ca1b8c"
+      ],
+      "last_flagged_iso": "2026-05-22",
+      "reason_samples": [
+        "Etsy marketplace messages — adult shopping, no kids' events"
       ]
     },
     "do-not-reply@ottooptics.io": {
@@ -661,6 +681,16 @@
       "last_flagged_iso": "2026-05-21",
       "reason_samples": [
         "Etsy order shipping notification for adult purchase (class reunion decorations shipped to a third party address)"
+      ]
+    },
+    "events@paulweiss.com": {
+      "first_flagged_iso": "2026-05-22",
+      "flagged_message_ids": [
+        "19e4ae2f9d912cd6"
+      ],
+      "last_flagged_iso": "2026-05-22",
+      "reason_samples": [
+        "Adult legal industry event — no children's events"
       ]
     },
     "googlehome.noreply@google.com": {
