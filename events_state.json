@@ -851,6 +851,20 @@
       "source_message_id": "19da909fe35cca68",
       "time": "9:00 AM - 4:00 PM"
     },
+    "5d4db3c810a6": {
+      "category": "Sports & Extracurriculars",
+      "child": "Everly",
+      "date": "2026-05-24",
+      "first_seen_iso": "2026-05-23T07:36:51-04:00",
+      "id": "5d4db3c810a6",
+      "location": "Born 2 Dance Studio (262 Cedar Ln SE, Vienna, VA 22180)",
+      "name": "B2D ECHO Team Weekly Rehearsal — Arrival Time",
+      "sender_block_key": "teamsnap.com",
+      "sender_domain": "teamsnap.com",
+      "source": "B2D - ECHO Team via TeamSnap (May 22)",
+      "source_message_id": "19e50e6bdd05c5f5",
+      "time": "1:30 PM"
+    },
     "5d9fd79acf46": {
       "category": "Academic Due Date",
       "child": "All LAES students",
@@ -1379,20 +1393,6 @@
       "source_message_id": "19e21b1cf8cce374",
       "time": "All day (deadline)"
     },
-    "7e1ac013b029": {
-      "category": "Academic Due Date",
-      "child": "Isla",
-      "date": "2026-05-22",
-      "first_seen_iso": "2026-05-19T09:33:32-04:00",
-      "id": "7e1ac013b029",
-      "location": "https://www.signupgenius.com/go/20F0A49ABAA2FA3F58-64069881-3rdgrade",
-      "name": "3rd Grade EOY Party — Room Parent Sign-Up Deadline (SignUpGenius)",
-      "sender_block_key": "lynnliying2011@gmail.com",
-      "sender_domain": "gmail.com",
-      "source": "Ying Li (May 18)",
-      "source_message_id": "19e3b0064e248460",
-      "time": "All day (deadline)"
-    },
     "7eea1f3f2160": {
       "category": "School Activity",
       "child": "Everly",
@@ -1597,20 +1597,6 @@
       "source_message_id": "19e3b6f4c5c2afb7",
       "time": "9:45 AM–12:05 PM"
     },
-    "90fa047416fa": {
-      "category": "Sports & Extracurriculars",
-      "child": "",
-      "date": "2026-05-22",
-      "first_seen_iso": "2026-05-22T08:35:51-04:00",
-      "id": "90fa047416fa",
-      "location": "",
-      "name": "Volleyball Practice Cancelled",
-      "sender_block_key": "marasullivan@gmail.com",
-      "sender_domain": "gmail.com",
-      "source": "Mara Thayer (May 21)",
-      "source_message_id": "19e4c600455c292e",
-      "time": "All day"
-    },
     "9119e910789d": {
       "category": "School Activity",
       "child": "Everly",
@@ -1773,6 +1759,20 @@
       "source": "LAES PTA Sunbeam (Mar 22)",
       "time": "9:00 AM – 2:00 PM"
     },
+    "a69292d0b6a8": {
+      "category": "Academic Due Date",
+      "child": "Isla",
+      "date": "2026-05-25",
+      "first_seen_iso": "2026-05-23T07:36:51-04:00",
+      "id": "a69292d0b6a8",
+      "location": "https://www.signupgenius.com/go/20F0A49ABAA2FA3F58-64069881-3rdgrade",
+      "name": "3rd Grade EOY Party Sign-Up Deadline for Room Parents",
+      "sender_block_key": "lynnliying2011@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Ying Li EOY Party Planning (May 22)",
+      "source_message_id": "19e501317adf93f0",
+      "time": "All day (deadline)"
+    },
     "a733932aec0f": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -1786,20 +1786,6 @@
       "source": "LAES PTA Sunbeam (Apr 26)",
       "source_message_id": "19dccf5b656488ec",
       "time": "9:00 AM - 2:00 PM"
-    },
-    "ab589c2c1f5b": {
-      "category": "Academic Due Date",
-      "child": "Everly",
-      "date": "2026-05-22",
-      "first_seen_iso": "2026-05-16T07:19:00-04:00",
-      "id": "ab589c2c1f5b",
-      "location": "https://drive.google.com/drive/folders/1vDKrTfGKV1lar1PQ02FZHXq5eOA5Q6M9?usp=sharing",
-      "name": "6th Grade Celebration Baby Photo & K-6th Photos Submission Deadline",
-      "sender_block_key": "shannon.n.aimone@gmail.com",
-      "sender_domain": "gmail.com",
-      "source": "Shannon Aimone / LAES 6th Grade Celebration (May 15)",
-      "source_message_id": "19e2b8046454118c",
-      "time": "11:59 PM (deadline)"
     },
     "ab9f2b4829ba": {
       "category": "School Activity",
@@ -1853,20 +1839,6 @@
       "source": "Fairfax County Public Library Branch Out (May 1)",
       "source_message_id": "19de48039f5aae42",
       "time": "1:00 PM - 2:00 PM"
-    },
-    "afc2af7ce5f5": {
-      "category": "School Activity",
-      "child": "Everly",
-      "date": "2026-05-22",
-      "first_seen_iso": "2026-05-08T07:47:32-04:00",
-      "id": "afc2af7ce5f5",
-      "location": "Louise Archer Elementary School",
-      "name": "Math MAP Testing (Sahai/Monroe → Sahai; Pinkman → Crenshaw)",
-      "sender_block_key": "fcps.edu",
-      "sender_domain": "fcps.edu",
-      "source": "Sahai, Anita (May 7)",
-      "source_message_id": "19e038254e9104cf",
-      "time": "School hours"
     },
     "b0acc99912d7": {
       "category": "Sports & Extracurriculars",
@@ -2617,34 +2589,6 @@
       "source_message_id": "19d86af203b31fdc",
       "time": ""
     },
-    "e4c774f60a8f": {
-      "category": "School Activity",
-      "child": "Isla",
-      "date": "2026-05-22",
-      "first_seen_iso": "2026-05-19T09:33:32-04:00",
-      "id": "e4c774f60a8f",
-      "location": "https://www.signupgenius.com/go/20F0A49ABAA2FA3F58-64069881-3rdgrade",
-      "name": "3rd Grade EOY Party — Sign-Up Open for All 3rd Grade Parents",
-      "sender_block_key": "lynnliying2011@gmail.com",
-      "sender_domain": "gmail.com",
-      "source": "Ying Li (May 18)",
-      "source_message_id": "19e3b0064e248460",
-      "time": ""
-    },
-    "e713af0405f3": {
-      "category": "Sports & Extracurriculars",
-      "child": "",
-      "date": "2026-05-22",
-      "first_seen_iso": "2026-05-19T09:33:32-04:00",
-      "id": "e713af0405f3",
-      "location": "",
-      "name": "VYI Volleyball Practice (possible cancellation)",
-      "sender_block_key": "teamsnap.com",
-      "sender_domain": "teamsnap.com",
-      "source": "Mara Thayer / VYI Volleyball (May 18)",
-      "source_message_id": "19e3c78ca5a5c4c4",
-      "time": "8:00 PM–9:00 PM"
-    },
     "e892e2dcecdf": {
       "category": "Sports & Extracurriculars",
       "child": "Rising 7th & 8th graders",
@@ -2668,6 +2612,34 @@
       "sender_domain": "fcps.edu",
       "source": "Sahai, Anita - June Newsletter & Important Dates (May 18)",
       "source_message_id": "19e3c41ba6342a67",
+      "time": "All day"
+    },
+    "eac09502d49e": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-05-25",
+      "first_seen_iso": "2026-05-23T07:36:51-04:00",
+      "id": "eac09502d49e",
+      "location": "Louise Archer Elementary School",
+      "name": "Everly Takes Costume to School",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Ellen Holmes self-note (May 22)",
+      "source_message_id": "19e4fb9141a1273f",
+      "time": "School hours"
+    },
+    "eb05f59f5586": {
+      "category": "School Activity",
+      "child": "Isla",
+      "date": "2026-05-26",
+      "first_seen_iso": "2026-05-23T07:36:51-04:00",
+      "id": "eb05f59f5586",
+      "location": "https://www.signupgenius.com/go/20F0A49ABAA2FA3F58-64069881-3rdgrade",
+      "name": "3rd Grade EOY Party Sign-Up Link Shared to All Parents",
+      "sender_block_key": "lynnliying2011@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Ying Li EOY Party Planning (May 22)",
+      "source_message_id": "19e501317adf93f0",
       "time": "All day"
     },
     "eefb39d0cabd": {
@@ -2733,20 +2705,6 @@
       "source": "LAES PTA Sunbeam (Apr 26)",
       "source_message_id": "19dccf5b656488ec",
       "time": "8:30 AM - 12:30 PM"
-    },
-    "f40d2da5e13a": {
-      "category": "Sports & Extracurriculars",
-      "child": "Everly",
-      "date": "2026-05-22",
-      "first_seen_iso": "2026-05-19T09:33:32-04:00",
-      "id": "f40d2da5e13a",
-      "location": "Born 2 Dance Studio, 262 Cedar Lane SE, 2nd Floor, Vienna, VA 22180",
-      "name": "B2D IGNITE Team Weekly Rehearsal",
-      "sender_block_key": "goodamerican.com",
-      "sender_domain": "goodamerican.com",
-      "source": "TeamSnap / Janet Hobson (May 18)",
-      "source_message_id": "19e3c15e8c1369d6",
-      "time": "4:45 PM–6:45 PM"
     },
     "f46ec8f1c8f0": {
       "category": "Sports & Extracurriculars",
@@ -2939,7 +2897,7 @@
       "time": "School hours"
     }
   },
-  "last_updated_iso": "2026-05-22T08:35:51-04:00",
+  "last_updated_iso": "2026-05-23T07:36:51-04:00",
   "processed_messages": {
     "19a0da1d7445f787": "2026-04-17T18:51:22-04:00",
     "19a1784ff2f26474": "2026-04-17T18:51:22-04:00",
@@ -3292,7 +3250,13 @@
     "19e4ae93967ead57": "2026-05-22T08:35:51-04:00",
     "19e4bfad0e6da66a": "2026-05-22T08:35:51-04:00",
     "19e4c600455c292e": "2026-05-22T08:35:51-04:00",
-    "19e4c78fc9017ced": "2026-05-22T08:35:51-04:00"
+    "19e4c78fc9017ced": "2026-05-22T08:35:51-04:00",
+    "19e4fb9141a1273f": "2026-05-23T07:36:51-04:00",
+    "19e4fed2e868441a": "2026-05-23T07:36:51-04:00",
+    "19e500b4171f2420": "2026-05-23T07:36:51-04:00",
+    "19e501317adf93f0": "2026-05-23T07:36:51-04:00",
+    "19e50e2ddbaf8c86": "2026-05-23T07:36:51-04:00",
+    "19e50e6bdd05c5f5": "2026-05-23T07:36:51-04:00"
   },
   "schema_version": 3
 }

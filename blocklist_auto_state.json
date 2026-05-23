@@ -210,6 +210,11 @@
       "last_flagged_iso": "2026-04-26",
       "reason": "legacy entry seeded post-deploy"
     },
+    "info@revivalrugs.com": {
+      "added_iso": "2026-05-23",
+      "last_flagged_iso": "2026-05-23",
+      "reason": "Promotional retail/rug sale email — no kids' content whatsoever"
+    },
     "interstitialcystitisassociationica@mailman.bloomerang-mail.com": {
       "added_iso": "2026-04-26",
       "last_flagged_iso": "2026-04-26",
@@ -571,7 +576,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-05-22",
+  "last_updated_iso": "2026-05-23",
   "pending": {
     "acuvue@m.helloworldemail.com": {
       "first_flagged_iso": "2026-05-20",
@@ -751,16 +756,6 @@
       "last_flagged_iso": "2026-05-07",
       "reason_samples": [
         "Adult medical weight loss promotion, no connection to children"
-      ]
-    },
-    "info@revivalrugs.com": {
-      "first_flagged_iso": "2026-05-14",
-      "flagged_message_ids": [
-        "19e21b1cf8cce374"
-      ],
-      "last_flagged_iso": "2026-05-14",
-      "reason_samples": [
-        "Rug retailer marketing; the kids design contest is a one-off promotional item unlikely to recur"
       ]
     },
     "membership@m.dcbar.org": {
