@@ -117,3 +117,5 @@ cindy@virginiahousekeepers.com  # auto 2026-05-13: House cleaning service schedu
 noreply@email.myvalottery.com  # auto 2026-05-14: Virginia Lottery promotional email, adult gambling content only
 mail@info.gotickets.com  # auto 2026-05-19: Adult concert/sports ticket promotional email with no kids' content
 info@revivalrugs.com  # auto 2026-05-23: Promotional retail/rug sale email — no kids' content whatsoever
+email@email.etsy.com  # auto 2026-05-24: Etsy order shipping notification for an adult purchase (class reunion decoration
+membership@m.dcbar.org  # auto 2026-05-24: D.C. Bar adult professional license renewal notice — entirely adult/work-related

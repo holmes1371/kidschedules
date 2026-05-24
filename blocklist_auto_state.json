@@ -105,6 +105,11 @@
       "last_flagged_iso": "2026-04-26",
       "reason": "legacy entry seeded post-deploy"
     },
+    "email@email.etsy.com": {
+      "added_iso": "2026-05-24",
+      "last_flagged_iso": "2026-05-24",
+      "reason": "Etsy order shipping notification for an adult purchase (class reunion decoration) — no kids' events"
+    },
     "email@theatlantic.com": {
       "added_iso": "2026-04-26",
       "last_flagged_iso": "2026-04-26",
@@ -274,6 +279,11 @@
       "added_iso": "2026-04-26",
       "last_flagged_iso": "2026-04-26",
       "reason": "legacy entry seeded post-deploy"
+    },
+    "membership@m.dcbar.org": {
+      "added_iso": "2026-05-24",
+      "last_flagged_iso": "2026-05-24",
+      "reason": "D.C. Bar adult professional license renewal notice — entirely adult/work-related"
     },
     "messageservice@daysmart.com": {
       "added_iso": "2026-04-26",
@@ -576,7 +586,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-05-23",
+  "last_updated_iso": "2026-05-24",
   "pending": {
     "acuvue@m.helloworldemail.com": {
       "first_flagged_iso": "2026-05-20",
@@ -678,16 +688,6 @@
         "Charity fundraising/donor newsletter with no kids' events for this family"
       ]
     },
-    "email@email.etsy.com": {
-      "first_flagged_iso": "2026-05-21",
-      "flagged_message_ids": [
-        "19e47317fe67844d"
-      ],
-      "last_flagged_iso": "2026-05-21",
-      "reason_samples": [
-        "Etsy order shipping notification for adult purchase (class reunion decorations shipped to a third party address)"
-      ]
-    },
     "events@paulweiss.com": {
       "first_flagged_iso": "2026-05-22",
       "flagged_message_ids": [
@@ -756,16 +756,6 @@
       "last_flagged_iso": "2026-05-07",
       "reason_samples": [
         "Adult medical weight loss promotion, no connection to children"
-      ]
-    },
-    "membership@m.dcbar.org": {
-      "first_flagged_iso": "2026-05-03",
-      "flagged_message_ids": [
-        "19de75405ba54476"
-      ],
-      "last_flagged_iso": "2026-05-03",
-      "reason_samples": [
-        "Adult professional association — D.C. Bar license renewal, no children's content"
       ]
     },
     "newsletter@mail.coinbase.com": {
