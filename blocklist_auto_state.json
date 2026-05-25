@@ -175,6 +175,11 @@
       "last_flagged_iso": "2026-04-26",
       "reason": "legacy entry seeded post-deploy"
     },
+    "info@cupshe.com": {
+      "added_iso": "2026-05-25",
+      "last_flagged_iso": "2026-05-25",
+      "reason": "Adult retail promotional email (swimwear/clothing); no kids' events"
+    },
     "info@daliaforsupervisor.com": {
       "added_iso": "2026-04-26",
       "last_flagged_iso": "2026-04-26",
@@ -586,7 +591,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-05-24",
+  "last_updated_iso": "2026-05-25",
   "pending": {
     "acuvue@m.helloworldemail.com": {
       "first_flagged_iso": "2026-05-20",
@@ -738,16 +743,6 @@
         "Adult fashion/retail promotional email with no kids' content"
       ]
     },
-    "info@cupshe.com": {
-      "first_flagged_iso": "2026-04-27",
-      "flagged_message_ids": [
-        "19dcac8322de3d3c"
-      ],
-      "last_flagged_iso": "2026-04-27",
-      "reason_samples": [
-        "Retail/promotional email from clothing brand, no kids' events content"
-      ]
-    },
     "info@healemedical.com": {
       "first_flagged_iso": "2026-05-07",
       "flagged_message_ids": [
@@ -806,6 +801,16 @@
       "last_flagged_iso": "2026-05-19",
       "reason_samples": [
         "Adult airline trip confirmation with no children's event content"
+      ]
+    },
+    "noreply@account.etsy.com": {
+      "first_flagged_iso": "2026-05-25",
+      "flagged_message_ids": [
+        "19e5b1d76f8f829b"
+      ],
+      "last_flagged_iso": "2026-05-25",
+      "reason_samples": [
+        "Etsy shipping notification for adult purchase (class reunion items); no kids' events or activities"
       ]
     },
     "noreply@mypatientvisit.com": {

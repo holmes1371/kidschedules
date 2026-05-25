@@ -119,3 +119,4 @@ mail@info.gotickets.com  # auto 2026-05-19: Adult concert/sports ticket promotio
 info@revivalrugs.com  # auto 2026-05-23: Promotional retail/rug sale email — no kids' content whatsoever
 email@email.etsy.com  # auto 2026-05-24: Etsy order shipping notification for an adult purchase (class reunion decoration
 membership@m.dcbar.org  # auto 2026-05-24: D.C. Bar adult professional license renewal notice — entirely adult/work-related
+info@cupshe.com  # auto 2026-05-25: Adult retail promotional email (swimwear/clothing); no kids' events
