@@ -294,10 +294,20 @@ with 7-day refresh-token expiry) requires:
 
 Workarounds within Google's world:
 
-- Drop to `gmail.readonly` — lower verification bar (still verification,
-  no CASA). Cost: lose label-based incremental extraction (see
-  `design/incremental-extraction.md`); needs redesign so dedupe runs
-  purely on message IDs cached in state. Doable.
+- **Dropping to `gmail.readonly` does NOT escape CASA.** All Gmail
+  scopes that read message bodies (`gmail.readonly`, `gmail.modify`,
+  `gmail.compose`, `gmail.send`) are "restricted scopes" requiring CASA
+  Tier 2. The only scope that escapes is `gmail.metadata` (headers
+  only) — useless for us, since event extraction needs the body. So
+  the scope choice does not change the verification cost class. A
+  marginal narrative benefit exists — a read-only system is slightly
+  easier to argue safe in the CASA assessment — but the bill is the
+  same. Worth knowing for future-Tom: the pipeline is **already almost
+  read-only** — the only Gmail write is `gmail_client.py::create_draft()`
+  for the Monday digest (`design/weekly-digest-draft.md`). Dropping
+  that feature (Ellen isn't using it; Tom confirmed obsolete
+  2026-05-25) would make the pipeline 100% read-only with no
+  functional loss to the iOS-app path.
 - Workspace-only product — service accounts skip consumer-Gmail
   verification entirely. Different market (schools, daycare networks),
   probably not what Tom wants.
