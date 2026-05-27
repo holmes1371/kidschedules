@@ -120,3 +120,4 @@ info@revivalrugs.com  # auto 2026-05-23: Promotional retail/rug sale email — n
 email@email.etsy.com  # auto 2026-05-24: Etsy order shipping notification for an adult purchase (class reunion decoration
 membership@m.dcbar.org  # auto 2026-05-24: D.C. Bar adult professional license renewal notice — entirely adult/work-related
 info@cupshe.com  # auto 2026-05-25: Adult retail promotional email (swimwear/clothing); no kids' events
+viennarecreation@rectrac.com  # auto 2026-05-27: Automated receipt email with no event content

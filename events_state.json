@@ -678,6 +678,20 @@
       "source_message_id": "19dffc1bd81d5159",
       "time": "All day (deadline)"
     },
+    "4e2302b20841": {
+      "category": "Academic Due Date",
+      "child": "Isla",
+      "date": "2026-06-16",
+      "first_seen_iso": "2026-05-27T09:50:09-04:00",
+      "id": "4e2302b20841",
+      "location": "https://www.signupgenius.com/go/20F0A49ABAA2FA3F58-64069881-3rdgrade",
+      "name": "3rd Grade End-of-Year Party Volunteer/Supply Sign-Up",
+      "sender_block_key": "lynnliying2011@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Ying Li / Room Parents 3rd Grade (May 26)",
+      "source_message_id": "19e664210c8c90e7",
+      "time": "All day (deadline)"
+    },
     "4f505931ed24": {
       "category": "School Activity",
       "child": "Isla",
@@ -931,6 +945,20 @@
       "name": "Sports Camp at LAES — Session 2 Last Day",
       "source": "LAES PTA Sunbeam (Mar 22)",
       "time": "9:00 AM – 2:00 PM"
+    },
+    "62d48d365947": {
+      "category": "Sports & Extracurriculars",
+      "child": "",
+      "date": "2026-06-06",
+      "first_seen_iso": "2026-05-27T09:50:09-04:00",
+      "id": "62d48d365947",
+      "location": "Rita's Italian Ice & Frozen Custard, 116 Church Street NW, Vienna, VA",
+      "name": "VYI Volleyball End-of-Season Celebration at Rita's Italian Ice",
+      "sender_block_key": "ottosportmail.ai",
+      "sender_domain": "ottosportmail.ai",
+      "source": "Vienna Youth Inc (May 26)",
+      "source_message_id": "19e650a89e2e7b98",
+      "time": "12:00 PM – 8:00 PM"
     },
     "6306a5f98984": {
       "category": "School Activity",
@@ -1569,6 +1597,20 @@
       "source_message_id": "19e151f325e69e74",
       "time": "9:00 AM – 4:00 PM"
     },
+    "8ff1aec20018": {
+      "category": "School Activity",
+      "child": "Isla",
+      "date": "2026-06-16",
+      "first_seen_iso": "2026-05-27T09:50:09-04:00",
+      "id": "8ff1aec20018",
+      "location": "Peterson Lane Park — sign up at https://www.signupgenius.com/go/20F0A49ABAA2FA3F58-64069881-3rdgrade",
+      "name": "3rd Grade End-of-Year Party at Peterson Lane Park",
+      "sender_block_key": "lynnliying2011@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Ying Li / Room Parents 3rd Grade (May 26)",
+      "source_message_id": "19e664210c8c90e7",
+      "time": "9:45 AM – 12:05 PM"
+    },
     "90c36b4a3943": {
       "category": "School Activity",
       "child": "Isla",
@@ -1663,20 +1705,6 @@
       "source": "LAES PTA Sunbeam (May 3)",
       "source_message_id": "19df118b46bc994c",
       "time": "9:00 AM – 2:00 PM"
-    },
-    "9aef9f7e7781": {
-      "category": "School Activity",
-      "child": "Everly",
-      "date": "2026-05-26",
-      "first_seen_iso": "2026-04-24T20:01:41-04:00",
-      "id": "9aef9f7e7781",
-      "location": "",
-      "name": "NO SCHOOL — Student Holiday / Teacher Workday",
-      "sender_block_key": "fcps.edu",
-      "sender_domain": "fcps.edu",
-      "source": "Sahai, Anita - 6 AAP May Newsletter (Apr 24)",
-      "source_message_id": "19dc0becff6647d8",
-      "time": "All day"
     },
     "9c6a7541e14c": {
       "category": "Sports & Extracurriculars",
@@ -1783,20 +1811,6 @@
       "name": "HTM Sharks NVSL A Meet — HOME: Cottontail (CT) @ Hunter Mill",
       "source": "HTM Sharks / Carly Reiley via SportsEngine Motion (Mar 4)",
       "time": "9:00 AM – 12:00 PM"
-    },
-    "ae145afa3fc7": {
-      "category": "School Activity",
-      "child": "",
-      "date": "2026-05-26",
-      "first_seen_iso": "2026-05-02T07:07:13-04:00",
-      "id": "ae145afa3fc7",
-      "location": "Oakton Library",
-      "name": "Invention Workshops: Remote-Control Cars (Ages 8-12) — Oakton Library",
-      "sender_block_key": "fairfaxcounty.gov",
-      "sender_domain": "fairfaxcounty.gov",
-      "source": "Fairfax County Public Library Branch Out (May 1)",
-      "source_message_id": "19de48039f5aae42",
-      "time": "1:00 PM - 2:00 PM"
     },
     "b0acc99912d7": {
       "category": "Sports & Extracurriculars",
@@ -1976,6 +1990,20 @@
       "source": "Children's Dentistry of Oakton (Apr 6)",
       "source_message_id": "19d6387e9e9ca21d",
       "time": "8:30 AM"
+    },
+    "bcc6934c9415": {
+      "category": "Sports & Extracurriculars",
+      "child": "",
+      "date": "2026-06-07",
+      "first_seen_iso": "2026-05-27T09:50:09-04:00",
+      "id": "bcc6934c9415",
+      "location": "Rita's Italian Ice & Frozen Custard, 116 Church Street NW, Vienna, VA",
+      "name": "VYI Volleyball End-of-Season Celebration at Rita's Italian Ice",
+      "sender_block_key": "ottosportmail.ai",
+      "sender_domain": "ottosportmail.ai",
+      "source": "Vienna Youth Inc (May 26)",
+      "source_message_id": "19e650a89e2e7b98",
+      "time": "12:00 PM – 8:00 PM"
     },
     "bf043f46febf": {
       "category": "Sports & Extracurriculars",
@@ -2438,6 +2466,20 @@
       "source_message_id": "19da909fe35cca68",
       "time": "8:30 AM - 12:30 PM"
     },
+    "dd59d953c73b": {
+      "category": "School Activity",
+      "child": "Isla",
+      "date": "",
+      "first_seen_iso": "2026-05-27T09:50:09-04:00",
+      "id": "dd59d953c73b",
+      "location": "Town of Vienna Parks and Recreation, 120 Cherry St SE, Vienna, VA 22180",
+      "name": "Isla — Kids on Canvas Camp Waitlist (Town of Vienna)",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Ellen Holmes / Vienna Parks & Rec (May 26)",
+      "source_message_id": "19e6549b2674c145",
+      "time": ""
+    },
     "dd8035755b2f": {
       "category": "School Activity",
       "child": "Everly",
@@ -2519,6 +2561,20 @@
       "source_message_id": "19d86af203b31fdc",
       "time": ""
     },
+    "e87bff6da7dc": {
+      "category": "Sports & Extracurriculars",
+      "child": "",
+      "date": "",
+      "first_seen_iso": "2026-05-27T09:50:09-04:00",
+      "id": "e87bff6da7dc",
+      "location": "",
+      "name": "VYI Fall Volleyball Registration Opens",
+      "sender_block_key": "ottosportmail.ai",
+      "sender_domain": "ottosportmail.ai",
+      "source": "Vienna Youth Inc (May 26)",
+      "source_message_id": "19e650a89e2e7b98",
+      "time": ""
+    },
     "e892e2dcecdf": {
       "category": "Sports & Extracurriculars",
       "child": "Rising 7th & 8th graders",
@@ -2542,20 +2598,6 @@
       "sender_domain": "fcps.edu",
       "source": "Sahai, Anita - June Newsletter & Important Dates (May 18)",
       "source_message_id": "19e3c41ba6342a67",
-      "time": "All day"
-    },
-    "eb05f59f5586": {
-      "category": "School Activity",
-      "child": "Isla",
-      "date": "2026-05-26",
-      "first_seen_iso": "2026-05-23T07:36:51-04:00",
-      "id": "eb05f59f5586",
-      "location": "https://www.signupgenius.com/go/20F0A49ABAA2FA3F58-64069881-3rdgrade",
-      "name": "3rd Grade EOY Party Sign-Up Link Shared to All Parents",
-      "sender_block_key": "lynnliying2011@gmail.com",
-      "sender_domain": "gmail.com",
-      "source": "Ying Li EOY Party Planning (May 22)",
-      "source_message_id": "19e501317adf93f0",
       "time": "All day"
     },
     "eefb39d0cabd": {
@@ -2813,7 +2855,7 @@
       "time": "School hours"
     }
   },
-  "last_updated_iso": "2026-05-26T08:49:57-04:00",
+  "last_updated_iso": "2026-05-27T09:50:09-04:00",
   "processed_messages": {
     "19a0da1d7445f787": "2026-04-17T18:51:22-04:00",
     "19a1784ff2f26474": "2026-04-17T18:51:22-04:00",
@@ -3193,7 +3235,13 @@
     "19e602a7d746d729": "2026-05-26T08:49:57-04:00",
     "19e60f2c8c67f1db": "2026-05-26T08:49:57-04:00",
     "19e613feb1c0b65b": "2026-05-26T08:49:57-04:00",
-    "19e614250b8c2b62": "2026-05-26T08:49:57-04:00"
+    "19e614250b8c2b62": "2026-05-26T08:49:57-04:00",
+    "19e6450abcbed615": "2026-05-27T09:50:09-04:00",
+    "19e650a89e2e7b98": "2026-05-27T09:50:09-04:00",
+    "19e652498fb3f305": "2026-05-27T09:50:09-04:00",
+    "19e6549b2674c145": "2026-05-27T09:50:09-04:00",
+    "19e6555c43d6d5e7": "2026-05-27T09:50:09-04:00",
+    "19e664210c8c90e7": "2026-05-27T09:50:09-04:00"
   },
   "schema_version": 3
 }

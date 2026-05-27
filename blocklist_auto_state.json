@@ -580,6 +580,11 @@
       "last_flagged_iso": "2026-04-26",
       "reason": "legacy entry seeded post-deploy"
     },
+    "viennarecreation@rectrac.com": {
+      "added_iso": "2026-05-27",
+      "last_flagged_iso": "2026-05-27",
+      "reason": "Automated receipt email with no event content"
+    },
     "vspvisioncarevcm@e.vsp.com": {
       "added_iso": "2026-04-26",
       "last_flagged_iso": "2026-04-26",
@@ -591,7 +596,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-05-26",
+  "last_updated_iso": "2026-05-27",
   "pending": {
     "acuvue@m.helloworldemail.com": {
       "first_flagged_iso": "2026-05-20",
@@ -611,6 +616,16 @@
       "last_flagged_iso": "2026-05-01",
       "reason_samples": [
         "Adult clothing retailer order/return confirmation — no kids' events"
+      ]
+    },
+    "allianzglobalassistance@allianzassistance.com": {
+      "first_flagged_iso": "2026-05-27",
+      "flagged_message_ids": [
+        "19e652498fb3f305"
+      ],
+      "last_flagged_iso": "2026-05-27",
+      "reason_samples": [
+        "Travel insurance marketing newsletter — adult commercial content, no kids' events"
       ]
     },
     "americanairlines@info.ms.aa.com": {
@@ -931,16 +946,6 @@
       "last_flagged_iso": "2026-05-20",
       "reason_samples": [
         "Adult online guide/product order fulfillment — no kids' content"
-      ]
-    },
-    "viennarecreation@rectrac.com": {
-      "first_flagged_iso": "2026-04-26",
-      "flagged_message_ids": [
-        "19dc55731e6ea2df"
-      ],
-      "last_flagged_iso": "2026-04-26",
-      "reason_samples": [
-        "Email contained only a receipt attachment notice with no extractable event details"
       ]
     },
     "volcor@cake4kids.org": {
