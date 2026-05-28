@@ -1069,6 +1069,20 @@
       "source_message_id": "19d97dc3ddcf82b5",
       "time": "All day (deadline)"
     },
+    "679eee9416d5": {
+      "category": "School Activity",
+      "child": "Isla",
+      "date": "2026-06-12",
+      "first_seen_iso": "2026-05-28T10:08:10-04:00",
+      "id": "679eee9416d5",
+      "location": "Louise Archer Elementary School",
+      "name": "Cities Market Day",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Rohde, Meredith Newsletter & Important Cities Updates (May 27)",
+      "source_message_id": "19e6a22332b60f89",
+      "time": "School hours"
+    },
     "686cacccc6e1": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -1150,6 +1164,20 @@
       "source_message_id": "19e3c78ca5a5c4c4",
       "time": "8:00 PM–9:00 PM"
     },
+    "6cda5366ab32": {
+      "category": "School Activity",
+      "child": "Isla",
+      "date": "2026-06-16",
+      "first_seen_iso": "2026-05-28T10:08:10-04:00",
+      "id": "6cda5366ab32",
+      "location": "Louise Archer Elementary School",
+      "name": "End-of-the-Year Party (3rd Grade)",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Rohde, Meredith Newsletter & Important Cities Updates (May 27)",
+      "source_message_id": "19e6a22332b60f89",
+      "time": "9:45 AM – 12:05 PM"
+    },
     "6d797548083d": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -1174,6 +1202,20 @@
       "source": "Mara Thayer / VYI Volleyball (May 18)",
       "source_message_id": "19e3c78ca5a5c4c4",
       "time": "12:00 PM"
+    },
+    "6f7ed603a043": {
+      "category": "School Activity",
+      "child": "Isla",
+      "date": "2026-06-08",
+      "first_seen_iso": "2026-05-28T10:08:10-04:00",
+      "id": "6f7ed603a043",
+      "location": "Louise Archer Elementary School",
+      "name": "Cities Market Day",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Rohde, Meredith Newsletter & Important Cities Updates (May 27)",
+      "source_message_id": "19e6a22332b60f89",
+      "time": "School hours"
     },
     "7004b3b33e79": {
       "category": "School Activity",
@@ -1477,6 +1519,34 @@
       "source_message_id": "19d15c8e3ef38809",
       "time": "All day (deadline)"
     },
+    "82b21edcc507": {
+      "category": "School Activity",
+      "child": "Isla",
+      "date": "2026-06-05",
+      "first_seen_iso": "2026-05-28T10:08:10-04:00",
+      "id": "82b21edcc507",
+      "location": "Louise Archer Elementary School",
+      "name": "Field Day: Video Game Field Day",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Rohde, Meredith Newsletter & Important Cities Updates (May 27)",
+      "source_message_id": "19e6a22332b60f89",
+      "time": "School hours"
+    },
+    "82b9547c2852": {
+      "category": "School Activity",
+      "child": "Isla",
+      "date": "2026-06-02",
+      "first_seen_iso": "2026-05-28T10:08:10-04:00",
+      "id": "82b9547c2852",
+      "location": "Louise Archer Elementary School",
+      "name": "Cities Market Day",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Rohde, Meredith Newsletter & Important Cities Updates (May 27)",
+      "source_message_id": "19e6a22332b60f89",
+      "time": "School hours"
+    },
     "83b1961d2967": {
       "category": "Sports & Extracurriculars",
       "child": "",
@@ -1596,6 +1666,20 @@
       "source": "LAES PTA Sunbeam (May 10)",
       "source_message_id": "19e151f325e69e74",
       "time": "9:00 AM – 4:00 PM"
+    },
+    "8eecfd28a1ef": {
+      "category": "School Activity",
+      "child": "Isla",
+      "date": "2026-06-10",
+      "first_seen_iso": "2026-05-28T10:08:10-04:00",
+      "id": "8eecfd28a1ef",
+      "location": "Louise Archer Elementary School",
+      "name": "Cities Market Day",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Rohde, Meredith Newsletter & Important Cities Updates (May 27)",
+      "source_message_id": "19e6a22332b60f89",
+      "time": "School hours"
     },
     "8ff1aec20018": {
       "category": "School Activity",
@@ -1921,6 +2005,20 @@
       "source_message_id": "19e3c41ba6342a67",
       "time": "School hours"
     },
+    "b4a91995e5f6": {
+      "category": "Sports & Extracurriculars",
+      "child": "Everly",
+      "date": "2026-05-29",
+      "first_seen_iso": "2026-05-28T10:08:10-04:00",
+      "id": "b4a91995e5f6",
+      "location": "Born 2 Dance Studio (262 Cedar Lane SE, 2nd Floor, Vienna, VA 22180)",
+      "name": "B2D IGNITE Team Weekly Rehearsal",
+      "sender_block_key": "teamsnap.com",
+      "sender_domain": "teamsnap.com",
+      "source": "B2D - IGNITE Team via TeamSnap (May 27)",
+      "source_message_id": "19e6b7fdc3acdfcd",
+      "time": "4:45 PM – 6:45 PM"
+    },
     "b4abd46386f6": {
       "category": "Sports & Extracurriculars",
       "child": "All LAES students",
@@ -1948,6 +2046,20 @@
       "source": "Mara Thayer / VYI Volleyball (May 18)",
       "source_message_id": "19e3c78ca5a5c4c4",
       "time": "3:00 PM"
+    },
+    "b8fe8d5bbd23": {
+      "category": "School Activity",
+      "child": "Isla",
+      "date": "2026-06-04",
+      "first_seen_iso": "2026-05-28T10:08:10-04:00",
+      "id": "b8fe8d5bbd23",
+      "location": "Louise Archer Elementary School",
+      "name": "Cities Market Day",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Rohde, Meredith Newsletter & Important Cities Updates (May 27)",
+      "source_message_id": "19e6a22332b60f89",
+      "time": "School hours"
     },
     "b9470047a401": {
       "category": "Sports & Extracurriculars",
@@ -2046,20 +2158,6 @@
       "source": "LAES PTA Sunbeam (May 17)",
       "source_message_id": "19e38ef24189c70a",
       "time": "8:30 AM – 12:30 PM"
-    },
-    "c1fb27866b40": {
-      "category": "School Activity",
-      "child": "Everly",
-      "date": "2026-05-27",
-      "first_seen_iso": "2026-04-24T20:01:41-04:00",
-      "id": "c1fb27866b40",
-      "location": "",
-      "name": "NO SCHOOL — Holiday (Eid)",
-      "sender_block_key": "fcps.edu",
-      "sender_domain": "fcps.edu",
-      "source": "Sahai, Anita - 6 AAP May Newsletter (Apr 24)",
-      "source_message_id": "19dc0becff6647d8",
-      "time": "All day"
     },
     "c32951eb42fb": {
       "category": "School Activity",
@@ -2855,7 +2953,7 @@
       "time": "School hours"
     }
   },
-  "last_updated_iso": "2026-05-27T09:50:09-04:00",
+  "last_updated_iso": "2026-05-28T10:08:10-04:00",
   "processed_messages": {
     "19a0da1d7445f787": "2026-04-17T18:51:22-04:00",
     "19a1784ff2f26474": "2026-04-17T18:51:22-04:00",
@@ -3241,7 +3339,11 @@
     "19e652498fb3f305": "2026-05-27T09:50:09-04:00",
     "19e6549b2674c145": "2026-05-27T09:50:09-04:00",
     "19e6555c43d6d5e7": "2026-05-27T09:50:09-04:00",
-    "19e664210c8c90e7": "2026-05-27T09:50:09-04:00"
+    "19e664210c8c90e7": "2026-05-27T09:50:09-04:00",
+    "19e6a12afd88e34b": "2026-05-28T10:08:10-04:00",
+    "19e6a1e6ea1af8ac": "2026-05-28T10:08:10-04:00",
+    "19e6a22332b60f89": "2026-05-28T10:08:10-04:00",
+    "19e6b7fdc3acdfcd": "2026-05-28T10:08:10-04:00"
   },
   "schema_version": 3
 }

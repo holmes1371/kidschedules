@@ -1,5 +1,5 @@
 {
-  "last_updated_iso": "2026-05-27T09:50:09-04:00",
+  "last_updated_iso": "2026-05-28T10:08:10-04:00",
   "schema_version": 1,
   "senders": {
     "23andmedatasettlement@e.emailksa.com": {
@@ -320,10 +320,9 @@
     "donotreply@email.teamsnap.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-05-23T07:36:51-04:00",
-      "messages_seen": 45,
+      "last_seen_iso": "2026-05-28T10:08:10-04:00",
+      "messages_seen": 46,
       "per_message_counts": [
-        1,
         1,
         1,
         1,
@@ -332,9 +331,10 @@
         1,
         1,
         1,
-        2
+        2,
+        1
       ],
-      "total_events": 67
+      "total_events": 68
     },
     "donotreply@inova.org": {
       "first_seen_iso": "2026-04-24T20:01:41-04:00",
@@ -629,6 +629,16 @@
       ],
       "total_events": 0
     },
+    "info@email.obama.org": {
+      "first_seen_iso": "2026-05-28T10:08:10-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-05-28T10:08:10-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
     "info@healemedical.com": {
       "first_seen_iso": "2026-05-07T08:11:59-04:00",
       "is_newsletter": false,
@@ -917,16 +927,18 @@
     "mlrohde@fcps.edu": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-05-11T08:50:07-04:00",
-      "messages_seen": 5,
+      "last_seen_iso": "2026-05-28T10:08:10-04:00",
+      "messages_seen": 7,
       "per_message_counts": [
         1,
         4,
         3,
         0,
-        3
+        3,
+        7,
+        7
       ],
-      "total_events": 11
+      "total_events": 25
     },
     "mmmcgrath@fcps.edu": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",

@@ -596,7 +596,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-05-27",
+  "last_updated_iso": "2026-05-28",
   "pending": {
     "acuvue@m.helloworldemail.com": {
       "first_flagged_iso": "2026-05-20",
@@ -766,6 +766,16 @@
       "last_flagged_iso": "2026-05-19",
       "reason_samples": [
         "Adult fashion/retail promotional email with no kids' content"
+      ]
+    },
+    "info@email.obama.org": {
+      "first_flagged_iso": "2026-05-28",
+      "flagged_message_ids": [
+        "19e6a12afd88e34b"
+      ],
+      "last_flagged_iso": "2026-05-28",
+      "reason_samples": [
+        "Adult-oriented nonprofit/political organization promotional email; no children's events or school-related content"
       ]
     },
     "info@healemedical.com": {
