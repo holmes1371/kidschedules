@@ -121,3 +121,6 @@ email@email.etsy.com  # auto 2026-05-24: Etsy order shipping notification for an
 membership@m.dcbar.org  # auto 2026-05-24: D.C. Bar adult professional license renewal notice — entirely adult/work-related
 info@cupshe.com  # auto 2026-05-25: Adult retail promotional email (swimwear/clothing); no kids' events
 viennarecreation@rectrac.com  # auto 2026-05-27: Automated receipt email with no event content
+newsletter@mail.coinbase.com  # auto 2026-05-29: Cryptocurrency market newsletter — adult financial content, no kids' events
+anthropologie@st.anthropologie.com  # auto 2026-05-29: Adult clothing retailer order/shipping notifications — no kids' events
+events@paulweiss.com  # auto 2026-05-29: Adult legal industry event reminder — no kids' events
