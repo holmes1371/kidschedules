@@ -611,7 +611,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-05-29",
+  "last_updated_iso": "2026-05-30",
   "pending": {
     "acuvue@m.helloworldemail.com": {
       "first_flagged_iso": "2026-05-20",
@@ -913,6 +913,16 @@
         "Adult home decor retail promotional email, no children's events"
       ]
     },
+    "serkan.vysa.com@qohgb.e2ma.net": {
+      "first_flagged_iso": "2026-05-30",
+      "flagged_message_ids": [
+        "19e747b45069428d"
+      ],
+      "last_flagged_iso": "2026-05-30",
+      "reason_samples": [
+        "organizational leadership announcement for Virginia Youth Soccer Association staff hires — no kids' events"
+      ]
+    },
     "subscriptions@message.bloomberg.com": {
       "first_flagged_iso": "2026-05-16",
       "flagged_message_ids": [
@@ -921,16 +931,6 @@
       "last_flagged_iso": "2026-05-16",
       "reason_samples": [
         "Adult news/finance newsletter with no kids' content"
-      ]
-    },
-    "support5@info.myloancare.com": {
-      "first_flagged_iso": "2026-04-29",
-      "flagged_message_ids": [
-        "19dd59c2bdfc5f33"
-      ],
-      "last_flagged_iso": "2026-04-29",
-      "reason_samples": [
-        "Mortgage/loan payment notification — adult financial content only"
       ]
     },
     "support@s.usa.experian.com": {
