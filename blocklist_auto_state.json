@@ -210,6 +210,11 @@
       "last_flagged_iso": "2026-04-26",
       "reason": "legacy entry seeded post-deploy"
     },
+    "info@email.obama.org": {
+      "added_iso": "2026-05-31",
+      "last_flagged_iso": "2026-05-31",
+      "reason": "Obama Foundation promotional email about presidential center — adult civic/cultural content, no kids' events"
+    },
     "info@embracehomeloans.com": {
       "added_iso": "2026-04-26",
       "last_flagged_iso": "2026-04-26",
@@ -605,13 +610,18 @@
       "last_flagged_iso": "2026-04-26",
       "reason": "legacy entry seeded post-deploy"
     },
+    "vzwmail@ecrmemail.verizonwireless.com": {
+      "added_iso": "2026-05-31",
+      "last_flagged_iso": "2026-05-31",
+      "reason": "Verizon Wireless order confirmation — adult consumer electronics, no kids' events"
+    },
     "waivers@waivers.dance.one": {
       "added_iso": "2026-04-26",
       "last_flagged_iso": "2026-04-26",
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-05-30",
+  "last_updated_iso": "2026-05-31",
   "pending": {
     "acuvue@m.helloworldemail.com": {
       "first_flagged_iso": "2026-05-20",
@@ -761,16 +771,6 @@
       "last_flagged_iso": "2026-05-19",
       "reason_samples": [
         "Adult fashion/retail promotional email with no kids' content"
-      ]
-    },
-    "info@email.obama.org": {
-      "first_flagged_iso": "2026-05-28",
-      "flagged_message_ids": [
-        "19e6a12afd88e34b"
-      ],
-      "last_flagged_iso": "2026-05-28",
-      "reason_samples": [
-        "Adult-oriented nonprofit/political organization promotional email; no children's events or school-related content"
       ]
     },
     "info@form5.org": {
@@ -923,6 +923,16 @@
         "organizational leadership announcement for Virginia Youth Soccer Association staff hires — no kids' events"
       ]
     },
+    "strine.steven@gmail.com": {
+      "first_flagged_iso": "2026-05-31",
+      "flagged_message_ids": [
+        "19e7a25692928be2"
+      ],
+      "last_flagged_iso": "2026-05-31",
+      "reason_samples": [
+        "Neighborhood community group message about old sport netting — no kids' events"
+      ]
+    },
     "subscriptions@message.bloomberg.com": {
       "first_flagged_iso": "2026-05-16",
       "flagged_message_ids": [
@@ -961,16 +971,6 @@
       "last_flagged_iso": "2026-05-13",
       "reason_samples": [
         "Volunteer organization newsletter for adult bakers — no events relevant to this family's children"
-      ]
-    },
-    "vzwmail@ecrmemail.verizonwireless.com": {
-      "first_flagged_iso": "2026-05-14",
-      "flagged_message_ids": [
-        "19e2105fc5583d90"
-      ],
-      "last_flagged_iso": "2026-05-14",
-      "reason_samples": [
-        "Verizon Wireless adult account/travel notification, no kids' content"
       ]
     },
     "whitehouseblackmarket@orders.whitehouseblackmarket.com": {

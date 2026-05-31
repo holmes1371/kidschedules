@@ -124,3 +124,5 @@ viennarecreation@rectrac.com  # auto 2026-05-27: Automated receipt email with no
 newsletter@mail.coinbase.com  # auto 2026-05-29: Cryptocurrency market newsletter — adult financial content, no kids' events
 anthropologie@st.anthropologie.com  # auto 2026-05-29: Adult clothing retailer order/shipping notifications — no kids' events
 events@paulweiss.com  # auto 2026-05-29: Adult legal industry event reminder — no kids' events
+vzwmail@ecrmemail.verizonwireless.com  # auto 2026-05-31: Verizon Wireless order confirmation — adult consumer electronics, no kids' event
+info@email.obama.org  # auto 2026-05-31: Obama Foundation promotional email about presidential center — adult civic/cultu
