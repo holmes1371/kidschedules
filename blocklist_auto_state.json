@@ -621,7 +621,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-05-31",
+  "last_updated_iso": "2026-06-01",
   "pending": {
     "acuvue@m.helloworldemail.com": {
       "first_flagged_iso": "2026-05-20",
@@ -631,16 +631,6 @@
       "last_flagged_iso": "2026-05-20",
       "reason_samples": [
         "Adult contact lens rewards program — terms and conditions update, no kids' content"
-      ]
-    },
-    "ae@notifications.ae.com": {
-      "first_flagged_iso": "2026-05-01",
-      "flagged_message_ids": [
-        "19dde8baec0243f6"
-      ],
-      "last_flagged_iso": "2026-05-01",
-      "reason_samples": [
-        "Adult clothing retailer order/return confirmation — no kids' events"
       ]
     },
     "allianzglobalassistance@allianzassistance.com": {
@@ -671,6 +661,16 @@
       "last_flagged_iso": "2026-05-21",
       "reason_samples": [
         "Airbnb reservation cancellation and refund notification — adult travel booking"
+      ]
+    },
+    "betsy@virginiahousekeepers.com": {
+      "first_flagged_iso": "2026-06-01",
+      "flagged_message_ids": [
+        "19e7e0933f692093"
+      ],
+      "last_flagged_iso": "2026-06-01",
+      "reason_samples": [
+        "House cleaning payment reminder — adult billing/service, no children's events"
       ]
     },
     "conversations@mail.etsy.com": {
@@ -883,26 +883,6 @@
         "Adult airline travel receipt with no children's events or activities mentioned"
       ]
     },
-    "rei_email@email.rei.com": {
-      "first_flagged_iso": "2026-05-01",
-      "flagged_message_ids": [
-        "19ddeb30ed410a61"
-      ],
-      "last_flagged_iso": "2026-05-01",
-      "reason_samples": [
-        "Adult outdoor retail membership newsletter — no kids' events"
-      ]
-    },
-    "reply@rs.email.nextdoor.com": {
-      "first_flagged_iso": "2026-05-01",
-      "flagged_message_ids": [
-        "19dda8a0f87fe6c6"
-      ],
-      "last_flagged_iso": "2026-05-01",
-      "reason_samples": [
-        "Nextdoor neighborhood trending posts — adult community discussion, no kids' events"
-      ]
-    },
     "sales@darbycreektrading.com": {
       "first_flagged_iso": "2026-05-18",
       "flagged_message_ids": [
@@ -971,16 +951,6 @@
       "last_flagged_iso": "2026-05-13",
       "reason_samples": [
         "Volunteer organization newsletter for adult bakers — no events relevant to this family's children"
-      ]
-    },
-    "whitehouseblackmarket@orders.whitehouseblackmarket.com": {
-      "first_flagged_iso": "2026-05-01",
-      "flagged_message_ids": [
-        "19ddc3ecf58a1055"
-      ],
-      "last_flagged_iso": "2026-05-01",
-      "reason_samples": [
-        "Adult women's clothing retailer shipping notification — no kids' events"
       ]
     },
     "yingjin920@gmail.com": {
