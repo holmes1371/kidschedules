@@ -621,7 +621,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-06-01",
+  "last_updated_iso": "2026-06-02",
   "pending": {
     "acuvue@m.helloworldemail.com": {
       "first_flagged_iso": "2026-05-20",
@@ -791,6 +791,16 @@
       "last_flagged_iso": "2026-05-07",
       "reason_samples": [
         "Adult medical weight loss promotion, no connection to children"
+      ]
+    },
+    "nihar.shah@ses.com": {
+      "first_flagged_iso": "2026-06-02",
+      "flagged_message_ids": [
+        "19e84329266b22d7"
+      ],
+      "last_flagged_iso": "2026-06-02",
+      "reason_samples": [
+        "Neighborhood listserv message about borrowing a ladder — entirely adult/household, no kids' events"
       ]
     },
     "no-reply@account.etsy.com": {

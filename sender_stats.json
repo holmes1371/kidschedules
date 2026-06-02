@@ -1,5 +1,5 @@
 {
-  "last_updated_iso": "2026-06-01T12:18:21-04:00",
+  "last_updated_iso": "2026-06-02T10:33:11-04:00",
   "schema_version": 1,
   "senders": {
     "23andmedatasettlement@e.emailksa.com": {
@@ -969,10 +969,11 @@
     "mmmcgrath@fcps.edu": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-04-17T17:04:04-04:00",
-      "messages_seen": 1,
+      "last_seen_iso": "2026-06-02T10:33:11-04:00",
+      "messages_seen": 2,
       "per_message_counts": [
-        1
+        1,
+        0
       ],
       "total_events": 1
     },
@@ -1021,6 +1022,16 @@
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
       "last_seen_iso": "2026-04-17T17:04:04-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
+    "nihar.shah@ses.com": {
+      "first_seen_iso": "2026-06-02T10:33:11-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-06-02T10:33:11-04:00",
       "messages_seen": 1,
       "per_message_counts": [
         0
@@ -1518,8 +1529,8 @@
     "sunbeam@louisearcherpta.org": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": true,
-      "last_seen_iso": "2026-05-19T09:33:32-04:00",
-      "messages_seen": 9,
+      "last_seen_iso": "2026-06-02T10:33:11-04:00",
+      "messages_seen": 10,
       "per_message_counts": [
         13,
         19,
@@ -1529,9 +1540,10 @@
         21,
         20,
         16,
-        16
+        16,
+        15
       ],
-      "total_events": 149
+      "total_events": 164
     },
     "support0@info.myloancare.com": {
       "first_seen_iso": "2026-04-17T17:12:56-04:00",

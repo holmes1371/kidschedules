@@ -173,20 +173,6 @@
       "source_message_id": "19dcb92548731780",
       "time": "School hours"
     },
-    "19247daa9141": {
-      "category": "Sports & Extracurriculars",
-      "child": "",
-      "date": "2026-06-01",
-      "first_seen_iso": "2026-05-24T07:43:36-04:00",
-      "id": "19247daa9141",
-      "location": "Hunter Mill Swim & Racquet Club, 10339 Brittenford Dr, Vienna, VA 22182-1862",
-      "name": "Tennis Court Resurfacing — Courts Unavailable",
-      "sender_block_key": "hmsrc.org",
-      "sender_domain": "hmsrc.org",
-      "source": "Hunter Mill Swim & Racquet Club (May 23)",
-      "source_message_id": "19e563ee58584b25",
-      "time": "All day"
-    },
     "1b00300bea25": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -420,6 +406,20 @@
       "source": "6th Grade Classroom Newsletter PDF (May 18)",
       "source_message_id": "19e3c41ba6342a67",
       "time": "Morning"
+    },
+    "322240f1ad72": {
+      "category": "Sports & Extracurriculars",
+      "child": "All LAES students",
+      "date": "2026-07-31",
+      "first_seen_iso": "2026-06-02T10:33:11-04:00",
+      "id": "322240f1ad72",
+      "location": "Louise Archer Elementary School — gym",
+      "name": "Sports Camp — Session 2 Last Day",
+      "sender_block_key": "louisearcherpta.org",
+      "sender_domain": "louisearcherpta.org",
+      "source": "LAES PTA Sunbeam (May 31)",
+      "source_message_id": "19e81307b9de3490",
+      "time": "9:00 AM – 2:00 PM"
     },
     "36fe89143706": {
       "category": "Academic Due Date",
@@ -1026,6 +1026,20 @@
       "name": "Cuppett June Recitals",
       "source": "Kids' Schedule — March 30, 2026 (Mar 30)",
       "time": "TBD"
+    },
+    "661a674dcc00": {
+      "category": "Academic Due Date",
+      "child": "All LAES students",
+      "date": "2026-06-12",
+      "first_seen_iso": "2026-06-02T10:33:11-04:00",
+      "id": "661a674dcc00",
+      "location": "www.shopttkits.com (school ID 93768)",
+      "name": "School Supply Kits Sale Deadline",
+      "sender_block_key": "louisearcherpta.org",
+      "sender_domain": "louisearcherpta.org",
+      "source": "LAES PTA Sunbeam (May 31)",
+      "source_message_id": "19e81307b9de3490",
+      "time": "All day (deadline)"
     },
     "663a477f321e": {
       "category": "Sports & Extracurriculars",
@@ -1801,6 +1815,20 @@
       "source": "LAES PTA Sunbeam (Mar 22)",
       "time": "9:00 AM – 2:00 PM"
     },
+    "a22ecf830923": {
+      "category": "Sports & Extracurriculars",
+      "child": "All LAES students",
+      "date": "2026-07-01",
+      "first_seen_iso": "2026-06-02T10:33:11-04:00",
+      "id": "a22ecf830923",
+      "location": "Oakton High School",
+      "name": "Oakton High School Junior Dance Camp — Last Day & Performance",
+      "sender_block_key": "louisearcherpta.org",
+      "sender_domain": "louisearcherpta.org",
+      "source": "LAES PTA Sunbeam (May 31)",
+      "source_message_id": "19e81307b9de3490",
+      "time": "8:30 AM – 12:30 PM"
+    },
     "a733932aec0f": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -1828,6 +1856,20 @@
       "source": "LAES PTA Sunbeam (Apr 19)",
       "source_message_id": "19da909fe35cca68",
       "time": "9:00 AM - 2:00 PM"
+    },
+    "abc08ad4154c": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-06-12",
+      "first_seen_iso": "2026-06-02T10:33:11-04:00",
+      "id": "abc08ad4154c",
+      "location": "Louise Archer Elementary School",
+      "name": "6th Grade Celebration (Luau-Themed)",
+      "sender_block_key": "louisearcherpta.org",
+      "sender_domain": "louisearcherpta.org",
+      "source": "LAES PTA Sunbeam (May 31)",
+      "source_message_id": "19e81307b9de3490",
+      "time": "7:00 PM – 9:00 PM"
     },
     "ac8009eaf4a5": {
       "category": "School Activity",
@@ -2046,6 +2088,20 @@
       "source": "Children's Dentistry of Oakton (Apr 6)",
       "source_message_id": "19d6387e9e9ca21d",
       "time": "8:30 AM"
+    },
+    "bc5899b2d1ad": {
+      "category": "Sports & Extracurriculars",
+      "child": "All LAES students",
+      "date": "2026-06-26",
+      "first_seen_iso": "2026-06-02T10:33:11-04:00",
+      "id": "bc5899b2d1ad",
+      "location": "Louise Archer Elementary School — gym",
+      "name": "Sports Camp — Session 1 Last Day",
+      "sender_block_key": "louisearcherpta.org",
+      "sender_domain": "louisearcherpta.org",
+      "source": "LAES PTA Sunbeam (May 31)",
+      "source_message_id": "19e81307b9de3490",
+      "time": "9:00 AM – 2:00 PM"
     },
     "bcc6934c9415": {
       "category": "Sports & Extracurriculars",
@@ -2494,6 +2550,20 @@
       "source_message_id": "19da909fe35cca68",
       "time": "8:30 AM - 12:30 PM"
     },
+    "dd308506fcdc": {
+      "category": "School Activity",
+      "child": "All LAES students",
+      "date": "2026-06-22",
+      "first_seen_iso": "2026-06-02T10:33:11-04:00",
+      "id": "dd308506fcdc",
+      "location": "Louise Archer Elementary School — cafeteria",
+      "name": "Chess Camp (Atlantic Chess Association)",
+      "sender_block_key": "louisearcherpta.org",
+      "sender_domain": "louisearcherpta.org",
+      "source": "LAES PTA Sunbeam (May 31)",
+      "source_message_id": "19e81307b9de3490",
+      "time": "9:00 AM – 4:00 PM"
+    },
     "dd59d953c73b": {
       "category": "School Activity",
       "child": "Isla",
@@ -2588,6 +2658,20 @@
       "source": "Isla L.'s School Photography by Lifetouch (Apr 13)",
       "source_message_id": "19d86af203b31fdc",
       "time": ""
+    },
+    "e2ab5464db65": {
+      "category": "Sports & Extracurriculars",
+      "child": "All LAES students",
+      "date": "2026-08-07",
+      "first_seen_iso": "2026-06-02T10:33:11-04:00",
+      "id": "e2ab5464db65",
+      "location": "Louise Archer Elementary School — gym",
+      "name": "Sports Camp — Session 3 Last Day",
+      "sender_block_key": "louisearcherpta.org",
+      "sender_domain": "louisearcherpta.org",
+      "source": "LAES PTA Sunbeam (May 31)",
+      "source_message_id": "19e81307b9de3490",
+      "time": "9:00 AM – 2:00 PM"
     },
     "e87bff6da7dc": {
       "category": "Sports & Extracurriculars",
@@ -2911,7 +2995,7 @@
       "time": "School hours"
     }
   },
-  "last_updated_iso": "2026-06-01T12:18:21-04:00",
+  "last_updated_iso": "2026-06-02T10:33:11-04:00",
   "processed_messages": {
     "19a0da1d7445f787": "2026-04-17T18:51:22-04:00",
     "19a1784ff2f26474": "2026-04-17T18:51:22-04:00",
@@ -3325,7 +3409,10 @@
     "19e7a25692928be2": "2026-05-31T07:52:00-04:00",
     "19e7a9dd2cd3412f": "2026-05-31T07:52:00-04:00",
     "19e7dec53b6893fc": "2026-06-01T12:18:21-04:00",
-    "19e7e0933f692093": "2026-06-01T12:18:21-04:00"
+    "19e7e0933f692093": "2026-06-01T12:18:21-04:00",
+    "19e81307b9de3490": "2026-06-02T10:33:11-04:00",
+    "19e84329266b22d7": "2026-06-02T10:33:11-04:00",
+    "19e8499344b760e0": "2026-06-02T10:33:11-04:00"
   },
   "schema_version": 3
 }
