@@ -351,6 +351,20 @@
       "source": "LAES PTA Sunbeam (Mar 22)",
       "time": "9:00 AM - 2:00 PM"
     },
+    "2b4dbb22a8cd": {
+      "category": "Sports & Extracurriculars",
+      "child": "Everly",
+      "date": "2026-06-06",
+      "first_seen_iso": "2026-06-03T11:06:17-04:00",
+      "id": "2b4dbb22a8cd",
+      "location": "Born 2 Dance Studio",
+      "name": "B2D Competition Team Audition — Jazz Group B (MATRIX/KINETIX)",
+      "sender_block_key": "cognitoforms.com",
+      "sender_domain": "cognitoforms.com",
+      "source": "Born 2 Dance Studio (Jun 2)",
+      "source_message_id": "19e8ac336804eb41",
+      "time": "5:00 PM – 5:45 PM"
+    },
     "2d55ffb02f14": {
       "category": "Sports & Extracurriculars",
       "child": "All LAES students",
@@ -836,6 +850,20 @@
       "name": "Chess Camp at LAES (Session 1 End)",
       "source": "LAES PTA Sunbeam (Mar 15)",
       "time": "9:00 AM - 4:00 PM"
+    },
+    "595312aac8c9": {
+      "category": "Sports & Extracurriculars",
+      "child": "Everly",
+      "date": "2026-06-07",
+      "first_seen_iso": "2026-06-03T11:06:17-04:00",
+      "id": "595312aac8c9",
+      "location": "Born 2 Dance Studio",
+      "name": "B2D Competition Team Audition — Contemporary Group B (ILLUSION/ICONIC/IMPACT)",
+      "sender_block_key": "cognitoforms.com",
+      "sender_domain": "cognitoforms.com",
+      "source": "Born 2 Dance Studio (Jun 2)",
+      "source_message_id": "19e8ac336804eb41",
+      "time": "7:45 PM – 8:45 PM"
     },
     "59d1df50e57f": {
       "category": "Sports & Extracurriculars",
@@ -1533,20 +1561,6 @@
       "source_message_id": "19e6a22332b60f89",
       "time": "School hours"
     },
-    "82b9547c2852": {
-      "category": "School Activity",
-      "child": "Isla",
-      "date": "2026-06-02",
-      "first_seen_iso": "2026-05-28T10:08:10-04:00",
-      "id": "82b9547c2852",
-      "location": "Louise Archer Elementary School",
-      "name": "Cities Market Day",
-      "sender_block_key": "fcps.edu",
-      "sender_domain": "fcps.edu",
-      "source": "Rohde, Meredith Newsletter & Important Cities Updates (May 27)",
-      "source_message_id": "19e6a22332b60f89",
-      "time": "School hours"
-    },
     "83b1961d2967": {
       "category": "Sports & Extracurriculars",
       "child": "",
@@ -1651,6 +1665,20 @@
       "sender_domain": "teamsnap.com",
       "source": "B2D TeamSnap (May 28)",
       "source_message_id": "19e6f7c49afbc211",
+      "time": "All day (deadline)"
+    },
+    "8c10e4abe01c": {
+      "category": "Academic Due Date",
+      "child": "All LAES students",
+      "date": "2026-06-12",
+      "first_seen_iso": "2026-06-03T11:06:17-04:00",
+      "id": "8c10e4abe01c",
+      "location": "www.shopttkits.com (School ID: 93768)",
+      "name": "School Supply Kit Order Deadline (2026-2027)",
+      "sender_block_key": "louisearcherpta.org",
+      "sender_domain": "louisearcherpta.org",
+      "source": "LAES PTA Vice President (Jun 2)",
+      "source_message_id": "19e8a5fbf91cbe14",
       "time": "All day (deadline)"
     },
     "8c2d7533952c": {
@@ -2995,7 +3023,7 @@
       "time": "School hours"
     }
   },
-  "last_updated_iso": "2026-06-02T10:33:11-04:00",
+  "last_updated_iso": "2026-06-03T11:06:17-04:00",
   "processed_messages": {
     "19a0da1d7445f787": "2026-04-17T18:51:22-04:00",
     "19a1784ff2f26474": "2026-04-17T18:51:22-04:00",
@@ -3412,7 +3440,11 @@
     "19e7e0933f692093": "2026-06-01T12:18:21-04:00",
     "19e81307b9de3490": "2026-06-02T10:33:11-04:00",
     "19e84329266b22d7": "2026-06-02T10:33:11-04:00",
-    "19e8499344b760e0": "2026-06-02T10:33:11-04:00"
+    "19e8499344b760e0": "2026-06-02T10:33:11-04:00",
+    "19e8830032bc36df": "2026-06-03T11:06:17-04:00",
+    "19e8a5fbf91cbe14": "2026-06-03T11:06:17-04:00",
+    "19e8a983b79788cd": "2026-06-03T11:06:17-04:00",
+    "19e8ac336804eb41": "2026-06-03T11:06:17-04:00"
   },
   "schema_version": 3
 }
