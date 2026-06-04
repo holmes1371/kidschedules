@@ -621,7 +621,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-06-03",
+  "last_updated_iso": "2026-06-04",
   "pending": {
     "acuvue@m.helloworldemail.com": {
       "first_flagged_iso": "2026-05-20",
@@ -793,6 +793,16 @@
         "Adult medical weight loss promotion, no connection to children"
       ]
     },
+    "insights@law.com": {
+      "first_flagged_iso": "2026-06-04",
+      "flagged_message_ids": [
+        "19e8d1bc90e91095"
+      ],
+      "last_flagged_iso": "2026-06-04",
+      "reason_samples": [
+        "Legal industry news publication (The American Lawyer Morning Update) — entirely adult/work content with no connection to children's activities"
+      ]
+    },
     "nihar.shah@ses.com": {
       "first_flagged_iso": "2026-06-02",
       "flagged_message_ids": [
@@ -861,6 +871,16 @@
       "last_flagged_iso": "2026-05-05",
       "reason_samples": [
         "adult patient visit appointment review notification with no child-related content"
+      ]
+    },
+    "noreply@nextech.com": {
+      "first_flagged_iso": "2026-06-04",
+      "flagged_message_ids": [
+        "19e8d9235f28e8af"
+      ],
+      "last_flagged_iso": "2026-06-04",
+      "reason_samples": [
+        "Adult medical aesthetics appointment reminder — Dontage Medical Aesthetics is a cosmetic/aesthetics clinic, not a pediatric provider"
       ]
     },
     "noreply@qemailserver.com": {
