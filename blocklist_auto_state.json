@@ -621,7 +621,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-06-04",
+  "last_updated_iso": "2026-06-05",
   "pending": {
     "acuvue@m.helloworldemail.com": {
       "first_flagged_iso": "2026-05-20",
@@ -693,16 +693,6 @@
         "contact lens refill marketing email, adult optical/vision product promotion, no children's events"
       ]
     },
-    "donotreply@nextech.com": {
-      "first_flagged_iso": "2026-05-05",
-      "flagged_message_ids": [
-        "19df3135b6812dc6"
-      ],
-      "last_flagged_iso": "2026-05-05",
-      "reason_samples": [
-        "appointment confirmation system with no visible content — appears to be an adult medical/scheduling platform with no child-related context"
-      ]
-    },
     "eleanor_lunger@hotmail.com": {
       "first_flagged_iso": "2026-05-08",
       "flagged_message_ids": [
@@ -711,16 +701,6 @@
       "last_flagged_iso": "2026-05-08",
       "reason_samples": [
         "neighborhood email thread about arborist recommendations — entirely adult/home maintenance topic, no kids' events"
-      ]
-    },
-    "ellen.holmes@bhp.com": {
-      "first_flagged_iso": "2026-05-05",
-      "flagged_message_ids": [
-        "19df49fb6d3fb489"
-      ],
-      "last_flagged_iso": "2026-05-05",
-      "reason_samples": [
-        "internal corporate email from BHP (adult work communication — legal/compliance topic)"
       ]
     },
     "email@campaigns.stjude.org": {
@@ -863,14 +843,14 @@
         "Etsy shipping notification for adult purchase (class reunion items); no kids' events or activities"
       ]
     },
-    "noreply@mypatientvisit.com": {
-      "first_flagged_iso": "2026-05-05",
+    "noreply@fromyourdentalprovider.com": {
+      "first_flagged_iso": "2026-06-05",
       "flagged_message_ids": [
-        "19df30e98bda6741"
+        "19e941e751759b59"
       ],
-      "last_flagged_iso": "2026-05-05",
+      "last_flagged_iso": "2026-06-05",
       "reason_samples": [
-        "adult patient visit appointment review notification with no child-related content"
+        "Adult dental appointment confirmation for Ellen (parent), no child involved"
       ]
     },
     "noreply@nextech.com": {
@@ -891,6 +871,16 @@
       "last_flagged_iso": "2026-05-18",
       "reason_samples": [
         "Salesforce recruiting feedback survey for adult job candidate, no children's events"
+      ]
+    },
+    "office@viennacfd.com": {
+      "first_flagged_iso": "2026-06-05",
+      "flagged_message_ids": [
+        "19e9416cff6655a8"
+      ],
+      "last_flagged_iso": "2026-06-05",
+      "reason_samples": [
+        "Adult dental appointment reminder for Ellen (parent), no child involved"
       ]
     },
     "opportunities@mail.hiive.com": {
