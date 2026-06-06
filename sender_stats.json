@@ -1,5 +1,5 @@
 {
-  "last_updated_iso": "2026-06-05T09:26:46-04:00",
+  "last_updated_iso": "2026-06-06T07:45:35-04:00",
   "schema_version": 1,
   "senders": {
     "23andmedatasettlement@e.emailksa.com": {
@@ -335,10 +335,9 @@
     "donotreply@email.teamsnap.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-04T09:32:42-04:00",
-      "messages_seen": 51,
+      "last_seen_iso": "2026-06-06T07:45:35-04:00",
+      "messages_seen": 52,
       "per_message_counts": [
-        1,
         1,
         1,
         2,
@@ -347,9 +346,10 @@
         4,
         2,
         1,
+        1,
         1
       ],
-      "total_events": 78
+      "total_events": 79
     },
     "donotreply@inova.org": {
       "first_seen_iso": "2026-04-24T20:01:41-04:00",
@@ -583,6 +583,16 @@
       ],
       "total_events": 0
     },
+    "hello@send.primary.com": {
+      "first_seen_iso": "2026-06-06T07:45:35-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-06-06T07:45:35-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
     "help@goodamerican.com": {
       "first_seen_iso": "2026-05-19T09:33:32-04:00",
       "is_newsletter": false,
@@ -727,18 +737,29 @@
       ],
       "total_events": 1
     },
+    "info@sandyhillcamp.com": {
+      "first_seen_iso": "2026-06-06T07:45:35-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-06-06T07:45:35-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        1
+      ],
+      "total_events": 1
+    },
     "info@signupgenius.com": {
       "first_seen_iso": "2026-05-01T19:50:05-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-04T09:32:42-04:00",
-      "messages_seen": 4,
+      "last_seen_iso": "2026-06-06T07:45:35-04:00",
+      "messages_seen": 5,
       "per_message_counts": [
         1,
         1,
         1,
-        2
+        2,
+        1
       ],
-      "total_events": 5
+      "total_events": 6
     },
     "info@viennadentalarts.com": {
       "first_seen_iso": "2026-04-17T17:12:56-04:00",
@@ -835,11 +856,10 @@
     "lifetouch@m.lifetouch.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-05T09:26:46-04:00",
-      "messages_seen": 25,
+      "last_seen_iso": "2026-06-06T07:45:35-04:00",
+      "messages_seen": 26,
       "per_message_counts": [
         1,
-        1,
         0,
         0,
         1,
@@ -847,7 +867,8 @@
         1,
         0,
         0,
-        1
+        1,
+        0
       ],
       "total_events": 13
     },
@@ -900,14 +921,15 @@
     "marasullivan@gmail.com": {
       "first_seen_iso": "2026-05-19T09:33:32-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-04T09:32:42-04:00",
-      "messages_seen": 3,
+      "last_seen_iso": "2026-06-06T07:45:35-04:00",
+      "messages_seen": 4,
       "per_message_counts": [
         0,
         2,
-        4
+        4,
+        3
       ],
-      "total_events": 6
+      "total_events": 9
     },
     "mashafer@gmail.com": {
       "first_seen_iso": "2026-04-17T18:36:12-04:00",
@@ -932,16 +954,17 @@
     "member.support@epactnetwork.com": {
       "first_seen_iso": "2026-04-26T18:57:52-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-05-31T07:52:00-04:00",
-      "messages_seen": 5,
+      "last_seen_iso": "2026-06-06T07:45:35-04:00",
+      "messages_seen": 6,
       "per_message_counts": [
         0,
         1,
         1,
         1,
+        1,
         1
       ],
-      "total_events": 4
+      "total_events": 5
     },
     "membership@m.dcbar.org": {
       "first_seen_iso": "2026-05-03T11:23:36-04:00",
@@ -1224,12 +1247,13 @@
     "noreply@fcps.edu": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-04-17T17:04:04-04:00",
-      "messages_seen": 1,
+      "last_seen_iso": "2026-06-06T07:45:35-04:00",
+      "messages_seen": 2,
       "per_message_counts": [
-        0
+        0,
+        1
       ],
-      "total_events": 0
+      "total_events": 1
     },
     "noreply@fromyourdentalprovider.com": {
       "first_seen_iso": "2026-06-05T09:26:46-04:00",
@@ -1406,10 +1430,11 @@
     "radhika.mital@gmail.com": {
       "first_seen_iso": "2026-05-15T08:14:10-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-05-15T08:14:10-04:00",
-      "messages_seen": 1,
+      "last_seen_iso": "2026-06-06T07:45:35-04:00",
+      "messages_seen": 2,
       "per_message_counts": [
-        1
+        1,
+        0
       ],
       "total_events": 1
     },
@@ -1683,6 +1708,16 @@
       ],
       "total_events": 24
     },
+    "suzanne@worthydog.org": {
+      "first_seen_iso": "2026-06-06T07:45:35-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-06-06T07:45:35-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
     "swimteam@hmsrc.org": {
       "first_seen_iso": "2026-04-22T08:44:22-04:00",
       "is_newsletter": false,
@@ -1705,6 +1740,16 @@
         0
       ],
       "total_events": 0
+    },
+    "tecrenshaw@fcps.edu": {
+      "first_seen_iso": "2026-06-06T07:45:35-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-06-06T07:45:35-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        1
+      ],
+      "total_events": 1
     },
     "thomas.holmes1371@gmail.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",

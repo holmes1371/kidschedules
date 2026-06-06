@@ -621,7 +621,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-06-05",
+  "last_updated_iso": "2026-06-06",
   "pending": {
     "acuvue@m.helloworldemail.com": {
       "first_flagged_iso": "2026-05-20",
@@ -743,6 +743,16 @@
         "Adult longevity/health supplement marketing email, no kids' content"
       ]
     },
+    "hello@send.primary.com": {
+      "first_flagged_iso": "2026-06-06",
+      "flagged_message_ids": [
+        "19e951cd35f5274e"
+      ],
+      "last_flagged_iso": "2026-06-06",
+      "reason_samples": [
+        "retail marketing email for children's clothing sale — no events, deadlines, or activities"
+      ]
+    },
     "help@goodamerican.com": {
       "first_flagged_iso": "2026-05-19",
       "flagged_message_ids": [
@@ -801,16 +811,6 @@
       "last_flagged_iso": "2026-05-21",
       "reason_samples": [
         "Etsy order shipped notification for adult purchase (class reunion decorations)"
-      ]
-    },
-    "no-reply@doordash.com": {
-      "first_flagged_iso": "2026-05-06",
-      "flagged_message_ids": [
-        "19dfa011e1a9e021"
-      ],
-      "last_flagged_iso": "2026-05-06",
-      "reason_samples": [
-        "Food delivery order confirmation for adult — no kids' events or activities"
       ]
     },
     "no-reply@excellenceresorts.com": {
@@ -961,6 +961,16 @@
       "last_flagged_iso": "2026-05-20",
       "reason_samples": [
         "Adult online guide/product order fulfillment — no kids' content"
+      ]
+    },
+    "suzanne@worthydog.org": {
+      "first_flagged_iso": "2026-06-06",
+      "flagged_message_ids": [
+        "19e951cd35f5274e"
+      ],
+      "last_flagged_iso": "2026-06-06",
+      "reason_samples": [
+        "dog rescue adoption application confirmation — adult process, no kids' events"
       ]
     },
     "volcor@cake4kids.org": {
