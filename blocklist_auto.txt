@@ -126,3 +126,4 @@ anthropologie@st.anthropologie.com  # auto 2026-05-29: Adult clothing retailer o
 events@paulweiss.com  # auto 2026-05-29: Adult legal industry event reminder — no kids' events
 vzwmail@ecrmemail.verizonwireless.com  # auto 2026-05-31: Verizon Wireless order confirmation — adult consumer electronics, no kids' event
 info@email.obama.org  # auto 2026-05-31: Obama Foundation promotional email about presidential center — adult civic/cultu
+noreply@nextech.com  # auto 2026-06-07: Adult medical aesthetics appointment reminder — no children involved

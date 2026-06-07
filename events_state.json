@@ -134,6 +134,20 @@
       "source_message_id": "19e1b9233722fc67",
       "time": "All day (deadline)"
     },
+    "0f176bd3a9e6": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-06-10",
+      "first_seen_iso": "2026-06-07T08:02:49-04:00",
+      "id": "0f176bd3a9e6",
+      "location": "Louise Archer Elementary School",
+      "name": "6th Grade Musical — Evening Performance",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Sahai, Anita (Jun 6)",
+      "source_message_id": "19e9ca0ccf2f8a0c",
+      "time": "Doors open 6:30 PM"
+    },
     "13dce15d2106": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -326,20 +340,6 @@
       "source_message_id": "19e3c41ba6342a67",
       "time": "Morning"
     },
-    "251c962950fd": {
-      "category": "Sports & Extracurriculars",
-      "child": "Everly",
-      "date": "2026-06-06",
-      "first_seen_iso": "2026-05-29T09:34:15-04:00",
-      "id": "251c962950fd",
-      "location": "https://born2dancestudio.com/youth/dance-programs/competition-team-auditions-2026-27-2",
-      "name": "B2D Competition Team Auditions — Day 1",
-      "sender_block_key": "teamsnap.com",
-      "sender_domain": "teamsnap.com",
-      "source": "B2D TeamSnap (May 28)",
-      "source_message_id": "19e6f7c49afbc211",
-      "time": ""
-    },
     "2806e3232844": {
       "category": "Appointment",
       "child": "",
@@ -393,19 +393,19 @@
       "source": "LAES PTA Sunbeam (Mar 22)",
       "time": "9:00 AM - 2:00 PM"
     },
-    "2b4dbb22a8cd": {
+    "2c78924e0394": {
       "category": "Sports & Extracurriculars",
       "child": "Everly",
-      "date": "2026-06-06",
-      "first_seen_iso": "2026-06-03T11:06:17-04:00",
-      "id": "2b4dbb22a8cd",
-      "location": "Born 2 Dance Studio",
-      "name": "B2D Competition Team Audition — Jazz Group B (MATRIX/KINETIX)",
-      "sender_block_key": "cognitoforms.com",
-      "sender_domain": "cognitoforms.com",
-      "source": "Born 2 Dance Studio (Jun 2)",
-      "source_message_id": "19e8ac336804eb41",
-      "time": "5:00 PM – 5:45 PM"
+      "date": "2026-07-03",
+      "first_seen_iso": "2026-06-07T08:02:49-04:00",
+      "id": "2c78924e0394",
+      "location": "",
+      "name": "B2D Season 11 Placement Notices Complete (end of week)",
+      "sender_block_key": "teamsnap.com",
+      "sender_domain": "teamsnap.com",
+      "source": "B2D TeamSnap - Rami Shalan (Jun 6)",
+      "source_message_id": "19e9df4307f3e074",
+      "time": "All day"
     },
     "2d55ffb02f14": {
       "category": "Sports & Extracurriculars",
@@ -420,6 +420,20 @@
       "source": "LAES PTA Sunbeam (May 17)",
       "source_message_id": "19e38ef24189c70a",
       "time": "9:00 AM – 2:00 PM"
+    },
+    "2da48199d58d": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-06-09",
+      "first_seen_iso": "2026-06-07T08:02:49-04:00",
+      "id": "2da48199d58d",
+      "location": "Louise Archer Elementary School",
+      "name": "Dress Like an Idiom Day — REQUIRED (Pinkman & Sahai Homerooms)",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Sahai, Anita (Jun 6)",
+      "source_message_id": "19e9ca0ccf2f8a0c",
+      "time": "All day"
     },
     "2dad08c82fa6": {
       "category": "Sports & Extracurriculars",
@@ -541,20 +555,6 @@
       "source": "HTM Sharks / Carly Reiley via SportsEngine Motion (Mar 4)",
       "time": "9:00 AM – 12:00 PM"
     },
-    "3d3e88cba02b": {
-      "category": "Sports & Extracurriculars",
-      "child": "Everly",
-      "date": "2026-06-06",
-      "first_seen_iso": "2026-05-29T09:34:15-04:00",
-      "id": "3d3e88cba02b",
-      "location": "https://born2dancestudio.com/youth/dance-programs/competition-team-auditions-2026-27-2",
-      "name": "B2D Competition Team Auditions — Day 1 (duplicate message)",
-      "sender_block_key": "teamsnap.com",
-      "sender_domain": "teamsnap.com",
-      "source": "B2D TeamSnap (May 28)",
-      "source_message_id": "19e6f7c46dc88afb",
-      "time": ""
-    },
     "3decd6dd7acb": {
       "category": "Academic Due Date",
       "child": "All LAES students",
@@ -567,20 +567,6 @@
       "sender_domain": "louisearcherpta.org",
       "source": "LAES PTA Sunbeam (May 3)",
       "source_message_id": "19df118b46bc994c",
-      "time": "All day (deadline)"
-    },
-    "3e55092c2bff": {
-      "category": "Academic Due Date",
-      "child": "Everly",
-      "date": "2026-06-01",
-      "first_seen_iso": "2026-06-06T07:45:35-04:00",
-      "id": "3e55092c2bff",
-      "location": "https://www.sandyhillcamp.com.asp/login.asp",
-      "name": "Sandy Hill Camp 2026 — Past Due Items (originally due June 1)",
-      "sender_block_key": "sandyhillcamp.com",
-      "sender_domain": "sandyhillcamp.com",
-      "source": "Sandy Hill Camp (Jun 5)",
-      "source_message_id": "19e9961fc8fe140e",
       "time": "All day (deadline)"
     },
     "41ef4ef0c5a8": {
@@ -790,20 +776,6 @@
       "source_message_id": "19e664210c8c90e7",
       "time": "All day (deadline)"
     },
-    "4e95aa9d3907": {
-      "category": "School Activity",
-      "child": "All LAES students",
-      "date": "2026-06-06",
-      "first_seen_iso": "2026-06-06T07:45:35-04:00",
-      "id": "4e95aa9d3907",
-      "location": "Louise Archer Elementary School — https://www.signupgenius.com/go/20F0B4AAAA62EA5FE3-63697105-louise/73029158",
-      "name": "Louise Archer Field Day 2026",
-      "sender_block_key": "signupgenius.com",
-      "sender_domain": "signupgenius.com",
-      "source": "Louise Archer PTA via SignUpGenius (Jun 5)",
-      "source_message_id": "19e9559f9330cf84",
-      "time": "Morning shift 9:15 AM / Afternoon shift 12:45 PM"
-    },
     "4f505931ed24": {
       "category": "School Activity",
       "child": "Isla",
@@ -867,6 +839,20 @@
       "source": "Lifetouch School Photography (May 3)",
       "source_message_id": "19def611cdcf1978",
       "time": "School hours"
+    },
+    "534910e15256": {
+      "category": "Sports & Extracurriculars",
+      "child": "Everly",
+      "date": "2026-06-06",
+      "first_seen_iso": "2026-06-07T08:02:49-04:00",
+      "id": "534910e15256",
+      "location": "Born 2 Dance Studio (B2D)",
+      "name": "B2D Sparx Team Practice Ends Early (3:30 PM)",
+      "sender_block_key": "teamsnap.com",
+      "sender_domain": "teamsnap.com",
+      "source": "B2D TeamSnap - Rami Shalan (Jun 6)",
+      "source_message_id": "19e9df4307f3e074",
+      "time": "3:30 PM"
     },
     "54387eb73866": {
       "category": "Sports & Extracurriculars",
@@ -1113,20 +1099,6 @@
       "name": "Sports Camp at LAES — Session 2 Last Day",
       "source": "LAES PTA Sunbeam (Mar 22)",
       "time": "9:00 AM – 2:00 PM"
-    },
-    "62d48d365947": {
-      "category": "Sports & Extracurriculars",
-      "child": "",
-      "date": "2026-06-06",
-      "first_seen_iso": "2026-05-27T09:50:09-04:00",
-      "id": "62d48d365947",
-      "location": "Rita's Italian Ice & Frozen Custard, 116 Church Street NW, Vienna, VA",
-      "name": "VYI Volleyball End-of-Season Celebration at Rita's Italian Ice",
-      "sender_block_key": "ottosportmail.ai",
-      "sender_domain": "ottosportmail.ai",
-      "source": "Vienna Youth Inc (May 26)",
-      "source_message_id": "19e650a89e2e7b98",
-      "time": "12:00 PM – 8:00 PM"
     },
     "6306a5f98984": {
       "category": "School Activity",
@@ -1505,6 +1477,20 @@
       "source_message_id": "19da909fe35cca68",
       "time": "9:00 AM - 2:00 PM"
     },
+    "79526292b05f": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-06-10",
+      "first_seen_iso": "2026-06-07T08:02:49-04:00",
+      "id": "79526292b05f",
+      "location": "Louise Archer Elementary School",
+      "name": "6th Grade Musical — School Day Performance",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Sahai, Anita (Jun 6)",
+      "source_message_id": "19e9ca0ccf2f8a0c",
+      "time": "2:30 PM (call time 1:45 PM)"
+    },
     "79ea0571b650": {
       "category": "Sports & Extracurriculars",
       "child": "Isla",
@@ -1779,6 +1765,20 @@
       "source_message_id": "19d3f0d72e52bba6",
       "time": ""
     },
+    "8c91ca7d5adf": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-06-11",
+      "first_seen_iso": "2026-06-07T08:02:49-04:00",
+      "id": "8c91ca7d5adf",
+      "location": "Louise Archer Elementary School",
+      "name": "6th Grade Musical — School Day Performance",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Sahai, Anita (Jun 6)",
+      "source_message_id": "19e9ca0ccf2f8a0c",
+      "time": "2:30 PM (call time 1:45 PM)"
+    },
     "8e53c92f1547": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -1835,6 +1835,20 @@
       "source_message_id": "19e3b6f4c5c2afb7",
       "time": "9:45 AM–12:05 PM"
     },
+    "91dd4e06d523": {
+      "category": "Academic Due Date",
+      "child": "Everly",
+      "date": "2026-06-08",
+      "first_seen_iso": "2026-06-07T08:02:49-04:00",
+      "id": "91dd4e06d523",
+      "location": "Louise Archer Elementary School",
+      "name": "Smashbooks Due",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Sahai, Anita (Jun 6)",
+      "source_message_id": "19e9ca0ccf2f8a0c",
+      "time": "All day (deadline)"
+    },
     "920e19edba89": {
       "category": "Sports & Extracurriculars",
       "child": "",
@@ -1845,6 +1859,20 @@
       "name": "HTM Sharks NVSL A Meet — HOME: Forest Hollow (FH) @ Hunter Mill",
       "source": "HTM Sharks / Carly Reiley via SportsEngine Motion (Mar 4)",
       "time": "9:00 AM – 12:00 PM"
+    },
+    "926db3dc07e6": {
+      "category": "Sports & Extracurriculars",
+      "child": "",
+      "date": "2026-06-07",
+      "first_seen_iso": "2026-06-07T08:02:49-04:00",
+      "id": "926db3dc07e6",
+      "location": "Vienna Community Center",
+      "name": "VYI Volleyball Playoffs — Championship Game (if win Round 1)",
+      "sender_block_key": "mollypeng28@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Molly Peng / Coach Mara (Jun 6)",
+      "source_message_id": "19e9d1cab4a47fb6",
+      "time": "5:00 PM"
     },
     "92cff68a3330": {
       "category": "Sports & Extracurriculars",
@@ -1901,6 +1929,20 @@
       "source": "LAES PTA Sunbeam (May 3)",
       "source_message_id": "19df118b46bc994c",
       "time": "9:00 AM – 2:00 PM"
+    },
+    "9a392bb5cbed": {
+      "category": "Sports & Extracurriculars",
+      "child": "Everly",
+      "date": "2026-06-06",
+      "first_seen_iso": "2026-06-07T08:02:49-04:00",
+      "id": "9a392bb5cbed",
+      "location": "Born 2 Dance Studio (B2D)",
+      "name": "B2D Auditions Weekend (Saturday)",
+      "sender_block_key": "teamsnap.com",
+      "sender_domain": "teamsnap.com",
+      "source": "B2D TeamSnap - Rami Shalan (Jun 6)",
+      "source_message_id": "19e9df4307f3e074",
+      "time": ""
     },
     "9dee9505b4f9": {
       "category": "Sports & Extracurriculars",
@@ -1969,6 +2011,20 @@
       "source_message_id": "19e81307b9de3490",
       "time": "8:30 AM – 12:30 PM"
     },
+    "a23279ec80a4": {
+      "category": "Sports & Extracurriculars",
+      "child": "Everly",
+      "date": "2026-06-22",
+      "first_seen_iso": "2026-06-07T08:02:49-04:00",
+      "id": "a23279ec80a4",
+      "location": "Born 2 Dance Studio (B2D)",
+      "name": "B2D Nationals Rehearsal Schedules Announced (week of 6/22 and 6/29)",
+      "sender_block_key": "teamsnap.com",
+      "sender_domain": "teamsnap.com",
+      "source": "B2D TeamSnap - Rami Shalan (Jun 6)",
+      "source_message_id": "19e9df4307f3e074",
+      "time": ""
+    },
     "a5b7abb36025": {
       "category": "Sports & Extracurriculars",
       "child": "",
@@ -1982,6 +2038,20 @@
       "source": "Mara Thayer / VYI Volleyball (Jun 3)",
       "source_message_id": "19e8df8ffdafc31b",
       "time": "4:00 PM"
+    },
+    "a64315590ad8": {
+      "category": "Sports & Extracurriculars",
+      "child": "Everly",
+      "date": "2026-06-07",
+      "first_seen_iso": "2026-06-07T08:02:49-04:00",
+      "id": "a64315590ad8",
+      "location": "Born 2 Dance Studio (B2D)",
+      "name": "B2D Auditions Weekend (Sunday)",
+      "sender_block_key": "teamsnap.com",
+      "sender_domain": "teamsnap.com",
+      "source": "B2D TeamSnap - Rami Shalan (Jun 6)",
+      "source_message_id": "19e9df4307f3e074",
+      "time": ""
     },
     "a733932aec0f": {
       "category": "School Activity",
@@ -2283,6 +2353,20 @@
       "sender_domain": "louisearcherpta.org",
       "source": "LAES PTA Sunbeam (Apr 26)",
       "source_message_id": "19dccf5b656488ec",
+      "time": "All day (deadline)"
+    },
+    "c072cccd995d": {
+      "category": "Academic Due Date",
+      "child": "Everly",
+      "date": "2026-06-06",
+      "first_seen_iso": "2026-06-07T08:02:49-04:00",
+      "id": "c072cccd995d",
+      "location": "https://www.sandyhillcamp.com/health_agreement_2026-05-18.pdf",
+      "name": "Sandy Hill Camp Health Update Submission Deadline",
+      "sender_block_key": "sandyhillcamp.com",
+      "sender_domain": "sandyhillcamp.com",
+      "source": "Sandy Hill Camp (Jun 6)",
+      "source_message_id": "19e9e3cca7d80323",
       "time": "All day (deadline)"
     },
     "c11b4b4c7697": {
@@ -2592,6 +2676,34 @@
       "source": "LAES PTA Sunbeam (Mar 22)",
       "time": "9:00 AM – 4:00 PM"
     },
+    "d4f42907fc39": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-06-11",
+      "first_seen_iso": "2026-06-07T08:02:49-04:00",
+      "id": "d4f42907fc39",
+      "location": "Louise Archer Elementary School",
+      "name": "6th Grade Musical — Evening Performance",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Sahai, Anita (Jun 6)",
+      "source_message_id": "19e9ca0ccf2f8a0c",
+      "time": "Doors open 6:30 PM"
+    },
+    "d588c0a3d3dc": {
+      "category": "Sports & Extracurriculars",
+      "child": "Everly",
+      "date": "2026-06-21",
+      "first_seen_iso": "2026-06-07T08:02:49-04:00",
+      "id": "d588c0a3d3dc",
+      "location": "Born 2 Dance Studio (B2D)",
+      "name": "B2D Recital",
+      "sender_block_key": "teamsnap.com",
+      "sender_domain": "teamsnap.com",
+      "source": "B2D TeamSnap - Rami Shalan (Jun 6)",
+      "source_message_id": "19e9df4307f3e074",
+      "time": ""
+    },
     "d7485ecc5f38": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -2647,6 +2759,20 @@
       "source": "Cuppett Performing Arts (May 18)",
       "source_message_id": "19e3b5ebba538199",
       "time": "All day (deadline)"
+    },
+    "d8c70fb99096": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-06-12",
+      "first_seen_iso": "2026-06-07T08:02:49-04:00",
+      "id": "d8c70fb99096",
+      "location": "Louise Archer Elementary School",
+      "name": "6th Grade Musical — Final Show & Strike / Cast Party",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Sahai, Anita (Jun 6)",
+      "source_message_id": "19e9ca0ccf2f8a0c",
+      "time": "Cast party 12:40–1:15 PM; specials 1:45–2:45 PM"
     },
     "db41997a7e17": {
       "category": "School Activity",
@@ -2824,6 +2950,20 @@
       "source_message_id": "19e3c41ba6342a67",
       "time": "All day"
     },
+    "eea7b9d5803e": {
+      "category": "Sports & Extracurriculars",
+      "child": "",
+      "date": "2026-06-07",
+      "first_seen_iso": "2026-06-07T08:02:49-04:00",
+      "id": "eea7b9d5803e",
+      "location": "Luther Jackson MS (back gym)",
+      "name": "VYI Volleyball Playoffs — 3rd Place Game (if lose Round 1)",
+      "sender_block_key": "mollypeng28@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Molly Peng / Coach Mara (Jun 6)",
+      "source_message_id": "19e9d1cab4a47fb6",
+      "time": "4:00 PM"
+    },
     "eefb39d0cabd": {
       "category": "School Activity",
       "child": "Everly",
@@ -2888,6 +3028,20 @@
       "source_message_id": "19dccf5b656488ec",
       "time": "8:30 AM - 12:30 PM"
     },
+    "f3795853791e": {
+      "category": "Sports & Extracurriculars",
+      "child": "Everly",
+      "date": "2026-06-22",
+      "first_seen_iso": "2026-06-07T08:02:49-04:00",
+      "id": "f3795853791e",
+      "location": "",
+      "name": "B2D Season 11 Placement Notices Begin Going Out",
+      "sender_block_key": "teamsnap.com",
+      "sender_domain": "teamsnap.com",
+      "source": "B2D TeamSnap - Rami Shalan (Jun 6)",
+      "source_message_id": "19e9df4307f3e074",
+      "time": "All day"
+    },
     "f46ec8f1c8f0": {
       "category": "Sports & Extracurriculars",
       "child": "",
@@ -2940,6 +3094,34 @@
       "source": "B2D TeamSnap (May 28)",
       "source_message_id": "19e6fdea07655dbc",
       "time": ""
+    },
+    "f79a761c982d": {
+      "category": "Sports & Extracurriculars",
+      "child": "",
+      "date": "2026-06-07",
+      "first_seen_iso": "2026-06-07T08:02:49-04:00",
+      "id": "f79a761c982d",
+      "location": "Luther Jackson MS (back gym)",
+      "name": "VYI Volleyball Playoffs — Round 1 vs Team Purple",
+      "sender_block_key": "mollypeng28@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Molly Peng / Coach Mara (Jun 6)",
+      "source_message_id": "19e9d1cab4a47fb6",
+      "time": "2:15 PM"
+    },
+    "f877bfd1d835": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-06-08",
+      "first_seen_iso": "2026-06-07T08:02:49-04:00",
+      "id": "f877bfd1d835",
+      "location": "Louise Archer Elementary School",
+      "name": "6th Grade Musical — Full Dress Rehearsal Day",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Sahai, Anita (Jun 6)",
+      "source_message_id": "19e9ca0ccf2f8a0c",
+      "time": "All day (specials 2:45–3:45 PM)"
     },
     "f95b5613dbf8": {
       "category": "School Activity",
@@ -3107,7 +3289,7 @@
       "time": "School hours"
     }
   },
-  "last_updated_iso": "2026-06-06T07:45:35-04:00",
+  "last_updated_iso": "2026-06-07T08:02:49-04:00",
   "processed_messages": {
     "19a0da1d7445f787": "2026-04-17T18:51:22-04:00",
     "19a1784ff2f26474": "2026-04-17T18:51:22-04:00",
@@ -3552,7 +3734,15 @@
     "19e9961fc8fe140e": "2026-06-06T07:45:35-04:00",
     "19e996fe29ffa930": "2026-06-06T07:45:35-04:00",
     "19e998cdd8ef565c": "2026-06-06T07:45:35-04:00",
-    "19e99d08fb6a5a8c": "2026-06-06T07:45:35-04:00"
+    "19e99d08fb6a5a8c": "2026-06-06T07:45:35-04:00",
+    "19e9ca0ccf2f8a0c": "2026-06-07T08:02:49-04:00",
+    "19e9cd0cc53cdda5": "2026-06-07T08:02:49-04:00",
+    "19e9d051b3506c67": "2026-06-07T08:02:49-04:00",
+    "19e9d190454ccde3": "2026-06-07T08:02:49-04:00",
+    "19e9d1cab4a47fb6": "2026-06-07T08:02:49-04:00",
+    "19e9d2d7cdab5aa1": "2026-06-07T08:02:49-04:00",
+    "19e9df4307f3e074": "2026-06-07T08:02:49-04:00",
+    "19e9e3cca7d80323": "2026-06-07T08:02:49-04:00"
   },
   "schema_version": 3
 }

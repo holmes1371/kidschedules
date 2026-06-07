@@ -1,5 +1,5 @@
 {
-  "last_updated_iso": "2026-06-06T07:45:35-04:00",
+  "last_updated_iso": "2026-06-07T08:02:49-04:00",
   "schema_version": 1,
   "senders": {
     "23andmedatasettlement@e.emailksa.com": {
@@ -131,17 +131,18 @@
     "asahai@fcps.edu": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": true,
-      "last_seen_iso": "2026-05-19T09:33:32-04:00",
-      "messages_seen": 6,
+      "last_seen_iso": "2026-06-07T08:02:49-04:00",
+      "messages_seen": 7,
       "per_message_counts": [
         6,
         6,
         0,
         10,
         27,
-        23
+        23,
+        8
       ],
-      "total_events": 72
+      "total_events": 80
     },
     "automated@airbnb.com": {
       "first_seen_iso": "2026-05-21T09:33:37-04:00",
@@ -335,10 +336,9 @@
     "donotreply@email.teamsnap.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-06T07:45:35-04:00",
-      "messages_seen": 52,
+      "last_seen_iso": "2026-06-07T08:02:49-04:00",
+      "messages_seen": 53,
       "per_message_counts": [
-        1,
         1,
         2,
         1,
@@ -347,9 +347,10 @@
         2,
         1,
         1,
-        1
+        1,
+        7
       ],
-      "total_events": 79
+      "total_events": 86
     },
     "donotreply@inova.org": {
       "first_seen_iso": "2026-04-24T20:01:41-04:00",
@@ -740,12 +741,13 @@
     "info@sandyhillcamp.com": {
       "first_seen_iso": "2026-06-06T07:45:35-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-06T07:45:35-04:00",
-      "messages_seen": 1,
+      "last_seen_iso": "2026-06-07T08:02:49-04:00",
+      "messages_seen": 2,
       "per_message_counts": [
+        1,
         1
       ],
-      "total_events": 1
+      "total_events": 2
     },
     "info@signupgenius.com": {
       "first_seen_iso": "2026-05-01T19:50:05-04:00",
@@ -856,10 +858,9 @@
     "lifetouch@m.lifetouch.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-06T07:45:35-04:00",
-      "messages_seen": 26,
+      "last_seen_iso": "2026-06-07T08:02:49-04:00",
+      "messages_seen": 27,
       "per_message_counts": [
-        1,
         0,
         0,
         1,
@@ -868,6 +869,7 @@
         0,
         0,
         1,
+        0,
         0
       ],
       "total_events": 13
@@ -1024,6 +1026,16 @@
         0
       ],
       "total_events": 1
+    },
+    "mollypeng28@gmail.com": {
+      "first_seen_iso": "2026-06-07T08:02:49-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-06-07T08:02:49-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        3
+      ],
+      "total_events": 3
     },
     "msb@info.myschoolbucks.com": {
       "first_seen_iso": "2026-05-12T08:19:20-04:00",
@@ -1222,6 +1234,16 @@
       ],
       "total_events": 2
     },
+    "noreply@email.apple.com": {
+      "first_seen_iso": "2026-06-07T08:02:49-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-06-07T08:02:49-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
     "noreply@email.myvalottery.com": {
       "first_seen_iso": "2026-05-01T19:50:05-04:00",
       "is_newsletter": false,
@@ -1318,9 +1340,10 @@
     "noreply@nextech.com": {
       "first_seen_iso": "2026-06-04T09:32:42-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-04T09:32:42-04:00",
-      "messages_seen": 1,
+      "last_seen_iso": "2026-06-07T08:02:49-04:00",
+      "messages_seen": 2,
       "per_message_counts": [
+        0,
         0
       ],
       "total_events": 0
@@ -1784,6 +1807,16 @@
       "first_seen_iso": "2026-04-17T17:12:56-04:00",
       "is_newsletter": false,
       "last_seen_iso": "2026-04-17T17:12:56-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
+    "venmo@venmo.com": {
+      "first_seen_iso": "2026-06-07T08:02:49-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-06-07T08:02:49-04:00",
       "messages_seen": 1,
       "per_message_counts": [
         0

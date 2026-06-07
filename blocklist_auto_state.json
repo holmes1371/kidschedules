@@ -445,6 +445,11 @@
       "last_flagged_iso": "2026-04-26",
       "reason": "legacy entry seeded post-deploy"
     },
+    "noreply@nextech.com": {
+      "added_iso": "2026-06-07",
+      "last_flagged_iso": "2026-06-07",
+      "reason": "Adult medical aesthetics appointment reminder — no children involved"
+    },
     "noreply@opera.upscalebychoice.com": {
       "added_iso": "2026-04-26",
       "last_flagged_iso": "2026-04-26",
@@ -621,7 +626,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-06-06",
+  "last_updated_iso": "2026-06-07",
   "pending": {
     "acuvue@m.helloworldemail.com": {
       "first_flagged_iso": "2026-05-20",
@@ -723,16 +728,6 @@
         "Google Home device invitation, unrelated to children's activities"
       ]
     },
-    "hello-us@newsletter.emailbenefithub.com": {
-      "first_flagged_iso": "2026-05-07",
-      "flagged_message_ids": [
-        "19dfe97ff93f479f"
-      ],
-      "last_flagged_iso": "2026-05-07",
-      "reason_samples": [
-        "Adult employee benefits/discount newsletter, no connection to children"
-      ]
-    },
     "hello@hellowisp.com": {
       "first_flagged_iso": "2026-05-14",
       "flagged_message_ids": [
@@ -771,16 +766,6 @@
       "last_flagged_iso": "2026-05-29",
       "reason_samples": [
         "Nonprofit prosthetics organization newsletter — community/charity content, no kids' events relevant to this family"
-      ]
-    },
-    "info@healemedical.com": {
-      "first_flagged_iso": "2026-05-07",
-      "flagged_message_ids": [
-        "19dff13282bca3c0"
-      ],
-      "last_flagged_iso": "2026-05-07",
-      "reason_samples": [
-        "Adult medical weight loss promotion, no connection to children"
       ]
     },
     "insights@law.com": {
@@ -843,6 +828,16 @@
         "Etsy shipping notification for adult purchase (class reunion items); no kids' events or activities"
       ]
     },
+    "noreply@email.apple.com": {
+      "first_flagged_iso": "2026-06-07",
+      "flagged_message_ids": [
+        "19e9d190454ccde3"
+      ],
+      "last_flagged_iso": "2026-06-07",
+      "reason_samples": [
+        "Apple account security notification — no kids' events"
+      ]
+    },
     "noreply@fromyourdentalprovider.com": {
       "first_flagged_iso": "2026-06-05",
       "flagged_message_ids": [
@@ -851,16 +846,6 @@
       "last_flagged_iso": "2026-06-05",
       "reason_samples": [
         "Adult dental appointment confirmation for Ellen (parent), no child involved"
-      ]
-    },
-    "noreply@nextech.com": {
-      "first_flagged_iso": "2026-06-04",
-      "flagged_message_ids": [
-        "19e8d9235f28e8af"
-      ],
-      "last_flagged_iso": "2026-06-04",
-      "reason_samples": [
-        "Adult medical aesthetics appointment reminder — Dontage Medical Aesthetics is a cosmetic/aesthetics clinic, not a pediatric provider"
       ]
     },
     "noreply@qemailserver.com": {
@@ -971,6 +956,16 @@
       "last_flagged_iso": "2026-06-06",
       "reason_samples": [
         "dog rescue adoption application confirmation — adult process, no kids' events"
+      ]
+    },
+    "venmo@venmo.com": {
+      "first_flagged_iso": "2026-06-07",
+      "flagged_message_ids": [
+        "19e9d2d7cdab5aa1"
+      ],
+      "last_flagged_iso": "2026-06-07",
+      "reason_samples": [
+        "Venmo payment notification — adult financial transaction, no kids' events"
       ]
     },
     "volcor@cake4kids.org": {
