@@ -415,6 +415,11 @@
       "last_flagged_iso": "2026-04-26",
       "reason": "legacy entry seeded post-deploy"
     },
+    "noreply@email.apple.com": {
+      "added_iso": "2026-06-08",
+      "last_flagged_iso": "2026-06-08",
+      "reason": "Apple system notification about parental controls / app restrictions update, no scheduled kids' events"
+    },
     "noreply@email.myvalottery.com": {
       "added_iso": "2026-05-14",
       "last_flagged_iso": "2026-05-14",
@@ -565,6 +570,11 @@
       "last_flagged_iso": "2026-04-26",
       "reason": "legacy entry seeded post-deploy"
     },
+    "support@s.usa.experian.com": {
+      "added_iso": "2026-06-08",
+      "last_flagged_iso": "2026-06-08",
+      "reason": "Adult personal finance / credit monitoring account statement, no children's content"
+    },
     "support@zimadental.co": {
       "added_iso": "2026-04-26",
       "last_flagged_iso": "2026-04-26",
@@ -626,7 +636,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-06-07",
+  "last_updated_iso": "2026-06-08",
   "pending": {
     "acuvue@m.helloworldemail.com": {
       "first_flagged_iso": "2026-05-20",
@@ -696,16 +706,6 @@
       "last_flagged_iso": "2026-05-10",
       "reason_samples": [
         "contact lens refill marketing email, adult optical/vision product promotion, no children's events"
-      ]
-    },
-    "eleanor_lunger@hotmail.com": {
-      "first_flagged_iso": "2026-05-08",
-      "flagged_message_ids": [
-        "19e04d1f9a98401f"
-      ],
-      "last_flagged_iso": "2026-05-08",
-      "reason_samples": [
-        "neighborhood email thread about arborist recommendations — entirely adult/home maintenance topic, no kids' events"
       ]
     },
     "email@campaigns.stjude.org": {
@@ -798,16 +798,6 @@
         "Etsy order shipped notification for adult purchase (class reunion decorations)"
       ]
     },
-    "no-reply@excellenceresorts.com": {
-      "first_flagged_iso": "2026-05-08",
-      "flagged_message_ids": [
-        "19e030ecc7cb7640"
-      ],
-      "last_flagged_iso": "2026-05-08",
-      "reason_samples": [
-        "adult resort reservation confirmation for parents-only trip — no children involved"
-      ]
-    },
     "no-reply@info.email.aa.com": {
       "first_flagged_iso": "2026-05-19",
       "flagged_message_ids": [
@@ -826,16 +816,6 @@
       "last_flagged_iso": "2026-05-25",
       "reason_samples": [
         "Etsy shipping notification for adult purchase (class reunion items); no kids' events or activities"
-      ]
-    },
-    "noreply@email.apple.com": {
-      "first_flagged_iso": "2026-06-07",
-      "flagged_message_ids": [
-        "19e9d190454ccde3"
-      ],
-      "last_flagged_iso": "2026-06-07",
-      "reason_samples": [
-        "Apple account security notification — no kids' events"
       ]
     },
     "noreply@fromyourdentalprovider.com": {
@@ -926,16 +906,6 @@
       "last_flagged_iso": "2026-05-16",
       "reason_samples": [
         "Adult news/finance newsletter with no kids' content"
-      ]
-    },
-    "support@s.usa.experian.com": {
-      "first_flagged_iso": "2026-05-09",
-      "flagged_message_ids": [
-        "19e0866aad58598c"
-      ],
-      "last_flagged_iso": "2026-05-09",
-      "reason_samples": [
-        "adult personal credit monitoring service — no children or school content"
       ]
     },
     "support@thatgirlconcept.com": {
