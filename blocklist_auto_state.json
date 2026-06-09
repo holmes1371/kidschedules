@@ -240,6 +240,11 @@
       "last_flagged_iso": "2026-05-23",
       "reason": "Promotional retail/rug sale email — no kids' content whatsoever"
     },
+    "insights@law.com": {
+      "added_iso": "2026-06-09",
+      "last_flagged_iso": "2026-06-09",
+      "reason": "Legal industry newsletter (NLJ 500 rankings) — adult/work content, no kids' events"
+    },
     "interstitialcystitisassociationica@mailman.bloomerang-mail.com": {
       "added_iso": "2026-04-26",
       "last_flagged_iso": "2026-04-26",
@@ -636,7 +641,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-06-08",
+  "last_updated_iso": "2026-06-09",
   "pending": {
     "acuvue@m.helloworldemail.com": {
       "first_flagged_iso": "2026-05-20",
@@ -766,16 +771,6 @@
       "last_flagged_iso": "2026-05-29",
       "reason_samples": [
         "Nonprofit prosthetics organization newsletter — community/charity content, no kids' events relevant to this family"
-      ]
-    },
-    "insights@law.com": {
-      "first_flagged_iso": "2026-06-04",
-      "flagged_message_ids": [
-        "19e8d1bc90e91095"
-      ],
-      "last_flagged_iso": "2026-06-04",
-      "reason_samples": [
-        "Legal industry news publication (The American Lawyer Morning Update) — entirely adult/work content with no connection to children's activities"
       ]
     },
     "nihar.shah@ses.com": {
@@ -946,16 +941,6 @@
       "last_flagged_iso": "2026-05-13",
       "reason_samples": [
         "Volunteer organization newsletter for adult bakers — no events relevant to this family's children"
-      ]
-    },
-    "yingjin920@gmail.com": {
-      "first_flagged_iso": "2026-05-09",
-      "flagged_message_ids": [
-        "19e08309b4f3c584"
-      ],
-      "last_flagged_iso": "2026-05-09",
-      "reason_samples": [
-        "neighborhood email thread about arborist recommendations — no children or school content"
       ]
     }
   },

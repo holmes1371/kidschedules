@@ -129,3 +129,4 @@ info@email.obama.org  # auto 2026-05-31: Obama Foundation promotional email abou
 noreply@nextech.com  # auto 2026-06-07: Adult medical aesthetics appointment reminder — no children involved
 support@s.usa.experian.com  # auto 2026-06-08: Adult personal finance / credit monitoring account statement, no children's cont
 noreply@email.apple.com  # auto 2026-06-08: Apple system notification about parental controls / app restrictions update, no
+insights@law.com  # auto 2026-06-09: Legal industry newsletter (NLJ 500 rankings) — adult/work content, no kids' even

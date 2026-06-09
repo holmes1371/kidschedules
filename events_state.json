@@ -84,6 +84,20 @@
       "source_message_id": "19e98b64c4404b24",
       "time": "All day (deadline)"
     },
+    "0350ebd850d7": {
+      "category": "Sports & Extracurriculars",
+      "child": "All LAES students",
+      "date": "2026-07-31",
+      "first_seen_iso": "2026-06-09T09:19:03-04:00",
+      "id": "0350ebd850d7",
+      "location": "Louise Archer Elementary School Gym",
+      "name": "Sports Camp Session 2 at LAES — Last Day",
+      "sender_block_key": "louisearcherpta.org",
+      "sender_domain": "louisearcherpta.org",
+      "source": "LAES PTA Sunbeam (Jun 7)",
+      "source_message_id": "19ea53c126e941d7",
+      "time": "9:00 AM – 2:00 PM"
+    },
     "0679ed279f7d": {
       "category": "Sports & Extracurriculars",
       "child": "All LAES students",
@@ -148,6 +162,20 @@
       "source_message_id": "19e9ca0ccf2f8a0c",
       "time": "Doors open 6:30 PM"
     },
+    "0f235521a2e4": {
+      "category": "Sports & Extracurriculars",
+      "child": "Isla",
+      "date": "2026-06-18",
+      "first_seen_iso": "2026-06-09T09:19:03-04:00",
+      "id": "0f235521a2e4",
+      "location": "",
+      "name": "Cuppett Performing Arts Recital 2026 — Show Day 2",
+      "sender_block_key": "jackrabbittech.com",
+      "sender_domain": "jackrabbittech.com",
+      "source": "Cuppett Performing Arts Center (Jun 8)",
+      "source_message_id": "19ea90953343bf00",
+      "time": ""
+    },
     "13dce15d2106": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -200,6 +228,20 @@
       "source": "Rohde, Meredith (Apr 26)",
       "source_message_id": "19dcb92548731780",
       "time": "School hours"
+    },
+    "1aebfd20a06a": {
+      "category": "School Activity",
+      "child": "All LAES students",
+      "date": "2026-06-16",
+      "first_seen_iso": "2026-06-09T09:19:03-04:00",
+      "id": "1aebfd20a06a",
+      "location": "LAES Front Office",
+      "name": "Drop Off Cookies/Treats for End-of-Year Staff Celebration",
+      "sender_block_key": "louisearcherpta.org",
+      "sender_domain": "louisearcherpta.org",
+      "source": "LAES PTA Sunbeam (Jun 7)",
+      "source_message_id": "19ea53c126e941d7",
+      "time": "All day"
     },
     "1b00300bea25": {
       "category": "School Activity",
@@ -477,6 +519,20 @@
       "source_message_id": "19e81307b9de3490",
       "time": "9:00 AM – 2:00 PM"
     },
+    "349f031552e2": {
+      "category": "Academic Due Date",
+      "child": "All LAES students",
+      "date": "2026-06-12",
+      "first_seen_iso": "2026-06-09T09:19:03-04:00",
+      "id": "349f031552e2",
+      "location": "www.shopttkits.com (School ID: 93768)",
+      "name": "School Supply Kit Sale Deadline",
+      "sender_block_key": "louisearcherpta.org",
+      "sender_domain": "louisearcherpta.org",
+      "source": "LAES PTA Sunbeam (Jun 7)",
+      "source_message_id": "19ea53c126e941d7",
+      "time": "All day (deadline)"
+    },
     "36fe89143706": {
       "category": "Academic Due Date",
       "child": "All LAES students",
@@ -515,6 +571,20 @@
       "name": "Sports Camp at LAES — Session 3",
       "source": "LAES PTA Sunbeam (Mar 22)",
       "time": "9:00 AM – 2:00 PM"
+    },
+    "3800335cb949": {
+      "category": "School Activity",
+      "child": "All LAES students",
+      "date": "2026-06-15",
+      "first_seen_iso": "2026-06-09T09:19:03-04:00",
+      "id": "3800335cb949",
+      "location": "LAES Front Office",
+      "name": "Drop Off Cookies/Treats for End-of-Year Staff Celebration",
+      "sender_block_key": "louisearcherpta.org",
+      "sender_domain": "louisearcherpta.org",
+      "source": "LAES PTA Sunbeam (Jun 7)",
+      "source_message_id": "19ea53c126e941d7",
+      "time": "All day"
     },
     "3860bd1ba19a": {
       "category": "School Activity",
@@ -826,6 +896,20 @@
       "source_message_id": "19def611cdcf1978",
       "time": "School hours"
     },
+    "531b3e90f9d5": {
+      "category": "Sports & Extracurriculars",
+      "child": "All LAES students",
+      "date": "2026-07-01",
+      "first_seen_iso": "2026-06-09T09:19:03-04:00",
+      "id": "531b3e90f9d5",
+      "location": "Oakton High School",
+      "name": "Oakton High School Dance Team Junior Dance Camp — Last Day / End-of-Camp Performance",
+      "sender_block_key": "louisearcherpta.org",
+      "sender_domain": "louisearcherpta.org",
+      "source": "LAES PTA Sunbeam (Jun 7)",
+      "source_message_id": "19ea53c126e941d7",
+      "time": "8:30 AM – 12:30 PM"
+    },
     "56e2a3eec01e": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -853,6 +937,20 @@
       "source": "HTM Sharks / SportsEngine Motion (Mar 4)",
       "source_message_id": "19cbba1549285194",
       "time": "9:00 AM – 12:00 PM"
+    },
+    "584f6c3dc15f": {
+      "category": "Sports & Extracurriculars",
+      "child": "All LAES students",
+      "date": "2026-06-29",
+      "first_seen_iso": "2026-06-09T09:19:03-04:00",
+      "id": "584f6c3dc15f",
+      "location": "Oakton High School",
+      "name": "Oakton High School Dance Team Junior Dance Camp",
+      "sender_block_key": "louisearcherpta.org",
+      "sender_domain": "louisearcherpta.org",
+      "source": "LAES PTA Sunbeam (Jun 7)",
+      "source_message_id": "19ea53c126e941d7",
+      "time": "8:30 AM – 12:30 PM"
     },
     "592a83c35325": {
       "category": "School Activity",
@@ -1005,6 +1103,20 @@
       "source_message_id": "19d1873576a3c28d",
       "time": "9:00 AM - 2:00 PM"
     },
+    "6099a7ec9be1": {
+      "category": "School Activity",
+      "child": "All LAES students",
+      "date": "2026-06-26",
+      "first_seen_iso": "2026-06-09T09:19:03-04:00",
+      "id": "6099a7ec9be1",
+      "location": "Louise Archer Elementary School Cafeteria",
+      "name": "Chess Camp (Atlantic Chess Association) at LAES — Last Day",
+      "sender_block_key": "louisearcherpta.org",
+      "sender_domain": "louisearcherpta.org",
+      "source": "LAES PTA Sunbeam (Jun 7)",
+      "source_message_id": "19ea53c126e941d7",
+      "time": "9:00 AM – 4:00 PM"
+    },
     "621e8009c68b": {
       "category": "Sports & Extracurriculars",
       "child": "All LAES students",
@@ -1125,6 +1237,20 @@
       "source_message_id": "19dccf5b656488ec",
       "time": "9:00 AM - 4:00 PM"
     },
+    "673975aa58ee": {
+      "category": "Sports & Extracurriculars",
+      "child": "All LAES students",
+      "date": "2026-08-03",
+      "first_seen_iso": "2026-06-09T09:19:03-04:00",
+      "id": "673975aa58ee",
+      "location": "Louise Archer Elementary School Gym",
+      "name": "Sports Camp Session 3 at LAES (Coach Worsham / Sports & Games for Kids)",
+      "sender_block_key": "louisearcherpta.org",
+      "sender_domain": "louisearcherpta.org",
+      "source": "LAES PTA Sunbeam (Jun 7)",
+      "source_message_id": "19ea53c126e941d7",
+      "time": "9:00 AM – 2:00 PM"
+    },
     "67907c522545": {
       "category": "Academic Due Date",
       "child": "All LAES students",
@@ -1216,20 +1342,6 @@
       "name": "Sports Camp at LAES — Session 3 (End)",
       "source": "LAES PTA Sunbeam (Mar 15)",
       "time": "9:00 AM - 2:00 PM"
-    },
-    "6f7ed603a043": {
-      "category": "School Activity",
-      "child": "Isla",
-      "date": "2026-06-08",
-      "first_seen_iso": "2026-05-28T10:08:10-04:00",
-      "id": "6f7ed603a043",
-      "location": "Louise Archer Elementary School",
-      "name": "Cities Market Day",
-      "sender_block_key": "fcps.edu",
-      "sender_domain": "fcps.edu",
-      "source": "Rohde, Meredith Newsletter & Important Cities Updates (May 27)",
-      "source_message_id": "19e6a22332b60f89",
-      "time": "School hours"
     },
     "7004b3b33e79": {
       "category": "School Activity",
@@ -1326,6 +1438,20 @@
       "source_message_id": "19d6e2fcbf50fdf5",
       "time": "All day (deadline)"
     },
+    "74843a7ed2ce": {
+      "category": "Sports & Extracurriculars",
+      "child": "All LAES students",
+      "date": "2026-06-22",
+      "first_seen_iso": "2026-06-09T09:19:03-04:00",
+      "id": "74843a7ed2ce",
+      "location": "Louise Archer Elementary School Gym",
+      "name": "Sports Camp Session 1 at LAES (Coach Worsham / Sports & Games for Kids)",
+      "sender_block_key": "louisearcherpta.org",
+      "sender_domain": "louisearcherpta.org",
+      "source": "LAES PTA Sunbeam (Jun 7)",
+      "source_message_id": "19ea53c126e941d7",
+      "time": "9:00 AM – 2:00 PM"
+    },
     "768285fc3534": {
       "category": "School Activity",
       "child": "Everly",
@@ -1379,6 +1505,20 @@
       "source_message_id": "19da909fe35cca68",
       "time": "9:00 AM - 2:00 PM"
     },
+    "786e1649d302": {
+      "category": "School Activity",
+      "child": "Isla",
+      "date": "2026-06-16",
+      "first_seen_iso": "2026-06-09T09:19:03-04:00",
+      "id": "786e1649d302",
+      "location": "Park (per SignUpGenius instructions)",
+      "name": "3rd Grade EOY Party Supplies Drop-Off at Park",
+      "sender_block_key": "lynnliying2011@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Ying Li / 3rd Grade EOY Party thread (Jun 8)",
+      "source_message_id": "19ea98652db4138d",
+      "time": ""
+    },
     "79526292b05f": {
       "category": "School Activity",
       "child": "Everly",
@@ -1421,6 +1561,20 @@
       "source_message_id": "19dccf5b656488ec",
       "time": "All day (deadline)"
     },
+    "7aea2ff25e22": {
+      "category": "Sports & Extracurriculars",
+      "child": "Isla",
+      "date": "2026-06-20",
+      "first_seen_iso": "2026-06-09T09:19:03-04:00",
+      "id": "7aea2ff25e22",
+      "location": "",
+      "name": "Cuppett Performing Arts Recital 2026 — Show Day 3",
+      "sender_block_key": "jackrabbittech.com",
+      "sender_domain": "jackrabbittech.com",
+      "source": "Cuppett Performing Arts Center (Jun 8)",
+      "source_message_id": "19ea90953343bf00",
+      "time": ""
+    },
     "7bf6ebee1a61": {
       "category": "Sports & Extracurriculars",
       "child": "",
@@ -1462,20 +1616,6 @@
       "source": "Town of Vienna Parks and Recreation via ePACT (May 30)",
       "source_message_id": "19e7844b404f4a12",
       "time": "All day (deadline)"
-    },
-    "7eea1f3f2160": {
-      "category": "School Activity",
-      "child": "Everly",
-      "date": "2026-06-08",
-      "first_seen_iso": "2026-05-19T09:33:32-04:00",
-      "id": "7eea1f3f2160",
-      "location": "Louise Archer Elementary School",
-      "name": "Musical Dress Rehearsal",
-      "sender_block_key": "fcps.edu",
-      "sender_domain": "fcps.edu",
-      "source": "6th Grade Classroom Newsletter PDF (May 18)",
-      "source_message_id": "19e3c41ba6342a67",
-      "time": "All day"
     },
     "7f33d1e801af": {
       "category": "Academic Due Date",
@@ -1639,6 +1779,20 @@
       "source_message_id": "19e6f7c49afbc211",
       "time": "All day (deadline)"
     },
+    "8c0a4726d8dd": {
+      "category": "Sports & Extracurriculars",
+      "child": "All LAES students",
+      "date": "2026-06-18",
+      "first_seen_iso": "2026-06-09T09:19:03-04:00",
+      "id": "8c0a4726d8dd",
+      "location": "bit.ly/ohsjuniordancecamp2026",
+      "name": "Oakton High School Dance Team Junior Dance Camp — Registration Deadline (for free t-shirt)",
+      "sender_block_key": "louisearcherpta.org",
+      "sender_domain": "louisearcherpta.org",
+      "source": "LAES PTA Sunbeam (Jun 7)",
+      "source_message_id": "19ea53c126e941d7",
+      "time": "All day (deadline)"
+    },
     "8c10e4abe01c": {
       "category": "Academic Due Date",
       "child": "All LAES students",
@@ -1751,20 +1905,6 @@
       "source_message_id": "19ea2f8463e8dc64",
       "time": "All day"
     },
-    "91dd4e06d523": {
-      "category": "Academic Due Date",
-      "child": "Everly",
-      "date": "2026-06-08",
-      "first_seen_iso": "2026-06-07T08:02:49-04:00",
-      "id": "91dd4e06d523",
-      "location": "Louise Archer Elementary School",
-      "name": "Smashbooks Due",
-      "sender_block_key": "fcps.edu",
-      "sender_domain": "fcps.edu",
-      "source": "Sahai, Anita (Jun 6)",
-      "source_message_id": "19e9ca0ccf2f8a0c",
-      "time": "All day (deadline)"
-    },
     "920e19edba89": {
       "category": "Sports & Extracurriculars",
       "child": "",
@@ -1869,6 +2009,20 @@
       "location": "LAES Gym, 324 Nutley St. NW, Vienna, VA 22180",
       "name": "Sports Camp at LAES — Session 2",
       "source": "LAES PTA Sunbeam (Mar 22)",
+      "time": "9:00 AM – 2:00 PM"
+    },
+    "a210a0a4c5b7": {
+      "category": "Sports & Extracurriculars",
+      "child": "All LAES students",
+      "date": "2026-06-26",
+      "first_seen_iso": "2026-06-09T09:19:03-04:00",
+      "id": "a210a0a4c5b7",
+      "location": "Louise Archer Elementary School Gym",
+      "name": "Sports Camp Session 1 at LAES — Last Day",
+      "sender_block_key": "louisearcherpta.org",
+      "sender_domain": "louisearcherpta.org",
+      "source": "LAES PTA Sunbeam (Jun 7)",
+      "source_message_id": "19ea53c126e941d7",
       "time": "9:00 AM – 2:00 PM"
     },
     "a22ecf830923": {
@@ -1983,6 +2137,20 @@
       "source_message_id": "19e6f7c49afbc211",
       "time": "All day (deadline)"
     },
+    "adc1ac884e3e": {
+      "category": "Sports & Extracurriculars",
+      "child": "All LAES students",
+      "date": "2026-07-27",
+      "first_seen_iso": "2026-06-09T09:19:03-04:00",
+      "id": "adc1ac884e3e",
+      "location": "Louise Archer Elementary School Gym",
+      "name": "Sports Camp Session 2 at LAES (Coach Worsham / Sports & Games for Kids)",
+      "sender_block_key": "louisearcherpta.org",
+      "sender_domain": "louisearcherpta.org",
+      "source": "LAES PTA Sunbeam (Jun 7)",
+      "source_message_id": "19ea53c126e941d7",
+      "time": "9:00 AM – 2:00 PM"
+    },
     "ae0445135fcf": {
       "category": "Sports & Extracurriculars",
       "child": "",
@@ -1993,6 +2161,20 @@
       "name": "HTM Sharks NVSL A Meet — HOME: Cottontail (CT) @ Hunter Mill",
       "source": "HTM Sharks / Carly Reiley via SportsEngine Motion (Mar 4)",
       "time": "9:00 AM – 12:00 PM"
+    },
+    "b0759fee728f": {
+      "category": "School Activity",
+      "child": "All LAES students",
+      "date": "2026-06-22",
+      "first_seen_iso": "2026-06-09T09:19:03-04:00",
+      "id": "b0759fee728f",
+      "location": "Louise Archer Elementary School Cafeteria",
+      "name": "Chess Camp (Atlantic Chess Association) at LAES",
+      "sender_block_key": "louisearcherpta.org",
+      "sender_domain": "louisearcherpta.org",
+      "source": "LAES PTA Sunbeam (Jun 7)",
+      "source_message_id": "19ea53c126e941d7",
+      "time": "9:00 AM – 4:00 PM"
     },
     "b0acc99912d7": {
       "category": "Sports & Extracurriculars",
@@ -2257,6 +2439,20 @@
       "source_message_id": "19e3a7802163751d",
       "time": "All day (deadline)"
     },
+    "c72ab9e85bad": {
+      "category": "Sports & Extracurriculars",
+      "child": "Isla",
+      "date": "2026-06-17",
+      "first_seen_iso": "2026-06-09T09:19:03-04:00",
+      "id": "c72ab9e85bad",
+      "location": "",
+      "name": "Cuppett Performing Arts Recital 2026 — Show Day 1",
+      "sender_block_key": "jackrabbittech.com",
+      "sender_domain": "jackrabbittech.com",
+      "source": "Cuppett Performing Arts Center (Jun 8)",
+      "source_message_id": "19ea90953343bf00",
+      "time": ""
+    },
     "c9d15ac906be": {
       "category": "Academic Due Date",
       "child": "Everly",
@@ -2457,6 +2653,20 @@
       "source": "Sahai, Anita - June Newsletter & Important Dates (May 18)",
       "source_message_id": "19e3c41ba6342a67",
       "time": "10:00 AM"
+    },
+    "d37921e731a6": {
+      "category": "School Activity",
+      "child": "Isla",
+      "date": "2026-06-15",
+      "first_seen_iso": "2026-06-09T09:19:03-04:00",
+      "id": "d37921e731a6",
+      "location": "Louise Archer Elementary School — Ms. Skousen's classroom",
+      "name": "3rd Grade EOY Party Supplies Pick-Up from Class",
+      "sender_block_key": "lynnliying2011@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Ying Li / 3rd Grade EOY Party thread (Jun 8)",
+      "source_message_id": "19ea98652db4138d",
+      "time": "After school"
     },
     "d39ddba68d93": {
       "category": "School Activity",
@@ -2740,19 +2950,19 @@
       "source": "FCPS News You Choose — VIP Camp (Apr 10)",
       "time": "9:00 AM – 4:00 PM"
     },
-    "eab3b3c61717": {
-      "category": "School Activity",
-      "child": "Everly",
-      "date": "2026-06-08",
-      "first_seen_iso": "2026-05-19T09:33:32-04:00",
-      "id": "eab3b3c61717",
-      "location": "Louise Archer Elementary School",
-      "name": "Musical Dress Rehearsal Day (All Day)",
-      "sender_block_key": "fcps.edu",
-      "sender_domain": "fcps.edu",
-      "source": "Sahai, Anita - June Newsletter & Important Dates (May 18)",
-      "source_message_id": "19e3c41ba6342a67",
-      "time": "All day"
+    "ed3631bb66f1": {
+      "category": "Sports & Extracurriculars",
+      "child": "All LAES students",
+      "date": "2026-08-07",
+      "first_seen_iso": "2026-06-09T09:19:03-04:00",
+      "id": "ed3631bb66f1",
+      "location": "Louise Archer Elementary School Gym",
+      "name": "Sports Camp Session 3 at LAES — Last Day",
+      "sender_block_key": "louisearcherpta.org",
+      "sender_domain": "louisearcherpta.org",
+      "source": "LAES PTA Sunbeam (Jun 7)",
+      "source_message_id": "19ea53c126e941d7",
+      "time": "9:00 AM – 2:00 PM"
     },
     "eefb39d0cabd": {
       "category": "School Activity",
@@ -2781,6 +2991,20 @@
       "source": "Ellen Holmes / Velocity Dance (Jun 7)",
       "source_message_id": "19ea2f8463e8dc64",
       "time": "All day"
+    },
+    "ef1a74c373e5": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-06-13",
+      "first_seen_iso": "2026-06-09T09:19:03-04:00",
+      "id": "ef1a74c373e5",
+      "location": "Thoreau Middle School — http://click.signupgenius.com/f/a/oXZLHgKsjKk1iIp9nJqMwQ~~/AAFPrxA~/XaMfazavermLeDsoYHJbjJ6sXscYDjorhfjoZCqUxr3Lhzq50xy_MdtycfCwWDXxvycW5pR-465VfV6n3s5G9ndhX7ywFUc-4WQ36KN0k89-pZU75xnHwecdGoSCBvG9UWqNUhyz313jCJeaZX3hOjiU1yHG0oV4k-xvQiYPvwGXV0TAVD5HSUS8Unk3P1n2",
+      "name": "MS Spring Showcase — Showcase Session",
+      "sender_block_key": "signupgenius.com",
+      "sender_domain": "signupgenius.com",
+      "source": "SignUpGenius (Jun 8)",
+      "source_message_id": "19ea52e7ecd2bfd4",
+      "time": "10:30 AM–12:00 PM"
     },
     "ef88087609ca": {
       "category": "Sports & Extracurriculars",
@@ -2898,20 +3122,6 @@
       "source": "Ellen Holmes / Velocity Dance (Jun 7)",
       "source_message_id": "19ea2f8463e8dc64",
       "time": "All day"
-    },
-    "f877bfd1d835": {
-      "category": "School Activity",
-      "child": "Everly",
-      "date": "2026-06-08",
-      "first_seen_iso": "2026-06-07T08:02:49-04:00",
-      "id": "f877bfd1d835",
-      "location": "Louise Archer Elementary School",
-      "name": "6th Grade Musical — Full Dress Rehearsal Day",
-      "sender_block_key": "fcps.edu",
-      "sender_domain": "fcps.edu",
-      "source": "Sahai, Anita (Jun 6)",
-      "source_message_id": "19e9ca0ccf2f8a0c",
-      "time": "All day (specials 2:45–3:45 PM)"
     },
     "f95b5613dbf8": {
       "category": "School Activity",
@@ -3065,7 +3275,7 @@
       "time": "School hours"
     }
   },
-  "last_updated_iso": "2026-06-08T10:22:20-04:00",
+  "last_updated_iso": "2026-06-09T09:19:03-04:00",
   "processed_messages": {
     "19a0da1d7445f787": "2026-04-17T18:51:22-04:00",
     "19a1784ff2f26474": "2026-04-17T18:51:22-04:00",
@@ -3525,7 +3735,14 @@
     "19ea2077aa19bba7": "2026-06-08T10:22:20-04:00",
     "19ea2f8463e8dc64": "2026-06-08T10:22:20-04:00",
     "19ea3a8a2058610b": "2026-06-08T10:22:20-04:00",
-    "19ea3cbd0492918e": "2026-06-08T10:22:20-04:00"
+    "19ea3cbd0492918e": "2026-06-08T10:22:20-04:00",
+    "19ea487b06e0a3a0": "2026-06-09T09:19:03-04:00",
+    "19ea52e7ecd2bfd4": "2026-06-09T09:19:03-04:00",
+    "19ea53c126e941d7": "2026-06-09T09:19:03-04:00",
+    "19ea71e45b48f9b3": "2026-06-09T09:19:03-04:00",
+    "19ea7f910e2433b3": "2026-06-09T09:19:03-04:00",
+    "19ea90953343bf00": "2026-06-09T09:19:03-04:00",
+    "19ea98652db4138d": "2026-06-09T09:19:03-04:00"
   },
   "schema_version": 3
 }
