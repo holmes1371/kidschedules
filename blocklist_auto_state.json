@@ -90,6 +90,11 @@
       "last_flagged_iso": "2026-04-26",
       "reason": "legacy entry seeded post-deploy"
     },
+    "corporatecounsel@law.com": {
+      "added_iso": "2026-06-10",
+      "last_flagged_iso": "2026-06-10",
+      "reason": "Legal industry newsletter (Corporate Counsel Morning Update) — entirely adult/professional content"
+    },
     "dccc@ak.dccc.org": {
       "added_iso": "2026-04-26",
       "last_flagged_iso": "2026-04-26",
@@ -641,7 +646,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-06-09",
+  "last_updated_iso": "2026-06-10",
   "pending": {
     "acuvue@m.helloworldemail.com": {
       "first_flagged_iso": "2026-05-20",
@@ -703,16 +708,6 @@
         "Etsy marketplace messages — adult shopping, no kids' events"
       ]
     },
-    "do-not-reply@ottooptics.io": {
-      "first_flagged_iso": "2026-05-10",
-      "flagged_message_ids": [
-        "19e0b8a0b535f241"
-      ],
-      "last_flagged_iso": "2026-05-10",
-      "reason_samples": [
-        "contact lens refill marketing email, adult optical/vision product promotion, no children's events"
-      ]
-    },
     "email@campaigns.stjude.org": {
       "first_flagged_iso": "2026-05-17",
       "flagged_message_ids": [
@@ -771,6 +766,16 @@
       "last_flagged_iso": "2026-05-29",
       "reason_samples": [
         "Nonprofit prosthetics organization newsletter — community/charity content, no kids' events relevant to this family"
+      ]
+    },
+    "message@touchmd.com": {
+      "first_flagged_iso": "2026-06-10",
+      "flagged_message_ids": [
+        "19ead3b923b9986a"
+      ],
+      "last_flagged_iso": "2026-06-10",
+      "reason_samples": [
+        "Medical aesthetic/cosmetic practice welcome email — adult-only medical spa, no children involved"
       ]
     },
     "nihar.shah@ses.com": {
@@ -921,6 +926,16 @@
       "last_flagged_iso": "2026-06-06",
       "reason_samples": [
         "dog rescue adoption application confirmation — adult process, no kids' events"
+      ]
+    },
+    "theamericanlawyer@law.com": {
+      "first_flagged_iso": "2026-06-10",
+      "flagged_message_ids": [
+        "19eac2a4fa826175"
+      ],
+      "last_flagged_iso": "2026-06-10",
+      "reason_samples": [
+        "Legal industry newsletter (The American Lawyer Morning Update) — entirely adult/professional content"
       ]
     },
     "venmo@venmo.com": {
