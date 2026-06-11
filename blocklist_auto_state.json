@@ -605,6 +605,11 @@
       "last_flagged_iso": "2026-04-26",
       "reason": "legacy entry seeded post-deploy"
     },
+    "theamericanlawyer@law.com": {
+      "added_iso": "2026-06-11",
+      "last_flagged_iso": "2026-06-11",
+      "reason": "Legal industry news newsletter for adults — no kids' events"
+    },
     "tommy.price@nordstrom.com": {
       "added_iso": "2026-04-26",
       "last_flagged_iso": "2026-04-26",
@@ -646,7 +651,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-06-10",
+  "last_updated_iso": "2026-06-11",
   "pending": {
     "acuvue@m.helloworldemail.com": {
       "first_flagged_iso": "2026-05-20",
@@ -656,6 +661,16 @@
       "last_flagged_iso": "2026-05-20",
       "reason_samples": [
         "Adult contact lens rewards program — terms and conditions update, no kids' content"
+      ]
+    },
+    "adoptions@worthydogrescue.org": {
+      "first_flagged_iso": "2026-06-11",
+      "flagged_message_ids": [
+        "19eaff3aa632f12b"
+      ],
+      "last_flagged_iso": "2026-06-11",
+      "reason_samples": [
+        "Pet adoption tips and care information — no kids' events"
       ]
     },
     "allianzglobalassistance@allianzassistance.com": {
@@ -676,6 +691,16 @@
       "last_flagged_iso": "2026-05-22",
       "reason_samples": [
         "Adult travel booking confirmation — no children's events"
+      ]
+    },
+    "austin.krystoff@synquery-debriefs.com": {
+      "first_flagged_iso": "2026-06-11",
+      "flagged_message_ids": [
+        "19eb226cf650f7a2"
+      ],
+      "last_flagged_iso": "2026-06-11",
+      "reason_samples": [
+        "Adult professional/consulting recruitment outreach — no kids' events"
       ]
     },
     "automated@airbnb.com": {
@@ -878,6 +903,16 @@
         "Adult home decor retail promotional email, no children's events"
       ]
     },
+    "seekingalpha@mail.sailthru.com": {
+      "first_flagged_iso": "2026-06-11",
+      "flagged_message_ids": [
+        "19eb0c72bbbcdc1b"
+      ],
+      "last_flagged_iso": "2026-06-11",
+      "reason_samples": [
+        "Adult financial/stock market news — no kids' events"
+      ]
+    },
     "serkan.vysa.com@qohgb.e2ma.net": {
       "first_flagged_iso": "2026-05-30",
       "flagged_message_ids": [
@@ -926,16 +961,6 @@
       "last_flagged_iso": "2026-06-06",
       "reason_samples": [
         "dog rescue adoption application confirmation — adult process, no kids' events"
-      ]
-    },
-    "theamericanlawyer@law.com": {
-      "first_flagged_iso": "2026-06-10",
-      "flagged_message_ids": [
-        "19eac2a4fa826175"
-      ],
-      "last_flagged_iso": "2026-06-10",
-      "reason_samples": [
-        "Legal industry newsletter (The American Lawyer Morning Update) — entirely adult/professional content"
       ]
     },
     "venmo@venmo.com": {

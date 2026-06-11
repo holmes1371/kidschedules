@@ -1,5 +1,5 @@
 {
-  "last_updated_iso": "2026-06-10T09:50:02-04:00",
+  "last_updated_iso": "2026-06-11T10:13:07-04:00",
   "schema_version": 1,
   "senders": {
     "23andmedatasettlement@e.emailksa.com": {
@@ -26,6 +26,16 @@
       "first_seen_iso": "2026-05-20T08:40:08-04:00",
       "is_newsletter": false,
       "last_seen_iso": "2026-05-20T08:40:08-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
+    "adoptions@worthydogrescue.org": {
+      "first_seen_iso": "2026-06-11T10:13:07-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-06-11T10:13:07-04:00",
       "messages_seen": 1,
       "per_message_counts": [
         0
@@ -131,8 +141,8 @@
     "asahai@fcps.edu": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": true,
-      "last_seen_iso": "2026-06-07T08:02:49-04:00",
-      "messages_seen": 7,
+      "last_seen_iso": "2026-06-11T10:13:07-04:00",
+      "messages_seen": 8,
       "per_message_counts": [
         6,
         6,
@@ -140,9 +150,20 @@
         10,
         27,
         23,
-        8
+        8,
+        9
       ],
-      "total_events": 80
+      "total_events": 89
+    },
+    "austin.krystoff@synquery-debriefs.com": {
+      "first_seen_iso": "2026-06-11T10:13:07-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-06-11T10:13:07-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
     },
     "automated@airbnb.com": {
       "first_seen_iso": "2026-05-21T09:33:37-04:00",
@@ -347,10 +368,9 @@
     "donotreply@email.teamsnap.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-07T08:02:49-04:00",
-      "messages_seen": 53,
+      "last_seen_iso": "2026-06-11T10:13:07-04:00",
+      "messages_seen": 54,
       "per_message_counts": [
-        1,
         2,
         1,
         2,
@@ -359,9 +379,10 @@
         1,
         1,
         1,
-        7
+        7,
+        1
       ],
-      "total_events": 86
+      "total_events": 87
     },
     "donotreply@inova.org": {
       "first_seen_iso": "2026-04-24T20:01:41-04:00",
@@ -436,10 +457,9 @@
     "ellen.n.holmes@gmail.com": {
       "first_seen_iso": "2026-04-24T21:16:59-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-09T09:19:03-04:00",
-      "messages_seen": 41,
+      "last_seen_iso": "2026-06-11T10:13:07-04:00",
+      "messages_seen": 42,
       "per_message_counts": [
-        0,
         0,
         0,
         1,
@@ -448,6 +468,7 @@
         1,
         0,
         7,
+        0,
         0
       ],
       "total_events": 140
@@ -872,21 +893,21 @@
     "lifetouch@m.lifetouch.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-10T09:50:02-04:00",
-      "messages_seen": 30,
+      "last_seen_iso": "2026-06-11T10:13:07-04:00",
+      "messages_seen": 32,
       "per_message_counts": [
         0,
-        1,
-        0,
         0,
         1,
         0,
         0,
         1,
         0,
+        0,
+        1,
         0
       ],
-      "total_events": 14
+      "total_events": 15
     },
     "lschuttloffel@gmail.com": {
       "first_seen_iso": "2026-05-13T08:25:46-04:00",
@@ -1328,21 +1349,21 @@
     "noreply@jackrabbittech.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-09T09:19:03-04:00",
-      "messages_seen": 19,
+      "last_seen_iso": "2026-06-11T10:13:07-04:00",
+      "messages_seen": 20,
       "per_message_counts": [
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
         3,
-        0,
-        0,
-        1,
-        1,
-        1,
-        1,
-        0,
-        0,
-        3
+        1
       ],
-      "total_events": 16
+      "total_events": 17
     },
     "noreply@jumbula.com": {
       "first_seen_iso": "2026-05-26T08:49:57-04:00",
@@ -1489,6 +1510,16 @@
       ],
       "total_events": 1
     },
+    "rami@born2dancestudio.com": {
+      "first_seen_iso": "2026-06-11T10:13:07-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-06-11T10:13:07-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        1
+      ],
+      "total_events": 1
+    },
     "receipts@united.com": {
       "first_seen_iso": "2026-05-21T09:33:37-04:00",
       "is_newsletter": false,
@@ -1578,6 +1609,16 @@
       "messages_seen": 2,
       "per_message_counts": [
         0,
+        0
+      ],
+      "total_events": 0
+    },
+    "seekingalpha@mail.sailthru.com": {
+      "first_seen_iso": "2026-06-11T10:13:07-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-06-11T10:13:07-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
         0
       ],
       "total_events": 0
@@ -1807,9 +1848,11 @@
     "theamericanlawyer@law.com": {
       "first_seen_iso": "2026-06-10T09:50:02-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-10T09:50:02-04:00",
-      "messages_seen": 1,
+      "last_seen_iso": "2026-06-11T10:13:07-04:00",
+      "messages_seen": 3,
       "per_message_counts": [
+        0,
+        0,
         0
       ],
       "total_events": 0
