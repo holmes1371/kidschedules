@@ -651,7 +651,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-06-11",
+  "last_updated_iso": "2026-06-12",
   "pending": {
     "acuvue@m.helloworldemail.com": {
       "first_flagged_iso": "2026-05-20",
@@ -791,6 +791,16 @@
       "last_flagged_iso": "2026-05-29",
       "reason_samples": [
         "Nonprofit prosthetics organization newsletter — community/charity content, no kids' events relevant to this family"
+      ]
+    },
+    "info@shoott.com": {
+      "first_flagged_iso": "2026-06-12",
+      "flagged_message_ids": [
+        "19eb76c7d21ea512"
+      ],
+      "last_flagged_iso": "2026-06-12",
+      "reason_samples": [
+        "Commercial photography booking service marketing email; no kids' events"
       ]
     },
     "message@touchmd.com": {

@@ -1,5 +1,5 @@
 {
-  "last_updated_iso": "2026-06-11T10:13:07-04:00",
+  "last_updated_iso": "2026-06-12T09:44:40-04:00",
   "schema_version": 1,
   "senders": {
     "23andmedatasettlement@e.emailksa.com": {
@@ -457,10 +457,9 @@
     "ellen.n.holmes@gmail.com": {
       "first_seen_iso": "2026-04-24T21:16:59-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-11T10:13:07-04:00",
-      "messages_seen": 42,
+      "last_seen_iso": "2026-06-12T09:44:40-04:00",
+      "messages_seen": 43,
       "per_message_counts": [
-        0,
         0,
         1,
         1,
@@ -468,6 +467,7 @@
         1,
         0,
         7,
+        0,
         0,
         0
       ],
@@ -549,10 +549,11 @@
     "forms-receipts-noreply@google.com": {
       "first_seen_iso": "2026-04-24T20:01:41-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-04-24T20:01:41-04:00",
-      "messages_seen": 1,
+      "last_seen_iso": "2026-06-12T09:44:40-04:00",
+      "messages_seen": 2,
       "per_message_counts": [
-        1
+        1,
+        0
       ],
       "total_events": 1
     },
@@ -782,6 +783,16 @@
       ],
       "total_events": 2
     },
+    "info@shoott.com": {
+      "first_seen_iso": "2026-06-12T09:44:40-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-06-12T09:44:40-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
     "info@signupgenius.com": {
       "first_seen_iso": "2026-05-01T19:50:05-04:00",
       "is_newsletter": false,
@@ -893,11 +904,10 @@
     "lifetouch@m.lifetouch.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-11T10:13:07-04:00",
-      "messages_seen": 32,
+      "last_seen_iso": "2026-06-12T09:44:40-04:00",
+      "messages_seen": 33,
       "per_message_counts": [
         0,
-        0,
         1,
         0,
         0,
@@ -905,6 +915,7 @@
         0,
         0,
         1,
+        0,
         0
       ],
       "total_events": 15
@@ -992,17 +1003,18 @@
     "member.support@epactnetwork.com": {
       "first_seen_iso": "2026-04-26T18:57:52-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-06T07:45:35-04:00",
-      "messages_seen": 6,
+      "last_seen_iso": "2026-06-12T09:44:40-04:00",
+      "messages_seen": 7,
       "per_message_counts": [
         0,
         1,
         1,
         1,
         1,
+        1,
         1
       ],
-      "total_events": 5
+      "total_events": 6
     },
     "membership@m.dcbar.org": {
       "first_seen_iso": "2026-05-03T11:23:36-04:00",
@@ -1039,6 +1051,16 @@
       "first_seen_iso": "2026-04-17T18:51:22-04:00",
       "is_newsletter": false,
       "last_seen_iso": "2026-04-17T18:51:22-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
+    "misssuzie@perfectpointe.com": {
+      "first_seen_iso": "2026-06-12T09:44:40-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-06-12T09:44:40-04:00",
       "messages_seen": 1,
       "per_message_counts": [
         0
@@ -1701,22 +1723,22 @@
     "summercamp@born2dancestudio.com": {
       "first_seen_iso": "2026-05-19T09:33:32-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-04T09:32:42-04:00",
-      "messages_seen": 3,
+      "last_seen_iso": "2026-06-12T09:44:40-04:00",
+      "messages_seen": 4,
       "per_message_counts": [
         2,
         3,
-        2
+        2,
+        4
       ],
-      "total_events": 7
+      "total_events": 11
     },
     "sunbeam@louisearcherpta.org": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": true,
-      "last_seen_iso": "2026-06-09T09:19:03-04:00",
-      "messages_seen": 11,
+      "last_seen_iso": "2026-06-12T09:44:40-04:00",
+      "messages_seen": 12,
       "per_message_counts": [
-        19,
         11,
         11,
         22,
@@ -1725,9 +1747,10 @@
         16,
         16,
         15,
-        16
+        16,
+        1
       ],
-      "total_events": 180
+      "total_events": 181
     },
     "support0@info.myloancare.com": {
       "first_seen_iso": "2026-04-17T17:12:56-04:00",
@@ -1793,14 +1816,15 @@
     "susan.anspach@gmail.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": true,
-      "last_seen_iso": "2026-04-17T17:12:56-04:00",
-      "messages_seen": 3,
+      "last_seen_iso": "2026-06-12T09:44:40-04:00",
+      "messages_seen": 4,
       "per_message_counts": [
         11,
         8,
-        5
+        5,
+        2
       ],
-      "total_events": 24
+      "total_events": 26
     },
     "suzanne@worthydog.org": {
       "first_seen_iso": "2026-06-06T07:45:35-04:00",
