@@ -651,7 +651,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-06-12",
+  "last_updated_iso": "2026-06-13",
   "pending": {
     "acuvue@m.helloworldemail.com": {
       "first_flagged_iso": "2026-05-20",
@@ -883,16 +883,6 @@
         "Adult dental appointment reminder for Ellen (parent), no child involved"
       ]
     },
-    "opportunities@mail.hiive.com": {
-      "first_flagged_iso": "2026-05-13",
-      "flagged_message_ids": [
-        "19e1d75453d412dc"
-      ],
-      "last_flagged_iso": "2026-05-13",
-      "reason_samples": [
-        "Adult investment/financial opportunity email — no kids' content"
-      ]
-    },
     "receipts@united.com": {
       "first_flagged_iso": "2026-05-21",
       "flagged_message_ids": [
@@ -981,16 +971,6 @@
       "last_flagged_iso": "2026-06-07",
       "reason_samples": [
         "Venmo payment notification — adult financial transaction, no kids' events"
-      ]
-    },
-    "volcor@cake4kids.org": {
-      "first_flagged_iso": "2026-05-13",
-      "flagged_message_ids": [
-        "19e1e0300b435e6f"
-      ],
-      "last_flagged_iso": "2026-05-13",
-      "reason_samples": [
-        "Volunteer organization newsletter for adult bakers — no events relevant to this family's children"
       ]
     }
   },

@@ -1,5 +1,5 @@
 {
-  "last_updated_iso": "2026-06-12T09:44:40-04:00",
+  "last_updated_iso": "2026-06-13T08:05:34-04:00",
   "schema_version": 1,
   "senders": {
     "23andmedatasettlement@e.emailksa.com": {
@@ -209,10 +209,9 @@
     "blpinkman@fcps.edu": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-05-13T08:25:46-04:00",
-      "messages_seen": 10,
+      "last_seen_iso": "2026-06-13T08:05:34-04:00",
+      "messages_seen": 11,
       "per_message_counts": [
-        1,
         2,
         1,
         2,
@@ -221,7 +220,8 @@
         1,
         1,
         0,
-        1
+        1,
+        0
       ],
       "total_events": 9
     },
@@ -368,10 +368,9 @@
     "donotreply@email.teamsnap.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-11T10:13:07-04:00",
-      "messages_seen": 54,
+      "last_seen_iso": "2026-06-13T08:05:34-04:00",
+      "messages_seen": 55,
       "per_message_counts": [
-        2,
         1,
         2,
         4,
@@ -380,9 +379,10 @@
         1,
         1,
         7,
+        1,
         1
       ],
-      "total_events": 87
+      "total_events": 88
     },
     "donotreply@inova.org": {
       "first_seen_iso": "2026-04-24T20:01:41-04:00",
@@ -904,10 +904,9 @@
     "lifetouch@m.lifetouch.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-12T09:44:40-04:00",
-      "messages_seen": 33,
+      "last_seen_iso": "2026-06-13T08:05:34-04:00",
+      "messages_seen": 34,
       "per_message_counts": [
-        0,
         1,
         0,
         0,
@@ -916,9 +915,10 @@
         0,
         1,
         0,
-        0
+        0,
+        2
       ],
-      "total_events": 15
+      "total_events": 17
     },
     "lschuttloffel@gmail.com": {
       "first_seen_iso": "2026-05-13T08:25:46-04:00",
@@ -1070,8 +1070,8 @@
     "mlrohde@fcps.edu": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-04T09:32:42-04:00",
-      "messages_seen": 8,
+      "last_seen_iso": "2026-06-13T08:05:34-04:00",
+      "messages_seen": 9,
       "per_message_counts": [
         1,
         4,
@@ -1080,7 +1080,8 @@
         3,
         7,
         7,
-        1
+        1,
+        0
       ],
       "total_events": 26
     },
