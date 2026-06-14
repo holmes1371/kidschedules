@@ -651,7 +651,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-06-13",
+  "last_updated_iso": "2026-06-14",
   "pending": {
     "acuvue@m.helloworldemail.com": {
       "first_flagged_iso": "2026-05-20",
@@ -753,16 +753,6 @@
         "Google Home device invitation, unrelated to children's activities"
       ]
     },
-    "hello@hellowisp.com": {
-      "first_flagged_iso": "2026-05-14",
-      "flagged_message_ids": [
-        "19e238455f272164"
-      ],
-      "last_flagged_iso": "2026-05-14",
-      "reason_samples": [
-        "Adult longevity/health supplement marketing email, no kids' content"
-      ]
-    },
     "hello@send.primary.com": {
       "first_flagged_iso": "2026-06-06",
       "flagged_message_ids": [
@@ -801,6 +791,16 @@
       "last_flagged_iso": "2026-06-12",
       "reason_samples": [
         "Commercial photography booking service marketing email; no kids' events"
+      ]
+    },
+    "information@harperwilde.com": {
+      "first_flagged_iso": "2026-06-14",
+      "flagged_message_ids": [
+        "19ec2928da15da05"
+      ],
+      "last_flagged_iso": "2026-06-14",
+      "reason_samples": [
+        "Adult women's underwear/bra retailer marketing email, no children's content"
       ]
     },
     "message@touchmd.com": {
@@ -891,6 +891,16 @@
       "last_flagged_iso": "2026-05-21",
       "reason_samples": [
         "Adult airline travel receipt with no children's events or activities mentioned"
+      ]
+    },
+    "reply@rs.email.nextdoor.com": {
+      "first_flagged_iso": "2026-06-14",
+      "flagged_message_ids": [
+        "19ec1a352adc74a0"
+      ],
+      "last_flagged_iso": "2026-06-14",
+      "reason_samples": [
+        "Nextdoor neighborhood social post about watching World Cup matches, no children's events"
       ]
     },
     "sales@darbycreektrading.com": {
