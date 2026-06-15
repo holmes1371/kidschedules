@@ -1,5 +1,5 @@
 {
-  "last_updated_iso": "2026-06-14T08:16:28-04:00",
+  "last_updated_iso": "2026-06-15T12:05:59-04:00",
   "schema_version": 1,
   "senders": {
     "23andmedatasettlement@e.emailksa.com": {
@@ -914,10 +914,9 @@
     "lifetouch@m.lifetouch.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-13T08:05:34-04:00",
-      "messages_seen": 34,
+      "last_seen_iso": "2026-06-15T12:05:59-04:00",
+      "messages_seen": 35,
       "per_message_counts": [
-        1,
         0,
         0,
         1,
@@ -926,7 +925,8 @@
         1,
         0,
         0,
-        2
+        2,
+        0
       ],
       "total_events": 17
     },
@@ -943,8 +943,8 @@
     "lynnliying2011@gmail.com": {
       "first_seen_iso": "2026-05-14T08:08:14-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-09T09:19:03-04:00",
-      "messages_seen": 7,
+      "last_seen_iso": "2026-06-15T12:05:59-04:00",
+      "messages_seen": 8,
       "per_message_counts": [
         0,
         0,
@@ -952,9 +952,10 @@
         0,
         3,
         2,
-        2
+        2,
+        3
       ],
-      "total_events": 9
+      "total_events": 12
     },
     "machineswimschool-notifications@ses.iclasspro.com": {
       "first_seen_iso": "2026-05-16T07:19:00-04:00",

@@ -622,20 +622,6 @@
       "source_message_id": "19e38ef24189c70a",
       "time": "9:00 AM – 4:00 PM"
     },
-    "477f90242731": {
-      "category": "School Activity",
-      "child": "Everly",
-      "date": "2026-06-12",
-      "first_seen_iso": "2026-06-14T08:16:28-04:00",
-      "id": "477f90242731",
-      "location": "Louise Archer Elementary School — near the cafeteria",
-      "name": "LAES 6th Grade Celebration — Pick Up at 9:00 PM (near cafeteria)",
-      "sender_block_key": "shannon.n.aimone@gmail.com",
-      "sender_domain": "gmail.com",
-      "source": "Shannon Aimone (Jun 12)",
-      "source_message_id": "19ebe4c926b07055",
-      "time": "9:00 PM"
-    },
     "498902c5bdde": {
       "category": "Academic Due Date",
       "child": "All LAES students",
@@ -677,20 +663,6 @@
       "source": "Rohde Room Parent Volunteers (May 18)",
       "source_message_id": "19e3b6f4c5c2afb7",
       "time": "All day (deadline)"
-    },
-    "49febf3712ca": {
-      "category": "Sports & Extracurriculars",
-      "child": "Everly",
-      "date": "2026-06-14",
-      "first_seen_iso": "2026-06-13T08:05:34-04:00",
-      "id": "49febf3712ca",
-      "location": "Born 2 Dance Studio (262 Cedar Ln SE, Vienna, VA 22180, United States)",
-      "name": "B2D ECHO Team Weekly Rehearsal",
-      "sender_block_key": "teamsnap.com",
-      "sender_domain": "teamsnap.com",
-      "source": "B2D - ECHO Team via TeamSnap (Jun 12)",
-      "source_message_id": "19ebd79d2c5ced87",
-      "time": "2:45 PM – 4:45 PM (Arrival 2:30 PM)"
     },
     "4b51463fe92f": {
       "category": "School Activity",
@@ -1835,6 +1807,20 @@
       "source_message_id": "19e664210c8c90e7",
       "time": "9:45 AM – 12:05 PM"
     },
+    "9068059b8bb0": {
+      "category": "Academic Due Date",
+      "child": "Isla",
+      "date": "2026-06-15",
+      "first_seen_iso": "2026-06-15T12:05:59-04:00",
+      "id": "9068059b8bb0",
+      "location": "Room parents' houses (near LAES, Wolftrap Elementary, Cunningham Park Elementary)",
+      "name": "3rd Grade End-of-Year Party — Supplies Drop-Off Deadline at Room Parents' Houses",
+      "sender_block_key": "lynnliying2011@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Ying Li (Jun 14)",
+      "source_message_id": "19ec68c781052052",
+      "time": "By end of evening"
+    },
     "90c36b4a3943": {
       "category": "School Activity",
       "child": "Isla",
@@ -2383,6 +2369,20 @@
       "source_message_id": "19ea90953343bf00",
       "time": ""
     },
+    "c74b6128e624": {
+      "category": "School Activity",
+      "child": "Isla",
+      "date": "2026-06-16",
+      "first_seen_iso": "2026-06-15T12:05:59-04:00",
+      "id": "c74b6128e624",
+      "location": "Park (near Louise Archer Elementary School)",
+      "name": "3rd Grade End-of-Year Party — Supplies Drop-Off at Park",
+      "sender_block_key": "lynnliying2011@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Ying Li (Jun 14)",
+      "source_message_id": "19ec68c781052052",
+      "time": "9:15 AM – 10:00 AM"
+    },
     "c9d15ac906be": {
       "category": "Academic Due Date",
       "child": "Everly",
@@ -2594,6 +2594,20 @@
       "name": "Summer Chess Camp (Session 1 ends)",
       "source": "LAES PTA Sunbeam (Mar 22)",
       "time": "9:00 AM - 4:00 PM"
+    },
+    "d4c30c343780": {
+      "category": "School Activity",
+      "child": "Isla",
+      "date": "2026-06-16",
+      "first_seen_iso": "2026-06-15T12:05:59-04:00",
+      "id": "d4c30c343780",
+      "location": "Park (near Louise Archer Elementary School)",
+      "name": "3rd Grade End-of-Year Party",
+      "sender_block_key": "lynnliying2011@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Ying Li (Jun 14)",
+      "source_message_id": "19ec68c781052052",
+      "time": ""
     },
     "d4d239aa8ee2": {
       "category": "School Activity",
@@ -3149,7 +3163,7 @@
       "time": "All day (deadline)"
     }
   },
-  "last_updated_iso": "2026-06-14T08:16:28-04:00",
+  "last_updated_iso": "2026-06-15T12:05:59-04:00",
   "processed_messages": {
     "19a0da1d7445f787": "2026-04-17T18:51:22-04:00",
     "19a1784ff2f26474": "2026-04-17T18:51:22-04:00",
@@ -3653,7 +3667,9 @@
     "19ebd79d2c5ced87": "2026-06-13T08:05:34-04:00",
     "19ebe4c926b07055": "2026-06-14T08:16:28-04:00",
     "19ec1a352adc74a0": "2026-06-14T08:16:28-04:00",
-    "19ec2928da15da05": "2026-06-14T08:16:28-04:00"
+    "19ec2928da15da05": "2026-06-14T08:16:28-04:00",
+    "19ec60bb18bc0831": "2026-06-15T12:05:59-04:00",
+    "19ec68c781052052": "2026-06-15T12:05:59-04:00"
   },
   "schema_version": 3
 }
