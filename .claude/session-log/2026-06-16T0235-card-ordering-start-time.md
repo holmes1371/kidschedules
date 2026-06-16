@@ -11,5 +11,9 @@
   (approx.)`) failed the strict parser and floated into the all-day bucket
   above earlier cards. `_event_start_time` now falls back to a leading-clock
   `_CLOCK_RE.search`; `.ics` export untouched.
-- Branch `claude/card-ordering-start-time-4lo7kg`. Awaiting Tom live-verify
-  before any board move to Done. See `design/card-ordering-start-time.md`.
+- POST-DEPLOY FIX: timed cards with trailing text ('10:00 AM ... (approx.)')
+  failed the strict parser, fell into the all-day bucket, floated above a
+  clean 9:45 card. `_event_start_time` now `_CLOCK_RE.search` fallback +
+  shared `_clock_match_to_time`. `.ics` export unchanged. Regression test added.
+- Branch `claude/card-ordering-start-time-4lo7kg` (first cut already merged).
+  Awaiting Tom live-verify of the follow-up. See design note.
