@@ -1,0 +1,39 @@
+# Card ordering by start time (intraday)
+
+## Problem
+
+Within a single day, cards were ordered alphabetically, not chronologically.
+A 12:45 PM event could appear above a 9:30 AM event on the same day. Weeks and
+days were already ascending and correct — only the *intraday* order was wrong.
+
+## Decision (settled with Tom, 2026-06-16)
+
+- **Direction:** everything ascending. Within a day, timed cards sort
+  earliest-start first (9:30 above 12:45). Weeks/days untouched.
+- **All-day placement:** all-day / untimed cards (empty time, "Time TBD",
+  "All day", etc.) lead the day, then timed cards. All-day cards keep sorting
+  by name among themselves. (Google-Calendar-style all-day-row-on-top.)
+
+## Implementation
+
+`scripts/process_events.py`:
+
+- New pure helper `_event_start_time(ev) -> dt.time | None` — reuses the
+  existing `_parse_time_range` (takes range start) then `_parse_clock_time`;
+  returns `None` for all-day / unparseable strings.
+- New `_day_sort_key(ev)` returns `(date, all_day_rank, start, name.lower())`
+  where `all_day_rank` is `0` for untimed (None start → `dt.time.min`
+  placeholder) and `1` for timed. `name.lower()` stays the tie-break, so the
+  pre-existing all-day-only name sort is preserved.
+- `group_by_week` now sorts with `_day_sort_key` instead of the old
+  `(date, name)` lambda.
+
+## Tests (`tests/test_process_events.py`)
+
+- `test_group_by_week_sorts_same_day_events_by_start_time` — out-of-order
+  9:30 / 12:45 / 2-5 PM, with the alphabetically-first name on the latest
+  time so a name-only sort would fail.
+- `test_group_by_week_all_day_events_sort_before_timed` — all-day + "Time TBD"
+  lead (by name), then timed earliest-first.
+- Existing `test_group_by_week_sorts_same_day_events_by_name` (all-day only)
+  still green — the rank/name tie-break preserves it.

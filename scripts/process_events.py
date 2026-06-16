@@ -183,6 +183,20 @@ def _parse_time_range(s: str) -> tuple[dt.time, dt.time] | None:
     return dt.time(start_24, sm), dt.time(end_24, em)
 
 
+def _event_start_time(ev: dict[str, Any]) -> dt.time | None:
+    """Start clock-time used to order cards within a day.
+
+    Prefers the start of a range ('2-5 PM' → 2 PM); falls back to a single
+    clock time ('9:30 AM' → 9:30). Returns None for all-day, 'Time TBD', or
+    any unparseable string, so callers can group untimed cards separately.
+    """
+    s = ev.get("time") or ""
+    rng = _parse_time_range(s)
+    if rng is not None:
+        return rng[0]
+    return _parse_clock_time(s)
+
+
 def _format_ics_duration(start: dt.time, end: dt.time) -> str:
     """Format a start→end clock-time gap as an RFC 5545 DURATION value.
 
@@ -731,9 +745,18 @@ def week_start(d: dt.date) -> dt.date:
     return d - dt.timedelta(days=d.weekday())
 
 
+def _day_sort_key(ev: dict[str, Any]) -> tuple[dt.date, int, dt.time, str]:
+    """Order key within a day: all-day cards first, then timed cards
+    earliest-start first, with name as the tie-break. Weeks/days stay
+    ascending — this only fixes the intraday ordering."""
+    start = _event_start_time(ev)
+    return (ev["_date_obj"], 0 if start is None else 1,
+            start or dt.time.min, ev["name"].lower())
+
+
 def group_by_week(events: list[dict[str, Any]]
                   ) -> list[tuple[dt.date, list[dict[str, Any]]]]:
-    events = sorted(events, key=lambda e: (e["_date_obj"], e["name"].lower()))
+    events = sorted(events, key=_day_sort_key)
     buckets: OrderedDict[dt.date, list[dict[str, Any]]] = OrderedDict()
     for ev in events:
         w = week_start(ev["_date_obj"])
