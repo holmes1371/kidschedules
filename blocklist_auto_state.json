@@ -335,6 +335,11 @@
       "last_flagged_iso": "2026-04-26",
       "reason": "legacy entry seeded post-deploy"
     },
+    "nationallawjournal@law.com": {
+      "added_iso": "2026-06-16",
+      "last_flagged_iso": "2026-06-16",
+      "reason": "Adult legal news newsletter — no kids' content"
+    },
     "news@email.gramophone.co.uk": {
       "added_iso": "2026-04-26",
       "last_flagged_iso": "2026-04-26",
@@ -555,6 +560,11 @@
       "last_flagged_iso": "2026-04-26",
       "reason": "legacy entry seeded post-deploy"
     },
+    "subscriptions@message.bloomberg.com": {
+      "added_iso": "2026-06-16",
+      "last_flagged_iso": "2026-06-16",
+      "reason": "Adult sports/finance news newsletter with no kids' content"
+    },
     "support0@info.myloancare.com": {
       "added_iso": "2026-04-26",
       "last_flagged_iso": "2026-04-26",
@@ -651,7 +661,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-06-15",
+  "last_updated_iso": "2026-06-16",
   "pending": {
     "acuvue@m.helloworldemail.com": {
       "first_flagged_iso": "2026-05-20",
@@ -781,6 +791,16 @@
       "last_flagged_iso": "2026-05-29",
       "reason_samples": [
         "Nonprofit prosthetics organization newsletter — community/charity content, no kids' events relevant to this family"
+      ]
+    },
+    "info@govdelivery.dmv.virginia.gov": {
+      "first_flagged_iso": "2026-06-16",
+      "flagged_message_ids": [
+        "19ecb2c9a570a2d7"
+      ],
+      "last_flagged_iso": "2026-06-16",
+      "reason_samples": [
+        "Virginia DMV adult ID promotion — no kids' content"
       ]
     },
     "info@shoott.com": {
@@ -941,16 +961,6 @@
       "last_flagged_iso": "2026-05-31",
       "reason_samples": [
         "Neighborhood community group message about old sport netting — no kids' events"
-      ]
-    },
-    "subscriptions@message.bloomberg.com": {
-      "first_flagged_iso": "2026-05-16",
-      "flagged_message_ids": [
-        "19e2ce4e8552f736"
-      ],
-      "last_flagged_iso": "2026-05-16",
-      "reason_samples": [
-        "Adult news/finance newsletter with no kids' content"
       ]
     },
     "support@thatgirlconcept.com": {

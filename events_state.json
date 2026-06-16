@@ -123,6 +123,20 @@
       "source": "FCPS News You Choose (Apr 10)",
       "time": "All day"
     },
+    "09fae58b4f26": {
+      "category": "Sports & Extracurriculars",
+      "child": "All LAES students",
+      "date": "2026-06-26",
+      "first_seen_iso": "2026-06-15T22:45:54-04:00",
+      "id": "09fae58b4f26",
+      "location": "LAES Gym, 324 Nutley St. NW, Vienna, VA 22180",
+      "name": "Sports Camp Session 1 — Last Day",
+      "sender_block_key": "louisearcherpta.org",
+      "sender_domain": "louisearcherpta.org",
+      "source": "LAES PTA Sunbeam (Jun 14)",
+      "source_message_id": "19ec91986cef306d",
+      "time": "9:00 AM – 2:00 PM"
+    },
     "0c99125bb1f4": {
       "category": "School Activity",
       "child": "Rising 7th & 8th graders",
@@ -161,6 +175,34 @@
       "source": "Cuppett Performing Arts Center (Jun 8)",
       "source_message_id": "19ea90953343bf00",
       "time": ""
+    },
+    "13471e485cc6": {
+      "category": "Sports & Extracurriculars",
+      "child": "All LAES students",
+      "date": "2026-07-01",
+      "first_seen_iso": "2026-06-15T22:45:54-04:00",
+      "id": "13471e485cc6",
+      "location": "Oakton High School",
+      "name": "Oakton High School Junior Dance Camp — End-of-Camp Performance",
+      "sender_block_key": "louisearcherpta.org",
+      "sender_domain": "louisearcherpta.org",
+      "source": "LAES PTA Sunbeam (Jun 14)",
+      "source_message_id": "19ec91986cef306d",
+      "time": "8:30 AM – 12:30 PM"
+    },
+    "136dc1838544": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-06-16",
+      "first_seen_iso": "2026-06-15T22:45:54-04:00",
+      "id": "136dc1838544",
+      "location": "Cafeteria at Louise Archer Elementary School",
+      "name": "Yearbook Signing (Students and Teachers)",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Pinkman/Sahai LAES (Jun 15)",
+      "source_message_id": "19ecc8719fcb6f66",
+      "time": "2:45 PM – 3:45 PM"
     },
     "13dce15d2106": {
       "category": "School Activity",
@@ -214,6 +256,20 @@
       "source": "Rohde, Meredith (Apr 26)",
       "source_message_id": "19dcb92548731780",
       "time": "School hours"
+    },
+    "1739bf5ad9b6": {
+      "category": "Academic Due Date",
+      "child": "Everly",
+      "date": "2026-06-21",
+      "first_seen_iso": "2026-06-15T22:45:54-04:00",
+      "id": "1739bf5ad9b6",
+      "location": "Sandy Hill Camp & Retreat Center, 3380 Turkey Point Road, North East, MD 21901",
+      "name": "Sandy Hill Camp Bus Fee Payment Deadline (before sign-in Sunday)",
+      "sender_block_key": "lifetouch.com",
+      "sender_domain": "lifetouch.com",
+      "source": "Sandy Hill Camp (Jun 15)",
+      "source_message_id": "19ecb332ebb40bef",
+      "time": "All day (deadline)"
     },
     "1aebfd20a06a": {
       "category": "School Activity",
@@ -368,6 +424,34 @@
       "source_message_id": "19dab4de3a36a8ed",
       "time": ""
     },
+    "285d80bbc470": {
+      "category": "Academic Due Date",
+      "child": "Everly",
+      "date": "2026-06-21",
+      "first_seen_iso": "2026-06-15T22:45:54-04:00",
+      "id": "285d80bbc470",
+      "location": "Sandy Hill Camp & Retreat Center",
+      "name": "Sandy Hill Camp Bus Cancellation Deadline (no penalty)",
+      "sender_block_key": "lifetouch.com",
+      "sender_domain": "lifetouch.com",
+      "source": "Sandy Hill Camp (Jun 15)",
+      "source_message_id": "19ecb332ebb40bef",
+      "time": "All day (deadline)"
+    },
+    "28ae41880076": {
+      "category": "School Activity",
+      "child": "Isla",
+      "date": "2026-06-16",
+      "first_seen_iso": "2026-06-15T22:45:54-04:00",
+      "id": "28ae41880076",
+      "location": "Peterson Lane Park",
+      "name": "3rd Grade EOY Class Party at Peterson Lane Park",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Rohde LAES EOY Party Reminder (Jun 15)",
+      "source_message_id": "19ecba71c1d2dda8",
+      "time": "School hours"
+    },
     "2a6305b435b9": {
       "category": "School Activity",
       "child": "Isla",
@@ -463,6 +547,20 @@
       "source_message_id": "19e81307b9de3490",
       "time": "9:00 AM – 2:00 PM"
     },
+    "36b2b7c67d70": {
+      "category": "Sports & Extracurriculars",
+      "child": "Isla",
+      "date": "2026-06-16",
+      "first_seen_iso": "2026-06-15T22:45:54-04:00",
+      "id": "36b2b7c67d70",
+      "location": "Cuppett Performing Arts Center",
+      "name": "Cuppett Performing Arts — Last Class of School-Year 2025-2026 Session",
+      "sender_block_key": "jackrabbittech.com",
+      "sender_domain": "jackrabbittech.com",
+      "source": "Cuppett Performing Arts Center (Jun 15)",
+      "source_message_id": "19ecbd04ba751ebe",
+      "time": ""
+    },
     "36fe89143706": {
       "category": "Academic Due Date",
       "child": "All LAES students",
@@ -502,19 +600,19 @@
       "source": "LAES PTA Sunbeam (Mar 22)",
       "time": "9:00 AM – 2:00 PM"
     },
-    "3800335cb949": {
-      "category": "School Activity",
+    "37ecd3cd201e": {
+      "category": "Sports & Extracurriculars",
       "child": "All LAES students",
-      "date": "2026-06-15",
-      "first_seen_iso": "2026-06-09T09:19:03-04:00",
-      "id": "3800335cb949",
-      "location": "LAES Front Office",
-      "name": "Drop Off Cookies/Treats for End-of-Year Staff Celebration",
+      "date": "2026-08-07",
+      "first_seen_iso": "2026-06-15T22:45:54-04:00",
+      "id": "37ecd3cd201e",
+      "location": "LAES Gym, 324 Nutley St. NW, Vienna, VA 22180",
+      "name": "Sports Camp Session 3 — Last Day",
       "sender_block_key": "louisearcherpta.org",
       "sender_domain": "louisearcherpta.org",
-      "source": "LAES PTA Sunbeam (Jun 7)",
-      "source_message_id": "19ea53c126e941d7",
-      "time": "All day"
+      "source": "LAES PTA Sunbeam (Jun 14)",
+      "source_message_id": "19ec91986cef306d",
+      "time": "9:00 AM – 2:00 PM"
     },
     "3860bd1ba19a": {
       "category": "School Activity",
@@ -567,6 +665,20 @@
       "sender_domain": "louisearcherpta.org",
       "source": "LAES PTA Sunbeam (May 10)",
       "source_message_id": "19e151f325e69e74",
+      "time": "9:00 AM – 2:00 PM"
+    },
+    "43cf17d4ad7d": {
+      "category": "Sports & Extracurriculars",
+      "child": "All LAES students",
+      "date": "2026-07-31",
+      "first_seen_iso": "2026-06-15T22:45:54-04:00",
+      "id": "43cf17d4ad7d",
+      "location": "LAES Gym, 324 Nutley St. NW, Vienna, VA 22180",
+      "name": "Sports Camp Session 2 — Last Day",
+      "sender_block_key": "louisearcherpta.org",
+      "sender_domain": "louisearcherpta.org",
+      "source": "LAES PTA Sunbeam (Jun 14)",
+      "source_message_id": "19ec91986cef306d",
       "time": "9:00 AM – 2:00 PM"
     },
     "44331c2a522e": {
@@ -867,6 +979,20 @@
       "source": "LAES PTA Sunbeam (May 3)",
       "source_message_id": "19df118b46bc994c",
       "time": "9:00 AM – 4:00 PM"
+    },
+    "577aaa2560ed": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-06-16",
+      "first_seen_iso": "2026-06-15T22:45:54-04:00",
+      "id": "577aaa2560ed",
+      "location": "Louise Archer Elementary School",
+      "name": "6th Grade Promotion Ceremony (Pinkman Class Party after)",
+      "sender_block_key": "susan.anspach@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Susan Anspach email (Jun 15)",
+      "source_message_id": "19ecb08d6bd6df53",
+      "time": ""
     },
     "5845d30a4ed3": {
       "category": "Sports & Extracurriculars",
@@ -1209,6 +1335,34 @@
       "source_message_id": "19dccf5b656488ec",
       "time": "9:00 AM - 2:00 PM"
     },
+    "686f3214b890": {
+      "category": "Academic Due Date",
+      "child": "All LAES students",
+      "date": "2026-06-18",
+      "first_seen_iso": "2026-06-15T22:45:54-04:00",
+      "id": "686f3214b890",
+      "location": "bit.ly/ohsjuniordancecamp2026",
+      "name": "Oakton Junior Dance Camp Registration Deadline (for t-shirt)",
+      "sender_block_key": "louisearcherpta.org",
+      "sender_domain": "louisearcherpta.org",
+      "source": "LAES PTA Sunbeam (Jun 14)",
+      "source_message_id": "19ec91986cef306d",
+      "time": "All day (deadline)"
+    },
+    "696feb4f68f4": {
+      "category": "Sports & Extracurriculars",
+      "child": "Everly",
+      "date": "2026-06-21",
+      "first_seen_iso": "2026-06-15T22:45:54-04:00",
+      "id": "696feb4f68f4",
+      "location": "Sandy Hill Camp & Retreat Center, 3380 Turkey Point Road, North East, MD 21901",
+      "name": "Everly Arrives at Sandy Hill Camp",
+      "sender_block_key": "lifetouch.com",
+      "sender_domain": "lifetouch.com",
+      "source": "Sandy Hill Camp (Jun 15)",
+      "source_message_id": "19ecb332ebb40bef",
+      "time": ""
+    },
     "69d9f97b454a": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -1247,6 +1401,20 @@
       "source": "Rohde, Meredith Newsletter & Important Cities Updates (May 27)",
       "source_message_id": "19e6a22332b60f89",
       "time": "9:45 AM – 12:05 PM"
+    },
+    "6d0d2876e446": {
+      "category": "School Activity",
+      "child": "All LAES students",
+      "date": "2026-06-15",
+      "first_seen_iso": "2026-06-15T22:45:54-04:00",
+      "id": "6d0d2876e446",
+      "location": "LAES Front Office, 324 Nutley St. NW, Vienna, VA 22180",
+      "name": "Cookie Drop-Off for End-of-Year Staff Celebration (Monday)",
+      "sender_block_key": "louisearcherpta.org",
+      "sender_domain": "louisearcherpta.org",
+      "source": "LAES PTA Sunbeam (Jun 14)",
+      "source_message_id": "19ec91986cef306d",
+      "time": "All day (deadline)"
     },
     "6d58fb649447": {
       "category": "Academic Due Date",
@@ -1410,6 +1578,20 @@
       "source_message_id": "19ea53c126e941d7",
       "time": "9:00 AM – 2:00 PM"
     },
+    "7600338b401d": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-06-16",
+      "first_seen_iso": "2026-06-15T22:45:54-04:00",
+      "id": "7600338b401d",
+      "location": "Gym at Louise Archer Elementary School",
+      "name": "6th Grade Promotion Slideshow & Pictures",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Pinkman/Sahai LAES (Jun 15)",
+      "source_message_id": "19ecc8719fcb6f66",
+      "time": "10:00 AM – 11:30 AM"
+    },
     "7783d9ae597a": {
       "category": "Sports & Extracurriculars",
       "child": "Everly",
@@ -1477,6 +1659,20 @@
       "source_message_id": "19ea98652db4138d",
       "time": ""
     },
+    "78f9f1a0354a": {
+      "category": "School Activity",
+      "child": "All LAES students",
+      "date": "2026-06-17",
+      "first_seen_iso": "2026-06-15T22:45:54-04:00",
+      "id": "78f9f1a0354a",
+      "location": "Louise Archer Elementary School",
+      "name": "Final Report Cards Distributed / Last Day of School",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Pinkman/Sahai LAES (Jun 15)",
+      "source_message_id": "19ecc8719fcb6f66",
+      "time": "School hours"
+    },
     "79ea0571b650": {
       "category": "Sports & Extracurriculars",
       "child": "Isla",
@@ -1533,19 +1729,19 @@
       "source_message_id": "19cbba1549285194",
       "time": "9:00 AM – 12:00 PM"
     },
-    "7c61df17f7d7": {
-      "category": "Academic Due Date",
-      "child": "All FCPS students",
-      "date": "2026-06-15",
-      "first_seen_iso": "2026-05-02T07:07:13-04:00",
-      "id": "7c61df17f7d7",
-      "location": "https://research.fairfaxcounty.gov/kids/wherewebelong?utm_medium=email&utm_source=govdelivery",
-      "name": "Where We Belong Student Art Contest Deadline",
-      "sender_block_key": "fairfaxcounty.gov",
-      "sender_domain": "fairfaxcounty.gov",
-      "source": "Fairfax County Public Library Branch Out (May 1)",
-      "source_message_id": "19de48039f5aae42",
-      "time": "All day (deadline)"
+    "7c505ac57bfe": {
+      "category": "School Activity",
+      "child": "6th grade LAES students",
+      "date": "2026-06-16",
+      "first_seen_iso": "2026-06-15T22:45:54-04:00",
+      "id": "7c505ac57bfe",
+      "location": "Louise Archer Elementary School",
+      "name": "6th Grade Class Party (Monroe, Bechtle, Pinkman homerooms)",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Pinkman/Sahai LAES (Jun 15)",
+      "source_message_id": "19ecc8719fcb6f66",
+      "time": "12:10 PM – 1:45 PM"
     },
     "7e7ffd83f63a": {
       "category": "Academic Due Date",
@@ -1602,20 +1798,6 @@
       "source": "LAES PTA Sunbeam (May 3)",
       "source_message_id": "19df118b46bc994c",
       "time": "9:00 AM – 2:00 PM"
-    },
-    "82286dc3e73d": {
-      "category": "School Activity",
-      "child": "Everly",
-      "date": "2026-06-15",
-      "first_seen_iso": "2026-06-11T10:13:07-04:00",
-      "id": "82286dc3e73d",
-      "location": "Louise Archer Elementary School",
-      "name": "6th Grade Class Party — Sahai Homeroom",
-      "sender_block_key": "fcps.edu",
-      "sender_domain": "fcps.edu",
-      "source": "Sahai, Anita (Jun 10)",
-      "source_message_id": "19eb2b9155a50d06",
-      "time": ""
     },
     "82436e40406c": {
       "category": "Academic Due Date",
@@ -1765,6 +1947,20 @@
       "source_message_id": "19d3f0d72e52bba6",
       "time": ""
     },
+    "8cd01369e2ab": {
+      "category": "Sports & Extracurriculars",
+      "child": "All LAES students",
+      "date": "2026-06-29",
+      "first_seen_iso": "2026-06-15T22:45:54-04:00",
+      "id": "8cd01369e2ab",
+      "location": "Oakton High School",
+      "name": "Oakton High School Junior Dance Camp — Week (6/29–7/1)",
+      "sender_block_key": "louisearcherpta.org",
+      "sender_domain": "louisearcherpta.org",
+      "source": "LAES PTA Sunbeam (Jun 14)",
+      "source_message_id": "19ec91986cef306d",
+      "time": "8:30 AM – 12:30 PM"
+    },
     "8e53c92f1547": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -1807,20 +2003,6 @@
       "source_message_id": "19e664210c8c90e7",
       "time": "9:45 AM – 12:05 PM"
     },
-    "9068059b8bb0": {
-      "category": "Academic Due Date",
-      "child": "Isla",
-      "date": "2026-06-15",
-      "first_seen_iso": "2026-06-15T12:05:59-04:00",
-      "id": "9068059b8bb0",
-      "location": "Room parents' houses (near LAES, Wolftrap Elementary, Cunningham Park Elementary)",
-      "name": "3rd Grade End-of-Year Party — Supplies Drop-Off Deadline at Room Parents' Houses",
-      "sender_block_key": "lynnliying2011@gmail.com",
-      "sender_domain": "gmail.com",
-      "source": "Ying Li (Jun 14)",
-      "source_message_id": "19ec68c781052052",
-      "time": "By end of evening"
-    },
     "90c36b4a3943": {
       "category": "School Activity",
       "child": "Isla",
@@ -1860,6 +2042,20 @@
       "source": "HTM Sharks / Carly Reiley via SportsEngine Motion (Mar 4)",
       "time": "9:00 AM – 12:00 PM"
     },
+    "944882a1c372": {
+      "category": "Sports & Extracurriculars",
+      "child": "All LAES students",
+      "date": "2026-06-22",
+      "first_seen_iso": "2026-06-15T22:45:54-04:00",
+      "id": "944882a1c372",
+      "location": "LAES Gym, 324 Nutley St. NW, Vienna, VA 22180",
+      "name": "Sports Camp Session 1 — Week (6/22–6/26)",
+      "sender_block_key": "louisearcherpta.org",
+      "sender_domain": "louisearcherpta.org",
+      "source": "LAES PTA Sunbeam (Jun 14)",
+      "source_message_id": "19ec91986cef306d",
+      "time": "9:00 AM – 2:00 PM"
+    },
     "979872abeb6f": {
       "category": "Sports & Extracurriculars",
       "child": "Isla",
@@ -1887,6 +2083,20 @@
       "source": "LAES PTA Sunbeam (May 3)",
       "source_message_id": "19df118b46bc994c",
       "time": "9:00 AM – 2:00 PM"
+    },
+    "99374f0b92c3": {
+      "category": "School Activity",
+      "child": "All LAES students",
+      "date": "2026-06-16",
+      "first_seen_iso": "2026-06-15T22:45:54-04:00",
+      "id": "99374f0b92c3",
+      "location": "LAES Front Office, 324 Nutley St. NW, Vienna, VA 22180",
+      "name": "Cookie Drop-Off for End-of-Year Staff Celebration (Tuesday)",
+      "sender_block_key": "louisearcherpta.org",
+      "sender_domain": "louisearcherpta.org",
+      "source": "LAES PTA Sunbeam (Jun 14)",
+      "source_message_id": "19ec91986cef306d",
+      "time": "All day (deadline)"
     },
     "9a5f99e6b5ba": {
       "category": "School Activity",
@@ -1943,6 +2153,20 @@
       "source": "Evite / Andrea LoBalbo (Jun 4)",
       "source_message_id": "19e9416cff6655a8",
       "time": ""
+    },
+    "a0b3a620daa3": {
+      "category": "Sports & Extracurriculars",
+      "child": "All LAES students",
+      "date": "2026-07-27",
+      "first_seen_iso": "2026-06-15T22:45:54-04:00",
+      "id": "a0b3a620daa3",
+      "location": "LAES Gym, 324 Nutley St. NW, Vienna, VA 22180",
+      "name": "Sports Camp Session 2 — Week (7/27–7/31)",
+      "sender_block_key": "louisearcherpta.org",
+      "sender_domain": "louisearcherpta.org",
+      "source": "LAES PTA Sunbeam (Jun 14)",
+      "source_message_id": "19ec91986cef306d",
+      "time": "9:00 AM – 2:00 PM"
     },
     "a15530b711f7": {
       "category": "Sports & Extracurriculars",
@@ -2078,6 +2302,20 @@
       "source": "HTM Sharks / Carly Reiley via SportsEngine Motion (Mar 4)",
       "time": "9:00 AM – 12:00 PM"
     },
+    "b026d0fde8c7": {
+      "category": "School Activity",
+      "child": "All LAES students",
+      "date": "2026-06-22",
+      "first_seen_iso": "2026-06-15T22:45:54-04:00",
+      "id": "b026d0fde8c7",
+      "location": "LAES Cafeteria, 324 Nutley St. NW, Vienna, VA 22180",
+      "name": "Chess Camp (Atlantic Chess Association) — Week (6/22–6/26)",
+      "sender_block_key": "louisearcherpta.org",
+      "sender_domain": "louisearcherpta.org",
+      "source": "LAES PTA Sunbeam (Jun 14)",
+      "source_message_id": "19ec91986cef306d",
+      "time": "9:00 AM – 4:00 PM"
+    },
     "b0759fee728f": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -2177,14 +2415,14 @@
       "category": "School Activity",
       "child": "Everly",
       "date": "2026-06-15",
-      "first_seen_iso": "2026-05-19T09:33:32-04:00",
+      "first_seen_iso": "2026-06-15T22:45:54-04:00",
       "id": "b405980cf99e",
       "location": "Louise Archer Elementary School",
       "name": "Sahai Homeroom Class Party",
       "sender_block_key": "fcps.edu",
       "sender_domain": "fcps.edu",
-      "source": "Sahai, Anita - June Newsletter & Important Dates (May 18)",
-      "source_message_id": "19e3c41ba6342a67",
+      "source": "Pinkman/Sahai LAES (Jun 15)",
+      "source_message_id": "19ecc8719fcb6f66",
       "time": "School hours"
     },
     "b4abd46386f6": {
@@ -2199,6 +2437,20 @@
       "sender_domain": "louisearcherpta.org",
       "source": "LAES PTA Sunbeam (May 10)",
       "source_message_id": "19e151f325e69e74",
+      "time": "9:00 AM – 2:00 PM"
+    },
+    "b4f005c58b5b": {
+      "category": "Sports & Extracurriculars",
+      "child": "All LAES students",
+      "date": "2026-08-03",
+      "first_seen_iso": "2026-06-15T22:45:54-04:00",
+      "id": "b4f005c58b5b",
+      "location": "LAES Gym, 324 Nutley St. NW, Vienna, VA 22180",
+      "name": "Sports Camp Session 3 — Week (8/3–8/7)",
+      "sender_block_key": "louisearcherpta.org",
+      "sender_domain": "louisearcherpta.org",
+      "source": "LAES PTA Sunbeam (Jun 14)",
+      "source_message_id": "19ec91986cef306d",
       "time": "9:00 AM – 2:00 PM"
     },
     "b9f8b3d00f5d": {
@@ -2326,6 +2578,20 @@
       "source": "Cuppett Performing Arts Center (May 4)",
       "source_message_id": "19df386ad36213aa",
       "time": ""
+    },
+    "c46832e2b698": {
+      "category": "Academic Due Date",
+      "child": "Isla",
+      "date": "",
+      "first_seen_iso": "2026-06-15T22:45:54-04:00",
+      "id": "c46832e2b698",
+      "location": "",
+      "name": "Lifetouch Spring Image Access Expiring — Save 50% Sitewide",
+      "sender_block_key": "lifetouch.com",
+      "sender_domain": "lifetouch.com",
+      "source": "Lifetouch Photography (Jun 15)",
+      "source_message_id": "19ecb332ebb40bef",
+      "time": "All day (deadline)"
     },
     "c48276fd1541": {
       "category": "Sports & Extracurriculars",
@@ -2570,20 +2836,6 @@
       "source_message_id": "19e3c41ba6342a67",
       "time": "10:00 AM"
     },
-    "d37921e731a6": {
-      "category": "School Activity",
-      "child": "Isla",
-      "date": "2026-06-15",
-      "first_seen_iso": "2026-06-09T09:19:03-04:00",
-      "id": "d37921e731a6",
-      "location": "Louise Archer Elementary School — Ms. Skousen's classroom",
-      "name": "3rd Grade EOY Party Supplies Pick-Up from Class",
-      "sender_block_key": "lynnliying2011@gmail.com",
-      "sender_domain": "gmail.com",
-      "source": "Ying Li / 3rd Grade EOY Party thread (Jun 8)",
-      "source_message_id": "19ea98652db4138d",
-      "time": "After school"
-    },
     "d39ddba68d93": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -2594,6 +2846,20 @@
       "name": "Summer Chess Camp (Session 1 ends)",
       "source": "LAES PTA Sunbeam (Mar 22)",
       "time": "9:00 AM - 4:00 PM"
+    },
+    "d3a80094602d": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-06-16",
+      "first_seen_iso": "2026-06-15T22:45:54-04:00",
+      "id": "d3a80094602d",
+      "location": "Louise Archer Elementary School",
+      "name": "Pinkman Class Party (after 6th Grade Promotion Ceremony)",
+      "sender_block_key": "susan.anspach@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Susan Anspach email (Jun 15)",
+      "source_message_id": "19ecb08d6bd6df53",
+      "time": "Ends ~1:45 PM"
     },
     "d4c30c343780": {
       "category": "School Activity",
@@ -2690,20 +2956,6 @@
       "source_message_id": "19df118b46bc994c",
       "time": "9:00 AM – 2:00 PM"
     },
-    "d7c535c6f3bf": {
-      "category": "School Activity",
-      "child": "All LAES students",
-      "date": "2026-06-15",
-      "first_seen_iso": "2026-06-10T09:50:02-04:00",
-      "id": "d7c535c6f3bf",
-      "location": "Louise Archer Elementary School — Main Lobby",
-      "name": "Extra Yearbook Copies — In-Person Sale (Cash Only, $30)",
-      "sender_block_key": "louisearcherpta.org",
-      "sender_domain": "louisearcherpta.org",
-      "source": "LAES PTA Vice President (Jun 9)",
-      "source_message_id": "19ead0cc57f71788",
-      "time": "9:00 AM until morning bell"
-    },
     "d8a2b8c2d16d": {
       "category": "Academic Due Date",
       "child": "Isla",
@@ -2731,6 +2983,20 @@
       "source": "Lifetouch School Photography (Apr 19)",
       "source_message_id": "19da585c1a38aca6",
       "time": "School hours"
+    },
+    "dc9c970ab35d": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-06-16",
+      "first_seen_iso": "2026-06-15T22:45:54-04:00",
+      "id": "dc9c970ab35d",
+      "location": "Louise Archer Elementary School",
+      "name": "6th Grade Recess",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Pinkman/Sahai LAES (Jun 15)",
+      "source_message_id": "19ecc8719fcb6f66",
+      "time": "11:30 AM – 12:10 PM"
     },
     "dcc737efa633": {
       "category": "Sports & Extracurriculars",
@@ -2919,6 +3185,20 @@
       "source": "FCPS News You Choose — VIP Camp (Apr 10)",
       "time": "All day"
     },
+    "f0125c5258d2": {
+      "category": "Sports & Extracurriculars",
+      "child": "Isla",
+      "date": "2026-06-15",
+      "first_seen_iso": "2026-06-15T22:45:54-04:00",
+      "id": "f0125c5258d2",
+      "location": "Cuppett Performing Arts Center",
+      "name": "Cuppett Performing Arts — Last Class of School-Year 2025-2026 Session",
+      "sender_block_key": "jackrabbittech.com",
+      "sender_domain": "jackrabbittech.com",
+      "source": "Cuppett Performing Arts Center (Jun 15)",
+      "source_message_id": "19ecbd04ba751ebe",
+      "time": ""
+    },
     "f13e463b9f27": {
       "category": "Appointment",
       "child": "Isla, Everly",
@@ -3025,19 +3305,19 @@
       "source_message_id": "19ea2f8463e8dc64",
       "time": "All day"
     },
-    "f95b5613dbf8": {
+    "f81a3d78f6f9": {
       "category": "School Activity",
-      "child": "Isla",
-      "date": "2026-06-15",
-      "first_seen_iso": "2026-05-19T09:33:32-04:00",
-      "id": "f95b5613dbf8",
-      "location": "Peterson Lane Park",
-      "name": "3rd Grade End of Year Party — Possible Date Change to Monday June 15",
-      "sender_block_key": "fcps.edu",
-      "sender_domain": "fcps.edu",
-      "source": "FCPS Skousen EOY Party (May 18)",
-      "source_message_id": "19e3b6bceb945d65",
-      "time": "10:45 AM–1:15 PM"
+      "child": "All LAES students",
+      "date": "2026-06-22",
+      "first_seen_iso": "2026-06-15T22:45:54-04:00",
+      "id": "f81a3d78f6f9",
+      "location": "LAES Cafeteria, 324 Nutley St. NW, Vienna, VA 22180",
+      "name": "Chess Camp (Atlantic Chess Association) — Day 1",
+      "sender_block_key": "louisearcherpta.org",
+      "sender_domain": "louisearcherpta.org",
+      "source": "LAES PTA Sunbeam (Jun 14)",
+      "source_message_id": "19ec91986cef306d",
+      "time": "9:00 AM – 4:00 PM"
     },
     "f98a7dc9acb4": {
       "category": "Sports & Extracurriculars",
@@ -3091,20 +3371,6 @@
       "source": "LAES PTA Sunbeam (May 10)",
       "source_message_id": "19e151f325e69e74",
       "time": "9:00 AM – 2:00 PM"
-    },
-    "fa77f24d3113": {
-      "category": "School Activity",
-      "child": "Isla",
-      "date": "2026-06-15",
-      "first_seen_iso": "2026-05-20T08:40:08-04:00",
-      "id": "fa77f24d3113",
-      "location": "Peterson Lane Park",
-      "name": "3rd Grade End of Year Party — Possible Alternate Date (Monday)",
-      "sender_block_key": "justa_schmidt@yahoo.com",
-      "sender_domain": "yahoo.com",
-      "source": "EOY Party Planning Email Thread (May 19)",
-      "source_message_id": "19e3d8e0ee67451c",
-      "time": "10:45 AM–1:15 PM"
     },
     "fb4a89c2b6c7": {
       "category": "Sports & Extracurriculars",
@@ -3163,7 +3429,7 @@
       "time": "All day (deadline)"
     }
   },
-  "last_updated_iso": "2026-06-15T12:05:59-04:00",
+  "last_updated_iso": "2026-06-15T22:45:54-04:00",
   "processed_messages": {
     "19a0da1d7445f787": "2026-04-17T18:51:22-04:00",
     "19a1784ff2f26474": "2026-04-17T18:51:22-04:00",
@@ -3669,7 +3935,19 @@
     "19ec1a352adc74a0": "2026-06-14T08:16:28-04:00",
     "19ec2928da15da05": "2026-06-14T08:16:28-04:00",
     "19ec60bb18bc0831": "2026-06-15T12:05:59-04:00",
-    "19ec68c781052052": "2026-06-15T12:05:59-04:00"
+    "19ec68c781052052": "2026-06-15T12:05:59-04:00",
+    "19ec91986cef306d": "2026-06-15T22:45:54-04:00",
+    "19eca943d29c05cd": "2026-06-15T22:45:54-04:00",
+    "19ecaf131e558d57": "2026-06-15T22:45:54-04:00",
+    "19ecb08d6bd6df53": "2026-06-15T22:45:54-04:00",
+    "19ecb2c9a570a2d7": "2026-06-15T22:45:54-04:00",
+    "19ecb332ebb40bef": "2026-06-15T22:45:54-04:00",
+    "19ecba1ba450bfb0": "2026-06-15T22:45:54-04:00",
+    "19ecba71c1d2dda8": "2026-06-15T22:45:54-04:00",
+    "19ecbd04ba751ebe": "2026-06-15T22:45:54-04:00",
+    "19ecc8719fcb6f66": "2026-06-15T22:45:54-04:00",
+    "19eccdef85e5795f": "2026-06-15T22:45:54-04:00",
+    "19ecd17c66eba23c": "2026-06-15T22:45:54-04:00"
   },
   "schema_version": 3
 }

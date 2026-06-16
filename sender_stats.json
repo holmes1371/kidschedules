@@ -1,5 +1,5 @@
 {
-  "last_updated_iso": "2026-06-15T12:05:59-04:00",
+  "last_updated_iso": "2026-06-15T22:45:54-04:00",
   "schema_version": 1,
   "senders": {
     "23andmedatasettlement@e.emailksa.com": {
@@ -209,10 +209,9 @@
     "blpinkman@fcps.edu": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-13T08:05:34-04:00",
-      "messages_seen": 11,
+      "last_seen_iso": "2026-06-15T22:45:54-04:00",
+      "messages_seen": 12,
       "per_message_counts": [
-        2,
         1,
         2,
         0,
@@ -221,9 +220,10 @@
         1,
         0,
         1,
-        0
+        0,
+        7
       ],
-      "total_events": 9
+      "total_events": 16
     },
     "childrensdentistryofoakton@mail.modento.io": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
@@ -457,16 +457,16 @@
     "ellen.n.holmes@gmail.com": {
       "first_seen_iso": "2026-04-24T21:16:59-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-12T09:44:40-04:00",
-      "messages_seen": 43,
+      "last_seen_iso": "2026-06-15T22:45:54-04:00",
+      "messages_seen": 44,
       "per_message_counts": [
-        0,
         1,
         1,
         0,
         1,
         0,
         7,
+        0,
         0,
         0,
         0
@@ -721,6 +721,16 @@
       ],
       "total_events": 0
     },
+    "info@govdelivery.dmv.virginia.gov": {
+      "first_seen_iso": "2026-06-15T22:45:54-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-06-15T22:45:54-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
     "info@healemedical.com": {
       "first_seen_iso": "2026-05-07T08:11:59-04:00",
       "is_newsletter": false,
@@ -775,11 +785,12 @@
     "info@sandyhillcamp.com": {
       "first_seen_iso": "2026-06-06T07:45:35-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-07T08:02:49-04:00",
-      "messages_seen": 2,
+      "last_seen_iso": "2026-06-15T22:45:54-04:00",
+      "messages_seen": 3,
       "per_message_counts": [
         1,
-        1
+        1,
+        0
       ],
       "total_events": 2
     },
@@ -914,10 +925,9 @@
     "lifetouch@m.lifetouch.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-15T12:05:59-04:00",
-      "messages_seen": 35,
+      "last_seen_iso": "2026-06-15T22:45:54-04:00",
+      "messages_seen": 36,
       "per_message_counts": [
-        0,
         0,
         1,
         0,
@@ -926,9 +936,10 @@
         0,
         0,
         2,
-        0
+        0,
+        4
       ],
-      "total_events": 17
+      "total_events": 21
     },
     "lschuttloffel@gmail.com": {
       "first_seen_iso": "2026-05-13T08:25:46-04:00",
@@ -1081,8 +1092,8 @@
     "mlrohde@fcps.edu": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-13T08:05:34-04:00",
-      "messages_seen": 9,
+      "last_seen_iso": "2026-06-15T22:45:54-04:00",
+      "messages_seen": 10,
       "per_message_counts": [
         1,
         4,
@@ -1092,9 +1103,10 @@
         7,
         7,
         1,
-        0
+        0,
+        1
       ],
-      "total_events": 26
+      "total_events": 27
     },
     "mmmcgrath@fcps.edu": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
@@ -1133,6 +1145,17 @@
       "last_seen_iso": "2026-04-17T17:12:56-04:00",
       "messages_seen": 1,
       "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
+    "nationallawjournal@law.com": {
+      "first_seen_iso": "2026-06-15T22:45:54-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-06-15T22:45:54-04:00",
+      "messages_seen": 2,
+      "per_message_counts": [
+        0,
         0
       ],
       "total_events": 0
@@ -1383,10 +1406,9 @@
     "noreply@jackrabbittech.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-11T10:13:07-04:00",
-      "messages_seen": 20,
+      "last_seen_iso": "2026-06-15T22:45:54-04:00",
+      "messages_seen": 21,
       "per_message_counts": [
-        0,
         0,
         1,
         1,
@@ -1395,9 +1417,10 @@
         0,
         0,
         3,
-        1
+        1,
+        2
       ],
-      "total_events": 17
+      "total_events": 19
     },
     "noreply@jumbula.com": {
       "first_seen_iso": "2026-05-26T08:49:57-04:00",
@@ -1727,9 +1750,10 @@
     "subscriptions@message.bloomberg.com": {
       "first_seen_iso": "2026-05-16T07:19:00-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-05-16T07:19:00-04:00",
-      "messages_seen": 1,
+      "last_seen_iso": "2026-06-15T22:45:54-04:00",
+      "messages_seen": 2,
       "per_message_counts": [
+        0,
         0
       ],
       "total_events": 0
@@ -1750,10 +1774,9 @@
     "sunbeam@louisearcherpta.org": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": true,
-      "last_seen_iso": "2026-06-12T09:44:40-04:00",
-      "messages_seen": 12,
+      "last_seen_iso": "2026-06-15T22:45:54-04:00",
+      "messages_seen": 13,
       "per_message_counts": [
-        11,
         11,
         22,
         21,
@@ -1762,9 +1785,10 @@
         16,
         15,
         16,
-        1
+        1,
+        15
       ],
-      "total_events": 181
+      "total_events": 196
     },
     "support0@info.myloancare.com": {
       "first_seen_iso": "2026-04-17T17:12:56-04:00",
@@ -1830,15 +1854,16 @@
     "susan.anspach@gmail.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": true,
-      "last_seen_iso": "2026-06-12T09:44:40-04:00",
-      "messages_seen": 4,
+      "last_seen_iso": "2026-06-15T22:45:54-04:00",
+      "messages_seen": 5,
       "per_message_counts": [
         11,
         8,
         5,
+        2,
         2
       ],
-      "total_events": 26
+      "total_events": 28
     },
     "suzanne@worthydog.org": {
       "first_seen_iso": "2026-06-06T07:45:35-04:00",

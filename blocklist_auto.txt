@@ -132,3 +132,5 @@ noreply@email.apple.com  # auto 2026-06-08: Apple system notification about pare
 insights@law.com  # auto 2026-06-09: Legal industry newsletter (NLJ 500 rankings) — adult/work content, no kids' even
 corporatecounsel@law.com  # auto 2026-06-10: Legal industry newsletter (Corporate Counsel Morning Update) — entirely adult/pr
 theamericanlawyer@law.com  # auto 2026-06-11: Legal industry news newsletter for adults — no kids' events
+subscriptions@message.bloomberg.com  # auto 2026-06-16: Adult sports/finance news newsletter with no kids' content
+nationallawjournal@law.com  # auto 2026-06-16: Adult legal news newsletter — no kids' content
