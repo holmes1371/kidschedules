@@ -118,6 +118,20 @@ _RANGE_RE = re.compile(
 )
 
 
+def _clock_match_to_time(m: "re.Match[str]") -> dt.time | None:
+    """Convert a _CLOCK_RE match into a dt.time, or None if out of range."""
+    hour = int(m.group(1))
+    minute = int(m.group(2) or 0)
+    ampm = m.group(3).upper()
+    if not (1 <= hour <= 12) or not (0 <= minute <= 59):
+        return None
+    if ampm == "AM":
+        hour = 0 if hour == 12 else hour
+    else:
+        hour = 12 if hour == 12 else hour + 12
+    return dt.time(hour, minute)
+
+
 def _parse_clock_time(s: str) -> dt.time | None:
     """Parse a clean clock time like '7:00 PM' or '8am' to a dt.time.
 
@@ -129,16 +143,7 @@ def _parse_clock_time(s: str) -> dt.time | None:
     m = _CLOCK_RE.fullmatch((s or "").strip())
     if not m:
         return None
-    hour = int(m.group(1))
-    minute = int(m.group(2) or 0)
-    ampm = m.group(3).upper()
-    if not (1 <= hour <= 12) or not (0 <= minute <= 59):
-        return None
-    if ampm == "AM":
-        hour = 0 if hour == 12 else hour
-    else:
-        hour = 12 if hour == 12 else hour + 12
-    return dt.time(hour, minute)
+    return _clock_match_to_time(m)
 
 
 def _parse_time_range(s: str) -> tuple[dt.time, dt.time] | None:
@@ -188,13 +193,24 @@ def _event_start_time(ev: dict[str, Any]) -> dt.time | None:
 
     Prefers the start of a range ('2-5 PM' → 2 PM); falls back to a single
     clock time ('9:30 AM' → 9:30). Returns None for all-day, 'Time TBD', or
-    any unparseable string, so callers can group untimed cards separately.
+    any string with no clock time, so callers can group untimed cards
+    separately.
+
+    The strict parsers are authoritative for clean inputs (and for
+    meridian-shared ranges like '11-1 PM'). When both miss, a tolerant
+    search rescues a leading clock time buried in noisier strings —
+    '10:00 AM – 11:30 AM (approx.)', '1:30 PM dismissal' — so a clearly
+    timed card isn't mistaken for all-day and floated to the top of its day.
     """
     s = ev.get("time") or ""
     rng = _parse_time_range(s)
     if rng is not None:
         return rng[0]
-    return _parse_clock_time(s)
+    t = _parse_clock_time(s)
+    if t is not None:
+        return t
+    m = _CLOCK_RE.search(s)
+    return _clock_match_to_time(m) if m else None
 
 
 def _format_ics_duration(start: dt.time, end: dt.time) -> str:

@@ -640,6 +640,27 @@ def test_group_by_week_all_day_events_sort_before_timed():
     assert names == ["Apple Due", "Zebra Due", "Timed Morning", "Timed Noon"]
 
 
+def test_group_by_week_sorts_times_with_trailing_text():
+    # Regression: a clean range ('9:45 AM-12:05 PM') parsed and sorted as
+    # timed, but a range with trailing text ('... (approx.)') failed the
+    # strict parser and fell into the all-day bucket, floating above the
+    # earlier event. Both should sort by their real start time.
+    events = [
+        {"name": "Promotion", "date": "2026-04-15",
+         "time": "10:00 AM - 11:30 AM (approx.)",
+         "location": "", "category": "School Activity", "child": "", "source": "x"},
+        {"name": "Graduation", "date": "2026-04-15", "time": "9:45 AM-12:05 PM",
+         "location": "", "category": "School Activity", "child": "", "source": "x"},
+        {"name": "Dismissal", "date": "2026-04-15", "time": "1:30 PM dismissal",
+         "location": "", "category": "School Activity", "child": "", "source": "x"},
+    ]
+    display, _, _, _, _, _ = pe.classify(events, cutoff=TODAY, horizon=HORIZON)
+    weeks = pe.group_by_week(display)
+    _, day_events = weeks[0]
+    names = [e["name"] for e in day_events]
+    assert names == ["Graduation", "Promotion", "Dismissal"]
+
+
 # ─── render_body snapshot ────────────────────────────────────────────────
 
 

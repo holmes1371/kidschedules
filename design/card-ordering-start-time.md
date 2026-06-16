@@ -28,6 +28,20 @@ days were already ascending and correct — only the *intraday* order was wrong.
 - `group_by_week` now sorts with `_day_sort_key` instead of the old
   `(date, name)` lambda.
 
+## Follow-up fix (2026-06-16, post-deploy)
+
+First cut used the strict `fullmatch` parsers for the sort key. A timed card
+with trailing text — `10:00 AM – 11:30 AM (approx.)` — failed `fullmatch`,
+returned `None`, and fell into the all-day bucket, floating *above* a clean
+`9:45 AM–12:05 PM` card. (Seen live on the deployed page.)
+
+Fix: `_event_start_time` now falls back to `_CLOCK_RE.search` for a leading
+clock time when both strict parsers miss, rescuing `(approx.)`-style ranges and
+`1:30 PM dismissal`. Strict parsers stay authoritative for clean inputs and
+meridian-shared ranges (`11-1 PM`). Extracted `_clock_match_to_time` so the
+match→`dt.time` conversion is shared. `.ics` export is unchanged — it never
+uses the search fallback.
+
 ## Tests (`tests/test_process_events.py`)
 
 - `test_group_by_week_sorts_same_day_events_by_start_time` — out-of-order
