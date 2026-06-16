@@ -602,6 +602,44 @@ def test_group_by_week_sorts_same_day_events_by_name():
     assert names == ["apple event", "Middle Event", "Zebra Event"]
 
 
+def test_group_by_week_sorts_same_day_events_by_start_time():
+    # Deliberately out of order, and with the alphabetically-first name
+    # ("Afternoon") on the latest time, so a name-only sort would mis-order.
+    events = [
+        {"name": "Afternoon", "date": "2026-04-15", "time": "12:45 PM",
+         "location": "", "category": "School Activity", "child": "", "source": "x"},
+        {"name": "Morning", "date": "2026-04-15", "time": "9:30 AM",
+         "location": "", "category": "School Activity", "child": "", "source": "x"},
+        {"name": "Range", "date": "2026-04-15", "time": "2-5 PM",
+         "location": "", "category": "School Activity", "child": "", "source": "x"},
+    ]
+    display, _, _, _, _, _ = pe.classify(events, cutoff=TODAY, horizon=HORIZON)
+    weeks = pe.group_by_week(display)
+    _, day_events = weeks[0]
+    names = [e["name"] for e in day_events]
+    assert names == ["Morning", "Afternoon", "Range"]
+
+
+def test_group_by_week_all_day_events_sort_before_timed():
+    # All-day / untimed cards lead the day (sorted by name among themselves);
+    # timed cards follow, earliest start first.
+    events = [
+        {"name": "Timed Noon", "date": "2026-04-15", "time": "12:00 PM",
+         "location": "", "category": "School Activity", "child": "", "source": "x"},
+        {"name": "Zebra Due", "date": "2026-04-15", "time": "Time TBD",
+         "location": "", "category": "Academic Due Date", "child": "", "source": "x"},
+        {"name": "Apple Due", "date": "2026-04-15", "time": "",
+         "location": "", "category": "Academic Due Date", "child": "", "source": "x"},
+        {"name": "Timed Morning", "date": "2026-04-15", "time": "8 AM",
+         "location": "", "category": "School Activity", "child": "", "source": "x"},
+    ]
+    display, _, _, _, _, _ = pe.classify(events, cutoff=TODAY, horizon=HORIZON)
+    weeks = pe.group_by_week(display)
+    _, day_events = weeks[0]
+    names = [e["name"] for e in day_events]
+    assert names == ["Apple Due", "Zebra Due", "Timed Morning", "Timed Noon"]
+
+
 # ─── render_body snapshot ────────────────────────────────────────────────
 
 
