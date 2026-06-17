@@ -661,7 +661,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-06-16",
+  "last_updated_iso": "2026-06-17",
   "pending": {
     "acuvue@m.helloworldemail.com": {
       "first_flagged_iso": "2026-05-20",
@@ -741,16 +741,6 @@
       "last_flagged_iso": "2026-05-22",
       "reason_samples": [
         "Etsy marketplace messages — adult shopping, no kids' events"
-      ]
-    },
-    "email@campaigns.stjude.org": {
-      "first_flagged_iso": "2026-05-17",
-      "flagged_message_ids": [
-        "19e32d9c91fc177c"
-      ],
-      "last_flagged_iso": "2026-05-17",
-      "reason_samples": [
-        "Charity fundraising/donor newsletter with no kids' events for this family"
       ]
     },
     "googlehome.noreply@google.com": {
@@ -981,6 +971,16 @@
       "last_flagged_iso": "2026-06-06",
       "reason_samples": [
         "dog rescue adoption application confirmation — adult process, no kids' events"
+      ]
+    },
+    "transaction@account.etsy.com": {
+      "first_flagged_iso": "2026-06-17",
+      "flagged_message_ids": [
+        "19ed2829f0495f0b"
+      ],
+      "last_flagged_iso": "2026-06-17",
+      "reason_samples": [
+        "Etsy purchase confirmation for a digital download (reunion sign template) — purely adult/personal commerce, no kids' events"
       ]
     },
     "venmo@venmo.com": {

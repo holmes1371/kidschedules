@@ -84,20 +84,6 @@
       "source_message_id": "19ea53c126e941d7",
       "time": "9:00 AM – 2:00 PM"
     },
-    "0507034cb650": {
-      "category": "School Activity",
-      "child": "Isla",
-      "date": "2026-06-16",
-      "first_seen_iso": "2026-06-13T08:05:34-04:00",
-      "id": "0507034cb650",
-      "location": "Peterson Lane Park",
-      "name": "Class Party at Peterson Lane Park (no lunch needed)",
-      "sender_block_key": "lifetouch.com",
-      "sender_domain": "lifetouch.com",
-      "source": "Rohde, Meredith — Final Newsletter (Jun 12)",
-      "source_message_id": "19ebbb3a17076744",
-      "time": "School hours"
-    },
     "0679ed279f7d": {
       "category": "Sports & Extracurriculars",
       "child": "All LAES students",
@@ -148,6 +134,20 @@
       "source": "FCPS News You Choose (Apr 10)",
       "time": "All day"
     },
+    "0ce11f67ee74": {
+      "category": "Academic Due Date",
+      "child": "",
+      "date": "",
+      "first_seen_iso": "2026-06-17T10:06:39-04:00",
+      "id": "0ce11f67ee74",
+      "location": "https://forms.gle/3PyfCu9PGrvKE58s7",
+      "name": "VYI Volleyball End-of-Season Survey Deadline",
+      "sender_block_key": "ottosportmail.ai",
+      "sender_domain": "ottosportmail.ai",
+      "source": "Vienna Youth Inc (Jun 16)",
+      "source_message_id": "19ed18b69ad91fd7",
+      "time": "All day (deadline)"
+    },
     "0dc1e010b3cb": {
       "category": "Academic Due Date",
       "child": "Isla",
@@ -189,20 +189,6 @@
       "source": "LAES PTA Sunbeam (Jun 14)",
       "source_message_id": "19ec91986cef306d",
       "time": "8:30 AM – 12:30 PM"
-    },
-    "136dc1838544": {
-      "category": "School Activity",
-      "child": "Everly",
-      "date": "2026-06-16",
-      "first_seen_iso": "2026-06-15T22:45:54-04:00",
-      "id": "136dc1838544",
-      "location": "Cafeteria at Louise Archer Elementary School",
-      "name": "Yearbook Signing (Students and Teachers)",
-      "sender_block_key": "fcps.edu",
-      "sender_domain": "fcps.edu",
-      "source": "Pinkman/Sahai LAES (Jun 15)",
-      "source_message_id": "19ecc8719fcb6f66",
-      "time": "2:45 PM – 3:45 PM"
     },
     "13dce15d2106": {
       "category": "School Activity",
@@ -270,20 +256,6 @@
       "source": "Sandy Hill Camp (Jun 15)",
       "source_message_id": "19ecb332ebb40bef",
       "time": "All day (deadline)"
-    },
-    "1aebfd20a06a": {
-      "category": "School Activity",
-      "child": "All LAES students",
-      "date": "2026-06-16",
-      "first_seen_iso": "2026-06-09T09:19:03-04:00",
-      "id": "1aebfd20a06a",
-      "location": "LAES Front Office",
-      "name": "Drop Off Cookies/Treats for End-of-Year Staff Celebration",
-      "sender_block_key": "louisearcherpta.org",
-      "sender_domain": "louisearcherpta.org",
-      "source": "LAES PTA Sunbeam (Jun 7)",
-      "source_message_id": "19ea53c126e941d7",
-      "time": "All day"
     },
     "1b00300bea25": {
       "category": "School Activity",
@@ -396,20 +368,6 @@
       "source_message_id": "19ea2f8463e8dc64",
       "time": "All day"
     },
-    "26a02e8ded0b": {
-      "category": "School Activity",
-      "child": "Everly",
-      "date": "2026-06-16",
-      "first_seen_iso": "2026-06-12T09:44:40-04:00",
-      "id": "26a02e8ded0b",
-      "location": "Louise Archer Elementary School",
-      "name": "Pinkman Class Party (after Promotion Ceremony)",
-      "sender_block_key": "susan.anspach@gmail.com",
-      "sender_domain": "gmail.com",
-      "source": "Susan Anspach (Jun 11)",
-      "source_message_id": "19eb7dd0e262fc63",
-      "time": "After promotion ceremony, until ~1:45 PM"
-    },
     "2806e3232844": {
       "category": "Appointment",
       "child": "",
@@ -437,20 +395,6 @@
       "source": "Sandy Hill Camp (Jun 15)",
       "source_message_id": "19ecb332ebb40bef",
       "time": "All day (deadline)"
-    },
-    "28ae41880076": {
-      "category": "School Activity",
-      "child": "Isla",
-      "date": "2026-06-16",
-      "first_seen_iso": "2026-06-15T22:45:54-04:00",
-      "id": "28ae41880076",
-      "location": "Peterson Lane Park",
-      "name": "3rd Grade EOY Class Party at Peterson Lane Park",
-      "sender_block_key": "fcps.edu",
-      "sender_domain": "fcps.edu",
-      "source": "Rohde LAES EOY Party Reminder (Jun 15)",
-      "source_message_id": "19ecba71c1d2dda8",
-      "time": "School hours"
     },
     "2a6305b435b9": {
       "category": "School Activity",
@@ -547,18 +491,18 @@
       "source_message_id": "19e81307b9de3490",
       "time": "9:00 AM – 2:00 PM"
     },
-    "36b2b7c67d70": {
+    "36ac4325362f": {
       "category": "Sports & Extracurriculars",
       "child": "Isla",
-      "date": "2026-06-16",
-      "first_seen_iso": "2026-06-15T22:45:54-04:00",
-      "id": "36b2b7c67d70",
-      "location": "Cuppett Performing Arts Center",
-      "name": "Cuppett Performing Arts — Last Class of School-Year 2025-2026 Session",
-      "sender_block_key": "jackrabbittech.com",
-      "sender_domain": "jackrabbittech.com",
-      "source": "Cuppett Performing Arts Center (Jun 15)",
-      "source_message_id": "19ecbd04ba751ebe",
+      "date": "",
+      "first_seen_iso": "2026-06-17T10:06:39-04:00",
+      "id": "36ac4325362f",
+      "location": "120 Cherry St SE Vienna, VA 22180",
+      "name": "Isla — Kids on Canvas Camp (Town of Vienna Parks & Recreation)",
+      "sender_block_key": "ellen.n.holmes@gmail.com",
+      "sender_domain": "gmail.com",
+      "source": "Ellen Holmes / WebTrac (Jun 16)",
+      "source_message_id": "19ed2052269c9a81",
       "time": ""
     },
     "36fe89143706": {
@@ -638,20 +582,6 @@
       "name": "HTM Sharks NVSL A Meet — AWAY: Hunter Mill @ Greenbriar (G)",
       "source": "HTM Sharks / Carly Reiley via SportsEngine Motion (Mar 4)",
       "time": "9:00 AM – 12:00 PM"
-    },
-    "41c73b32097f": {
-      "category": "School Activity",
-      "child": "Everly",
-      "date": "2026-06-16",
-      "first_seen_iso": "2026-06-11T10:13:07-04:00",
-      "id": "41c73b32097f",
-      "location": "Gym at Louise Archer Elementary School",
-      "name": "Promotion & Pictures (in the gym)",
-      "sender_block_key": "fcps.edu",
-      "sender_domain": "fcps.edu",
-      "source": "Sahai, Anita (Jun 10)",
-      "source_message_id": "19eb2b9155a50d06",
-      "time": "10:00 AM – 11:30 AM (approx.)"
     },
     "4328c9afb42c": {
       "category": "Sports & Extracurriculars",
@@ -762,34 +692,6 @@
       "source_message_id": "19eb2b9155a50d06",
       "time": "All day"
     },
-    "49b55214c7eb": {
-      "category": "Academic Due Date",
-      "child": "Isla",
-      "date": "2026-06-16",
-      "first_seen_iso": "2026-05-19T09:33:32-04:00",
-      "id": "49b55214c7eb",
-      "location": "https://www.signupgenius.com/go/20F0A49ABAA2FA3F58-64069881-3rdgrade",
-      "name": "3rd Grade End of Year Party Sign-Up Genius",
-      "sender_block_key": "neha2083@gmail.com",
-      "sender_domain": "gmail.com",
-      "source": "Rohde Room Parent Volunteers (May 18)",
-      "source_message_id": "19e3b6f4c5c2afb7",
-      "time": "All day (deadline)"
-    },
-    "4b51463fe92f": {
-      "category": "School Activity",
-      "child": "Everly",
-      "date": "2026-06-16",
-      "first_seen_iso": "2026-04-24T20:01:41-04:00",
-      "id": "4b51463fe92f",
-      "location": "Gym, Louise Archer Elementary School",
-      "name": "6th Grade Promotion Ceremony",
-      "sender_block_key": "fcps.edu",
-      "sender_domain": "fcps.edu",
-      "source": "Sahai, Anita - 6 AAP May Newsletter (Apr 24)",
-      "source_message_id": "19dc0becff6647d8",
-      "time": "10:00 AM"
-    },
     "4bb220291b0c": {
       "category": "School Activity",
       "child": "Isla",
@@ -830,20 +732,6 @@
       "sender_domain": "hmsrc.org",
       "source": "Hunter Mill Swim & Racquet Club (May 7)",
       "source_message_id": "19dffc1bd81d5159",
-      "time": "All day (deadline)"
-    },
-    "4e2302b20841": {
-      "category": "Academic Due Date",
-      "child": "Isla",
-      "date": "2026-06-16",
-      "first_seen_iso": "2026-05-27T09:50:09-04:00",
-      "id": "4e2302b20841",
-      "location": "https://www.signupgenius.com/go/20F0A49ABAA2FA3F58-64069881-3rdgrade",
-      "name": "3rd Grade End-of-Year Party Volunteer/Supply Sign-Up",
-      "sender_block_key": "lynnliying2011@gmail.com",
-      "sender_domain": "gmail.com",
-      "source": "Ying Li / Room Parents 3rd Grade (May 26)",
-      "source_message_id": "19e664210c8c90e7",
       "time": "All day (deadline)"
     },
     "4f505931ed24": {
@@ -895,20 +783,6 @@
       "source": "Ellen Holmes / Velocity Dance (Jun 7)",
       "source_message_id": "19ea2f8463e8dc64",
       "time": "All day"
-    },
-    "5229b7d2dfa6": {
-      "category": "School Activity",
-      "child": "Everly",
-      "date": "2026-06-16",
-      "first_seen_iso": "2026-06-11T10:13:07-04:00",
-      "id": "5229b7d2dfa6",
-      "location": "Louise Archer Elementary School",
-      "name": "Recess (Promotion Day)",
-      "sender_block_key": "fcps.edu",
-      "sender_domain": "fcps.edu",
-      "source": "Sahai, Anita (Jun 10)",
-      "source_message_id": "19eb2b9155a50d06",
-      "time": "11:30 AM – 12:10 PM"
     },
     "52bf32068e72": {
       "category": "Appointment",
@@ -980,20 +854,6 @@
       "source_message_id": "19df118b46bc994c",
       "time": "9:00 AM – 4:00 PM"
     },
-    "577aaa2560ed": {
-      "category": "School Activity",
-      "child": "Everly",
-      "date": "2026-06-16",
-      "first_seen_iso": "2026-06-15T22:45:54-04:00",
-      "id": "577aaa2560ed",
-      "location": "Louise Archer Elementary School",
-      "name": "6th Grade Promotion Ceremony (Pinkman Class Party after)",
-      "sender_block_key": "susan.anspach@gmail.com",
-      "sender_domain": "gmail.com",
-      "source": "Susan Anspach email (Jun 15)",
-      "source_message_id": "19ecb08d6bd6df53",
-      "time": ""
-    },
     "5845d30a4ed3": {
       "category": "Sports & Extracurriculars",
       "child": "",
@@ -1007,20 +867,6 @@
       "source": "HTM Sharks / SportsEngine Motion (Mar 4)",
       "source_message_id": "19cbba1549285194",
       "time": "9:00 AM – 12:00 PM"
-    },
-    "584f5193bb6f": {
-      "category": "School Activity",
-      "child": "Everly",
-      "date": "2026-06-16",
-      "first_seen_iso": "2026-06-11T10:13:07-04:00",
-      "id": "584f5193bb6f",
-      "location": "Louise Archer Elementary School",
-      "name": "6th Grade Class Party — Monroe, Bechtle, Pinkman Homerooms",
-      "sender_block_key": "fcps.edu",
-      "sender_domain": "fcps.edu",
-      "source": "Sahai, Anita (Jun 10)",
-      "source_message_id": "19eb2b9155a50d06",
-      "time": "12:10 PM – 1:45 PM"
     },
     "584f6c3dc15f": {
       "category": "Sports & Extracurriculars",
@@ -1173,6 +1019,20 @@
       "source_message_id": "19d1873576a3c28d",
       "time": "9:00 AM - 2:00 PM"
     },
+    "6090367a63aa": {
+      "category": "Appointment",
+      "child": "Isla",
+      "date": "2026-06-16",
+      "first_seen_iso": "2026-06-17T10:06:39-04:00",
+      "id": "6090367a63aa",
+      "location": "",
+      "name": "Isla Doctor Visit (Arm Injury)",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Rohde, Meredith (Jun 16)",
+      "source_message_id": "19ed2180dad4befc",
+      "time": ""
+    },
     "6099a7ec9be1": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -1186,20 +1046,6 @@
       "source": "LAES PTA Sunbeam (Jun 7)",
       "source_message_id": "19ea53c126e941d7",
       "time": "9:00 AM – 4:00 PM"
-    },
-    "610768718c52": {
-      "category": "School Activity",
-      "child": "Everly",
-      "date": "2026-06-16",
-      "first_seen_iso": "2026-06-11T10:13:07-04:00",
-      "id": "610768718c52",
-      "location": "Cafeteria at Louise Archer Elementary School",
-      "name": "Yearbook Signing (All 6th Grade Classes — Students & Teachers Only)",
-      "sender_block_key": "fcps.edu",
-      "sender_domain": "fcps.edu",
-      "source": "Sahai, Anita (Jun 10)",
-      "source_message_id": "19eb2b9155a50d06",
-      "time": "2:45 PM – 3:45 PM"
     },
     "621e8009c68b": {
       "category": "Sports & Extracurriculars",
@@ -1278,20 +1124,6 @@
       "source": "TeamSnap / Rami Shalan (May 11)",
       "source_message_id": "19e18f4e6eea5785",
       "time": ""
-    },
-    "66aecba1b6be": {
-      "category": "School Activity",
-      "child": "Everly",
-      "date": "2026-06-16",
-      "first_seen_iso": "2026-06-11T10:13:07-04:00",
-      "id": "66aecba1b6be",
-      "location": "Louise Archer Elementary School",
-      "name": "Bring Yearbook to School (Promotion Day)",
-      "sender_block_key": "fcps.edu",
-      "sender_domain": "fcps.edu",
-      "source": "Sahai, Anita (Jun 10)",
-      "source_message_id": "19eb2b9155a50d06",
-      "time": "All day"
     },
     "66baddfedae9": {
       "category": "School Activity",
@@ -1388,20 +1220,6 @@
       "source_message_id": "19e38ef24189c70a",
       "time": "9:00 AM – 2:00 PM"
     },
-    "6cda5366ab32": {
-      "category": "School Activity",
-      "child": "Isla",
-      "date": "2026-06-16",
-      "first_seen_iso": "2026-05-28T10:08:10-04:00",
-      "id": "6cda5366ab32",
-      "location": "Louise Archer Elementary School",
-      "name": "End-of-the-Year Party (3rd Grade)",
-      "sender_block_key": "fcps.edu",
-      "sender_domain": "fcps.edu",
-      "source": "Rohde, Meredith Newsletter & Important Cities Updates (May 27)",
-      "source_message_id": "19e6a22332b60f89",
-      "time": "9:45 AM – 12:05 PM"
-    },
     "6d58fb649447": {
       "category": "Academic Due Date",
       "child": "Isla",
@@ -1426,34 +1244,6 @@
       "name": "Sports Camp at LAES — Session 3 (End)",
       "source": "LAES PTA Sunbeam (Mar 15)",
       "time": "9:00 AM - 2:00 PM"
-    },
-    "6d9f12e4961b": {
-      "category": "School Activity",
-      "child": "All LAES students",
-      "date": "2026-06-16",
-      "first_seen_iso": "2026-06-10T09:50:02-04:00",
-      "id": "6d9f12e4961b",
-      "location": "Louise Archer Elementary School — Main Lobby",
-      "name": "Extra Yearbook Copies — In-Person Sale (Cash Only, $30)",
-      "sender_block_key": "louisearcherpta.org",
-      "sender_domain": "louisearcherpta.org",
-      "source": "LAES PTA Vice President (Jun 9)",
-      "source_message_id": "19ead0cc57f71788",
-      "time": "9:00 AM until morning bell"
-    },
-    "6e0836961cf0": {
-      "category": "School Activity",
-      "child": "Isla",
-      "date": "2026-06-16",
-      "first_seen_iso": "2026-06-10T09:50:02-04:00",
-      "id": "6e0836961cf0",
-      "location": "Louise Archer Elementary School",
-      "name": "3rd Grade Class Game Day (Sharks & Minnows / 4 Corners)",
-      "sender_block_key": "law.com",
-      "sender_domain": "law.com",
-      "source": "Neha Malkani / Ms. Rohde (Jun 9)",
-      "source_message_id": "19eac4307d77cd5e",
-      "time": ""
     },
     "7004b3b33e79": {
       "category": "School Activity",
@@ -1564,20 +1354,6 @@
       "source_message_id": "19ea53c126e941d7",
       "time": "9:00 AM – 2:00 PM"
     },
-    "7600338b401d": {
-      "category": "School Activity",
-      "child": "Everly",
-      "date": "2026-06-16",
-      "first_seen_iso": "2026-06-15T22:45:54-04:00",
-      "id": "7600338b401d",
-      "location": "Gym at Louise Archer Elementary School",
-      "name": "6th Grade Promotion Slideshow & Pictures",
-      "sender_block_key": "fcps.edu",
-      "sender_domain": "fcps.edu",
-      "source": "Pinkman/Sahai LAES (Jun 15)",
-      "source_message_id": "19ecc8719fcb6f66",
-      "time": "10:00 AM – 11:30 AM"
-    },
     "7783d9ae597a": {
       "category": "Sports & Extracurriculars",
       "child": "Everly",
@@ -1630,20 +1406,6 @@
       "source": "LAES PTA Sunbeam (Apr 19)",
       "source_message_id": "19da909fe35cca68",
       "time": "9:00 AM - 2:00 PM"
-    },
-    "786e1649d302": {
-      "category": "School Activity",
-      "child": "Isla",
-      "date": "2026-06-16",
-      "first_seen_iso": "2026-06-09T09:19:03-04:00",
-      "id": "786e1649d302",
-      "location": "Park (per SignUpGenius instructions)",
-      "name": "3rd Grade EOY Party Supplies Drop-Off at Park",
-      "sender_block_key": "lynnliying2011@gmail.com",
-      "sender_domain": "gmail.com",
-      "source": "Ying Li / 3rd Grade EOY Party thread (Jun 8)",
-      "source_message_id": "19ea98652db4138d",
-      "time": ""
     },
     "78f9f1a0354a": {
       "category": "School Activity",
@@ -1714,20 +1476,6 @@
       "source": "HTM Sharks / SportsEngine Motion (Mar 4)",
       "source_message_id": "19cbba1549285194",
       "time": "9:00 AM – 12:00 PM"
-    },
-    "7c505ac57bfe": {
-      "category": "School Activity",
-      "child": "6th grade LAES students",
-      "date": "2026-06-16",
-      "first_seen_iso": "2026-06-15T22:45:54-04:00",
-      "id": "7c505ac57bfe",
-      "location": "Louise Archer Elementary School",
-      "name": "6th Grade Class Party (Monroe, Bechtle, Pinkman homerooms)",
-      "sender_block_key": "fcps.edu",
-      "sender_domain": "fcps.edu",
-      "source": "Pinkman/Sahai LAES (Jun 15)",
-      "source_message_id": "19ecc8719fcb6f66",
-      "time": "12:10 PM – 1:45 PM"
     },
     "7e7ffd83f63a": {
       "category": "Academic Due Date",
@@ -1975,34 +1723,6 @@
       "source_message_id": "19eb830a82a14448",
       "time": "9:00 AM – 9:30 AM (Early Drop-Off: 8:30 AM)"
     },
-    "8ff1aec20018": {
-      "category": "School Activity",
-      "child": "Isla",
-      "date": "2026-06-16",
-      "first_seen_iso": "2026-05-27T09:50:09-04:00",
-      "id": "8ff1aec20018",
-      "location": "Peterson Lane Park — sign up at https://www.signupgenius.com/go/20F0A49ABAA2FA3F58-64069881-3rdgrade",
-      "name": "3rd Grade End-of-Year Party at Peterson Lane Park",
-      "sender_block_key": "lynnliying2011@gmail.com",
-      "sender_domain": "gmail.com",
-      "source": "Ying Li / Room Parents 3rd Grade (May 26)",
-      "source_message_id": "19e664210c8c90e7",
-      "time": "9:45 AM – 12:05 PM"
-    },
-    "90c36b4a3943": {
-      "category": "School Activity",
-      "child": "Isla",
-      "date": "2026-06-16",
-      "first_seen_iso": "2026-05-19T09:33:32-04:00",
-      "id": "90c36b4a3943",
-      "location": "Peterson Lane Park",
-      "name": "3rd Grade End of Year Party (at Peterson Lane Park)",
-      "sender_block_key": "neha2083@gmail.com",
-      "sender_domain": "gmail.com",
-      "source": "Rohde Room Parent Volunteers (May 18)",
-      "source_message_id": "19e3b6f4c5c2afb7",
-      "time": "9:45 AM–12:05 PM"
-    },
     "90f3a5147fbc": {
       "category": "Sports & Extracurriculars",
       "child": "Everly",
@@ -2069,34 +1789,6 @@
       "source": "LAES PTA Sunbeam (May 3)",
       "source_message_id": "19df118b46bc994c",
       "time": "9:00 AM – 2:00 PM"
-    },
-    "99374f0b92c3": {
-      "category": "School Activity",
-      "child": "All LAES students",
-      "date": "2026-06-16",
-      "first_seen_iso": "2026-06-15T22:45:54-04:00",
-      "id": "99374f0b92c3",
-      "location": "LAES Front Office, 324 Nutley St. NW, Vienna, VA 22180",
-      "name": "Cookie Drop-Off for End-of-Year Staff Celebration (Tuesday)",
-      "sender_block_key": "louisearcherpta.org",
-      "sender_domain": "louisearcherpta.org",
-      "source": "LAES PTA Sunbeam (Jun 14)",
-      "source_message_id": "19ec91986cef306d",
-      "time": "All day (deadline)"
-    },
-    "9a5f99e6b5ba": {
-      "category": "School Activity",
-      "child": "Everly",
-      "date": "2026-06-16",
-      "first_seen_iso": "2026-06-11T10:13:07-04:00",
-      "id": "9a5f99e6b5ba",
-      "location": "Louise Archer Elementary School",
-      "name": "Wear Class of '26 T-Shirt (Promotion Day)",
-      "sender_block_key": "fcps.edu",
-      "sender_domain": "fcps.edu",
-      "source": "Sahai, Anita (Jun 10)",
-      "source_message_id": "19eb2b9155a50d06",
-      "time": "All day"
     },
     "9dee9505b4f9": {
       "category": "Sports & Extracurriculars",
@@ -2326,20 +2018,6 @@
       "name": "Cuppett Recital Dress Rehearsal (Mandatory) — Day 2",
       "source": "Kids' Schedule — March 30, 2026 (Mar 30)",
       "time": "TBD"
-    },
-    "b0b585ec2016": {
-      "category": "School Activity",
-      "child": "Everly",
-      "date": "2026-06-16",
-      "first_seen_iso": "2026-05-19T09:33:32-04:00",
-      "id": "b0b585ec2016",
-      "location": "Louise Archer Elementary School",
-      "name": "6th Grade Graduation Ceremony",
-      "sender_block_key": "neha2083@gmail.com",
-      "sender_domain": "gmail.com",
-      "source": "Rohde Room Parent Volunteers (May 18)",
-      "source_message_id": "19e3b6f4c5c2afb7",
-      "time": "9:45 AM–12:05 PM"
     },
     "b146b2387484": {
       "category": "Sports & Extracurriculars",
@@ -2607,20 +2285,6 @@
       "source_message_id": "19ea90953343bf00",
       "time": ""
     },
-    "c74b6128e624": {
-      "category": "School Activity",
-      "child": "Isla",
-      "date": "2026-06-16",
-      "first_seen_iso": "2026-06-15T12:05:59-04:00",
-      "id": "c74b6128e624",
-      "location": "Park (near Louise Archer Elementary School)",
-      "name": "3rd Grade End-of-Year Party — Supplies Drop-Off at Park",
-      "sender_block_key": "lynnliying2011@gmail.com",
-      "sender_domain": "gmail.com",
-      "source": "Ying Li (Jun 14)",
-      "source_message_id": "19ec68c781052052",
-      "time": "9:15 AM – 10:00 AM"
-    },
     "c9d15ac906be": {
       "category": "Academic Due Date",
       "child": "Everly",
@@ -2687,20 +2351,6 @@
       "source": "LAES PTA Sunbeam (Mar 22)",
       "source_message_id": "19d1873576a3c28d",
       "time": "9:00 AM - 2:00 PM"
-    },
-    "cd7df754d11d": {
-      "category": "School Activity",
-      "child": "Isla",
-      "date": "2026-06-16",
-      "first_seen_iso": "2026-05-12T08:19:20-04:00",
-      "id": "cd7df754d11d",
-      "location": "Peterson Lane Park",
-      "name": "3rd Grade End of Year Party at Peterson Lane Park",
-      "sender_block_key": "fcps.edu",
-      "sender_domain": "fcps.edu",
-      "source": "Skousen, Rebekah / LAES 3rd Grade (May 11)",
-      "source_message_id": "19e17791b10dd51b",
-      "time": "9:45 AM – 12:05 PM"
     },
     "cda493c6821a": {
       "category": "School Activity",
@@ -2794,20 +2444,6 @@
       "source_message_id": "19d3f0d72e52bba6",
       "time": ""
     },
-    "d3695b60c5d6": {
-      "category": "School Activity",
-      "child": "Everly",
-      "date": "2026-06-16",
-      "first_seen_iso": "2026-05-19T09:33:32-04:00",
-      "id": "d3695b60c5d6",
-      "location": "Louise Archer Elementary School Gym",
-      "name": "6th Grade Promotion Ceremony — Wear Class of '26 Shirt",
-      "sender_block_key": "fcps.edu",
-      "sender_domain": "fcps.edu",
-      "source": "Sahai, Anita - June Newsletter & Important Dates (May 18)",
-      "source_message_id": "19e3c41ba6342a67",
-      "time": "10:00 AM"
-    },
     "d39ddba68d93": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -2818,34 +2454,6 @@
       "name": "Summer Chess Camp (Session 1 ends)",
       "source": "LAES PTA Sunbeam (Mar 22)",
       "time": "9:00 AM - 4:00 PM"
-    },
-    "d3a80094602d": {
-      "category": "School Activity",
-      "child": "Everly",
-      "date": "2026-06-16",
-      "first_seen_iso": "2026-06-15T22:45:54-04:00",
-      "id": "d3a80094602d",
-      "location": "Louise Archer Elementary School",
-      "name": "Pinkman Class Party (after 6th Grade Promotion Ceremony)",
-      "sender_block_key": "susan.anspach@gmail.com",
-      "sender_domain": "gmail.com",
-      "source": "Susan Anspach email (Jun 15)",
-      "source_message_id": "19ecb08d6bd6df53",
-      "time": "Ends ~1:45 PM"
-    },
-    "d4c30c343780": {
-      "category": "School Activity",
-      "child": "Isla",
-      "date": "2026-06-16",
-      "first_seen_iso": "2026-06-15T12:05:59-04:00",
-      "id": "d4c30c343780",
-      "location": "Park (near Louise Archer Elementary School)",
-      "name": "3rd Grade End-of-Year Party",
-      "sender_block_key": "lynnliying2011@gmail.com",
-      "sender_domain": "gmail.com",
-      "source": "Ying Li (Jun 14)",
-      "source_message_id": "19ec68c781052052",
-      "time": ""
     },
     "d4d239aa8ee2": {
       "category": "School Activity",
@@ -2955,20 +2563,6 @@
       "source": "Lifetouch School Photography (Apr 19)",
       "source_message_id": "19da585c1a38aca6",
       "time": "School hours"
-    },
-    "dc9c970ab35d": {
-      "category": "School Activity",
-      "child": "Everly",
-      "date": "2026-06-16",
-      "first_seen_iso": "2026-06-15T22:45:54-04:00",
-      "id": "dc9c970ab35d",
-      "location": "Louise Archer Elementary School",
-      "name": "6th Grade Recess",
-      "sender_block_key": "fcps.edu",
-      "sender_domain": "fcps.edu",
-      "source": "Pinkman/Sahai LAES (Jun 15)",
-      "source_message_id": "19ecc8719fcb6f66",
-      "time": "11:30 AM – 12:10 PM"
     },
     "dcc737efa633": {
       "category": "Sports & Extracurriculars",
@@ -3157,6 +2751,20 @@
       "source": "FCPS News You Choose — VIP Camp (Apr 10)",
       "time": "All day"
     },
+    "f10f8684d030": {
+      "category": "Appointment",
+      "child": "Isla",
+      "date": "2026-06-16",
+      "first_seen_iso": "2026-06-17T10:06:39-04:00",
+      "id": "f10f8684d030",
+      "location": "Louise Archer Elementary School Clinic, 324 Nutley St NW, Vienna, VA 22180",
+      "name": "Isla Clinic Visit — Hurt Right Arm (Louise Archer)",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Louise Archer Clinic / Gisele Mallis (Jun 16)",
+      "source_message_id": "19ed1544fbb62e27",
+      "time": ""
+    },
     "f13e463b9f27": {
       "category": "Appointment",
       "child": "Isla, Everly",
@@ -3209,20 +2817,6 @@
       "source": "HTM Sharks / SportsEngine Motion (Mar 4)",
       "source_message_id": "19cbba1549285194",
       "time": "9:00 AM – 12:00 PM"
-    },
-    "f671f1e70bdf": {
-      "category": "School Activity",
-      "child": "Everly",
-      "date": "2026-06-16",
-      "first_seen_iso": "2026-05-16T07:19:00-04:00",
-      "id": "f671f1e70bdf",
-      "location": "Louise Archer Elementary School",
-      "name": "LAES 6th Grade Graduation",
-      "sender_block_key": "shannon.n.aimone@gmail.com",
-      "sender_domain": "gmail.com",
-      "source": "Shannon Aimone / LAES 6th Grade Celebration (May 15)",
-      "source_message_id": "19e2b8046454118c",
-      "time": "Morning"
     },
     "f67e3d91085b": {
       "category": "Sports & Extracurriculars",
@@ -3344,20 +2938,6 @@
       "source_message_id": "19d6e3bb1942e7e1",
       "time": "3:30 PM"
     },
-    "fcd517f8438b": {
-      "category": "School Activity",
-      "child": "Everly",
-      "date": "2026-06-16",
-      "first_seen_iso": "2026-05-19T09:33:32-04:00",
-      "id": "fcd517f8438b",
-      "location": "Louise Archer Elementary School",
-      "name": "Pinkman Homeroom Class Party",
-      "sender_block_key": "fcps.edu",
-      "sender_domain": "fcps.edu",
-      "source": "Sahai, Anita - June Newsletter & Important Dates (May 18)",
-      "source_message_id": "19e3c41ba6342a67",
-      "time": "School hours"
-    },
     "fce6a96a192a": {
       "category": "Appointment",
       "child": "Isla",
@@ -3387,7 +2967,7 @@
       "time": "All day (deadline)"
     }
   },
-  "last_updated_iso": "2026-06-16T11:23:52-04:00",
+  "last_updated_iso": "2026-06-17T10:06:39-04:00",
   "processed_messages": {
     "19a0da1d7445f787": "2026-04-17T18:51:22-04:00",
     "19a1784ff2f26474": "2026-04-17T18:51:22-04:00",
@@ -3905,7 +3485,14 @@
     "19ecbd04ba751ebe": "2026-06-15T22:45:54-04:00",
     "19ecc8719fcb6f66": "2026-06-15T22:45:54-04:00",
     "19eccdef85e5795f": "2026-06-15T22:45:54-04:00",
-    "19ecd17c66eba23c": "2026-06-15T22:45:54-04:00"
+    "19ecd17c66eba23c": "2026-06-15T22:45:54-04:00",
+    "19ed051814fbf41a": "2026-06-17T10:06:39-04:00",
+    "19ed1544fbb62e27": "2026-06-17T10:06:39-04:00",
+    "19ed18b69ad91fd7": "2026-06-17T10:06:39-04:00",
+    "19ed2052269c9a81": "2026-06-17T10:06:39-04:00",
+    "19ed2180dad4befc": "2026-06-17T10:06:39-04:00",
+    "19ed2829f0495f0b": "2026-06-17T10:06:39-04:00",
+    "19ed295ff8a37b96": "2026-06-17T10:06:39-04:00"
   },
   "schema_version": 3
 }

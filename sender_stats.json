@@ -1,5 +1,5 @@
 {
-  "last_updated_iso": "2026-06-15T22:45:54-04:00",
+  "last_updated_iso": "2026-06-17T10:06:39-04:00",
   "schema_version": 1,
   "senders": {
     "23andmedatasettlement@e.emailksa.com": {
@@ -224,6 +224,16 @@
         7
       ],
       "total_events": 16
+    },
+    "ccmccormick@gmail.com": {
+      "first_seen_iso": "2026-06-17T10:06:39-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-06-17T10:06:39-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
     },
     "childrensdentistryofoakton@mail.modento.io": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
@@ -457,10 +467,9 @@
     "ellen.n.holmes@gmail.com": {
       "first_seen_iso": "2026-04-24T21:16:59-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-15T22:45:54-04:00",
-      "messages_seen": 44,
+      "last_seen_iso": "2026-06-17T10:06:39-04:00",
+      "messages_seen": 45,
       "per_message_counts": [
-        1,
         1,
         0,
         1,
@@ -469,9 +478,10 @@
         0,
         0,
         0,
-        0
+        0,
+        1
       ],
-      "total_events": 140
+      "total_events": 141
     },
     "email@campaigns.stjude.org": {
       "first_seen_iso": "2026-05-17T07:34:24-04:00",
@@ -554,6 +564,16 @@
       "per_message_counts": [
         1,
         0
+      ],
+      "total_events": 1
+    },
+    "gamallis1@fcps.edu": {
+      "first_seen_iso": "2026-06-17T10:06:39-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-06-17T10:06:39-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        1
       ],
       "total_events": 1
     },
@@ -925,10 +945,9 @@
     "lifetouch@m.lifetouch.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-15T22:45:54-04:00",
-      "messages_seen": 36,
+      "last_seen_iso": "2026-06-17T10:06:39-04:00",
+      "messages_seen": 37,
       "per_message_counts": [
-        0,
         1,
         0,
         0,
@@ -937,7 +956,8 @@
         0,
         2,
         0,
-        4
+        4,
+        0
       ],
       "total_events": 21
     },
@@ -1092,10 +1112,9 @@
     "mlrohde@fcps.edu": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-15T22:45:54-04:00",
-      "messages_seen": 10,
+      "last_seen_iso": "2026-06-17T10:06:39-04:00",
+      "messages_seen": 11,
       "per_message_counts": [
-        1,
         4,
         3,
         0,
@@ -1104,9 +1123,10 @@
         7,
         1,
         0,
+        1,
         1
       ],
-      "total_events": 27
+      "total_events": 28
     },
     "mmmcgrath@fcps.edu": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
@@ -1265,17 +1285,18 @@
     "no-reply@ottosportmail.ai": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-05-27T09:50:09-04:00",
-      "messages_seen": 6,
+      "last_seen_iso": "2026-06-17T10:06:39-04:00",
+      "messages_seen": 7,
       "per_message_counts": [
         0,
         2,
         2,
         0,
         1,
-        3
+        3,
+        1
       ],
-      "total_events": 8
+      "total_events": 9
     },
     "no-reply@r.sofi.com": {
       "first_seen_iso": "2026-04-24T20:42:56-04:00",
@@ -1948,6 +1969,16 @@
         3
       ],
       "total_events": 3
+    },
+    "transaction@account.etsy.com": {
+      "first_seen_iso": "2026-06-17T10:06:39-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-06-17T10:06:39-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
     },
     "usaabank@exmac.usaa.com": {
       "first_seen_iso": "2026-04-17T17:12:56-04:00",
