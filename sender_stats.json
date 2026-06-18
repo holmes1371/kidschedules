@@ -1,5 +1,5 @@
 {
-  "last_updated_iso": "2026-06-17T10:06:39-04:00",
+  "last_updated_iso": "2026-06-18T09:44:31-04:00",
   "schema_version": 1,
   "senders": {
     "23andmedatasettlement@e.emailksa.com": {
@@ -378,10 +378,9 @@
     "donotreply@email.teamsnap.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-13T08:05:34-04:00",
-      "messages_seen": 55,
+      "last_seen_iso": "2026-06-18T09:44:31-04:00",
+      "messages_seen": 56,
       "per_message_counts": [
-        1,
         2,
         4,
         2,
@@ -390,9 +389,10 @@
         1,
         7,
         1,
+        1,
         1
       ],
-      "total_events": 88
+      "total_events": 89
     },
     "donotreply@inova.org": {
       "first_seen_iso": "2026-04-24T20:01:41-04:00",
@@ -428,10 +428,9 @@
     "e-notify@fcps.edu": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-10T09:50:02-04:00",
-      "messages_seen": 10,
+      "last_seen_iso": "2026-06-18T09:44:31-04:00",
+      "messages_seen": 11,
       "per_message_counts": [
-        1,
         1,
         1,
         1,
@@ -440,9 +439,10 @@
         3,
         0,
         1,
+        1,
         1
       ],
-      "total_events": 11
+      "total_events": 12
     },
     "eleanor_lunger@hotmail.com": {
       "first_seen_iso": "2026-05-08T07:47:32-04:00",
@@ -467,10 +467,9 @@
     "ellen.n.holmes@gmail.com": {
       "first_seen_iso": "2026-04-24T21:16:59-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-17T10:06:39-04:00",
-      "messages_seen": 45,
+      "last_seen_iso": "2026-06-18T09:44:31-04:00",
+      "messages_seen": 46,
       "per_message_counts": [
-        1,
         0,
         1,
         0,
@@ -479,7 +478,8 @@
         0,
         0,
         0,
-        1
+        1,
+        0
       ],
       "total_events": 141
     },
@@ -624,6 +624,16 @@
       "messages_seen": 2,
       "per_message_counts": [
         0,
+        0
+      ],
+      "total_events": 0
+    },
+    "hello@classdojo.com": {
+      "first_seen_iso": "2026-06-18T09:44:31-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-06-18T09:44:31-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
         0
       ],
       "total_events": 0
@@ -945,10 +955,9 @@
     "lifetouch@m.lifetouch.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-17T10:06:39-04:00",
-      "messages_seen": 37,
+      "last_seen_iso": "2026-06-18T09:44:31-04:00",
+      "messages_seen": 38,
       "per_message_counts": [
-        1,
         0,
         0,
         1,
@@ -957,6 +966,7 @@
         2,
         0,
         4,
+        0,
         0
       ],
       "total_events": 21
@@ -1045,8 +1055,8 @@
     "member.support@epactnetwork.com": {
       "first_seen_iso": "2026-04-26T18:57:52-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-12T09:44:40-04:00",
-      "messages_seen": 7,
+      "last_seen_iso": "2026-06-18T09:44:31-04:00",
+      "messages_seen": 8,
       "per_message_counts": [
         0,
         1,
@@ -1054,14 +1064,26 @@
         1,
         1,
         1,
+        1,
         1
       ],
-      "total_events": 6
+      "total_events": 7
     },
     "membership@m.dcbar.org": {
       "first_seen_iso": "2026-05-03T11:23:36-04:00",
       "is_newsletter": false,
       "last_seen_iso": "2026-05-24T07:43:36-04:00",
+      "messages_seen": 2,
+      "per_message_counts": [
+        0,
+        0
+      ],
+      "total_events": 0
+    },
+    "merz@e.merz.com": {
+      "first_seen_iso": "2026-06-18T09:44:31-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-06-18T09:44:31-04:00",
       "messages_seen": 2,
       "per_message_counts": [
         0,
@@ -1557,6 +1579,16 @@
       ],
       "total_events": 0
     },
+    "outreach@rickscott.senate.gov": {
+      "first_seen_iso": "2026-06-18T09:44:31-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-06-18T09:44:31-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
     "passsif5183@network2.marxolmicko.space": {
       "first_seen_iso": "2026-04-24T20:01:41-04:00",
       "is_newsletter": false,
@@ -1944,10 +1976,9 @@
     "thomas.holmes1371@gmail.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-05-23T07:36:51-04:00",
-      "messages_seen": 14,
+      "last_seen_iso": "2026-06-18T09:44:31-04:00",
+      "messages_seen": 15,
       "per_message_counts": [
-        1,
         0,
         0,
         1,
@@ -1956,6 +1987,7 @@
         0,
         0,
         1,
+        0,
         0
       ],
       "total_events": 9

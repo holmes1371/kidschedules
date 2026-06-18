@@ -661,7 +661,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-06-17",
+  "last_updated_iso": "2026-06-18",
   "pending": {
     "acuvue@m.helloworldemail.com": {
       "first_flagged_iso": "2026-05-20",
@@ -743,16 +743,6 @@
         "Etsy marketplace messages — adult shopping, no kids' events"
       ]
     },
-    "googlehome.noreply@google.com": {
-      "first_flagged_iso": "2026-05-18",
-      "flagged_message_ids": [
-        "19e36ad4e2c30c62"
-      ],
-      "last_flagged_iso": "2026-05-18",
-      "reason_samples": [
-        "Google Home device invitation, unrelated to children's activities"
-      ]
-    },
     "hello@send.primary.com": {
       "first_flagged_iso": "2026-06-06",
       "flagged_message_ids": [
@@ -811,6 +801,16 @@
       "last_flagged_iso": "2026-06-14",
       "reason_samples": [
         "Adult women's underwear/bra retailer marketing email, no children's content"
+      ]
+    },
+    "merz@e.merz.com": {
+      "first_flagged_iso": "2026-06-18",
+      "flagged_message_ids": [
+        "19ed636710c65ef7"
+      ],
+      "last_flagged_iso": "2026-06-18",
+      "reason_samples": [
+        "Adult aesthetic treatment loyalty program account creation — no children's events"
       ]
     },
     "message@touchmd.com": {
@@ -873,16 +873,6 @@
         "Adult dental appointment confirmation for Ellen (parent), no child involved"
       ]
     },
-    "noreply@qemailserver.com": {
-      "first_flagged_iso": "2026-05-18",
-      "flagged_message_ids": [
-        "19e36ad4e2c30c62"
-      ],
-      "last_flagged_iso": "2026-05-18",
-      "reason_samples": [
-        "Salesforce recruiting feedback survey for adult job candidate, no children's events"
-      ]
-    },
     "office@viennacfd.com": {
       "first_flagged_iso": "2026-06-05",
       "flagged_message_ids": [
@@ -891,6 +881,16 @@
       "last_flagged_iso": "2026-06-05",
       "reason_samples": [
         "Adult dental appointment reminder for Ellen (parent), no child involved"
+      ]
+    },
+    "outreach@rickscott.senate.gov": {
+      "first_flagged_iso": "2026-06-18",
+      "flagged_message_ids": [
+        "19ed2e1402fcff77"
+      ],
+      "last_flagged_iso": "2026-06-18",
+      "reason_samples": [
+        "Political/government outreach about U.S. Service Academy applications — adult/political content with no relevance to children's events"
       ]
     },
     "receipts@united.com": {
@@ -911,16 +911,6 @@
       "last_flagged_iso": "2026-06-14",
       "reason_samples": [
         "Nextdoor neighborhood social post about watching World Cup matches, no children's events"
-      ]
-    },
-    "sales@darbycreektrading.com": {
-      "first_flagged_iso": "2026-05-18",
-      "flagged_message_ids": [
-        "19e379ff7ba2af12"
-      ],
-      "last_flagged_iso": "2026-05-18",
-      "reason_samples": [
-        "Adult home decor retail promotional email, no children's events"
       ]
     },
     "seekingalpha@mail.sailthru.com": {
