@@ -661,7 +661,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-06-18",
+  "last_updated_iso": "2026-06-19",
   "pending": {
     "acuvue@m.helloworldemail.com": {
       "first_flagged_iso": "2026-05-20",
@@ -743,6 +743,16 @@
         "Etsy marketplace messages — adult shopping, no kids' events"
       ]
     },
+    "hello@hellowisp.com": {
+      "first_flagged_iso": "2026-06-19",
+      "flagged_message_ids": [
+        "19edbd6433fa8347"
+      ],
+      "last_flagged_iso": "2026-06-19",
+      "reason_samples": [
+        "Adult skincare/prescription product marketing, no children's content"
+      ]
+    },
     "hello@send.primary.com": {
       "first_flagged_iso": "2026-06-06",
       "flagged_message_ids": [
@@ -751,16 +761,6 @@
       "last_flagged_iso": "2026-06-06",
       "reason_samples": [
         "retail marketing email for children's clothing sale — no events, deadlines, or activities"
-      ]
-    },
-    "help@goodamerican.com": {
-      "first_flagged_iso": "2026-05-19",
-      "flagged_message_ids": [
-        "19e3c15e8c1369d6"
-      ],
-      "last_flagged_iso": "2026-05-19",
-      "reason_samples": [
-        "Adult fashion/retail promotional email with no kids' content"
       ]
     },
     "info@form5.org": {
@@ -791,6 +791,16 @@
       "last_flagged_iso": "2026-06-12",
       "reason_samples": [
         "Commercial photography booking service marketing email; no kids' events"
+      ]
+    },
+    "info@viennart.org": {
+      "first_flagged_iso": "2026-06-19",
+      "flagged_message_ids": [
+        "19eda9fa680db8d7"
+      ],
+      "last_flagged_iso": "2026-06-19",
+      "reason_samples": [
+        "Art contest announcement for a student not in the family (Laurie Ma); no events for Everly or Isla"
       ]
     },
     "information@harperwilde.com": {
@@ -841,16 +851,6 @@
       "last_flagged_iso": "2026-05-21",
       "reason_samples": [
         "Etsy order shipped notification for adult purchase (class reunion decorations)"
-      ]
-    },
-    "no-reply@info.email.aa.com": {
-      "first_flagged_iso": "2026-05-19",
-      "flagged_message_ids": [
-        "19e3b0d14e2af45b"
-      ],
-      "last_flagged_iso": "2026-05-19",
-      "reason_samples": [
-        "Adult airline trip confirmation with no children's event content"
       ]
     },
     "noreply@account.etsy.com": {
