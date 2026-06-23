@@ -35,6 +35,11 @@
       "last_flagged_iso": "2026-04-26",
       "reason": "legacy entry seeded post-deploy"
     },
+    "americanairlines@info.ms.aa.com": {
+      "added_iso": "2026-06-23",
+      "last_flagged_iso": "2026-06-23",
+      "reason": "Adult travel/airline notification for Ellen's trip, no children's events"
+    },
     "ancestry@email.ancestry.com": {
       "added_iso": "2026-04-26",
       "last_flagged_iso": "2026-04-26",
@@ -415,6 +420,11 @@
       "last_flagged_iso": "2026-04-26",
       "reason": "legacy entry seeded post-deploy"
     },
+    "nordstrom@eml.nordstrom.com": {
+      "added_iso": "2026-06-23",
+      "last_flagged_iso": "2026-06-23",
+      "reason": "Adult retail order shipping notification, no children's events"
+    },
     "noreply@app.hiive.com": {
       "added_iso": "2026-04-26",
       "last_flagged_iso": "2026-04-26",
@@ -661,7 +671,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-06-21",
+  "last_updated_iso": "2026-06-23",
   "pending": {
     "accounts@noreply.theatlantic.com": {
       "first_flagged_iso": "2026-06-20",
@@ -693,16 +703,6 @@
         "Travel insurance marketing newsletter — adult commercial content, no kids' events"
       ]
     },
-    "americanairlines@info.ms.aa.com": {
-      "first_flagged_iso": "2026-05-22",
-      "flagged_message_ids": [
-        "19e4bfad0e6da66a"
-      ],
-      "last_flagged_iso": "2026-05-22",
-      "reason_samples": [
-        "Adult travel booking confirmation — no children's events"
-      ]
-    },
     "austin.krystoff@synquery-debriefs.com": {
       "first_flagged_iso": "2026-06-11",
       "flagged_message_ids": [
@@ -721,16 +721,6 @@
       "last_flagged_iso": "2026-06-01",
       "reason_samples": [
         "House cleaning payment reminder — adult billing/service, no children's events"
-      ]
-    },
-    "conversations@mail.etsy.com": {
-      "first_flagged_iso": "2026-05-22",
-      "flagged_message_ids": [
-        "19e4a68c40ca1b8c"
-      ],
-      "last_flagged_iso": "2026-05-22",
-      "reason_samples": [
-        "Etsy marketplace messages — adult shopping, no kids' events"
       ]
     },
     "hello@hellowisp.com": {
@@ -831,16 +821,6 @@
       "last_flagged_iso": "2026-06-02",
       "reason_samples": [
         "Neighborhood listserv message about borrowing a ladder — entirely adult/household, no kids' events"
-      ]
-    },
-    "nordstrom@eml.nordstrom.com": {
-      "first_flagged_iso": "2026-06-21",
-      "flagged_message_ids": [
-        "19ee492533ec1470"
-      ],
-      "last_flagged_iso": "2026-06-21",
-      "reason_samples": [
-        "Retail shipping confirmation for adult clothing/shoes order — no kids' events or activities"
       ]
     },
     "noreply@account.etsy.com": {
