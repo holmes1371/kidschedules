@@ -1,5 +1,5 @@
 {
-  "last_updated_iso": "2026-06-24T08:30:27-04:00",
+  "last_updated_iso": "2026-06-25T08:33:55-04:00",
   "schema_version": 1,
   "senders": {
     "23andmedatasettlement@e.emailksa.com": {
@@ -239,13 +239,14 @@
     "campers@sandyhillcamp.com": {
       "first_seen_iso": "2026-06-23T08:48:01-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-24T08:30:27-04:00",
-      "messages_seen": 2,
+      "last_seen_iso": "2026-06-25T08:33:55-04:00",
+      "messages_seen": 3,
       "per_message_counts": [
         1,
-        2
+        2,
+        1
       ],
-      "total_events": 3
+      "total_events": 4
     },
     "ccmccormick@gmail.com": {
       "first_seen_iso": "2026-06-17T10:06:39-04:00",
@@ -465,6 +466,16 @@
         1
       ],
       "total_events": 12
+    },
+    "editors-noreply@linkedin.com": {
+      "first_seen_iso": "2026-06-25T08:33:55-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-06-25T08:33:55-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
     },
     "eleanor_lunger@hotmail.com": {
       "first_seen_iso": "2026-05-08T07:47:32-04:00",
@@ -839,8 +850,8 @@
     "info@sandyhillcamp.com": {
       "first_seen_iso": "2026-06-06T07:45:35-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-23T08:48:01-04:00",
-      "messages_seen": 8,
+      "last_seen_iso": "2026-06-25T08:33:55-04:00",
+      "messages_seen": 10,
       "per_message_counts": [
         1,
         1,
@@ -849,9 +860,11 @@
         2,
         2,
         0,
-        0
+        0,
+        1,
+        1
       ],
-      "total_events": 7
+      "total_events": 9
     },
     "info@shoott.com": {
       "first_seen_iso": "2026-06-12T09:44:40-04:00",
@@ -2065,9 +2078,10 @@
     "transaction@account.etsy.com": {
       "first_seen_iso": "2026-06-17T10:06:39-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-17T10:06:39-04:00",
-      "messages_seen": 1,
+      "last_seen_iso": "2026-06-25T08:33:55-04:00",
+      "messages_seen": 2,
       "per_message_counts": [
+        0,
         0
       ],
       "total_events": 0

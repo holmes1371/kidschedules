@@ -1522,20 +1522,6 @@
       "source_message_id": "19d1ac06f155fe9f",
       "time": "All day (deadline)"
     },
-    "9e9d53c80f12": {
-      "category": "Sports & Extracurriculars",
-      "child": "Everly",
-      "date": "2026-06-23",
-      "first_seen_iso": "2026-06-24T08:30:27-04:00",
-      "id": "9e9d53c80f12",
-      "location": "3380 Turkey Point Road, North East, MD 21901",
-      "name": "Everly at Sandy Hill Camp — Week 1 (Rappahannock)",
-      "sender_block_key": "sandyhillcamp.com",
-      "sender_domain": "sandyhillcamp.com",
-      "source": "Sandy Hill Camp (Jun 23)",
-      "source_message_id": "19ef4cb6f83461dd",
-      "time": "All day"
-    },
     "9ec5d9b5cba1": {
       "category": "School Activity",
       "child": "Isla",
@@ -1644,6 +1630,20 @@
       "source": "LAES PTA Sunbeam (Apr 26)",
       "source_message_id": "19dccf5b656488ec",
       "time": "9:00 AM - 2:00 PM"
+    },
+    "a823faa05a28": {
+      "category": "Sports & Extracurriculars",
+      "child": "Everly",
+      "date": "2026-06-23",
+      "first_seen_iso": "2026-06-25T08:33:55-04:00",
+      "id": "a823faa05a28",
+      "location": "Sandy Hill Camp, 3380 Turkey Point Road, North East, MD 21901",
+      "name": "Sandy Hill Camp — Camper Phone Call Home Available",
+      "sender_block_key": "sandyhillcamp.com",
+      "sender_domain": "sandyhillcamp.com",
+      "source": "Sandy Hill Camp (Jun 23)",
+      "source_message_id": "19ef78413ffb501f",
+      "time": ""
     },
     "ab9f2b4829ba": {
       "category": "School Activity",
@@ -1967,6 +1967,20 @@
       "source_message_id": "19edb39cb2c4902d",
       "time": "All day"
     },
+    "c8c7f6a0ae57": {
+      "category": "Sports & Extracurriculars",
+      "child": "Everly",
+      "date": "",
+      "first_seen_iso": "2026-06-25T08:33:55-04:00",
+      "id": "c8c7f6a0ae57",
+      "location": "",
+      "name": "Velocity Jazz Dance — Sign-Up (No Tryout Tape Required, ~7 Girls Enrolled)",
+      "sender_block_key": "sandyhillcamp.com",
+      "sender_domain": "sandyhillcamp.com",
+      "source": "Sandy Hill Campers / Ellen Holmes email (Jun 24)",
+      "source_message_id": "19ef9eea5b789d0f",
+      "time": ""
+    },
     "c9d15ac906be": {
       "category": "Academic Due Date",
       "child": "Everly",
@@ -2266,6 +2280,20 @@
       "source_message_id": "19e81307b9de3490",
       "time": "9:00 AM – 2:00 PM"
     },
+    "e37c2edab63b": {
+      "category": "Sports & Extracurriculars",
+      "child": "Everly",
+      "date": "2026-06-24",
+      "first_seen_iso": "2026-06-25T08:33:55-04:00",
+      "id": "e37c2edab63b",
+      "location": "Sandy Hill Camp, 3380 Turkey Point Road, North East, MD 21901",
+      "name": "Sandy Hill Camp 2026 — Everly Holmes (Week 1, Rappahannock)",
+      "sender_block_key": "sandyhillcamp.com",
+      "sender_domain": "sandyhillcamp.com",
+      "source": "Sandy Hill Camp Payment Receipt (Jun 24)",
+      "source_message_id": "19efb2d28b8de69f",
+      "time": "All day"
+    },
     "e59b6e1eaf37": {
       "category": "Sports & Extracurriculars",
       "child": "Isla",
@@ -2493,7 +2521,7 @@
       "time": "All day (deadline)"
     }
   },
-  "last_updated_iso": "2026-06-24T08:30:27-04:00",
+  "last_updated_iso": "2026-06-25T08:33:55-04:00",
   "processed_messages": {
     "19a0da1d7445f787": "2026-04-17T18:51:22-04:00",
     "19a1784ff2f26474": "2026-04-17T18:51:22-04:00",
@@ -3072,7 +3100,12 @@
     "19ef45898a761030": "2026-06-24T08:30:27-04:00",
     "19ef4cb6f83461dd": "2026-06-24T08:30:27-04:00",
     "19ef4d7ff0bf5704": "2026-06-24T08:30:27-04:00",
-    "19ef6515796d2e83": "2026-06-24T08:30:27-04:00"
+    "19ef6515796d2e83": "2026-06-24T08:30:27-04:00",
+    "19ef78413ffb501f": "2026-06-25T08:33:55-04:00",
+    "19ef9a9196e19875": "2026-06-25T08:33:55-04:00",
+    "19ef9eea5b789d0f": "2026-06-25T08:33:55-04:00",
+    "19efab1882a2df87": "2026-06-25T08:33:55-04:00",
+    "19efb2d28b8de69f": "2026-06-25T08:33:55-04:00"
   },
   "schema_version": 3
 }

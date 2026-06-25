@@ -635,6 +635,11 @@
       "last_flagged_iso": "2026-04-26",
       "reason": "legacy entry seeded post-deploy"
     },
+    "transaction@account.etsy.com": {
+      "added_iso": "2026-06-25",
+      "last_flagged_iso": "2026-06-25",
+      "reason": "Etsy purchase confirmation for adult memorial/reunion printables — no kids' events"
+    },
     "updates@message.noom.com": {
       "added_iso": "2026-04-26",
       "last_flagged_iso": "2026-04-26",
@@ -671,7 +676,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-06-24",
+  "last_updated_iso": "2026-06-25",
   "pending": {
     "accounts@noreply.theatlantic.com": {
       "first_flagged_iso": "2026-06-20",
@@ -721,6 +726,16 @@
       "last_flagged_iso": "2026-06-01",
       "reason_samples": [
         "House cleaning payment reminder — adult billing/service, no children's events"
+      ]
+    },
+    "editors-noreply@linkedin.com": {
+      "first_flagged_iso": "2026-06-25",
+      "flagged_message_ids": [
+        "19efab1882a2df87"
+      ],
+      "last_flagged_iso": "2026-06-25",
+      "reason_samples": [
+        "LinkedIn News editorial digest — adult professional content, no kids' events"
       ]
     },
     "hello@hellowisp.com": {
@@ -823,16 +838,6 @@
         "Neighborhood listserv message about borrowing a ladder — entirely adult/household, no kids' events"
       ]
     },
-    "noreply@account.etsy.com": {
-      "first_flagged_iso": "2026-05-25",
-      "flagged_message_ids": [
-        "19e5b1d76f8f829b"
-      ],
-      "last_flagged_iso": "2026-05-25",
-      "reason_samples": [
-        "Etsy shipping notification for adult purchase (class reunion items); no kids' events or activities"
-      ]
-    },
     "noreply@fromyourdentalprovider.com": {
       "first_flagged_iso": "2026-06-05",
       "flagged_message_ids": [
@@ -931,16 +936,6 @@
       "last_flagged_iso": "2026-06-06",
       "reason_samples": [
         "dog rescue adoption application confirmation — adult process, no kids' events"
-      ]
-    },
-    "transaction@account.etsy.com": {
-      "first_flagged_iso": "2026-06-17",
-      "flagged_message_ids": [
-        "19ed2829f0495f0b"
-      ],
-      "last_flagged_iso": "2026-06-17",
-      "reason_samples": [
-        "Etsy purchase confirmation for a digital download (reunion sign template) — purely adult/personal commerce, no kids' events"
       ]
     },
     "venmo@venmo.com": {

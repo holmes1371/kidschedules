@@ -136,3 +136,4 @@ subscriptions@message.bloomberg.com  # auto 2026-06-16: Adult sports/finance new
 nationallawjournal@law.com  # auto 2026-06-16: Adult legal news newsletter — no kids' content
 americanairlines@info.ms.aa.com  # auto 2026-06-23: Adult travel/airline notification for Ellen's trip, no children's events
 nordstrom@eml.nordstrom.com  # auto 2026-06-23: Adult retail order shipping notification, no children's events
+transaction@account.etsy.com  # auto 2026-06-25: Etsy purchase confirmation for adult memorial/reunion printables — no kids' even
