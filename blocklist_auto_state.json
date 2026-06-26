@@ -676,7 +676,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-06-25",
+  "last_updated_iso": "2026-06-26",
   "pending": {
     "accounts@noreply.theatlantic.com": {
       "first_flagged_iso": "2026-06-20",
@@ -846,6 +846,16 @@
       "last_flagged_iso": "2026-06-05",
       "reason_samples": [
         "Adult dental appointment confirmation for Ellen (parent), no child involved"
+      ]
+    },
+    "notification@service.tiktok.com": {
+      "first_flagged_iso": "2026-06-26",
+      "flagged_message_ids": [
+        "19efc1aba6128b28"
+      ],
+      "last_flagged_iso": "2026-06-26",
+      "reason_samples": [
+        "TikTok social media notification, entirely adult/entertainment content with no kids' events"
       ]
     },
     "office@viennacfd.com": {

@@ -176,6 +176,20 @@
       "source_message_id": "19e151f325e69e74",
       "time": "8:30 AM – 12:30 PM"
     },
+    "14dde1a284ef": {
+      "category": "Academic Due Date",
+      "child": "Isla",
+      "date": "2026-06-25",
+      "first_seen_iso": "2026-06-26T08:27:39-04:00",
+      "id": "14dde1a284ef",
+      "location": "",
+      "name": "Isla Spring School Pictures — 60% Off Last Call",
+      "sender_block_key": "lifetouch.com",
+      "sender_domain": "lifetouch.com",
+      "source": "Isla L.'s Lifetouch Photography (Jun 25)",
+      "source_message_id": "19efea8100ebd225",
+      "time": "All day (deadline)"
+    },
     "160a24b53547": {
       "category": "School Activity",
       "child": "Rising 7th & 8th graders",
@@ -827,6 +841,20 @@
       "sender_domain": "epactnetwork.com",
       "source": "Town of Vienna Parks and Recreation via ePACT (Jun 5)",
       "source_message_id": "19e972acdd0cf213",
+      "time": "All day (deadline)"
+    },
+    "5aafabaf82dc": {
+      "category": "Academic Due Date",
+      "child": "Everly",
+      "date": "",
+      "first_seen_iso": "2026-06-26T08:27:39-04:00",
+      "id": "5aafabaf82dc",
+      "location": "kmmacoto@fcps.edu or Thoreau Middle School, 2505 Cedar Lane, Vienna, VA 22180",
+      "name": "Everly Immunization Records Submission Deadline (Tdap / Meningococcal)",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Macoto, Karla / Thoreau Middle School (Jun 25)",
+      "source_message_id": "19eff2182077905a",
       "time": "All day (deadline)"
     },
     "5b6ee6dc7f2c": {
@@ -1631,20 +1659,6 @@
       "source_message_id": "19dccf5b656488ec",
       "time": "9:00 AM - 2:00 PM"
     },
-    "a823faa05a28": {
-      "category": "Sports & Extracurriculars",
-      "child": "Everly",
-      "date": "2026-06-23",
-      "first_seen_iso": "2026-06-25T08:33:55-04:00",
-      "id": "a823faa05a28",
-      "location": "Sandy Hill Camp, 3380 Turkey Point Road, North East, MD 21901",
-      "name": "Sandy Hill Camp — Camper Phone Call Home Available",
-      "sender_block_key": "sandyhillcamp.com",
-      "sender_domain": "sandyhillcamp.com",
-      "source": "Sandy Hill Camp (Jun 23)",
-      "source_message_id": "19ef78413ffb501f",
-      "time": ""
-    },
     "ab9f2b4829ba": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -1911,6 +1925,20 @@
       "source_message_id": "19edc3b79b8559ad",
       "time": "After 1:00 PM"
     },
+    "c38a4e7a44be": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-07-03",
+      "first_seen_iso": "2026-06-26T08:27:39-04:00",
+      "id": "c38a4e7a44be",
+      "location": "Thoreau Middle School, 2505 Cedar Lane, Vienna, VA 22180",
+      "name": "Thoreau Middle School Office CLOSED",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Macoto, Karla / Thoreau Middle School (Jun 25)",
+      "source_message_id": "19eff2182077905a",
+      "time": "All day"
+    },
     "c390200187a5": {
       "category": "Sports & Extracurriculars",
       "child": "All LAES students",
@@ -1938,6 +1966,20 @@
       "source": "Lifetouch Photography (Jun 15)",
       "source_message_id": "19ecb332ebb40bef",
       "time": "All day (deadline)"
+    },
+    "c5bd156244c4": {
+      "category": "School Activity",
+      "child": "Isla",
+      "date": "2026-06-25",
+      "first_seen_iso": "2026-06-26T08:27:39-04:00",
+      "id": "c5bd156244c4",
+      "location": "",
+      "name": "Cuppett Recital Lost & Found Items to be Claimed",
+      "sender_block_key": "jackrabbittech.com",
+      "sender_domain": "jackrabbittech.com",
+      "source": "Cuppett Performing Arts Center (Jun 25)",
+      "source_message_id": "19efeda5f2a763b0",
+      "time": ""
     },
     "c5de04d88549": {
       "category": "Academic Due Date",
@@ -2104,6 +2146,20 @@
       "source_message_id": "19e6fdea07655dbc",
       "time": ""
     },
+    "d0e8c0066fc8": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-06-23",
+      "first_seen_iso": "2026-06-26T08:27:39-04:00",
+      "id": "d0e8c0066fc8",
+      "location": "Thoreau Middle School, 2505 Cedar Lane, Vienna, VA 22180",
+      "name": "Thoreau Middle School Summer Office Hours Begin (9am–12pm, Tue–Thu through Jul 2)",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Macoto, Karla / Thoreau Middle School (Jun 25)",
+      "source_message_id": "19eff2182077905a",
+      "time": "9:00 AM – 12:00 PM"
+    },
     "d39ddba68d93": {
       "category": "School Activity",
       "child": "All LAES students",
@@ -2156,6 +2212,20 @@
       "source": "Ellen Holmes (Jun 18)",
       "source_message_id": "19edb39cb2c4902d",
       "time": ""
+    },
+    "d8a28eaee645": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-07-06",
+      "first_seen_iso": "2026-06-26T08:27:39-04:00",
+      "id": "d8a28eaee645",
+      "location": "Thoreau Middle School, 2505 Cedar Lane, Vienna, VA 22180",
+      "name": "Thoreau Middle School Summer Office Hours (9am–12pm, Mon–Fri Jul 6–Aug 7)",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Macoto, Karla / Thoreau Middle School (Jun 25)",
+      "source_message_id": "19eff2182077905a",
+      "time": "9:00 AM – 12:00 PM"
     },
     "d8a2b8c2d16d": {
       "category": "Academic Due Date",
@@ -2280,20 +2350,6 @@
       "source_message_id": "19e81307b9de3490",
       "time": "9:00 AM – 2:00 PM"
     },
-    "e37c2edab63b": {
-      "category": "Sports & Extracurriculars",
-      "child": "Everly",
-      "date": "2026-06-24",
-      "first_seen_iso": "2026-06-25T08:33:55-04:00",
-      "id": "e37c2edab63b",
-      "location": "Sandy Hill Camp, 3380 Turkey Point Road, North East, MD 21901",
-      "name": "Sandy Hill Camp 2026 — Everly Holmes (Week 1, Rappahannock)",
-      "sender_block_key": "sandyhillcamp.com",
-      "sender_domain": "sandyhillcamp.com",
-      "source": "Sandy Hill Camp Payment Receipt (Jun 24)",
-      "source_message_id": "19efb2d28b8de69f",
-      "time": "All day"
-    },
     "e59b6e1eaf37": {
       "category": "Sports & Extracurriculars",
       "child": "Isla",
@@ -2307,6 +2363,20 @@
       "source": "Cuppett Performing Arts Center via Jackrabbit (Jun 10)",
       "source_message_id": "19eb24efff777c0e",
       "time": ""
+    },
+    "e804bbffef2e": {
+      "category": "School Activity",
+      "child": "Everly",
+      "date": "2026-08-10",
+      "first_seen_iso": "2026-06-26T08:27:39-04:00",
+      "id": "e804bbffef2e",
+      "location": "Thoreau Middle School, 2505 Cedar Lane, Vienna, VA 22180",
+      "name": "Thoreau Middle School Office Hours Change (7am–3pm starting Aug 10)",
+      "sender_block_key": "fcps.edu",
+      "sender_domain": "fcps.edu",
+      "source": "Macoto, Karla / Thoreau Middle School (Jun 25)",
+      "source_message_id": "19eff2182077905a",
+      "time": "7:00 AM – 3:00 PM"
     },
     "e87bff6da7dc": {
       "category": "Sports & Extracurriculars",
@@ -2521,7 +2591,7 @@
       "time": "All day (deadline)"
     }
   },
-  "last_updated_iso": "2026-06-25T08:33:55-04:00",
+  "last_updated_iso": "2026-06-26T08:27:39-04:00",
   "processed_messages": {
     "19a0da1d7445f787": "2026-04-17T18:51:22-04:00",
     "19a1784ff2f26474": "2026-04-17T18:51:22-04:00",
@@ -3105,7 +3175,11 @@
     "19ef9a9196e19875": "2026-06-25T08:33:55-04:00",
     "19ef9eea5b789d0f": "2026-06-25T08:33:55-04:00",
     "19efab1882a2df87": "2026-06-25T08:33:55-04:00",
-    "19efb2d28b8de69f": "2026-06-25T08:33:55-04:00"
+    "19efb2d28b8de69f": "2026-06-25T08:33:55-04:00",
+    "19efc1aba6128b28": "2026-06-26T08:27:39-04:00",
+    "19efea8100ebd225": "2026-06-26T08:27:39-04:00",
+    "19efeda5f2a763b0": "2026-06-26T08:27:39-04:00",
+    "19eff2182077905a": "2026-06-26T08:27:39-04:00"
   },
   "schema_version": 3
 }
