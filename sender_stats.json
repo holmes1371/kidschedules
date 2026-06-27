@@ -1,5 +1,5 @@
 {
-  "last_updated_iso": "2026-06-26T08:27:39-04:00",
+  "last_updated_iso": "2026-06-27T07:47:15-04:00",
   "schema_version": 1,
   "senders": {
     "23andmedatasettlement@e.emailksa.com": {
@@ -891,6 +891,16 @@
       ],
       "total_events": 7
     },
+    "info@thirdlove.com": {
+      "first_seen_iso": "2026-06-27T07:47:15-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-06-27T07:47:15-04:00",
+      "messages_seen": 1,
+      "per_message_counts": [
+        0
+      ],
+      "total_events": 0
+    },
     "info@viennadentalarts.com": {
       "first_seen_iso": "2026-04-17T17:12:56-04:00",
       "is_newsletter": false,
@@ -1008,10 +1018,9 @@
     "lifetouch@m.lifetouch.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-26T08:27:39-04:00",
-      "messages_seen": 45,
+      "last_seen_iso": "2026-06-27T07:47:15-04:00",
+      "messages_seen": 46,
       "per_message_counts": [
-        4,
         0,
         0,
         0,
@@ -1020,7 +1029,8 @@
         0,
         0,
         0,
-        1
+        1,
+        0
       ],
       "total_events": 24
     },
@@ -1350,6 +1360,17 @@
       ],
       "total_events": 0
     },
+    "no-reply@imagequix.com": {
+      "first_seen_iso": "2026-06-27T07:47:15-04:00",
+      "is_newsletter": false,
+      "last_seen_iso": "2026-06-27T07:47:15-04:00",
+      "messages_seen": 2,
+      "per_message_counts": [
+        0,
+        0
+      ],
+      "total_events": 0
+    },
     "no-reply@info.email.aa.com": {
       "first_seen_iso": "2026-05-19T09:33:32-04:00",
       "is_newsletter": false,
@@ -1651,9 +1672,10 @@
     "opportunities@mail.hiive.com": {
       "first_seen_iso": "2026-05-13T08:25:46-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-20T08:10:09-04:00",
-      "messages_seen": 2,
+      "last_seen_iso": "2026-06-27T07:47:15-04:00",
+      "messages_seen": 3,
       "per_message_counts": [
+        0,
         0,
         0
       ],

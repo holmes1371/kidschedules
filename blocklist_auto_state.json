@@ -505,6 +505,11 @@
       "last_flagged_iso": "2026-04-26",
       "reason": "legacy entry seeded post-deploy"
     },
+    "opportunities@mail.hiive.com": {
+      "added_iso": "2026-06-27",
+      "last_flagged_iso": "2026-06-27",
+      "reason": "adult investment/finance opportunity email, no kids' content"
+    },
     "orders@oe.target.com": {
       "added_iso": "2026-04-26",
       "last_flagged_iso": "2026-04-26",
@@ -676,7 +681,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-06-26",
+  "last_updated_iso": "2026-06-27",
   "pending": {
     "accounts@noreply.theatlantic.com": {
       "first_flagged_iso": "2026-06-20",
@@ -696,16 +701,6 @@
       "last_flagged_iso": "2026-06-11",
       "reason_samples": [
         "Pet adoption tips and care information — no kids' events"
-      ]
-    },
-    "allianzglobalassistance@allianzassistance.com": {
-      "first_flagged_iso": "2026-05-27",
-      "flagged_message_ids": [
-        "19e652498fb3f305"
-      ],
-      "last_flagged_iso": "2026-05-27",
-      "reason_samples": [
-        "Travel insurance marketing newsletter — adult commercial content, no kids' events"
       ]
     },
     "austin.krystoff@synquery-debriefs.com": {
@@ -788,6 +783,16 @@
         "Commercial photography booking service marketing email; no kids' events"
       ]
     },
+    "info@thirdlove.com": {
+      "first_flagged_iso": "2026-06-27",
+      "flagged_message_ids": [
+        "19f0406ed1bcff60"
+      ],
+      "last_flagged_iso": "2026-06-27",
+      "reason_samples": [
+        "adult women's lingerie/bra retailer promotional email, no kids' content"
+      ]
+    },
     "info@viennart.org": {
       "first_flagged_iso": "2026-06-19",
       "flagged_message_ids": [
@@ -866,16 +871,6 @@
       "last_flagged_iso": "2026-06-05",
       "reason_samples": [
         "Adult dental appointment reminder for Ellen (parent), no child involved"
-      ]
-    },
-    "opportunities@mail.hiive.com": {
-      "first_flagged_iso": "2026-06-20",
-      "flagged_message_ids": [
-        "19ee137128da2b50"
-      ],
-      "last_flagged_iso": "2026-06-20",
-      "reason_samples": [
-        "Adult investment/finance opportunity email, no relation to children's activities"
       ]
     },
     "outreach@rickscott.senate.gov": {
