@@ -681,7 +681,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-06-27",
+  "last_updated_iso": "2026-06-28",
   "pending": {
     "accounts@noreply.theatlantic.com": {
       "first_flagged_iso": "2026-06-20",
@@ -781,6 +781,16 @@
       "last_flagged_iso": "2026-06-12",
       "reason_samples": [
         "Commercial photography booking service marketing email; no kids' events"
+      ]
+    },
+    "info@shop.venus.com": {
+      "first_flagged_iso": "2026-06-28",
+      "flagged_message_ids": [
+        "19f09000c2e952a9"
+      ],
+      "last_flagged_iso": "2026-06-28",
+      "reason_samples": [
+        "Adult women's clothing retailer — no children's events or content"
       ]
     },
     "info@thirdlove.com": {
