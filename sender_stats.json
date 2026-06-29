@@ -1,5 +1,5 @@
 {
-  "last_updated_iso": "2026-06-28T07:59:17-04:00",
+  "last_updated_iso": "2026-06-29T10:18:24-04:00",
   "schema_version": 1,
   "senders": {
     "23andmedatasettlement@e.emailksa.com": {
@@ -1028,17 +1028,17 @@
     "lifetouch@m.lifetouch.com": {
       "first_seen_iso": "2026-04-17T17:04:04-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-28T07:59:17-04:00",
-      "messages_seen": 47,
+      "last_seen_iso": "2026-06-29T10:18:24-04:00",
+      "messages_seen": 48,
       "per_message_counts": [
         0,
-        0,
         1,
         1,
         0,
         0,
         0,
         1,
+        0,
         0,
         0
       ],
@@ -1129,8 +1129,8 @@
     "member.support@epactnetwork.com": {
       "first_seen_iso": "2026-04-26T18:57:52-04:00",
       "is_newsletter": false,
-      "last_seen_iso": "2026-06-23T08:48:01-04:00",
-      "messages_seen": 9,
+      "last_seen_iso": "2026-06-29T10:18:24-04:00",
+      "messages_seen": 10,
       "per_message_counts": [
         0,
         1,
@@ -1140,9 +1140,10 @@
         1,
         1,
         1,
+        1,
         1
       ],
-      "total_events": 8
+      "total_events": 9
     },
     "membership@m.dcbar.org": {
       "first_seen_iso": "2026-05-03T11:23:36-04:00",

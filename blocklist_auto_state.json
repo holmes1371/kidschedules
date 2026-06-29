@@ -681,7 +681,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-06-28",
+  "last_updated_iso": "2026-06-29",
   "pending": {
     "accounts@noreply.theatlantic.com": {
       "first_flagged_iso": "2026-06-20",
@@ -751,16 +751,6 @@
       "last_flagged_iso": "2026-06-06",
       "reason_samples": [
         "retail marketing email for children's clothing sale — no events, deadlines, or activities"
-      ]
-    },
-    "info@form5.org": {
-      "first_flagged_iso": "2026-05-29",
-      "flagged_message_ids": [
-        "19e6fbf5cd72b196"
-      ],
-      "last_flagged_iso": "2026-05-29",
-      "reason_samples": [
-        "Nonprofit prosthetics organization newsletter — community/charity content, no kids' events relevant to this family"
       ]
     },
     "info@govdelivery.dmv.virginia.gov": {
