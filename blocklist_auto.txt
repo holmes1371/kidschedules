@@ -138,3 +138,4 @@ americanairlines@info.ms.aa.com  # auto 2026-06-23: Adult travel/airline notific
 nordstrom@eml.nordstrom.com  # auto 2026-06-23: Adult retail order shipping notification, no children's events
 transaction@account.etsy.com  # auto 2026-06-25: Etsy purchase confirmation for adult memorial/reunion printables — no kids' even
 opportunities@mail.hiive.com  # auto 2026-06-27: adult investment/finance opportunity email, no kids' content
+info@shop.venus.com  # auto 2026-07-01: Adult women's clothing retailer promotional email, no children's events or conte

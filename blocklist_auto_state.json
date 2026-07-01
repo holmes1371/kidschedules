@@ -250,6 +250,11 @@
       "last_flagged_iso": "2026-05-23",
       "reason": "Promotional retail/rug sale email — no kids' content whatsoever"
     },
+    "info@shop.venus.com": {
+      "added_iso": "2026-07-01",
+      "last_flagged_iso": "2026-07-01",
+      "reason": "Adult women's clothing retailer promotional email, no children's events or content"
+    },
     "insights@law.com": {
       "added_iso": "2026-06-09",
       "last_flagged_iso": "2026-06-09",
@@ -681,7 +686,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-06-30",
+  "last_updated_iso": "2026-07-01",
   "pending": {
     "accounts@noreply.theatlantic.com": {
       "first_flagged_iso": "2026-06-20",
@@ -781,16 +786,6 @@
       "last_flagged_iso": "2026-06-12",
       "reason_samples": [
         "Commercial photography booking service marketing email; no kids' events"
-      ]
-    },
-    "info@shop.venus.com": {
-      "first_flagged_iso": "2026-06-28",
-      "flagged_message_ids": [
-        "19f09000c2e952a9"
-      ],
-      "last_flagged_iso": "2026-06-28",
-      "reason_samples": [
-        "Adult women's clothing retailer — no children's events or content"
       ]
     },
     "info@thirdlove.com": {
@@ -931,16 +926,6 @@
       "last_flagged_iso": "2026-06-11",
       "reason_samples": [
         "Adult financial/stock market news — no kids' events"
-      ]
-    },
-    "strine.steven@gmail.com": {
-      "first_flagged_iso": "2026-05-31",
-      "flagged_message_ids": [
-        "19e7a25692928be2"
-      ],
-      "last_flagged_iso": "2026-05-31",
-      "reason_samples": [
-        "Neighborhood community group message about old sport netting — no kids' events"
       ]
     },
     "suzanne@worthydog.org": {

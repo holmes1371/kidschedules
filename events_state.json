@@ -1979,20 +1979,6 @@
       "source_message_id": "19e81307b9de3490",
       "time": "9:00 AM – 2:00 PM"
     },
-    "e44ed82f7da4": {
-      "category": "Academic Due Date",
-      "child": "Everly",
-      "date": "2026-06-29",
-      "first_seen_iso": "2026-06-30T08:24:58-04:00",
-      "id": "e44ed82f7da4",
-      "location": "https://www.cognitoforms.com/Born2DanceStudio/Born2DanceSummerCamp2026JuniorsTweens",
-      "name": "B2D Summer Camp Form Completion Deadline (Juniors/Tweens)",
-      "sender_block_key": "born2dancestudio.com",
-      "sender_domain": "born2dancestudio.com",
-      "source": "B2D Summer Camp (Jun 29)",
-      "source_message_id": "19f140837b64e678",
-      "time": "All day (deadline)"
-    },
     "e59b6e1eaf37": {
       "category": "Sports & Extracurriculars",
       "child": "Isla",
@@ -2206,7 +2192,7 @@
       "time": "All day (deadline)"
     }
   },
-  "last_updated_iso": "2026-06-30T08:24:58-04:00",
+  "last_updated_iso": "2026-07-01T08:49:21-04:00",
   "processed_messages": {
     "19a0da1d7445f787": "2026-04-17T18:51:22-04:00",
     "19a1784ff2f26474": "2026-04-17T18:51:22-04:00",
@@ -2810,7 +2796,10 @@
     "19f140837b64e678": "2026-06-30T08:24:58-04:00",
     "19f1491ad2e0d7da": "2026-06-30T08:24:58-04:00",
     "19f1542e8f4c7a58": "2026-06-30T08:24:58-04:00",
-    "19f15ae2c5fe7343": "2026-06-30T08:24:58-04:00"
+    "19f15ae2c5fe7343": "2026-06-30T08:24:58-04:00",
+    "19f18626d7f79c6f": "2026-07-01T08:49:21-04:00",
+    "19f191b5224325bb": "2026-07-01T08:49:21-04:00",
+    "19f1ad72c9737f40": "2026-07-01T08:49:21-04:00"
   },
   "schema_version": 3
 }
