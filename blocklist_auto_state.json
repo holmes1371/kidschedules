@@ -686,7 +686,7 @@
       "reason": "legacy entry seeded post-deploy"
     }
   },
-  "last_updated_iso": "2026-07-01",
+  "last_updated_iso": "2026-07-02",
   "pending": {
     "accounts@noreply.theatlantic.com": {
       "first_flagged_iso": "2026-06-20",
@@ -718,14 +718,14 @@
         "Adult professional/consulting recruitment outreach — no kids' events"
       ]
     },
-    "betsy@virginiahousekeepers.com": {
-      "first_flagged_iso": "2026-06-01",
+    "deltaairlines@o.delta.com": {
+      "first_flagged_iso": "2026-07-02",
       "flagged_message_ids": [
-        "19e7e0933f692093"
+        "19f1f9fc5745e40d"
       ],
-      "last_flagged_iso": "2026-06-01",
+      "last_flagged_iso": "2026-07-02",
       "reason_samples": [
-        "House cleaning payment reminder — adult billing/service, no children's events"
+        "Adult airline loyalty/credit card marketing email, no kids' events"
       ]
     },
     "e-delivery@petsbest.com": {
